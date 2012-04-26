@@ -3,7 +3,7 @@ from latent_tax_assumption import *
 global config
 
 config = {
-    "reasonerDir" : "/Applications/ladr/",
+    "reasonerDir" : "",
     "reasonerTimeout" :  10,
     "inputLocation" : "",
     "outputDir" : "",
