@@ -1,0 +1,35 @@
+digraph foo {
+
+rankdir = TD
+
+node [color = orange, style = filled, shape = doublecircle]
+"1_A,2_A";
+"1_E,2_E";
+"1_G,2_G";
+"1_H,2_H";
+
+node [color = red, style = filled, shape = circle]
+edge [dir = back, concentrate = true]
+"1_A,2_A" -> {"1_B" "1_F" }
+{rank = same; "1_B" "1_F" }
+"1_B" -> {"1_C" "1_D" "1_E,2_E" }
+{rank = same; "1_C" "1_D" "1_E,2_E" }
+"1_F" -> {"1_G,2_G" "1_H,2_H" }
+{rank = same; "1_G,2_G" "1_H,2_H" }
+
+node [color = yellow, style = filled]
+"1_A,2_A" -> {"2_B" "2_F" }
+{rank = same; "2_B" "2_F" }
+"2_B" -> {"2_C" "1_H,2_H" "1_E,2_E" }
+{rank = same; "2_C" "1_H,2_H" "1_E,2_E" }
+"2_F" -> {"1_G,2_G" "2_I" }
+{rank = same; "1_G,2_G" "2_I" }
+
+{rank = same; "1_B" "2_B" }
+{rank = same; "1_F" "2_F" }
+
+"1_C" -> "2_C" [dir = forward, color = darkorange, label = is_included_in, fontcolor = darkgreen]
+"1_D" -> "2_C" [dir = forward, color = darkorange, label = is_included_in, fontcolor = darkgreen]
+"1_F" -> "2_B" [dir = none, color = navy, label = overlaps, fontcolor = navy, style = invis]
+graph [label = "\nequals: darkgreen\nincludes: darkviolet\nis_included_in: darkorange\ndisjoint: gold\noverlaps:navy\nisa: black"]
+}

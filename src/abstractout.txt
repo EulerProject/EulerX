@@ -1,0 +1,27 @@
+digraph foo {
+
+rankdir = LR
+
+subgraph cluster_1 {
+node [color = red, style = filled]
+edge [dir = back]
+A -> {B F }
+{rank = same; B F }
+B -> {C D E }
+{rank = same; C D E }
+F -> {G H }
+{rank = same; G H }
+}
+
+subgraph cluster_2 {
+node [color = orange, style = filled]
+edge [dir = back]
+A -> {B F }
+{rank = same; B F }
+B -> {C H E }
+{rank = same; C H E }
+F -> {G I }
+{rank = same; G I }
+}
+
+A -> A [dir = both, color = darkgreen, label = equals, fontcolor = darkgreen]
