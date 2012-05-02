@@ -233,7 +233,7 @@ class Articulation:
         return relString
     
     def __str__(self):
-        result = "["
+        result = ""
         if len(self.relations) == 1:
             result += self.relations[0].name
         else:
@@ -247,7 +247,6 @@ class Articulation:
         result += " " + self.taxon2.stringOf()
 	if self.numTaxon == 3:
             result += " " + self.taxon3.stringOf()
-	result += "]"
         return result
                 
     
@@ -349,12 +348,12 @@ class TaxonomyMapping:
 
     def removeMir(self, string):
         r = string.split(" ")
-	self.mir[r[0] + "," + r[len(r)-1]] = ""
+	self.mir[r[1] + "," + r[len(r)-1]] = ""
 	if len(r) > 3:
-	    if r[0] == "lsum":
-	        self.mir[r[1] + "," + r[3]] = ""
-	    if r[0] == "rsum":
-	        self.mir[r[0] + "," + r[2]] = ""
+	    if r[0] == "+=":
+	        self.mir[r[2] + "," + r[3]] = ""
+	    if r[0] == "=+":
+	        self.mir[r[1] + "," + r[2]] = ""
 
     # isa
     def addIMir(self, parent, child):
@@ -605,9 +604,9 @@ class TaxonomyMapping:
             if(s == "N" or s == "n" or s == ""):
 	        self.articulationSet.articulations.insert(i, a)
                 continue
+	    self.removeMir(a.__str__())
 	    if(self.testConsistency(outputDir)):
-		self.removeMir(a.toString())
-		print "Remedial measure: remove [" + a.toString() + "]"
+		#print "Remedial measure: remove [" + a.toString() + "]"
 		return True
         return False
 
@@ -620,7 +619,7 @@ class TaxonomyMapping:
 	for a in self.articulationSet.articulations:
 	    if not (a in consArti):
 		print a
-		self.removeMir(a.toString())
+		self.removeMir(a.__str__())
 	return True
 
     def divideByTwo(self, articulations):
