@@ -349,8 +349,6 @@ class TaxonomyMapping:
 
     def removeMir(self, string):
         r = string.split(" ")
-	print "remove"
-	print r
 	self.mir[r[0] + "," + r[len(r)-1]] = ""
 	if len(r) > 3:
 	    if r[0] == "lsum":
@@ -601,12 +599,16 @@ class TaxonomyMapping:
     def simpleRemedy(self, outputDir):
         s = len(self.articulationSet.articulations)
         for i in range(s):
-	    a = self.articulationSet.articulations.pop(i)
+	    a = self.articulationSet.articulations.pop(i)    
+            tmpStr = "Do you suspect [" + a.toString() + "] is wrong? [N]y: "
+            s = raw_input(tmpStr)
+            if(s == "N" or s == "n" or s == ""):
+	        self.articulationSet.articulations.insert(i, a)
+                continue
 	    if(self.testConsistency(outputDir)):
 		self.removeMir(a.toString())
 		print "Remedial measure: remove [" + a.toString() + "]"
 		return True
-	    self.articulationSet.articulations.insert(i, a)
         return False
 
     def BCSremedy(self, outputDir):
@@ -747,7 +749,6 @@ class TaxonomyMapping:
         output.write(self.prover.formatInputFile(ltaxRules))
         output.close()
         maceOutput = self.mace.run(outputFileName, False)
-	print maceOutput
         
         # if theroem is proved without a goal, then things are 
         # incconsistent
