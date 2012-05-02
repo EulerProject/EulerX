@@ -802,7 +802,6 @@ class TaxonomyMapping:
             inputs.append(outputFileName)
             proverOutput = self.prover.run(outputFileName, False)
             outputs.append(proverOutput[1])
-	    print proverOutput
             if (proverOutput[0] == "proved"):
               result = "false" + timeoutString
             # if the theoem is not proved, but no model is
