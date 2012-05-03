@@ -140,6 +140,8 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
 		(taxMap.simpleRemedy(reasonerOutputDir) != True)):
 	    print consistentWithoutGoal
 	    print "The input is inconsistent and don't know how to remedy"
+	    fMir.close()
+	    return None
         elif ("implied" in goalTypes) or ("possible" in goalTypes):
            
             for thisGoal in goals:
