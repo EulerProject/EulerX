@@ -24,6 +24,8 @@ class RCCType:
 relationDict = {}    
 relationDict["+="] = BasicRelation("+=","$x $y lsum $z","($x(x) | $y(x) <-> $z(x))")
 relationDict["=+"] = BasicRelation("=+","$x rsum $y $z","($x(x) <-> $y(x) | $z(x))")
+relationDict["-="] = BasicRelation("-=","$x $y ldiff $z","($x(x) & -$y(x) <-> $z(x))")
+relationDict["=-"] = BasicRelation("=-","$x rdiff $y $z","($x(x) <-> $y(x) & -$z(x))")
 relationDict["equals"] = BasicRelation("equals","$x \leftrightarrow $y","(all x ($x(x) <-> $y(x)))")
 relationDict["includes"] = BasicRelation("includes","$y \rightarrow $x","(all x ($y(x) -> $x(x))) & (exists x ($x(x) & -$y(x)))")
 relationDict["is_included_in"] = BasicRelation("is_included_in","$x \rightarrow $y","(all x ($x(x) -> $y(x))) & (exists x ($y(x) & -$x(x)))")
