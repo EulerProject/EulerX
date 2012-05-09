@@ -158,9 +158,15 @@ class Articulation:
 	    if (initInput.find("lsum") != -1):
 	        self.relations = [relationDict["+="]]
 	        elements = re.match("(.*)_(.*) (.*)_(.*) lsum (.*)_(.*)", initInput)
-	    else:
+	    elif (initInput.find("rsum") != -1):
 	        self.relations = [relationDict["=+"]]
 	        elements = re.match("(.*)_(.*) rsum (.*)_(.*) (.*)_(.*)", initInput)
+	    elif (initInput.find("ldiff") != -1):
+	        self.relations = [relationDict["-="]]
+	        elements = re.match("(.*)_(.*) (.*)_(.*) ldiff (.*)_(.*)", initInput)
+	    elif (initInput.find("rdiff") != -1):
+	        self.relations = [relationDict["=-"]]
+	        elements = re.match("(.*)_(.*) rdiff (.*)_(.*) (.*)_(.*)", initInput)
             taxon1taxonomy = elements.group(1)
             taxon1taxon = elements.group(2)
             taxon2taxonomy = elements.group(3)
@@ -344,6 +350,15 @@ class TaxonomyMapping:
 	    self.mir[r[0] + "," + r[2]] = "{includes}"
 	    self.mir[r[0] + "," + r[3]] = "{includes}"
 	    return None
+	elif (r[2] == "ldiff"):
+	    self.addIMir(r[0], r[3])
+	    self.mir[r[0] + "," + r[3]] = "{includes}"
+	    return None
+	elif (r[1] == "rdiff"):
+	    self.addIMir(r[3], r[0])
+	    self.mir[r[3] + "," + r[0]] = "{is_included_in}"
+	    return None
+	self.mir[r[0] + "," + r[2]] = "{"+r[1]+"}"
 	self.mir[r[0] + "," + r[2]] = "{"+r[1]+"}"
 
     def removeMir(self, string):
@@ -352,7 +367,7 @@ class TaxonomyMapping:
 	if len(r) > 3:
 	    if r[0] == "+=":
 	        self.mir[r[2] + "," + r[3]] = ""
-	    if r[0] == "=+":
+	    elif r[0] == "=+":
 	        self.mir[r[1] + "," + r[2]] = ""
 
     # isa
