@@ -154,7 +154,7 @@ class Articulation:
             self.taxon2 = Taxon()
             self.taxon3 = Taxon()
             self.relations = []
-	elif (initInput.find("sum") != -1):
+	elif (initInput.find("sum") != -1 or initInput.find("diff") != -1):
 	    if (initInput.find("lsum") != -1):
 	        self.relations = [relationDict["+="]]
 	        elements = re.match("(.*)_(.*) (.*)_(.*) lsum (.*)_(.*)", initInput)
