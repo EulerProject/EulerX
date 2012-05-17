@@ -149,12 +149,18 @@ class Articulation:
         
 	self.string = initInput
 	self.numTaxon = 2
+	self.confidence = 1
         if (initInput == ""):
             self.taxon1 = Taxon()
             self.taxon2 = Taxon()
             self.taxon3 = Taxon()
             self.relations = []
-	elif (initInput.find("sum") != -1 or initInput.find("diff") != -1):
+	    return None
+	if (initInput.find("confidence=") != -1):
+	    elements = re.match("(.*) confidence=(.*)", initInput)
+            initInput = elements.group(1)
+            self.confidence = int(elements.group(2))
+	if (initInput.find("sum") != -1 or initInput.find("diff") != -1):
 	    if (initInput.find("lsum") != -1):
 	        self.relations = [relationDict["+="]]
 	        elements = re.match("(.*)_(.*) (.*)_(.*) lsum (.*)_(.*)", initInput)
@@ -612,18 +618,17 @@ class TaxonomyMapping:
     #results are lists [result, [provers], [inputs], [outputs]]
     def simpleRemedy(self, outputDir):
         s = len(self.articulationSet.articulations)
-        for i in range(s):
-	    a = self.articulationSet.articulations.pop(i)    
-            tmpStr = "Do you suspect [" + a.toString() + "] is wrong? [N]y: "
-            s = raw_input(tmpStr)
-            if(s == "N" or s == "n" or s == ""):
-	        self.articulationSet.articulations.insert(i, a)
-                continue
-	    self.removeMir(a.__str__())
-	    if(self.testConsistency(outputDir)):
-		#print "Remedial measure: remove [" + a.toString() + "]"
-		return True
-        return False
+        for c in range(2):
+            for i in range(s):
+	        a = self.articulationSet.articulations.pop(i)    
+                if(a.confidence != 3-c):
+	            self.articulationSet.articulations.insert(i, a)
+                    continue
+	        self.removeMir(a.__str__())
+	        if(self.testConsistency(outputDir)):
+		    #print "Remedial measure: remove [" + a.toString() + "]"
+		    return True
+            return False
 
     def BCSremedy(self, outputDir):
 	testTaxMap = TaxonomyMapping()
