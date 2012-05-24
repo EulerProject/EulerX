@@ -482,13 +482,13 @@ class TaxonomyMapping:
         if (1 == 1):
             if (memory == False):
                 proverOutputFile = outputDir  + self.name + self.ltaAbbrevString() + thisGoal + "Prover.txt"
-                self.writeGoalFile(proverOutputFile, ltaxRules, self.prover)
+                self.writeGoalFile(proverOutputFile, ltaxRules, self.prover, True)
 
                 maceOutputFile = outputDir + self.name + self.ltaAbbrevString() + thisGoal + "Mace.txt"
-                self.writeGoalFile(maceOutputFile, ltaxRules, self.mace)
+                self.writeGoalFile(maceOutputFile, ltaxRules, self.mace, False)
             else:
-                proverOutputFile = self.makeGoalFile(ltaxRules, self.prover)
-                maceOutputFile = self.makeGoalFile(ltaxRules, self.mace)
+                proverOutputFile = self.makeGoalFile(ltaxRules, self.prover, True)
+                maceOutputFile = self.makeGoalFile(ltaxRules, self.mace, False)
         
             if (self.hypothesisType == "implied"):
                 result = self.testConsistencyWithImpliedGoalNoMace(proverOutputFile, maceOutputFile, memory)
@@ -599,19 +599,21 @@ class TaxonomyMapping:
         else:
             if (maceOutput[0].find("max_sec_no") != -1):
                 timeoutString += " mace4 timeout "
-            #reasoners.append(self.prover.name)
-            #if (memory == False):
-            #    inputs.append(proverInput)
-            #else:
-            #    inputs.append("memory");
-            #proverOutput = self.prover.run(proverInput, False)
-            #outputs.append(proverOutput[1])
-            #if (proverOutput[0] == "proved"):
-            #    result = "true" + timeoutString
-            #else:
-            #    if (proverOutput[0].find("max_sec_no") != -1):
-            #        timeoutString += " prover9 timeout "
-            result = "unclear" + timeoutString
+            reasoners.append(self.prover.name)
+            if (memory == False):
+                inputs.append(proverInput)
+            else:
+                inputs.append("memory");
+            proverOutput = self.prover.run(proverInput, False)
+            outputs.append(proverOutput[1])
+            if (proverOutput[0] == "proved"):
+                result = "false" + timeoutString
+            else:
+                if (proverOutput[0].find("max_sec_no") != -1):
+                    timeoutString += " prover9 timeout "
+                    result = "unclear" + timeoutString
+                else:
+                    result = "true" + timeoutString
               
         return [result, reasoners, inputs, outputs]
     
@@ -835,17 +837,19 @@ class TaxonomyMapping:
         return [result, reasoners, inputs, outputs]
     
 
-    def makeGoalFile(self, ltaxRules, program):
+    def makeGoalFile(self, ltaxRules, program, flag):
         result = program.formatInputFile(ltaxRules)
-        outString = ""
+        outString = "("
+        if(flag):
+            outString = "-("
         outString += self.hypothesis.toLTax()
-        outString += ".\n"
+        outString += ").\n"
         result += program.formatGoalFile(outString)
         
         return result   
 
-    def writeGoalFile(self, outputFileName, ltaxRules, program):
-        result = self.makeGoalFile(ltaxRules, program)
+    def writeGoalFile(self, outputFileName, ltaxRules, program, flag):
+        result = self.makeGoalFile(ltaxRules, program, flag)
         outputFileName = cleanOutputFileName(outputFileName)
         output = open(outputFileName, "w")
         output.write(result)
