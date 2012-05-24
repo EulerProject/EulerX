@@ -218,6 +218,7 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
                                  elif (goalIsTrue.find("unclear") != -1):
                                      #print "Cannot prove that it holds under " + taxMap.ltaString() + ".  But it may be the provers quitting early.\n"                                    output += "\t" + goalIsTrue + "\t"  + provenance
                                      output += "\t" + goalIsTrue + "\t" + provenance
+                                     tmpGoal = "unclear"
                                  else:
                                      #print "something's wrong with the logic for " + taxMap.ltaString() + "\n"
                                      print "erronious goal is true is " + goalIsTrue
@@ -225,8 +226,11 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
                                 
                                  result.append(output)
 		    if(goalType == "possible"):
-			taxMap.addPMir(thisGoal[0], thisGoal[1], tmpGoal)
-		        fMir.write(thisGoal[0] + "," + thisGoal[1] + ",inferred,{" + tmpGoal.rstrip() + "}\n")
+                        if(tmpGoal.find("unclear") != -1):
+		            fMir.write(thisGoal[0] + "," + thisGoal[1] + ",inferred,unclear\n")
+                        else:
+			    taxMap.addPMir(thisGoal[0], thisGoal[1], tmpGoal)
+		            fMir.write(thisGoal[0] + "," + thisGoal[1] + ",inferred,{" + tmpGoal.rstrip() + "}\n")
 			    
         if (memory == False):
             outputNewTLI(inputFile, ltaSet, newImplied, newPossible, goalTypes, outputDir)
