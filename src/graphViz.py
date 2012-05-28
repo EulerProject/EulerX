@@ -46,7 +46,7 @@ def main(infilename, outfilename):
     #relationships = input("List of relationships: ")
     relationships = ["equals","includes","is_included_in","disjoint","overlaps","isa"]
     outfile.write("digraph foo {\n\n")
-    outfile.write("rankdir = LR\n\n")
+    outfile.write("rankdir = TD\n\n")
     i = 0
     parents = []
     for line in infile:
@@ -121,8 +121,8 @@ def main(infilename, outfilename):
     infile.close()
     outfile.close()
 
-    #directory = os.getcwd()
-    directory = "/Users/McChen/research/euler/thau/abstract"
+    directory = os.getcwd()
+    #directory = "/Users/McChen/research/euler/thau/abstract"
     # os.chdir("C:\Documents and Settings\Owner\Desktop")
     #outfiledirectory = raw_input("Directory of dotfile: ")
     #os.chdir(outfiledirectory)
@@ -144,7 +144,10 @@ def makeGraph(infilename):
         main(infilename, outfilename)       
 
 if __name__ == "__main__":
+    if(len(sys.argv) == 2):
 	makeGraph(sys.argv[1])
+    else:
+	main(sys.argv[1], sys.argv[2])
          
 #more = True
 #while more:
