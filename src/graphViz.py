@@ -116,13 +116,12 @@ def main(infilename, outfilename):
     labels = []
     for relationship in relationships:
         labels = labels + ["\\n" + relationship + keys[relationship]]
-    outfile.writelines(["graph [label = \""] + labels + ["\"]"])
+    #outfile.writelines(["graph [label = \""] + labels + ["\"]"])
     outfile.write("\n}\n")
     infile.close()
     outfile.close()
 
     directory = os.getcwd()
-    #directory = "/Users/McChen/research/euler/thau/abstract"
     # os.chdir("C:\Documents and Settings\Owner\Desktop")
     #outfiledirectory = raw_input("Directory of dotfile: ")
     #os.chdir(outfiledirectory)

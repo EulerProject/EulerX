@@ -216,7 +216,7 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
                                      #print "Does not hold under " + taxMap.ltaString() + "\n"
                                      output += "\t" + goalIsTrue + "\t" + provenance
                                  elif (goalIsTrue.find("unclear") != -1):
-                                     #print "Cannot prove that it holds under " + taxMap.ltaString() + ".  But it may be the provers quitting early.\n"                                    output += "\t" + goalIsTrue + "\t"  + provenance
+                                     #print "Cannot prove that it holds under " + taxMap.ltaString() + ". But provers may quit early.\n"                                    
                                      output += "\t" + goalIsTrue + "\t" + provenance
                                      tmpGoal = "unclear"
                                  else:
@@ -236,6 +236,7 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
             outputNewTLI(inputFile, ltaSet, newImplied, newPossible, goalTypes, outputDir)
 
     fMir.close()
+    taxMap.generateDot(outputDir + taxMap.name + ".dot")
     outputResult(result, outputType, outputFile, numberOutputCols, goalTypes, outputDir, htmlDir)
     
 
@@ -652,18 +653,3 @@ if __name__ == "__main__":
         main(optInfo)
     else:
         usage()
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
