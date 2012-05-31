@@ -320,7 +320,6 @@ class TaxonomyMapping:
         return result
 
     def generateDot(self, outputFile):
-	print self.tr
         for [T1, T2] in self.eq:
             tmpTr = list(self.tr)
             for [T3, T4] in tmpTr:
@@ -331,18 +330,15 @@ class TaxonomyMapping:
 		elif(T1 == T4 or T2 == T4):
 		    self.tr.remove([T3, T4])
 		    self.tr.append([T3, T1+","+T2])
-	print self.tr
 	tmpTr = list(self.tr)
         for [T1, T2] in tmpTr:
 	    if(self.tr.count([T1, T2]) > 1):
 		self.tr.remove([T1, T2])
-	print self.tr
 	tmpTr = list(self.tr)
         for [T1, T2] in tmpTr:
             for [T3, T4] in tmpTr:
 		if (T2 == T3 and self.tr.count([T1, T4])>0):
 		    self.tr.remove([T1, T4])
-	print self.tr
         fDot = open(outputFile, 'w')
 	fDot.write("digraph {\n\nrankdir = TD\n\n")
 	for [T1, T2] in self.tr:
