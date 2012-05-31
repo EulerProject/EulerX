@@ -324,7 +324,6 @@ class TaxonomyMapping:
             tmpTr = list(self.tr)
             for [T3, T4] in tmpTr:
 		if(T1 == T3 or T2 == T3):
-		    print T3
 		    self.tr.remove([T3, T4])
 		    self.tr.append([T1+","+T2, T4])
 		elif(T1 == T4 or T2 == T4):
@@ -409,11 +408,19 @@ class TaxonomyMapping:
     def removeMir(self, string):
         r = string.split(" ")
 	self.mir[r[1] + "," + r[len(r)-1]] = ""
+	if(self.tr.count([r[1], r[len(r)-1]]) > 0):
+	    self.tr.remove([r[1], r[len(r)-1]])
+	elif(self.tr.count([r[len(r)-1], r[1]]) > 0):
+	    self.tr.remove([r[len(r)-1], r[1]])
 	if len(r) > 3:
 	    if r[0] == "+=":
 	        self.mir[r[2] + "," + r[3]] = ""
+		if(self.tr.count([r[2], r[3]]) > 0):
+	    	    self.tr.remove([r[2], r[3]])
 	    elif r[0] == "=+":
 	        self.mir[r[1] + "," + r[2]] = ""
+		if(self.tr.count([r[2], r[1]]) > 0):
+	    	    self.tr.remove([r[2], r[1]])
 
     # isa
     def addIMir(self, parent, child):
