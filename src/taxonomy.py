@@ -320,24 +320,33 @@ class TaxonomyMapping:
         return result
 
     def generateDot(self, outputFile):
-	print self.eq
 	print self.tr
         for [T1, T2] in self.eq:
-            for [T3, T4] in self.tr:
+            tmpTr = list(self.tr)
+            for [T3, T4] in tmpTr:
 		if(T1 == T3 or T2 == T3):
+		    print T3
 		    self.tr.remove([T3, T4])
 		    self.tr.append([T1+","+T2, T4])
 		elif(T1 == T4 or T2 == T4):
 		    self.tr.remove([T3, T4])
 		    self.tr.append([T3, T1+","+T2])
-        for [T1, T2] in self.tr:
-            for [T3, T4] in self.tr:
+	print self.tr
+	tmpTr = list(self.tr)
+        for [T1, T2] in tmpTr:
+	    if(self.tr.count([T1, T2]) > 1):
+		self.tr.remove([T1, T2])
+	print self.tr
+	tmpTr = list(self.tr)
+        for [T1, T2] in tmpTr:
+            for [T3, T4] in tmpTr:
 		if (T2 == T3 and self.tr.count([T1, T4])>0):
 		    self.tr.remove([T1, T4])
+	print self.tr
         fDot = open(outputFile, 'w')
 	fDot.write("digraph {\n\nrankdir = TD\n\n")
 	for [T1, T2] in self.tr:
-	    fDot.write(T1 + " -> " + T2 + "\n")
+	    fDot.write("\"" + T1 + "\" -> \"" + T2 + "\"\n")
         fDot.write("}\n")
         fDot.close()
     
@@ -620,34 +629,34 @@ class TaxonomyMapping:
         outputs = []
         
         timeoutString = ""
-        reasoners.append(self.mace.name)
+#        reasoners.append(self.mace.name)
+#        if (memory == False):
+#            inputs.append(maceInput)
+#        else:
+#            inputs.append("memory");
+        
+#        maceOutput = self.mace.run(maceInput, False)
+#        outputs.append(maceOutput[1])
+#        if (maceOutput[0] == "model found"):
+        result = "true"
+#        else:
+#            if (maceOutput[0].find("max_sec_no") != -1):
+#                timeoutString += " mace4 timeout "
+        reasoners.append(self.prover.name)
         if (memory == False):
-            inputs.append(maceInput)
+            inputs.append(proverInput)
         else:
             inputs.append("memory");
-        
-        maceOutput = self.mace.run(maceInput, False)
-        outputs.append(maceOutput[1])
-        if (maceOutput[0] == "model found"):
-            result = "true"
+        proverOutput = self.prover.run(proverInput, False)
+        outputs.append(proverOutput[1])
+        if (proverOutput[0] == "proved"):
+            result = "false" + timeoutString
         else:
-            if (maceOutput[0].find("max_sec_no") != -1):
-                timeoutString += " mace4 timeout "
-            reasoners.append(self.prover.name)
-            if (memory == False):
-                inputs.append(proverInput)
+            if (proverOutput[0].find("max_sec_no") != -1):
+                timeoutString += " prover9 timeout "
+                result = "unclear" + timeoutString
             else:
-                inputs.append("memory");
-            proverOutput = self.prover.run(proverInput, False)
-            outputs.append(proverOutput[1])
-            if (proverOutput[0] == "proved"):
-                result = "false" + timeoutString
-            else:
-                if (proverOutput[0].find("max_sec_no") != -1):
-                    timeoutString += " prover9 timeout "
-                    result = "unclear" + timeoutString
-                else:
-                    result = "true" + timeoutString
+                result = "true" + timeoutString
               
         return [result, reasoners, inputs, outputs]
     
@@ -837,35 +846,35 @@ class TaxonomyMapping:
         output = open(outputFileName, "w")
         output.write(self.prover.formatInputFile(ltaxRules))
         output.close()
-        maceOutput = self.mace.run(outputFileName, False)
+#        maceOutput = self.mace.run(outputFileName, False)
         
-        reasoners.append(self.mace.name)
-        inputs.append(outputFileName)
-        outputs.append(maceOutput[1])
+#        reasoners.append(self.mace.name)
+#        inputs.append(outputFileName)
+#        outputs.append(maceOutput[1])
         
         timeoutString = ""
         # if theroem is proved without a goal, then things are 
         # incconsistent
-        if (maceOutput[0] == "model found"):
-            result = "true"
-        else:
-            if (maceOutput[0]) == "timeout":
-                timeoutString += " mace4 timeout "
+#        if (maceOutput[0] == "model found"):
+        result = "true"
+#        else:
+#            if (maceOutput[0]) == "timeout":
+#                timeoutString += " mace4 timeout "
 
             # if theorem is not proved, but there's a model
             # then these axioms are consistent
-            reasoners.append(self.prover.name)
-            inputs.append(outputFileName)
-            proverOutput = self.prover.run(outputFileName, False)
-            outputs.append(proverOutput[1])
-            if (proverOutput[0] == "proved"):
-              result = "false" + timeoutString
+        reasoners.append(self.prover.name)
+        inputs.append(outputFileName)
+        proverOutput = self.prover.run(outputFileName, False)
+        outputs.append(proverOutput[1])
+        if (proverOutput[0] == "proved"):
+           result = "false" + timeoutString
             # if the theoem is not proved, but no model is
             # found, then we're not sure what's going on
-            else:   
+        else:   
               if (proverOutput[0] == "timeout"):
                   timeoutString += "prover9 timeout "
-              result = "unclear" + timeoutString
+                  result = "unclear" + timeoutString
               
         
         return [result, reasoners, inputs, outputs]
