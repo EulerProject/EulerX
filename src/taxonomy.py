@@ -321,7 +321,7 @@ class TaxonomyMapping:
 
     def generateDot(self, outputFile):
         fDot = open(outputFile, 'w')
-	fDot.write("digraph {\n\nrankdir = LR\n\n")
+	fDot.write("digraph {\n\nrankdir = RL\n\n")
 
 	# Equalities
         for [T1, T2] in self.eq:
