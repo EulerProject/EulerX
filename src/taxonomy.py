@@ -320,35 +320,60 @@ class TaxonomyMapping:
         return result
 
     def generateDot(self, outputFile):
-        for [T1, T2, P1] in self.eq:
-            tmpTr = list(self.tr)
-            for [T3, T4, P2] in tmpTr:
-		if(T1 == T3 or T2 == T3):
-		    self.tr.remove([T3, T4, P2])
-		    self.tr.append([T1+","+T2, T4])
-		elif(T1 == T4 or T2 == T4):
-		    self.tr.remove([T3, T4])
-		    self.tr.append([T3, T1+","+T2])
-	tmpTr = list(self.tr)
-        for [T1, T2] in tmpTr:
-	    if(self.tr.count([T1, T2]) > 1):
-		self.tr.remove([T1, T2])
-	tmpTr = list(self.tr)
-        for [T1, T2] in tmpTr:
-            for [T3, T4] in tmpTr:
-		if (T2 == T3 and self.tr.count([T1, T4])>0):
-		    self.tr.remove([T1, T4])
         fDot = open(outputFile, 'w')
 	fDot.write("digraph {\n\nrankdir = LR\n\n")
-	for [T1, T2] in self.tr:
-	    fDot.write("\"" + T1 + "\" -> \"" + T2 + "\"\n")
+
+	# Equalities
+        for [T1, T2] in self.eq:
+            T1s = T1.split("_")
+            T2s = T2.split("_")
+	    if(T1s[1] == T2s[1]):
+		tmpStr = T1s[1]
+		fDot.write("\"" + tmpStr +"\" [color=blue];\n")
+	    else:
+		tmpStr = T1+","+T2
+            tmpTr = list(self.tr)
+            for [T3, T4, P] in tmpTr:
+		if(T1 == T3 or T2 == T3):
+		    self.tr.remove([T3, T4, P])
+		    self.tr.append([tmpStr, T4, P])
+		elif(T1 == T4 or T2 == T4):
+		    self.tr.remove([T3, T4, P])
+		    self.tr.append([T3, tmpStr, P])
+
+	# Duplicates
+	tmpTr = list(self.tr)
+        for [T1, T2, P] in tmpTr:
+	    if(self.tr.count([T1, T2, P]) > 1):
+		self.tr.remove([T1, T2, P])
+
+	# Reductions
+	tmpTr = list(self.tr)
+        for [T1, T2, P1] in tmpTr:
+            for [T3, T4, P2] in tmpTr:
+		if (T2 == T3):
+		    if(self.tr.count([T1, T4, 0])>0):
+		        self.tr.remove([T1, T4, 0])
+		        self.tr.append([T1, T4, 2])
+		    if(self.tr.count([T1, T4, 1])>0):
+		        self.tr.remove([T1, T4, 1])
+		        self.tr.append([T1, T4, 3])
+	for [T1, T2, P] in self.tr:
+	    if(P == 0):
+	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")
+	    elif(P == 1):
+	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=red];\n")
+	    elif(P == 2):
+	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
+	    elif(P == 3):
+	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=red];\n")
         fDot.write("}\n")
         fDot.close()
     
     def addTMir(self, tName, parent, child):
 	self.mir[tName + "_" + parent +"," + tName + "_" + child] = "{includes}"
 	self.tr.append([tName + "_" + child, tName + "_" + parent, 0])
-	self.addIMir(tName + "_" + parent, tName + "_" + child)
+	self.addIMir(tName + "_" + parent, tName + "_" + child, 0)
 
     def addDMir(self, tName, child, sibling):
 	self.mir[tName + "_" + child +"," + tName + "_" + sibling] ="{disjoint}"
@@ -368,37 +393,37 @@ class TaxonomyMapping:
     def addAMir(self, astring, provenance):
     	r = astring.split(" ")
 	if (r[1] == "includes"):
-	    self.addIMir(r[0], r[2])
+	    self.addIMir(r[0], r[2], provenance)
 	    self.tr.append([r[2], r[0], provenance])
 	elif (r[1] == "is_included_in"):
-	    self.addIMir(r[2], r[0])
+	    self.addIMir(r[2], r[0], provenance)
 	    self.tr.append([r[0], r[2], provenance])
 	elif (r[1] == "equals"):
 	    self.addEMir(r[0], r[2])
-            self.eq.append([r[0], r[2], provenance])
+            self.eq.append([r[0], r[2]])
 	elif (r[2] == "lsum"):
-	    self.addIMir(r[3], r[0])
-	    self.addIMir(r[3], r[1])
+	    self.addIMir(r[3], r[0], provenance)
+	    self.addIMir(r[3], r[1], provenance)
 	    self.mir[r[0] + "," + r[3]] = "{is_included_in}"
 	    self.mir[r[1] + "," + r[3]] = "{is_included_in}"
 	    self.tr.append([r[0],r[3], provenance])
 	    self.tr.append([r[1],r[3], provenance])
 	    return None
 	elif (r[1] == "rsum"):
-	    self.addIMir(r[0], r[2])
-	    self.addIMir(r[0], r[3])
+	    self.addIMir(r[0], r[2], provenance)
+	    self.addIMir(r[0], r[3], provenance)
 	    self.mir[r[0] + "," + r[2]] = "{includes}"
 	    self.mir[r[0] + "," + r[3]] = "{includes}"
 	    self.tr.append([r[2], r[0], provenance])
 	    self.tr.append([r[3], r[0], provenance])
 	    return None
 	elif (r[2] == "ldiff"):
-	    self.addIMir(r[0], r[3])
+	    self.addIMir(r[0], r[3], provenance)
 	    self.mir[r[0] + "," + r[3]] = "{includes}"
 	    self.tr.append([r[3], r[0], provenance])
 	    return None
 	elif (r[1] == "rdiff"):
-	    self.addIMir(r[3], r[0])
+	    self.addIMir(r[3], r[0], provenance)
 	    self.mir[r[3] + "," + r[0]] = "{is_included_in}"
 	    self.tr.append([r[3], r[0], provenance])
 	    return None
@@ -423,7 +448,7 @@ class TaxonomyMapping:
 	    	    self.tr.remove([r[2], r[1]])
 
     # isa
-    def addIMir(self, parent, child):
+    def addIMir(self, parent, child, provenance):
 	for pair in self.mir.keys():
 	    if (self.mir[pair] == "{includes}"):
 	        if (pair.find("," + parent) != -1):
@@ -948,7 +973,7 @@ class TaxonomyMapping:
             elif (re.match("\[.*?\]", line)):
                 inside = re.match("\[(.*)\]", line).group(1)
                 self.articulationSet.addArticulationWithList(inside, self)
-		self.addAMir(inside)
+		self.addAMir(inside, 0)
               
             elif (re.match("\<.*\>", line)):
                 inside = re.match("\<(.*)\>", line).group(1)
