@@ -1,6 +1,6 @@
 digraph {
 
-rankdir = LR
+rankdir = RL
 
 "A" [color=blue];
 "E" [color=blue];
