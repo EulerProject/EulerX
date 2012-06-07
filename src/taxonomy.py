@@ -320,11 +320,11 @@ class TaxonomyMapping:
         return result
 
     def generateDot(self, outputFile):
-        for [T1, T2] in self.eq:
+        for [T1, T2, P1] in self.eq:
             tmpTr = list(self.tr)
-            for [T3, T4] in tmpTr:
+            for [T3, T4, P2] in tmpTr:
 		if(T1 == T3 or T2 == T3):
-		    self.tr.remove([T3, T4])
+		    self.tr.remove([T3, T4, P2])
 		    self.tr.append([T1+","+T2, T4])
 		elif(T1 == T4 or T2 == T4):
 		    self.tr.remove([T3, T4])
@@ -339,7 +339,7 @@ class TaxonomyMapping:
 		if (T2 == T3 and self.tr.count([T1, T4])>0):
 		    self.tr.remove([T1, T4])
         fDot = open(outputFile, 'w')
-	fDot.write("digraph {\n\nrankdir = TD\n\n")
+	fDot.write("digraph {\n\nrankdir = LR\n\n")
 	for [T1, T2] in self.tr:
 	    fDot.write("\"" + T1 + "\" -> \"" + T2 + "\"\n")
         fDot.write("}\n")
@@ -347,7 +347,7 @@ class TaxonomyMapping:
     
     def addTMir(self, tName, parent, child):
 	self.mir[tName + "_" + parent +"," + tName + "_" + child] = "{includes}"
-	self.tr.append([tName + "_" + child, tName + "_" + parent])
+	self.tr.append([tName + "_" + child, tName + "_" + parent, 0])
 	self.addIMir(tName + "_" + parent, tName + "_" + child)
 
     def addDMir(self, tName, child, sibling):
@@ -362,45 +362,45 @@ class TaxonomyMapping:
 	    tmpStr=r.replace("{", "")
 	    tmpStr=tmpStr.replace("}", "")
 	    tmpStr=tmpStr.replace(" ", ",")
-	    self.addAMir(t1+" "+tmpStr+" "+t2)
+	    self.addAMir(t1+" "+tmpStr+" "+t2, 1)
 
     # articulation
-    def addAMir(self, astring):
+    def addAMir(self, astring, provenance):
     	r = astring.split(" ")
 	if (r[1] == "includes"):
 	    self.addIMir(r[0], r[2])
-	    self.tr.append([r[2], r[0]])
+	    self.tr.append([r[2], r[0], provenance])
 	elif (r[1] == "is_included_in"):
 	    self.addIMir(r[2], r[0])
-	    self.tr.append([r[0], r[2]])
+	    self.tr.append([r[0], r[2], provenance])
 	elif (r[1] == "equals"):
 	    self.addEMir(r[0], r[2])
-            self.eq.append([r[0], r[2]])
+            self.eq.append([r[0], r[2], provenance])
 	elif (r[2] == "lsum"):
 	    self.addIMir(r[3], r[0])
 	    self.addIMir(r[3], r[1])
 	    self.mir[r[0] + "," + r[3]] = "{is_included_in}"
 	    self.mir[r[1] + "," + r[3]] = "{is_included_in}"
-	    self.tr.append([r[0],r[3]])
-	    self.tr.append([r[1],r[3]])
+	    self.tr.append([r[0],r[3], provenance])
+	    self.tr.append([r[1],r[3], provenance])
 	    return None
 	elif (r[1] == "rsum"):
 	    self.addIMir(r[0], r[2])
 	    self.addIMir(r[0], r[3])
 	    self.mir[r[0] + "," + r[2]] = "{includes}"
 	    self.mir[r[0] + "," + r[3]] = "{includes}"
-	    self.tr.append([r[2], r[0]])
-	    self.tr.append([r[3], r[0]])
+	    self.tr.append([r[2], r[0], provenance])
+	    self.tr.append([r[3], r[0], provenance])
 	    return None
 	elif (r[2] == "ldiff"):
 	    self.addIMir(r[0], r[3])
 	    self.mir[r[0] + "," + r[3]] = "{includes}"
-	    self.tr.append([r[3], r[0]])
+	    self.tr.append([r[3], r[0], provenance])
 	    return None
 	elif (r[1] == "rdiff"):
 	    self.addIMir(r[3], r[0])
 	    self.mir[r[3] + "," + r[0]] = "{is_included_in}"
-	    self.tr.append([r[3], r[0]])
+	    self.tr.append([r[3], r[0], provenance])
 	    return None
 	self.mir[r[0] + "," + r[2]] = "{"+r[1]+"}"
 	self.mir[r[0] + "," + r[2]] = "{"+r[1]+"}"
