@@ -346,6 +346,11 @@ class TaxonomyMapping:
         for [T1, T2, P] in tmpTr:
 	    if(self.tr.count([T1, T2, P]) > 1):
 		self.tr.remove([T1, T2, P])
+	tmpTr = list(self.tr)
+        for [T1, T2, P] in tmpTr:
+	    if(P == 0):
+	        if(self.tr.count([T1, T2, 1]) > 0):
+		    self.tr.remove([T1, T2, 1])
 
 	# Reductions
 	tmpTr = list(self.tr)
@@ -355,7 +360,9 @@ class TaxonomyMapping:
 		    if(self.tr.count([T1, T4, 0])>0):
 		        self.tr.remove([T1, T4, 0])
 		        self.tr.append([T1, T4, 2])
-		    if(self.tr.count([T1, T4, 1])>0):
+		        if(self.tr.count([T1, T4, 1])>0):
+		            self.tr.remove([T1, T4, 1])
+		    elif(self.tr.count([T1, T4, 1])>0):
 		        self.tr.remove([T1, T4, 1])
 		        self.tr.append([T1, T4, 3])
 	for [T1, T2, P] in self.tr:
