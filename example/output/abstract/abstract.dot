@@ -1,18 +1,43 @@
 digraph {
 
-rankdir = TD
+rankdir = LR
 
-"1_B" -> "2_B"
-"1_C" -> "2_C"
-"1_D" -> "2_C"
-"2_C" -> "1_B"
-"2_B" -> "1_A,2_A"
-"2_F" -> "1_A,2_A"
-"1_F" -> "1_A,2_A"
-"1_E,2_E" -> "1_B"
-"1_G,2_G" -> "1_F"
-"1_G,2_G" -> "2_F"
-"1_H,2_H" -> "1_F"
-"1_H,2_H" -> "2_B"
-"1_I,2_I" -> "2_F"
+"A" [color=blue];
+"E" [color=blue];
+"G" [color=blue];
+"H" [color=blue];
+"I" [color=blue];
+"1_B" -> "2_B" [style=filled, color=black];
+"1_C" -> "2_C" [style=filled, color=black];
+"1_D" -> "2_C" [style=filled, color=black];
+"2_C" -> "1_B" [style=filled, color=red];
+"1_F" -> "A" [style=filled, color=black];
+"2_B" -> "A" [style=filled, color=black];
+"2_F" -> "A" [style=filled, color=black];
+"1_F" -> "A" [style=filled, color=red];
+"E" -> "1_B" [style=filled, color=black];
+"G" -> "1_F" [style=filled, color=black];
+"G" -> "2_F" [style=filled, color=black];
+"G" -> "2_F" [style=filled, color=red];
+"H" -> "1_F" [style=filled, color=black];
+"H" -> "2_B" [style=filled, color=black];
+"H" -> "2_B" [style=filled, color=red];
+"I" -> "2_F" [style=filled, color=black];
+"I" -> "2_F" [style=filled, color=red];
+"1_C" -> "2_B" [style=dashed, color=red];
+"1_C" -> "A" [style=dashed, color=red];
+"1_D" -> "2_B" [style=dashed, color=red];
+"1_D" -> "A" [style=dashed, color=red];
+"1_B" -> "A" [style=dashed, color=grey];
+"1_B" -> "A" [style=dashed, color=red];
+"1_C" -> "1_B" [style=dashed, color=grey];
+"1_D" -> "1_B" [style=dashed, color=grey];
+"2_C" -> "2_B" [style=dashed, color=grey];
+"E" -> "2_B" [style=dashed, color=grey];
+"E" -> "2_B" [style=dashed, color=red];
+"E" -> "A" [style=dashed, color=red];
+"G" -> "A" [style=dashed, color=red];
+"H" -> "A" [style=dashed, color=red];
+"I" -> "A" [style=dashed, color=grey];
+"I" -> "A" [style=dashed, color=red];
 }
