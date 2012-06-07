@@ -20,17 +20,10 @@ rankdir = LR
 "H" -> "1_F" [style=filled, color=black];
 "H" -> "2_B" [style=filled, color=black];
 "I" -> "2_F" [style=filled, color=black];
-"1_C" -> "2_B" [style=dashed, color=red];
-"1_C" -> "A" [style=dashed, color=red];
-"1_D" -> "2_B" [style=dashed, color=red];
-"1_D" -> "A" [style=dashed, color=red];
 "1_B" -> "A" [style=dashed, color=grey];
 "1_C" -> "1_B" [style=dashed, color=grey];
 "1_D" -> "1_B" [style=dashed, color=grey];
 "2_C" -> "2_B" [style=dashed, color=grey];
 "E" -> "2_B" [style=dashed, color=grey];
-"E" -> "A" [style=dashed, color=red];
-"G" -> "A" [style=dashed, color=red];
-"H" -> "A" [style=dashed, color=red];
 "I" -> "A" [style=dashed, color=grey];
 }

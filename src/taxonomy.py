@@ -360,11 +360,9 @@ class TaxonomyMapping:
 		    if(self.tr.count([T1, T4, 0])>0):
 		        self.tr.remove([T1, T4, 0])
 		        self.tr.append([T1, T4, 2])
-		        if(self.tr.count([T1, T4, 1])>0):
-		            self.tr.remove([T1, T4, 1])
-		    elif(self.tr.count([T1, T4, 1])>0):
+		    if(self.tr.count([T1, T4, 1])>0):
 		        self.tr.remove([T1, T4, 1])
-		        self.tr.append([T1, T4, 3])
+		        #self.tr.append([T1, T4, 3])
 	for [T1, T2, P] in self.tr:
 	    if(P == 0):
 	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")
@@ -372,8 +370,6 @@ class TaxonomyMapping:
 	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=red];\n")
 	    elif(P == 2):
 	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
-	    elif(P == 3):
-	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=red];\n")
         fDot.write("}\n")
         fDot.close()
     
