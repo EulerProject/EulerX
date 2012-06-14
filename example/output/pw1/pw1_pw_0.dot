@@ -1,0 +1,7 @@
+digraph {
+
+rankdir = RL
+
+"1_E,2_F" -> "1_A,2_C" [style=filled, color=black];
+"1_B,2_D" -> "1_A,2_C" [style=filled, color=black];
+}
