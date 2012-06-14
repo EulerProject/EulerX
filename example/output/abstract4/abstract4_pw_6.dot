@@ -1,0 +1,16 @@
+digraph {
+
+rankdir = RL
+
+"B" [color=blue];
+"D" [color=blue];
+"B" [color=blue];
+"A" [color=blue];
+"D" [color=blue];
+"1_C" -> "A" [style=filled, color=black];
+"1_E" -> "A" [style=filled, color=black];
+"2_F" -> "A" [style=filled, color=black];
+"2_G" -> "A" [style=filled, color=black];
+"B" -> "A" [style=filled, color=black];
+"D" -> "A" [style=filled, color=black];
+}

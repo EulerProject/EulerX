@@ -86,6 +86,7 @@ class DisjointChildren(LatentTaxAssumption):
 		for taxon2 in taxonomy.taxa.values():                   
 			if ((taxon in taxonomy.roots) and (taxon2 in taxonomy.roots) and (taxon.stringOf() > taxon2.stringOf())):
                                 result += "(all x (" + taxon.stringOf() + "(x) -> -" + taxon2.stringOf() + "(x))).\n"
+                                result += "(all x (" + taxon2.stringOf() + "(x) -> -" + taxon.stringOf() + "(x))).\n"
                                 #result += taxon.stringOf() + " " + taxon2.stringOf() + " ( DC )\n"
 
 
