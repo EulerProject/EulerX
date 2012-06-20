@@ -1,0 +1,8 @@
+taxonomy t1 shawn1
+(a b c)
+
+taxonomy t2 shawn2
+(d)
+
+articulation art shawn
+[t2_d includes t1_a confidence=1]
