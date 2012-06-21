@@ -208,7 +208,7 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
 				     tmpGoal = tmpGoal + goalRelation + " "
                                      if (goalType == "implied"):
                                          newImplied.append(taxMap.hypothesis)
-				         taxMap.addPMir(thisGoal[0], thisGoal[1], goalRelation)
+				         taxMap.addPMir(thisGoal[0], thisGoal[1], goalRelation, 1)
                                      else:
                                          newPossible.append(taxMap.hypothesis)
                                 
@@ -229,13 +229,16 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
                         if(tmpGoal.find("unclear") != -1):
 		            fMir.write(thisGoal[0] + "," + thisGoal[1] + ",inferred,unclear\n")
                         else:
-			    taxMap.addPMir(thisGoal[0], thisGoal[1], tmpGoal)
+			    taxMap.addPMir(thisGoal[0], thisGoal[1], tmpGoal, 1)
 		            fMir.write(thisGoal[0] + "," + thisGoal[1] + ",inferred,{" + tmpGoal.rstrip() + "}\n")
 			    
         if (memory == False):
             outputNewTLI(inputFile, ltaSet, newImplied, newPossible, goalTypes, outputDir)
 
     fMir.close()
+    
+    # Generating all possible worlds
+    taxMap.generatePW(outputDir, taxMap.name)
     taxMap.generateDot(outputDir + taxMap.name + ".dot")
     outputResult(result, outputType, outputFile, numberOutputCols, goalTypes, outputDir, htmlDir)
     
