@@ -115,7 +115,7 @@ class Taxonomy:
             thisChild.parent = thisParent
 	    taxaMap.addTMir(self.authority.abbrev, parent, child)
 	    for sibling in thisParent.children:
-	    	taxaMap.addDMir(self.authority.abbrev, child, sibling.stringOf())
+	    	taxaMap.addDMir(self.authority.abbrev, child, sibling.abbrev)
             thisParent.addChild(thisChild)
 
     def addTaxaWithList(self, taxaMap, theList):
@@ -319,6 +319,66 @@ class TaxonomyMapping:
         result += `self.articulationSet`    
         return result
 
+    def createTMfromPW(self, pw, i):
+	newTM = TaxonomyMapping()
+	newTM.prover = self.prover
+	newTM.mace = self.mace
+	newTM.name = self.name+"_pw"+i.__str__()
+	newTM.taxonomies = copy.deepcopy(self.taxonomies)
+	newTM.ltas = self.ltas
+	newTM.mir = copy.deepcopy(self.mir)
+	newTM.tr = copy.deepcopy(self.tr)
+	newTM.eq = copy.deepcopy(self.eq)
+	for pair in pw.keys():
+	    t=re.match("(.*),(.*)",pair)
+	    tmpStr = pw[pair]
+	    if(tmpStr.find(",") != -1):
+		tmpStr = tmpStr.replace(","," ")
+		tmpStr = "{" + tmpStr + "}"
+	    list = t.group(1)+" "+tmpStr+" "+t.group(2)
+	    if(newTM.mir.has_key(pair) and newTM.mir[pair] != tmpStr):
+		newTM.mir[pair] = tmpStr
+		if(tmpStr == "is_included_in"):
+		    newTM.tr.append([t.group(1), t.group(2), 1])
+		elif(tmpStr == "includes"):
+		    newTM.tr.append([t.group(2), t.group(1), 1])
+		elif(tmpStr == "equals"):
+		    newTM.eq.append([t.group(1), t.group(2)])
+	    newTM.articulationSet.addArticulationWithList(list, newTM)
+	return newTM
+
+    def generatePW(self, outputDir, fileName):
+	tmpCnt = 1;
+	tmpBase = {};
+	PW = [];
+	for pair in self.mir.keys():
+	    tmpList = self.mir[pair].replace("{", "").replace("}", "").split(",")
+	    tmpBase[pair] = tmpCnt
+            tmpCnt = tmpCnt * len(tmpList)
+	
+	for i in range(tmpCnt):
+	    PW.append({})
+	for pair in self.mir.keys():
+	    tmpList = self.mir[pair].replace("{", "").replace("}","").split(",")
+	    for i in range(tmpCnt):
+		PW[i][pair]=tmpList[i / tmpBase[pair] % len(tmpList)]
+
+        consCnt = 0
+	for i in range(tmpCnt):
+	    tm = self.createTMfromPW(PW[i], i)
+            consistencyCheck = tm.testConsistencyWithoutGoal(outputDir+"reasonerFiles/")
+            if consistencyCheck[0] == "true":
+		tm.outputPW(outputDir+fileName+"_pw_"+consCnt.__str__())
+		consCnt = consCnt + 1
+	print "There is (are) " + consCnt.__str__() + " possible world(s)."
+
+    def outputPW(self, outputFileName):
+	fPW = open(outputFileName+".csv", 'w')
+	for pair in self.mir.keys():
+	    fPW.write(pair + "," + self.mir[pair] + "\n")
+	fPW.close()
+        self.generateDot(outputFileName+".dot")
+
     def generateDot(self, outputFile):
         fDot = open(outputFile, 'w')
 	fDot.write("digraph {\n\nrankdir = RL\n\n")
@@ -382,7 +442,7 @@ class TaxonomyMapping:
 	self.mir[tName + "_" + child +"," + tName + "_" + sibling] ="{disjoint}"
 	self.mir[tName + "_" + sibling +"," + tName + "_" + child] ="{disjoint}"
 
-    def addPMir(self, t1, t2, r):
+    def addPMir(self, t1, t2, r, provenance):
     	if(self.mir.has_key(t1 + "," + t2)):
 	    return None
 	else:
@@ -390,7 +450,7 @@ class TaxonomyMapping:
 	    tmpStr=r.replace("{", "")
 	    tmpStr=tmpStr.replace("}", "")
 	    tmpStr=tmpStr.replace(" ", ",")
-	    self.addAMir(t1+" "+tmpStr+" "+t2, 1)
+	    self.addAMir(t1+" "+tmpStr+" "+t2, provenance)
 
     # articulation
     def addAMir(self, astring, provenance):
@@ -877,32 +937,32 @@ class TaxonomyMapping:
         output = open(outputFileName, "w")
         output.write(self.prover.formatInputFile(ltaxRules))
         output.close()
-#        maceOutput = self.mace.run(outputFileName, False)
+        maceOutput = self.mace.run(outputFileName, False)
         
-#        reasoners.append(self.mace.name)
-#        inputs.append(outputFileName)
-#        outputs.append(maceOutput[1])
+        reasoners.append(self.mace.name)
+        inputs.append(outputFileName)
+        outputs.append(maceOutput[1])
         
         timeoutString = ""
         # if theroem is proved without a goal, then things are 
         # incconsistent
-#        if (maceOutput[0] == "model found"):
-        result = "true"
-#        else:
-#            if (maceOutput[0]) == "timeout":
-#                timeoutString += " mace4 timeout "
+        if (maceOutput[0] == "model found"):
+            result = "true"
+        else:
+            if (maceOutput[0]) == "timeout":
+                timeoutString += " mace4 timeout "
 
             # if theorem is not proved, but there's a model
             # then these axioms are consistent
-        reasoners.append(self.prover.name)
-        inputs.append(outputFileName)
-        proverOutput = self.prover.run(outputFileName, False)
-        outputs.append(proverOutput[1])
-        if (proverOutput[0] == "proved"):
-           result = "false" + timeoutString
+            reasoners.append(self.prover.name)
+            inputs.append(outputFileName)
+            proverOutput = self.prover.run(outputFileName, False)
+            outputs.append(proverOutput[1])
+            if (proverOutput[0] == "proved"):
+               result = "false" + timeoutString
             # if the theoem is not proved, but no model is
             # found, then we're not sure what's going on
-        else:   
+            else:   
               if (proverOutput[0] == "timeout"):
                   timeoutString += "prover9 timeout "
                   result = "unclear" + timeoutString
@@ -976,7 +1036,11 @@ class TaxonomyMapping:
             elif (re.match("\[.*?\]", line)):
                 inside = re.match("\[(.*)\]", line).group(1)
                 self.articulationSet.addArticulationWithList(inside, self)
-		self.addAMir(inside, 0)
+		if inside.find("{") != -1:
+		    r = re.match("(.*) \{(.*)\} (.*)", inside)
+		    self.addPMir(r.group(1), r.group(3), r.group(2).replace(" ",","), 0)
+		else:
+		    self.addAMir(inside, 0)
               
             elif (re.match("\<.*\>", line)):
                 inside = re.match("\<(.*)\>", line).group(1)
