@@ -370,7 +370,7 @@ class TaxonomyMapping:
             if consistencyCheck[0] == "true":
 		tm.outputPW(outputDir+fileName+"_pw_"+consCnt.__str__())
 		consCnt = consCnt + 1
-	print "There is (are) " + consCnt.__str__() + " possible world(s)."
+	print "There is (are) " + consCnt.__str__() + " outof " + tmpCnt.__str__() + " possible world(s)."
 
     def outputPW(self, outputFileName):
 	fPW = open(outputFileName+".csv", 'w')
@@ -514,20 +514,26 @@ class TaxonomyMapping:
     def addIMir(self, parent, child, provenance):
 	for pair in self.mir.keys():
 	    if (self.mir[pair] == "{includes}"):
-	        if (pair.find("," + parent) != -1):
-		    newPair = pair.replace(parent, child)
+	        if (pair.find("," + parent) == len(pair) - len(parent) - 1):
+		    newPair = pair.replace("," + parent, "," + child)
 		    self.mir[newPair] = "{includes}"
-	        elif (pair.find(child + ",") != -1):
-		    newPair = pair.replace(child, parent)
+		elif (pair.find(child + ",") == 0):
+		    newPair = pair.replace(child + ",", parent + ",")
 	    	    self.mir[newPair] = "{includes}"
     # Equality mir
     def addEMir(self, parent, child):
 	for pair in self.mir.keys():
-	    if (pair.find(parent) != -1):
-		newPair = pair.replace(parent, child)
+	    if (pair.find(parent+",") == 0):
+		newPair = pair.replace(parent+",", child+",")
 		self.mir[newPair] = self.mir[pair]
-	    elif (pair.find(child) != -1):
-		newPair = pair.replace(child, parent)
+	    elif (pair.find(child+",") == 0):
+		newPair = pair.replace(child+",", parent+",")
+	    	self.mir[newPair] = self.mir[pair]
+	    elif (pair.find(","+parent) == len(pair)-len(parent)-1):
+		newPair = pair.replace(","+parent, ","+child)
+		self.mir[newPair] = self.mir[pair]
+	    elif (pair.find(","+child) == len(pair)-len(child)-1):
+		newPair = pair.replace(","+child, ","+parent)
 	    	self.mir[newPair] = self.mir[pair]
 
     def setReasonerTimeout(self, timeout):
