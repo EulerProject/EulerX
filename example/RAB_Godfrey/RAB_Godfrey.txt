@@ -1,0 +1,12 @@
+taxonomy R RAB 1968
+(31 32)
+
+taxonomy G Godfrey & Wooten 1979
+(33 34 35 38)
+(35 36 37)
+
+articulation abs abstract
+[R_31 equals G_33]
+[R_32 includes G_34]
+[R_32 includes G_35]
+[R_32 includes G_38]

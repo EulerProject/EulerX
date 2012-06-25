@@ -1,0 +1,27 @@
+taxonomy H Hackel 1889
+(1 2 8)
+(2 3 6)
+(3 4 5)
+(6 7)
+(8 9 10 11 12)
+
+taxonomy S Small 1933
+(13 14 15 16)
+
+articulation abs abstract
+[H_1 equals S_13]
+[H_2 is_included_in S_13]
+[H_2 includes S_14]
+[H_2 includes S_15]
+[H_2 rsum S_14 2_15]
+[H_3 equals S_14]
+[H_4 is_included_in S_14]
+[H_5 is_included_in S_14]
+[H_4 H_5 lsum S_14]
+[H_6 equals S_15]
+[H_7 equals S_15]
+[H_8 equals S_16]
+[H_9 is_included_in S_16]
+[H_10 is_included_in S_16]
+[H_11 is_included_in S_16]
+[H_12 is_included_in S_16]
