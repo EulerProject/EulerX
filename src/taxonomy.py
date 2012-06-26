@@ -100,7 +100,7 @@ class Taxonomy:
             self.taxa[parent] = thisParent
             self.roots.append(thisParent)
 
-    def addDoubleTaxon(self, taxaMap, parent, child):
+    def addDoubleTaxon(self, taxaMap, parent, child, onlyOne):
         thisParent = self.taxa[parent]
         
         if (child != ""):
@@ -113,9 +113,12 @@ class Taxonomy:
                 self.taxa[child] = thisChild
             
             thisChild.parent = thisParent
-	    taxaMap.addTMir(self.authority.abbrev, parent, child)
-	    for sibling in thisParent.children:
-	    	taxaMap.addDMir(self.authority.abbrev, child, sibling.abbrev)
+	    if(onlyOne):
+		taxaMap.addEMir(parent, child)
+	    else:
+	    	taxaMap.addTMir(self.authority.abbrev, parent, child)
+	    	for sibling in thisParent.children:
+	    	    taxaMap.addDMir(self.authority.abbrev, child, sibling.abbrev)
             thisParent.addChild(thisChild)
 
     def addTaxaWithList(self, taxaMap, theList):
@@ -124,7 +127,7 @@ class Taxonomy:
             elements = re.split("\s", noParens)
             self.addTaxon(elements[0])
             for index in range (1, len(elements)):
-                self.addDoubleTaxon(taxaMap, elements[0], elements[index])
+                self.addDoubleTaxon(taxaMap, elements[0], elements[index], len(elements) == 2)
         else:
             self.addTaxon(noParens)    
             
