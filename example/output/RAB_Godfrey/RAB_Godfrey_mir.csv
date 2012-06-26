@@ -1,11 +1,11 @@
-R_32,G_38,mir,{includes}
+R_32,G_38,inferred,{includes}
 R_32,G_33,inferred,{equals}
 R_32,G_37,mir,{includes}
 R_32,G_36,mir,{includes}
 R_32,G_35,mir,{includes}
 R_32,G_34,mir,{includes}
 R_31,G_38,mir,{includes}
-R_31,G_33,mir,{includes}
+R_31,G_33,mir,{equals}
 R_31,G_37,mir,{includes}
 R_31,G_36,mir,{includes}
 R_31,G_35,mir,{includes}
