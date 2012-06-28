@@ -239,7 +239,7 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
     
     # Generating all possible worlds
     taxMap.generatePW(outputDir, taxMap.name)
-    taxMap.generateDot(outputDir + taxMap.name + ".dot")
+    taxMap.generateDot(outputDir, taxMap.name, taxMap)
     outputResult(result, outputType, outputFile, numberOutputCols, goalTypes, outputDir, htmlDir)
     
 

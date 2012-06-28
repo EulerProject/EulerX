@@ -51,7 +51,6 @@ class Taxon:
         return result
  
     def depthFirstLTax(self):
-        #pdb.set_trace()
         result = ""
         for child in self.children:
             result += child.stringOf() + "(x) -> " + self.stringOf() + "(x).\n"
@@ -371,19 +370,19 @@ class TaxonomyMapping:
 	    tm = self.createTMfromPW(PW[i], i)
             consistencyCheck = tm.testConsistencyWithoutGoal(outputDir+"reasonerFiles/")
             if consistencyCheck[0] == "true":
-		tm.outputPW(outputDir+fileName+"_pw_"+consCnt.__str__())
+		tm.outputPW(outputDir, fileName+"_pw_"+consCnt.__str__(), self)
 		consCnt = consCnt + 1
 	print "There is (are) " + consCnt.__str__() + " outof " + tmpCnt.__str__() + " possible world(s)."
 
-    def outputPW(self, outputFileName):
-	fPW = open(outputFileName+".csv", 'w')
+    def outputPW(self, outputDir, fileName, taxaMap):
+	fPW = open(outputDir+fileName+".csv", 'w')
 	for pair in self.mir.keys():
 	    fPW.write(pair + "," + self.mir[pair] + "\n")
 	fPW.close()
-        self.generateDot(outputFileName+".dot")
+        self.generateDot(outputDir,fileName, taxaMap)
 
-    def generateDot(self, outputFile):
-        fDot = open(outputFile, 'w')
+    def generateDot(self, outputDir, fileName, taxaMap):
+        fDot = open(outputDir+fileName+".dot", 'w')
 	fDot.write("digraph {\n\nrankdir = RL\n\n")
 
 	# Equalities
@@ -431,11 +430,26 @@ class TaxonomyMapping:
 	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")
 	    elif(P == 1):
 	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=red];\n")
+		if(self == taxaMap):
+		    self.traceDown(outputDir, T1, T2)
 	    elif(P == 2):
 	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
         fDot.write("}\n")
         fDot.close()
-    
+
+    def traceDown(self, outputDir, T1, T2):
+	tmpStr = "Red edge " + T1 + "->"+ T2 + " is related to [ "
+        s = len(self.articulationSet.articulations)
+        for i in range(s):
+	    a = self.articulationSet.articulations.pop(i)
+	    self.hypothesisType = "implied"
+	    self.hypothesis = Articulation(T1 + " is_included_in " + T2, self)
+	    goal = self.testConsistencyWithGoal(outputDir + "reasonerFiles/", False, False)
+	    if(goal[0].find("false") != -1):
+	        tmpStr = tmpStr + a.toString() + " "
+	    self.articulationSet.articulations.insert(i, a)
+	print tmpStr + "]"
+	
     def addTMir(self, tName, parent, child):
 	self.mir[tName + "_" + parent +"," + tName + "_" + child] = "{includes}"
 	self.tr.append([tName + "_" + child, tName + "_" + parent, 0])
@@ -625,12 +639,12 @@ class TaxonomyMapping:
         if (1 == 1):
             if (memory == False):
                 proverOutputFile = outputDir  + self.name + self.ltaAbbrevString() + thisGoal + "Prover.txt"
-                self.writeGoalFile(proverOutputFile, ltaxRules, self.prover, True)
+                self.writeGoalFile(proverOutputFile, ltaxRules, self.prover, self.hypothesisType == "possible")
 
                 maceOutputFile = outputDir + self.name + self.ltaAbbrevString() + thisGoal + "Mace.txt"
                 self.writeGoalFile(maceOutputFile, ltaxRules, self.mace, False)
             else:
-                proverOutputFile = self.makeGoalFile(ltaxRules, self.prover, True)
+                proverOutputFile = self.makeGoalFile(ltaxRules, self.prover, self.hypothesisType == "possible")
                 maceOutputFile = self.makeGoalFile(ltaxRules, self.mace, False)
         
             if (self.hypothesisType == "implied"):
@@ -771,7 +785,7 @@ class TaxonomyMapping:
                     continue
 	        self.removeMir(a.__str__())
 	        if(self.testConsistency(outputDir)):
-		    #print "Remedial measure: remove [" + a.toString() + "]"
+		    print "Remedial measure: remove [" + a.toString() + "]"
 		    return True
             return False
 
