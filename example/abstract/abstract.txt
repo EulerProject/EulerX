@@ -9,11 +9,11 @@ taxonomy 2 Taxonomy2
 (F G I)
 
 articulation abs abstract
-[1_A equals 2_A]
-[1_B is_included_in 2_B]
-[1_C 1_D lsum 2_C]
-[1_E equals 2_E]
-[1_F overlaps 2_F]
-[1_G equals 2_G]
-[1_H equals 2_H]
-[1_F overlaps 2_B]
+[1.A equals 2.A]
+[1.B is_included_in 2.B]
+[1.C 1.D lsum 2.C]
+[1.E equals 2.E]
+[1.F overlaps 2.F]
+[1.G equals 2.G]
+[1.H equals 2.H]
+[1.F overlaps 2.B]
