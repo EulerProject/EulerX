@@ -156,6 +156,7 @@ class Articulation:
             self.taxon1 = Taxon()
             self.taxon2 = Taxon()
             self.taxon3 = Taxon()
+            self.taxon4 = Taxon()
             self.relations = []
 	    return None
 	if (initInput.find("confidence=") != -1):
@@ -175,6 +176,12 @@ class Articulation:
 	    elif (initInput.find("rdiff") != -1):
 	        self.relations = [relationDict["=-"]]
 	        elements = re.match("(.*)_(.*) rdiff (.*)_(.*) (.*)_(.*)", initInput)
+	    elif (initInput.find("e4sum") != -1):
+	        self.relations = [relationDict["+=+"]]
+	        elements = re.match("(.*)_(.*) (.*)_(.*) e4sum (.*)_(.*) (.*)_(.*)", initInput)
+	    elif (initInput.find("i4sum") != -1):
+	        self.relations = [relationDict["+<=+"]]
+	        elements = re.match("(.*)_(.*) (.*)_(.*) i4sum (.*)_(.*) (.*)_(.*)", initInput)
             taxon1taxonomy = elements.group(1)
             taxon1taxon = elements.group(2)
             taxon2taxonomy = elements.group(3)
@@ -185,6 +192,11 @@ class Articulation:
             self.taxon2 = mapping.getTaxon(taxon2taxonomy, taxon2taxon)
             self.taxon3 = mapping.getTaxon(taxon3taxonomy, taxon3taxon)
 	    self.numTaxon = 3
+            if(initInput.find("4sum") != -1):
+                taxon4taxonomy = elements.group(7)
+                taxon4taxon = elements.group(8)
+                self.taxon4 = mapping.getTaxon(taxon4taxonomy, taxon4taxon)
+	        self.numTaxon = 4
         else:
             ## initInput is of form b48_a equals k04_a
             self.relations = []
