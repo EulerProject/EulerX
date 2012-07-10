@@ -151,7 +151,7 @@ class Articulation:
         
 	self.string = initInput
 	self.numTaxon = 2
-	self.confidence = 1
+	self.confidence = 2
         if (initInput == ""):
             self.taxon1 = Taxon()
             self.taxon2 = Taxon()
@@ -346,6 +346,8 @@ class TaxonomyMapping:
 	for pair in pw.keys():
 	    t=re.match("(.*),(.*)",pair)
 	    tmpStr = pw[pair]
+	    if(tmpStr == ""):
+		continue
 	    if(tmpStr.find(",") != -1):
 		tmpStr = tmpStr.replace(","," ")
 		tmpStr = "{" + tmpStr + "}"
@@ -410,10 +412,10 @@ class TaxonomyMapping:
             for [T3, T4, P] in tmpTr:
 		if(T1 == T3 or T2 == T3):
 		    self.tr.remove([T3, T4, P])
-		    self.tr.append([tmpStr, T4, P])
+		    self.tr.append([tmpStr, T4, 0])
 		elif(T1 == T4 or T2 == T4):
 		    self.tr.remove([T3, T4, P])
-		    self.tr.append([T3, tmpStr, P])
+		    self.tr.append([T3, tmpStr, 0])
 
 	# Duplicates
 	tmpTr = list(self.tr)
@@ -472,7 +474,7 @@ class TaxonomyMapping:
 	self.mir[tName + "_" + sibling +"," + tName + "_" + child] ="{disjoint}"
 
     def addPMir(self, t1, t2, r, provenance):
-    	if(self.mir.has_key(t1 + "," + t2)):
+    	if(self.mir.has_key(t1 + "," + t2) and self.mir[t1+","+t2] != ""):
 	    return None
 	else:
 	    r=r.rstrip()
@@ -795,11 +797,27 @@ class TaxonomyMapping:
                 if(a.confidence != 3-c):
 	            self.articulationSet.articulations.insert(i, a)
                     continue
-	        self.removeMir(a.__str__())
 	        if(self.testConsistency(outputDir)):
+	            self.removeMir(a.__str__())
 		    print "Remedial measure: remove [" + a.toString() + "]"
+                    self.traceOut(outputDir, a)
 		    return True
-            return False
+	        self.articulationSet.articulations.insert(i, a)
+        return False
+
+    def traceOut(self, outputDir, a):
+	tmpStr = "Articulation " + a.__str__() + " is inconsistent with [ "
+        s = len(self.articulationSet.articulations)
+        for i in range(s):
+	    a = self.articulationSet.articulations.pop(i)
+	    self.hypothesisType = "possible"
+	    self.hypothesis = Articulation(a.toString(), self)
+	    goal = self.testConsistencyWithGoal(outputDir, False, False)
+	    if(goal[0].find("false") != -1):
+	        tmpStr = tmpStr + a.toString() + " "
+	    self.articulationSet.articulations.insert(i, a)
+	print tmpStr + "]"
+	
 
     def BCSremedy(self, outputDir):
 	testTaxMap = TaxonomyMapping()

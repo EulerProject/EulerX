@@ -238,8 +238,8 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
     fMir.close()
     
     # Generating all possible worlds
-    taxMap.generatePW(outputDir, taxMap.name)
     taxMap.generateDot(outputDir, taxMap.name, taxMap)
+    taxMap.generatePW(outputDir, taxMap.name)
     outputResult(result, outputType, outputFile, numberOutputCols, goalTypes, outputDir, htmlDir)
     
 
