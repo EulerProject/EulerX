@@ -1,0 +1,25 @@
+1.A,2.A,mir,{is_included_in,equals}
+1.A,2.B,mir,{includes}
+1.A,2.D,mir,{includes}
+1.A,2.G,inferred,{includes overlaps}
+1.A,2.F,inferred,{includes overlaps}
+1.C,2.A,inferred,{is_included_in}
+1.C,2.B,mir,{disjoint}
+1.C,2.D,mir,{disjoint}
+1.C,2.G,inferred,{disjoint overlaps}
+1.C,2.F,mir,{is_included_in,overlaps}
+1.B,2.A,inferred,{is_included_in}
+1.B,2.B,mir,{equals}
+1.B,2.D,mir,{disjoint}
+1.B,2.G,mir,{disjoint}
+1.B,2.F,mir,{disjoint}
+1.E,2.A,inferred,{is_included_in}
+1.E,2.B,mir,{disjoint}
+1.E,2.D,mir,{disjoint}
+1.E,2.G,mir,{equals,overlaps}
+1.E,2.F,inferred,{disjoint overlaps}
+1.D,2.A,inferred,{is_included_in}
+1.D,2.B,mir,{disjoint}
+1.D,2.D,mir,{equals}
+1.D,2.G,mir,{disjoint}
+1.D,2.F,mir,{disjoint}

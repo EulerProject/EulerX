@@ -1,0 +1,15 @@
+taxonomy 1 Taxonomy1
+(A_1 B_1 F_1)
+(B_1 C_1 D_1 E_1)
+(F_1 G_1 H_1)
+
+taxonomy 2 Taxonomy2
+(A_2 B_2 F_2)
+(B_2 C_2 H_2 E_2)
+(F_2 G_2 I_2)
+
+articulation abs abstract
+[A_1 equals A_2]
+[E_1 equals E_2]
+[G_1 equals G_2]
+[F_1 overlaps B_2]
