@@ -38,8 +38,11 @@ class Taxon:
         return result
 
 
-    def stringOf(self):
+    def stringOfReasoner(self):
         return self.taxonomy.authority.abbrev + "_" + self.abbrev
+    
+    def stringOf(self):
+        return self.taxonomy.authority.abbrev + "." + self.abbrev
     
     def depthFirstPrint(self):
         
@@ -53,7 +56,7 @@ class Taxon:
     def depthFirstLTax(self):
         result = ""
         for child in self.children:
-            result += child.stringOf() + "(x) -> " + self.stringOf() + "(x).\n"
+            result += child.stringOfReasoner() + "(x) -> " + self.stringOfReasoner() + "(x).\n"
             result += child.depthFirstLTax()
         return result
  
@@ -166,16 +169,16 @@ class Articulation:
 	if (initInput.find("sum") != -1 or initInput.find("diff") != -1):
 	    if (initInput.find("lsum") != -1):
 	        self.relations = [relationDict["+="]]
-	        elements = re.match("(.*)_(.*) (.*)_(.*) lsum (.*)_(.*)", initInput)
+	        elements = re.match("(.*)\.(.*) (.*)\.(.*) lsum (.*)\.(.*)", initInput)
 	    elif (initInput.find("rsum") != -1):
 	        self.relations = [relationDict["=+"]]
-	        elements = re.match("(.*)_(.*) rsum (.*)_(.*) (.*)_(.*)", initInput)
+	        elements = re.match("(.*)\.(.*) rsum (.*)\.(.*) (.*)\.(.*)", initInput)
 	    elif (initInput.find("ldiff") != -1):
 	        self.relations = [relationDict["-="]]
-	        elements = re.match("(.*)_(.*) (.*)_(.*) ldiff (.*)_(.*)", initInput)
+	        elements = re.match("(.*)\.(.*) (.*)\.(.*) ldiff (.*)\.(.*)", initInput)
 	    elif (initInput.find("rdiff") != -1):
 	        self.relations = [relationDict["=-"]]
-	        elements = re.match("(.*)_(.*) rdiff (.*)_(.*) (.*)_(.*)", initInput)
+	        elements = re.match("(.*)\.(.*) rdiff (.*)\.(.*) (.*)\.(.*)", initInput)
 	    elif (initInput.find("e4sum") != -1):
 	        self.relations = [relationDict["+=+"]]
 	        elements = re.match("(.*)_(.*) (.*)_(.*) e4sum (.*)_(.*) (.*)_(.*)", initInput)
@@ -198,12 +201,12 @@ class Articulation:
                 self.taxon4 = mapping.getTaxon(taxon4taxonomy, taxon4taxon)
 	        self.numTaxon = 4
         else:
-            ## initInput is of form b48_a equals k04_a
+            ## initInput is of form b48.a equals k04.a
             self.relations = []
             if (initInput.find("{") != -1):
-                elements = re.match("(.*)_(.*) {(.*)} (.*)_(.*)", initInput)
+                elements = re.match("(.*)\.(.*) {(.*)} (.*)\.(.*)", initInput)
             else:
-                elements = re.match("(.*)_(.*) (.*) (.*)_(.*)", initInput)
+                elements = re.match("(.*)\.(.*) (.*) (.*)\.(.*)", initInput)
             
             taxon1taxonomy = elements.group(1)
             taxon1taxon = elements.group(2)
@@ -247,15 +250,15 @@ class Articulation:
     
     def articulationSubtitution(self, taxon1, taxon2, relation):
         relString = relation.logicSymbol
-        relString = relString.replace("$x", taxon1.stringOf())
-        relString = relString.replace("$y", taxon2.stringOf())
+        relString = relString.replace("$x", taxon1.stringOfReasoner())
+        relString = relString.replace("$y", taxon2.stringOfReasoner())
         return relString
     
     def sArticulationSubtitution(self, taxon1, taxon2, taxon3, relation):
         relString = relation.logicSymbol
-        relString = relString.replace("$x", taxon1.stringOf())
-        relString = relString.replace("$y", taxon2.stringOf())
-        relString = relString.replace("$z", taxon3.stringOf())
+        relString = relString.replace("$x", taxon1.stringOfReasoner())
+        relString = relString.replace("$y", taxon2.stringOfReasoner())
+        relString = relString.replace("$z", taxon3.stringOfReasoner())
         return relString
     
     def __str__(self):
@@ -401,8 +404,8 @@ class TaxonomyMapping:
 
 	# Equalities
         for [T1, T2] in self.eq:
-            T1s = T1.split("_")
-            T2s = T2.split("_")
+            T1s = T1.split(".")
+            T2s = T2.split(".")
 	    if(T1s[1] == T2s[1]):
 		tmpStr = T1s[1]
 		fDot.write("\"" + tmpStr +"\" [color=blue];\n")
@@ -465,16 +468,16 @@ class TaxonomyMapping:
 	print tmpStr + "]"
 	
     def addTMir(self, tName, parent, child):
-	self.mir[tName + "_" + parent +"," + tName + "_" + child] = "{includes}"
-	self.tr.append([tName + "_" + child, tName + "_" + parent, 0])
-	self.addIMir(tName + "_" + parent, tName + "_" + child, 0)
+	self.mir[tName + "." + parent +"," + tName + "." + child] = "{includes}"
+	self.tr.append([tName + "." + child, tName + "." + parent, 0])
+	self.addIMir(tName + "." + parent, tName + "." + child, 0)
 
     def addDMir(self, tName, child, sibling):
-	self.mir[tName + "_" + child +"," + tName + "_" + sibling] ="{disjoint}"
-	self.mir[tName + "_" + sibling +"," + tName + "_" + child] ="{disjoint}"
+	self.mir[tName + "." + child +"," + tName + "." + sibling] ="{disjoint}"
+	self.mir[tName + "." + sibling +"," + tName + "." + child] ="{disjoint}"
 
     def addPMir(self, t1, t2, r, provenance):
-    	if(self.mir.has_key(t1 + "," + t2) and self.mir[t1+","+t2] != ""):
+    	if(self.mir.has_key(t1 + "," + t2)):
 	    return None
 	else:
 	    r=r.rstrip()
@@ -604,7 +607,7 @@ class TaxonomyMapping:
                 innerTaxa = self.taxonomies[theseTaxonomies[innerloop]].taxa.keys()
                 for outerTaxonLoop in range (len(outerTaxa)):
                     for innerTaxonLoop in range (len(innerTaxa)):
-                        newTuple = (theseTaxonomies[outerloop] + "_" + outerTaxa[outerTaxonLoop], theseTaxonomies[innerloop] + "_" + innerTaxa[innerTaxonLoop])
+                        newTuple = (theseTaxonomies[outerloop] + "." + outerTaxa[outerTaxonLoop], theseTaxonomies[innerloop] + "." + innerTaxa[innerTaxonLoop])
                         taxa.append(newTuple)
         return taxa
                         
@@ -616,7 +619,7 @@ class TaxonomyMapping:
             theseTaxa = thisTaxonomy.taxa.keys()
             for outerloop in range(len(theseTaxa)):
                 for innerloop in range(outerloop+1, len(theseTaxa)):
-                    newTuple = (theseTaxonomies[taxonLoop] + "_" + theseTaxa[outerloop], theseTaxonomies[taxonLoop] + "_" + theseTaxa[innerloop])
+                    newTuple = (theseTaxonomies[taxonLoop] + "." + theseTaxa[outerloop], theseTaxonomies[taxonLoop] + "." + theseTaxa[innerloop])
                     taxa.append(newTuple)
         return taxa
         
@@ -653,12 +656,12 @@ class TaxonomyMapping:
         if (1 == 1):
             if (memory == False):
                 proverOutputFile = outputDir  + self.name + self.ltaAbbrevString() + thisGoal + "Prover.txt"
-                self.writeGoalFile(proverOutputFile, ltaxRules, self.prover, self.hypothesisType == "possible")
+                self.writeGoalFile(proverOutputFile, ltaxRules, self.prover, True)
 
                 maceOutputFile = outputDir + self.name + self.ltaAbbrevString() + thisGoal + "Mace.txt"
                 self.writeGoalFile(maceOutputFile, ltaxRules, self.mace, False)
             else:
-                proverOutputFile = self.makeGoalFile(ltaxRules, self.prover, self.hypothesisType == "possible")
+                proverOutputFile = self.makeGoalFile(ltaxRules, self.prover, True)
                 maceOutputFile = self.makeGoalFile(ltaxRules, self.mace, False)
         
             if (self.hypothesisType == "implied"):
@@ -999,9 +1002,8 @@ class TaxonomyMapping:
         timeoutString = ""
         # if theroem is proved without a goal, then things are 
         # incconsistent
-        if (maceOutput[0] == "model found"):
-            result = "true"
-        else:
+        result = "true"
+        if (maceOutput[0] != "model found"):
             if (maceOutput[0]) == "timeout":
                 timeoutString += " mace4 timeout "
 
@@ -1019,7 +1021,6 @@ class TaxonomyMapping:
               if (proverOutput[0] == "timeout"):
                   timeoutString += "prover9 timeout "
                   result = "unclear" + timeoutString
-              
         
         return [result, reasoners, inputs, outputs]
     

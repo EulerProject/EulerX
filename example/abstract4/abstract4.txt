@@ -5,9 +5,9 @@ taxonomy 2 Taxonomy2
 (A B D F G)
 
 articulation abs abstract
-[1_A {is_included_in equals} 2_A]
-[1_B equals 2_B]
-[1_C {is_included_in overlaps} 2_F]
-[1_D equals 2_D]
-[1_E {equals overlaps} 2_G]
+[1.A {is_included_in equals} 2.A]
+[1.B equals 2.B]
+[1.C {is_included_in overlaps} 2.F]
+[1.D equals 2.D]
+[1.E {equals overlaps} 2.G]
 

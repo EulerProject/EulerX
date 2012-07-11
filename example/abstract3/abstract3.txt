@@ -11,16 +11,16 @@ taxonomy 2 Taxonomy2
 (I K)
 
 articulation abs abstract
-[1_A is_included_in 2_A]
-[1_B equals 2_B]
-[1_F is_included_in 2_F]
-[1_I includes 2_I]
-[1_C 1_D lsum 2_CD]
-[1_E equals 2_E]
-[1_G equals 2_G]
-[1_H equals 2_H]
-[1_J equals 2_J]
-[1_K equals 2_K]
-[1_F 2_J lsum 2_F]
-[1_I 1_J lsum 2_K]
+[1.A is_included_in 2.A]
+[1.B equals 2.B]
+[1.F is_included_in 2.F]
+[1.I includes 2.I]
+[1.C 1.D lsum 2.CD]
+[1.E equals 2.E]
+[1.G equals 2.G]
+[1.H equals 2.H]
+[1.J equals 2.J]
+[1.K equals 2.K]
+[1.F 2.J lsum 2.F]
+[1.I 1.J lsum 2.K]
 

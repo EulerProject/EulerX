@@ -60,7 +60,7 @@ class NonEmptiness(LatentTaxAssumption):
         doneList = []
         for taxonomy in taxonomies.taxonomies.values():
             for taxon in taxonomy.taxa.values():
-                name = taxon.stringOf()
+                name = taxon.stringOfReasoner()
                 if ((name in doneList) == False):
                     doneList.append(name)
                     result += "exists x " + name + "(x).\n"   
@@ -81,12 +81,12 @@ class DisjointChildren(LatentTaxAssumption):
                     for child in taxon.children:
                         for child2 in taxon.children:
                             if (child.stringOf() > child2.stringOf()):
-                                result += "(all x (" + child.stringOf() + "(x) -> -" + child2.stringOf() + "(x))).\n"
+                                result += "(all x (" + child.stringOfReasoner() + "(x) -> -" + child2.stringOfReasoner() + "(x))).\n"
                 ### deal with multiple top level nodes
 		for taxon2 in taxonomy.taxa.values():                   
 			if ((taxon in taxonomy.roots) and (taxon2 in taxonomy.roots) and (taxon.stringOf() > taxon2.stringOf())):
-                                result += "(all x (" + taxon.stringOf() + "(x) -> -" + taxon2.stringOf() + "(x))).\n"
-                                result += "(all x (" + taxon2.stringOf() + "(x) -> -" + taxon.stringOf() + "(x))).\n"
+                                result += "(all x (" + taxon.stringOfReasoner() + "(x) -> -" + taxon2.stringOfReasoner() + "(x))).\n"
+                                result += "(all x (" + taxon2.stringOfReasoner() + "(x) -> -" + taxon.stringOfReasoner() + "(x))).\n"
                                 #result += taxon.stringOf() + " " + taxon2.stringOf() + " ( DC )\n"
 
 
@@ -106,10 +106,10 @@ class Coverage(LatentTaxAssumption):
         for taxonomy in taxonomies.taxonomies.values():
             for taxon in taxonomy.taxa.values():
                 if (taxon.hasChildren()):
-                    result += taxon.stringOf() + "(x) -> "
+                    result += taxon.stringOfReasoner() + "(x) -> "
                     for child in taxon.children:
                         if (child != taxon.children[0]):
                             result += " | "
-                        result += child.stringOf() + "(x)"
+                        result += child.stringOfReasoner() + "(x)"
                     result += ".\n"
         return result

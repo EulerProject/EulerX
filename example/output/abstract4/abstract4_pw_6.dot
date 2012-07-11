@@ -5,12 +5,14 @@ rankdir = RL
 "B" [color=blue];
 "D" [color=blue];
 "B" [color=blue];
-"A" [color=blue];
 "D" [color=blue];
-"1_C" -> "A" [style=filled, color=black];
-"1_E" -> "A" [style=filled, color=black];
-"2_F" -> "A" [style=filled, color=black];
-"2_G" -> "A" [style=filled, color=black];
-"B" -> "A" [style=filled, color=black];
-"D" -> "A" [style=filled, color=black];
+"1.C" -> "1.A" [style=filled, color=black];
+"1.E" -> "1.A" [style=filled, color=black];
+"2.F" -> "2.A" [style=filled, color=black];
+"2.G" -> "2.A" [style=filled, color=black];
+"1.A" -> "2.A" [style=filled, color=red];
+"B" -> "1.A" [style=filled, color=black];
+"D" -> "1.A" [style=filled, color=black];
+"B" -> "2.A" [style=dashed, color=grey];
+"D" -> "2.A" [style=dashed, color=grey];
 }
