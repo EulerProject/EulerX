@@ -815,12 +815,12 @@ class TaxonomyMapping:
 	    tmpTm.hypothesis = Articulation(a.toString(), self)
 	    goal = tmpTm.testConsistencyWithGoal(outputDir, False, False)
 	    #print goal
-	    $print tmpTm.articulationSet.articulations
-	    if(goal[0].find("true") == -1):
+	    #print tmpTm.articulationSet.articulations
+	    if(goal[0].find("true") != -1):
 	        tmpTm.articulationSet.articulations.insert(i, a)
 		i=i+1
 	tmpStr = tmpStr + tmpTm.articulationSet.articulations.__str__()
-	print tmpStr + "]"
+	print tmpStr
 	
     def traceOut(self, outputDir, a):
 	tmpStr = "Articulation " + a.__str__() + " is inconsistent with [ "
