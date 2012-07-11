@@ -800,11 +800,28 @@ class TaxonomyMapping:
 	        if(self.testConsistency(outputDir)):
 	            self.removeMir(a.__str__())
 		    print "Remedial measure: remove [" + a.toString() + "]"
-                    self.traceOut(outputDir, a)
+                    self.traceOut1(outputDir, a)
 		    return True
 	        self.articulationSet.articulations.insert(i, a)
         return False
 
+    def traceOut1(self, outputDir, a):
+	tmpStr = "Articulation " + a.__str__() + " is inconsistent with "
+	tmpTm = copy.deepcopy(self)
+	i = 0
+        while i < len(tmpTm.articulationSet.articulations):
+	    a = tmpTm.articulationSet.articulations.pop(i)
+	    tmpTm.hypothesisType = "possible"
+	    tmpTm.hypothesis = Articulation(a.toString(), self)
+	    goal = tmpTm.testConsistencyWithGoal(outputDir, False, False)
+	    #print goal
+	    $print tmpTm.articulationSet.articulations
+	    if(goal[0].find("true") == -1):
+	        tmpTm.articulationSet.articulations.insert(i, a)
+		i=i+1
+	tmpStr = tmpStr + tmpTm.articulationSet.articulations.__str__()
+	print tmpStr + "]"
+	
     def traceOut(self, outputDir, a):
 	tmpStr = "Articulation " + a.__str__() + " is inconsistent with [ "
         s = len(self.articulationSet.articulations)
