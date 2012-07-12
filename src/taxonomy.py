@@ -280,12 +280,13 @@ class Articulation:
                 
     
     def __repr__(self):
-        result = "Articulation: " + self.taxon1.stringOf() + " "
-        for relation in self.relations:
-            result += relation.name + " " 
+	return "<"+self.__str__()+">"
+        #result = "Articulation: " + self.taxon1.stringOf() + " "
+        #for relation in self.relations:
+        #    result += relation.name + " " 
     
-        result += self.taxon2.stringOf() + " \n"
-        return result
+        #result += self.taxon2.stringOf() + " \n"
+        #return result
   
 class ArticulationSet:
     
@@ -449,13 +450,30 @@ class TaxonomyMapping:
 	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=red];\n")
 		if(self == taxaMap):
 		    self.traceDown(outputDir, T1, T2)
+		    self.traceDown1(outputDir, T1, T2)
 	    elif(P == 2):
 	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
         fDot.write("}\n")
         fDot.close()
 
+    def traceDown1(self, outputDir, T1, T2):
+	tmpStr = "Red edge " + T1 + "->"+ T2 + " is related to "
+	tmpTm = copy.deepcopy(self)
+	i = 0
+        while i < len(tmpTm.articulationSet.articulations):
+	    a = tmpTm.articulationSet.articulations.pop(i)
+	    tmpTm.hypothesisType = "implied"
+	    tmpTm.hypothesis = Articulation(T1 + " is_included_in " + T2, tmpTm)
+	    goal = tmpTm.testConsistencyWithGoal(outputDir, False, False)
+	    #print tmpTm.articulationSet.articulations
+	    if(goal[0].find("true") == -1):
+	        tmpTm.articulationSet.articulations.insert(i, a)
+		i=i+1
+	tmpStr += tmpTm.articulationSet.articulations.__str__()
+	print tmpStr
+	
     def traceDown(self, outputDir, T1, T2):
-	tmpStr = "Red edge " + T1 + "->"+ T2 + " is related to [ "
+	tmpStr = "Red edge " + T1 + "->"+ T2 + " depends on ["
         s = len(self.articulationSet.articulations)
         for i in range(s):
 	    a = self.articulationSet.articulations.pop(i)
@@ -463,7 +481,7 @@ class TaxonomyMapping:
 	    self.hypothesis = Articulation(T1 + " is_included_in " + T2, self)
 	    goal = self.testConsistencyWithGoal(outputDir + "reasonerFiles/", False, False)
 	    if(goal[0].find("false") != -1):
-	        tmpStr = tmpStr + a.toString() + " "
+	        tmpStr += `a`+" "
 	    self.articulationSet.articulations.insert(i, a)
 	print tmpStr + "]"
 	
@@ -656,7 +674,7 @@ class TaxonomyMapping:
         if (1 == 1):
             if (memory == False):
                 proverOutputFile = outputDir  + self.name + self.ltaAbbrevString() + thisGoal + "Prover.txt"
-                self.writeGoalFile(proverOutputFile, ltaxRules, self.prover, True)
+                self.writeGoalFile(proverOutputFile, ltaxRules, self.prover, self.hypothesisType != "implied")
 
                 maceOutputFile = outputDir + self.name + self.ltaAbbrevString() + thisGoal + "Mace.txt"
                 self.writeGoalFile(maceOutputFile, ltaxRules, self.mace, False)
@@ -817,12 +835,11 @@ class TaxonomyMapping:
 	    tmpTm.hypothesisType = "possible"
 	    tmpTm.hypothesis = Articulation(a.toString(), self)
 	    goal = tmpTm.testConsistencyWithGoal(outputDir, False, False)
-	    #print goal
 	    #print tmpTm.articulationSet.articulations
 	    if(goal[0].find("true") != -1):
 	        tmpTm.articulationSet.articulations.insert(i, a)
 		i=i+1
-	tmpStr = tmpStr + tmpTm.articulationSet.articulations.__str__()
+	tmpStr += tmpTm.articulationSet.articulations.__str__()
 	print tmpStr
 	
     def traceOut(self, outputDir, a):
@@ -834,7 +851,7 @@ class TaxonomyMapping:
 	    self.hypothesis = Articulation(a.toString(), self)
 	    goal = self.testConsistencyWithGoal(outputDir, False, False)
 	    if(goal[0].find("false") != -1):
-	        tmpStr = tmpStr + a.toString() + " "
+	        tmpStr += "<" + a.toString() + "> "
 	    self.articulationSet.articulations.insert(i, a)
 	print tmpStr + "]"
 	
