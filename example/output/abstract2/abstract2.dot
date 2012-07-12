@@ -1,0 +1,27 @@
+digraph {
+
+rankdir = RL
+
+"A" [color=blue];
+"E" [color=blue];
+"1.D" -> "1.B" [style=filled, color=black];
+"2.CD" -> "2.B" [style=filled, color=black];
+"1.C" -> "2.CD" [style=filled, color=black];
+"2.CD" -> "1.B" [style=filled, color=red];
+"1.D" -> "2.B" [style=filled, color=red];
+"2.B" -> "A" [style=filled, color=black];
+"2.F" -> "A" [style=filled, color=black];
+"1.B" -> "A" [style=filled, color=black];
+"E" -> "1.B" [style=filled, color=black];
+"E" -> "2.B" [style=filled, color=black];
+"1.F,2.GH" -> "2.F" [style=filled, color=black];
+"1.G" -> "1.F,2.GH" [style=filled, color=black];
+"1.H" -> "1.F,2.GH" [style=filled, color=black];
+"1.C" -> "A" [style=dashed, color=grey];
+"1.D" -> "A" [style=dashed, color=grey];
+"1.C" -> "1.B" [style=dashed, color=grey];
+"1.G" -> "A" [style=dashed, color=grey];
+"1.H" -> "A" [style=dashed, color=grey];
+"E" -> "A" [style=dashed, color=grey];
+"1.F,2.GH" -> "A" [style=dashed, color=grey];
+}
