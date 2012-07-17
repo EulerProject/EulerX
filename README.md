@@ -1,5 +1,11 @@
 # Thank you for using Euler
 
+# Introduction
+
+Euler is a toolkit (mostly written in Python) for merging taxonomies and visualizing the results. (see https://sites.google.com/site/eulerdi/ for more info).
+
+# Examples
+
 Here are examples under example/ directory, 
 
 1. cd to example/ directory
