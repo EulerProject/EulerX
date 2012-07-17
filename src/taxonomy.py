@@ -656,7 +656,7 @@ class TaxonomyMapping:
         if (1 == 1):
             if (memory == False):
                 proverOutputFile = outputDir  + self.name + self.ltaAbbrevString() + thisGoal + "Prover.txt"
-                self.writeGoalFile(proverOutputFile, ltaxRules, self.prover, True)
+                self.writeGoalFile(proverOutputFile, ltaxRules, self.prover, self.hypothesisType != "implied")
 
                 maceOutputFile = outputDir + self.name + self.ltaAbbrevString() + thisGoal + "Mace.txt"
                 self.writeGoalFile(maceOutputFile, ltaxRules, self.mace, False)
