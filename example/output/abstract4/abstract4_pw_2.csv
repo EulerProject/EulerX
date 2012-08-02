@@ -24,7 +24,7 @@
 2.F,1.B,disjoint
 1.A,2.D,includes
 1.A,2.G,overlaps
-1.A,2.F,overlaps
+1.A,2.F,includes
 1.A,2.A,is_included_in
 2.F,1.D,disjoint
 1.A,2.B,includes
@@ -39,8 +39,8 @@
 2.D,2.F,disjoint
 2.D,2.B,disjoint
 1.A,1.D,includes
-1.C,2.G,disjoint
-1.C,2.F,is_included_in
+1.C,2.G,overlaps
+1.C,2.F,overlaps
 2.D,1.B,disjoint
 2.D,1.C,disjoint
 1.E,1.B,disjoint

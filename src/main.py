@@ -229,6 +229,15 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
                         if(tmpGoal.find("unclear") != -1):
 		            fMir.write(thisGoal[0] + "," + thisGoal[1] + ",inferred,unclear\n")
                         else:
+			    # Uncertainty Reduction
+			    toBeReduced = tmpGoal.rstrip().split(' ')
+			    tmpGoal=""
+			    for i in range(len(toBeReduced)):
+				usrInput = raw_input("Is it possible that "+thisGoal[0]+" "+toBeReduced[i]+" "+thisGoal[1]+"? [Y]n:")
+				if usrInput != "n":
+				    tmpGoal+=toBeReduced[i]+" "
+
+			    ###################################
 			    taxMap.addPMir(thisGoal[0], thisGoal[1], tmpGoal, 1)
 		            fMir.write(thisGoal[0] + "," + thisGoal[1] + ",inferred,{" + tmpGoal.rstrip() + "}\n")
 			    
