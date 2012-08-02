@@ -23,8 +23,8 @@
 1.C,2.B,disjoint
 2.F,1.B,disjoint
 1.A,2.D,includes
-1.A,2.G,includes
-1.A,2.F,overlaps
+1.A,2.G,overlaps
+1.A,2.F,includes
 1.A,2.A,is_included_in
 2.F,1.D,disjoint
 1.A,2.B,includes
@@ -46,7 +46,7 @@
 1.E,1.B,disjoint
 2.D,1.E,disjoint
 1.C,2.A,is_included_in
-1.E,2.G,equals
+1.E,2.G,overlaps
 1.C,1.B,disjoint
 1.C,1.D,disjoint
 1.C,1.E,disjoint
@@ -55,7 +55,7 @@
 1.E,2.B,disjoint
 1.E,2.D,disjoint
 2.F,2.B,disjoint
-1.E,2.F,disjoint
+1.E,2.F,overlaps
 1.E,2.A,is_included_in
 2.B,1.D,disjoint
 2.B,1.E,disjoint

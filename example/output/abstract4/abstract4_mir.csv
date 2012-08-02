@@ -1,7 +1,7 @@
 1.A,2.A,mir,{is_included_in,equals}
 1.A,2.B,mir,{includes}
 1.A,2.D,mir,{includes}
-1.A,2.G,inferred,{includes overlaps}
+1.A,2.G,inferred,{overlaps}
 1.A,2.F,inferred,{includes overlaps}
 1.C,2.A,inferred,{is_included_in}
 1.C,2.B,mir,{disjoint}
