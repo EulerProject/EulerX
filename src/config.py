@@ -22,6 +22,7 @@ config = {
     "compression" : False,
     "memory" : False,
     "ltas" :LatentTaxAssumption(),
+    "uncertaintyRed" : False,
 }
 
 
