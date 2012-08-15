@@ -68,7 +68,7 @@ def runDirReasoner(outputDir, inputDir):
     return result   
           
 
-def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, outputType, outputFile, numberOutputCols, reasonerDir, reasonerTimeout, compression, htmlDir, memory):
+def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, outputType, outputFile, numberOutputCols, reasonerDir, reasonerTimeout, compression, htmlDir, memory, uncertaintyRed = True):
 
     #ltaClass = LatentTaxAssumption()
 
@@ -230,12 +230,14 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
 		            fMir.write(thisGoal[0] + "," + thisGoal[1] + ",inferred,unclear\n")
                         else:
 			    # Uncertainty Reduction
-			    toBeReduced = tmpGoal.rstrip().split(' ')
-			    tmpGoal=""
-			    for i in range(len(toBeReduced)):
-				usrInput = raw_input("Is it possible that "+thisGoal[0]+" "+toBeReduced[i]+" "+thisGoal[1]+"? [Y]n:")
-				if usrInput != "n":
-				    tmpGoal+=toBeReduced[i]+" "
+			    if(uncertaintyRed):
+			        toBeReduced = tmpGoal.rstrip().split(' ')
+			        tmpGoal=""
+			        if(len(toBeReduced) != 1):
+			          for i in range(len(toBeReduced)):
+				    usrInput = raw_input("Is it possible that "+thisGoal[0]+" "+toBeReduced[i]+" "+thisGoal[1]+"? [Y]n:")
+				    if usrInput != "n":
+				        tmpGoal+=toBeReduced[i]+" "
 
 			    ###################################
 			    taxMap.addPMir(thisGoal[0], thisGoal[1], tmpGoal, 1)
@@ -605,6 +607,8 @@ def getConfig(opts, config):
                 for thisLTA in theseLTAs:
                     myList.append(ltas.getLTAFromAbbrev(thisLTA))
                     config["ltaList"] = powerSet(myList)
+        elif o == "-u":
+	    config["uncertaintyRed"] = True
 
 
     if (not(config.has_key("ltaList")) or ((len(config["ltaList"]) == 0))):
@@ -625,7 +629,7 @@ def main(optInfo):
 
 
     try:
-        opts, args = getopt.getopt(optInfo, "a:c:d:D:H:i:I:l:m:n:o:p:r:s:t:T:v:w:x:hzM")
+        opts, args = getopt.getopt(optInfo, "a:c:d:D:H:i:I:l:m:n:o:p:r:s:t:T:x:v:w:x:huzM")
     except getopt.GetoptError:
         # print help information and exit:
         usage()
@@ -649,7 +653,7 @@ def main(optInfo):
         parsedTLIs = parseTCS(config["inputLocation"], config["taxonomies"], config["species"], config["outputDir"])
         runDir(parsedTLIs, config["ltaList"], config["goals"], config["goalRelations"], config["goalTypes"], config["outputDir"], config["outputType"], config["outputFile"], numberOutputCols,config["reasonerDir"],config["reasonerTimeout"],config["compression"],config["htmlDir"], config["memory"])
     elif (config["inputType"] == "single"):
-        runSingle(config["inputLocation"], config["ltaList"], config["goals"], config["goalRelations"], config["goalTypes"], config["outputDir"], config["outputType"], config["outputFile"], numberOutputCols, config["reasonerDir"], config["reasonerTimeout"], config["compression"], config["htmlDir"], config["memory"])
+        runSingle(config["inputLocation"], config["ltaList"], config["goals"], config["goalRelations"], config["goalTypes"], config["outputDir"], config["outputType"], config["outputFile"], numberOutputCols, config["reasonerDir"], config["reasonerTimeout"], config["compression"], config["htmlDir"], config["memory"], config["uncertaintyRed"])
     elif (config["inputType"] == "directory"):
         runDir(config["inputLocation"], config["ltaList"], config["goals"], config["goalRelations"], config["goalTypes"], config["outputDir"], config["outputType"], config["outputFile"], numberOutputCols,config["reasonerDir"],config["reasonerTimeout"],config["compression"],config["htmlDir"], config["memory"])
     elif (config["inputType"] == "single_reasoner"):
