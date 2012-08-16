@@ -1,3 +1,4 @@
+from decisionTree import *
 from taxonomy import *
 from latent_tax_assumption import *
 from tcsParser import *
@@ -96,6 +97,9 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
         
     # for each LTA se
     #ltaSets = ltaClass.powerSet(["NonEmptiness()", "DisjointChildren()", "Coverage()"])
+
+    # branches that will be used to build decision trees
+    branches=[]
 
     for ltaSet in ltaSets:
         newImplied = []
@@ -232,9 +236,16 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
 			    # Uncertainty Reduction
 			    if(uncertaintyRed):
 			        toBeReduced = tmpGoal.rstrip().split(' ')
-			        tmpGoal=""
-			        if(len(toBeReduced) != 1):
-			          for i in range(len(toBeReduced)):
+				tmpL = len(toBeReduced)
+				if(tmpL == 0):
+				    print "Your input is inconsistent, exit!"
+				    return
+			        if(tmpL != 1):
+				  ## Build up decision trees
+				  branches.append([thisGoal[0], thisGoal[1], toBeReduced])
+				  ## Without building up decision trees
+			          #tmpGoal=""
+			          for i in range(0):
 				    usrInput = raw_input("Is it possible that "+thisGoal[0]+" "+toBeReduced[i]+" "+thisGoal[1]+"? [Y]n:")
 				    if usrInput != "n":
 				        tmpGoal+=toBeReduced[i]+" "
@@ -245,8 +256,12 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
 			    
         if (memory == False):
             outputNewTLI(inputFile, ltaSet, newImplied, newPossible, goalTypes, outputDir)
-
     fMir.close()
+
+    if(uncertaintyRed):
+	decs=Forest(taxMap, branches)
+	decs.dump()
+	return
     
     # Generating all possible worlds
     taxMap.generateDot(outputDir, taxMap.name, taxMap)
