@@ -260,7 +260,8 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
 
     if(uncertaintyRed):
 	decs=Forest(taxMap, branches)
-	decs.dump()
+	#decs.dump()
+	decs.genDot(outputDir+taxMap.name)
 	return
     
     # Generating all possible worlds

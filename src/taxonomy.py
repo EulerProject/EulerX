@@ -1023,11 +1023,12 @@ class TaxonomyMapping:
             ltaxRules += lta.toLTax(self)
         
         #print ltaxRules    
-        
-        output = open(outputFileName, "w")
-        output.write(self.prover.formatInputFile(ltaxRules))
-        output.close()
-        maceOutput = self.mace.run(outputFileName, False)
+	file = (outputDir == "")
+        if(file == False):
+            output = open(outputFileName, "w")
+            output.write(self.prover.formatInputFile(ltaxRules))
+            output.close()
+        maceOutput = self.mace.run(outputFileName, file)
         
         reasoners.append(self.mace.name)
         inputs.append(outputFileName)
@@ -1045,7 +1046,7 @@ class TaxonomyMapping:
             # then these axioms are consistent
             reasoners.append(self.prover.name)
             inputs.append(outputFileName)
-            proverOutput = self.prover.run(outputFileName, False)
+            proverOutput = self.prover.run(outputFileName, file)
             outputs.append(proverOutput[1])
             if (proverOutput[0] == "proved"):
                result = "false" + timeoutString
