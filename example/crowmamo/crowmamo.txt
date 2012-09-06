@@ -1,0 +1,67 @@
+taxonomy 2 Taxonomy2
+(348 349 352)
+(349 350 351)
+(352 353 354)
+(354 355 356)
+(356 357 358)
+(358 359 360)
+(360 361 362)
+(362 363 364)
+(364 365 366)
+(366 367 368)
+(368 369 370)
+(370 371 372)
+
+taxonomy 1 Taxonomy1
+(1 2 3 4 5 9 10 11 12 16 17)
+(5 6 7 8)
+(12 13 14 15)
+
+articulation crow crowmamo
+[2.348 equals 1.1]
+[2.350 equals 1.4]
+[2.351 equals 1.16]
+[2.353 overlaps 1.10]
+[2.355 equals 1.9]
+[2.357 is_included_in 1.10]
+[2.359 includes 1.5]
+[2.359 includes 1.6]
+[2.359 includes 1.7]
+[2.359 includes 1.8]
+[2.359 includes 1.11]
+[2.360 equals 1.12]
+[2.361 is_included_in 1.13]
+[2.362 is_included_in 1.12]
+[2.362 overlaps 1.13]
+[2.362 includes 1.14]
+[2.362 includes 1.15]
+[2.363 is_included_in 1.13]
+[2.364 is_included_in 1.12]
+[2.364 overlaps 1.13]
+[2.364 includes 1.14]
+[2.364 includes 1.15]
+[2.365 is_included_in 1.13]
+[2.366 is_included_in 1.12]
+[2.367 overlaps 1.13]
+[2.366 includes 1.14]
+[2.366 includes 1.15]
+[2.367 is_included_in 1.13]
+[2.368 is_included_in 1.12]
+[2.368 overlaps 1.13]
+[2.368 includes 1.14]
+[2.368 includes 1.15]
+[2.369 is_included_in 1.13]
+[2.370 is_included_in 1.12]
+[2.370 overlaps 1.13]
+[2.370 includes 1.14]
+[2.370 includes 1.15]
+[2.371 is_included_in 1.12]
+[2.371 overlaps 1.13]
+[2.371 includes 1.14]
+[2.371 includes 1.15]
+[2.372 is_included_in 1.13]
+[2.353 includes 1.2]
+[2.353 includes 1.3]
+[2.353 includes 1.17]
+[2.349 rsum 1.4 1.16]
+[2.359 rsum 1.5 1.11]
