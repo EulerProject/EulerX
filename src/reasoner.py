@@ -57,11 +57,12 @@ class Reasoner:
         
 
    
-        old = signal.signal(signal.SIGALRM, handler)
-        signal.alarm(900)
+        #old = signal.signal(signal.SIGALRM, handler)
+        #signal.alarm(900)
         result = ""
         outputFileName = ""
-        try:
+        #try:
+	if(1 == 1):
             inPipe, outPipe, errDummy = os.popen3(runPath)
             inPipe.write(inputString)
             inPipe.close()
@@ -69,19 +70,15 @@ class Reasoner:
             output = outPipe.read()
             
             result = self.parseOutput(output)
-        except TimedOut:
-            print "timed out homey! \n"
-            result = self.name + " forced timeout";
-        #finally:
-        signal.signal(signal.SIGALRM, old)
+        #except TimedOut:
+            #result = self.name + " forced timeout";
 
-        signal.alarm(0)
+
+        #signal.alarm(0)
         return [result, ""]
             
     def runFile (self,inputFileName):
         
-        def handler(signum, frame):
-            raise TimedOut()
         # top version linux, bottom version windoze.
         #program = os.popen(self.path + " " + input, "r")
         #program = os.popen(self.path.replace("Documents and Settings", "\"Documents and Settings\"") + " " + input.replace("Documents and Settings", "\"Documents and Settings\""), "r")
@@ -92,24 +89,25 @@ class Reasoner:
         if (os.environ.has_key("OS") and ((os.environ["OS"]).index("Windows") != -1)):
             inputFileName = quoteSpacesInPath(inputFileName)
    
-        old = signal.signal(signal.SIGALRM, handler)
-        signal.alarm(900)
+        #old = signal.signal(signal.SIGALRM, handler)
+        #signal.alarm(300)
         result = ""
         outputFileName = ""
-        try:
+        #try:
+	if(1 == 1):
             outFile, inFile, errFile = os.popen3(runPath + " " + inputFileName)
         
             output = inFile.read()
             outputFileName = self.saveOutput(origInput, output)
             result = self.parseOutput(output)
-        except TimedOut:
-            print "timed out homey! " + inputFileName + "\n"
-            result = self.name + " forced timeout"
+        #except TimedOut:
+        #    print "timed out homey! " + inputFileName + "\n"
+        #    result = self.name + " forced timeout"
             
         #finally:
-        signal.signal(signal.SIGALRM, old)
+        #signal.signal(signal.SIGALRM, old)
 
-        signal.alarm(0)
+        #signal.alarm(0)
         return [result, outputFileName]
                 
 

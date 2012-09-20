@@ -1,10 +1,13 @@
 from taxonomy import *
+from subprocess import Popen
 from latent_tax_assumption import *
 from tcsParser import *
 from utility import *
 from graphViz import *
 from config import *
 from reasoner import *
+import threading
+import time
 import getopt
 import sys
 import os
@@ -137,7 +140,7 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
          
         #if ((isConsistent == True) and (len(goalTypes) != 0))): 
         if ((consistentWithoutGoal != "true") and 
-		(taxMap.BCSremedy(reasonerOutputDir) != True)):
+		(taxMap.simpleRemedy(reasonerOutputDir) != True)):
 	    print consistentWithoutGoal
 	    print "The input is inconsistent and don't know how to remedy"
 	    fMir.close()
@@ -161,70 +164,70 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
 		    result.append(output)
 		    fMir.write(thisGoal[0] + "," + thisGoal[1] + ",mir," + tmpGoal + "\n")
 		    continue
-		tmpGoal = ""
                 for goalType in goalTypes:
+		    tmpGoal = ""
+		    threads = []
                     for goalRelation in goalRelations:                 
                         if goalType != "consistent":
                              #print goalType + " " + goalRelation + " " + str(thisGoal)
                              #goal = eval(thisGoal) goal should be an array of tuples
-                             taxMap.hypothesisType = goalType
-                             
-                             taxMap.hypothesis = Articulation(thisGoal[0] + " " + goalRelation + " " + thisGoal[1],taxMap)
-                        
-                             consistencyCheck = taxMap.testConsistencyWithGoal(reasonerOutputDir,compression, memory)
-                        
-                        
-                             goalIsTrue = consistencyCheck[0]
-                             source = consistencyCheck[4]
-                             #print "Hypothesis " + str(taxMap.hypothesis) + " is: " + goalIsTrue
-                             #if (goalIsTrue.find("stated") == -1):
-                             if (1 == 1):
-                        
-                                 output = taxMap.name 
-                            
-                                 #for taxonomy in taxMap.taxonomies.keys():
-                                     #output += taxMap.taxonomies[taxonomy].authority.abbrev + "\t"
-                                     #output += taxMap.taxonomies[taxonomy].authority.abbrev + "\t"
-                                 output += "\t" + taxMap.hypothesis.taxon1.taxonomy.authority.abbrev
-                                 output += "\t" + taxMap.hypothesis.taxon2.taxonomy.authority.abbrev
-                                 output += "\t" + taxMap.ltaString()         
-                                 output += "\t" + taxMap.hypothesisType + "\t" +  source
-                                 output += "\t" + taxMap.hypothesis.taxon1.abbrev 
-                                 #output += "\t" + taxMap.hypothesis.taxon1.taxonomy.authority.abbrev
-                                 output += "\t" + taxMap.hypothesis.taxon2.abbrev
-                                 #output += "\t" + taxMap.hypothesis.taxon2.taxonomy.authority.abbrev
-                                 output += "\t" + goalRelation
-                          
-                        
-                                 #print "con with goal: " + consistencyCheck[0] + " " + goalType + " " + goalRelation + " " + str(thisGoal)
-                        
-                                 provenance = provenanceString(consistencyCheck[1], consistencyCheck[2], consistencyCheck[3])
+			     t = ThreadProve(taxMap, reasonerOutputDir, thisGoal, goalRelation, goalType, compression, memory)
+			     t.start()
+			     threads.append(t)
+		    sleepT = 0
+                    for t in threads:
 
+		        while sleepT < 600:
+			    sleepT += 10
+			    time.sleep(10)
+			    if not t.isAlive():
+				break
+		        if t.isAlive():
+			    t.stop()
+			    t.join()
+			if t.result == None:
+			    print "FFF",
+			    consistencyCheck = ["unclear", "", "", "", ""]
+		        else:
+			    print "TTT",
+		    	    consistencyCheck = t.result
+
+		        goalRelation = t.goalRelation
+		    
+                        goalIsTrue = consistencyCheck[0]
+                        source = consistencyCheck[4]
                         
-                                 #print "Checking " + taxMap.hypothesisType + " "  + taxMap.hypothesis.toLTax() + ". "
-                                 if (goalIsTrue == "true"):
-                                     #print "Holds under " + taxMap.ltaString() + "\n"
-                                     output += "\ttrue\t" + provenance
-				     tmpGoal = tmpGoal + goalRelation + " "
-                                     if (goalType == "implied"):
-                                         newImplied.append(taxMap.hypothesis)
-				         taxMap.addPMir(thisGoal[0], thisGoal[1], goalRelation, 1)
-                                     else:
-                                         newPossible.append(taxMap.hypothesis)
+                        output = taxMap.name 
+                        output += "\t" + t.taxMap.hypothesis.taxon1.taxonomy.authority.abbrev
+                        output += "\t" + t.taxMap.hypothesis.taxon2.taxonomy.authority.abbrev
+                        output += "\t" + t.taxMap.ltaString()         
+                        output += "\t" + t.goalType + "\t" +  source
+                        output += "\t" + t.taxMap.hypothesis.taxon1.abbrev 
+                        output += "\t" + t.taxMap.hypothesis.taxon2.abbrev
+                        output += "\t" + goalRelation
+                          
+                        provenance = provenanceString(consistencyCheck[1], consistencyCheck[2], consistencyCheck[3])
+                        
+                        if (goalIsTrue == "true"):
+                            output += "\ttrue\t" + provenance
+			    tmpGoal = tmpGoal + goalRelation + " "
+                            if (goalType == "implied"):
+                                newImplied.append(t.taxMap.hypothesis)
+			        taxMap.addPMir(thisGoal[0], thisGoal[1], goalRelation, 1)
+                            else:
+                                newPossible.append(t.taxMap.hypothesis)
                                 
-                                 elif (goalIsTrue.find("false") != -1):
-                                     #print "Does not hold under " + taxMap.ltaString() + "\n"
-                                     output += "\t" + goalIsTrue + "\t" + provenance
-                                 elif (goalIsTrue.find("unclear") != -1):
-                                     #print "Cannot prove that it holds under " + taxMap.ltaString() + ". But provers may quit early.\n"                                    
-                                     output += "\t" + goalIsTrue + "\t" + provenance
-                                     tmpGoal = "unclear"
-                                 else:
-                                     #print "something's wrong with the logic for " + taxMap.ltaString() + "\n"
-                                     print "erronious goal is true is " + goalIsTrue
-                                     output += "ERROR!"    
+                        elif (goalIsTrue.find("false") != -1):
+                            output += "\t" + goalIsTrue + "\t" + provenance
+                        elif (goalIsTrue.find("unclear") != -1):
+                            output += "\t" + goalIsTrue + "\t" + provenance
+                            tmpGoal = "unclear"
+                        else:
+                            print "erronious goal is true is " + goalIsTrue
+                            output += "ERROR!"    
                                 
-                                 result.append(output)
+                        result.append(output)
+
 		    if(goalType == "possible"):
                         if(tmpGoal.find("unclear") != -1):
 		            fMir.write(thisGoal[0] + "," + thisGoal[1] + ",inferred,unclear\n")
@@ -248,11 +251,39 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
 
     fMir.close()
     
-    # Generating all possible worlds
+    # Generating RCG
     taxMap.generateDot(outputDir, taxMap.name, taxMap)
-    taxMap.generatePW(outputDir, taxMap.name)
+
+    # Generating all possible worlds
+    #taxMap.generatePW(outputDir, taxMap.name)
     outputResult(result, outputType, outputFile, numberOutputCols, goalTypes, outputDir, htmlDir)
     
+class ThreadProve(threading.Thread):
+    def __init__(self, taxMap, outputDir, thisGoal, goalRelation, goalType, compression, memory):
+	#threading.Thread.__init__(self)
+        super(ThreadProve, self).__init__()
+        self._stop = threading.Event()
+	self.taxMap = copy.deepcopy(taxMap)
+	self.outputDir = outputDir
+	self.thisGoal = thisGoal
+	self.goalType = goalType
+	self.goalRelation = goalRelation
+	self.compression = compression
+	self.memory = memory
+        self.taxMap.hypothesisType = goalType
+        self.taxMap.hypothesis = Articulation(thisGoal[0] + " " + goalRelation + " " + thisGoal[1],self.taxMap)
+	self.result = None
+                        
+
+    def run(self):
+	self.result = self.taxMap.testConsistencyWithGoal(self.outputDir,self.compression, self.memory)
+
+    def stop(self):
+        self._stop.set()
+
+    def stopped(self):
+        return self._stop.isSet()
+
 
 def outputNewTLI(inputFile, ltaSet, implied, possible, goalTypes, outputDir):
     
@@ -433,9 +464,9 @@ def outputResult(resultSet, outputType, outputFileName, outputCols, goalTypes, o
                 reasonerName = elements[reasonerIndex]
 		reasonerInput = ""
 		reasonerOutput = ""
-                if ((len(elements) >= reasonerIndex+1) and (elements[reasonerIndex+1].find(outputDir) != -1)): 
+                if ((len(elements) >= reasonerIndex+2) and (elements[reasonerIndex+1].find(outputDir) != -1)): 
                 	reasonerInput = (elements[reasonerIndex+1].split(outputDir))[1]
-                if ((len(elements) >= reasonerIndex+2) and (elements[reasonerIndex+2].find(outputDir) != -1)): 
+                if ((len(elements) >= reasonerIndex+3) and (elements[reasonerIndex+2].find(outputDir) != -1)): 
                 	reasonerOutput = (elements[reasonerIndex+2].split(outputDir))[1]
                 outputString += "<td>"
                 outputString += "<a href=\"" + htmlDir + "/output/" + reasonerInput + "\">" + reasonerName + " input file</a>"
