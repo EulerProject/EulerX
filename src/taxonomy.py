@@ -1,5 +1,6 @@
 import re
 import copy
+import signal, time
 from relations import *
 from latent_tax_assumption import *
 from reasoner import *
@@ -21,11 +22,12 @@ class Authority:
 
 class Taxon:
    
-    def __init__(self):
+    def __init__(self, level=0):
         self.parent = ""
         self.children = []
         self.fullName = ""
         self.abbrev = ""
+	self.level = level
         self.taxonomy = Taxonomy()    
             
     def addChild(self, child):
@@ -109,7 +111,7 @@ class Taxonomy:
             if self.taxa.has_key(child):
                 thisChild = self.taxa[child]
             else:
-                thisChild = Taxon()
+                thisChild = Taxon(thisParent.level+1)
                 thisChild.abbrev = child
                 thisChild.taxonomy = self
                 self.taxa[child] = thisChild
@@ -818,26 +820,43 @@ class TaxonomyMapping:
                 if(a.confidence != 3-c):
 	            self.articulationSet.articulations.insert(i, a)
                     continue
+		print a
+		print self.articulationSet.articulations
 	        if(self.testConsistency(outputDir)):
 	            self.removeMir(a.__str__())
 		    print "Remedial measure: remove [" + a.toString() + "]"
                     self.traceOut1(outputDir, a)
+                    #self.traceOut(outputDir, a)
 		    return True
 	        self.articulationSet.articulations.insert(i, a)
         return False
+
+    def nonrelatedArticulation(self, a, b):
+        A1 = Articulation(a.toString(), self)
+        A2 = Articulation(b.toString(), self)
+	if A1.taxon1.level > A2.taxon1.level+2 or\
+	   A1.taxon1.level < A2.taxon1.level-2 or\
+	   A1.taxon2.level > A2.taxon2.level+2 or\
+	   A1.taxon2.level < A2.taxon2.level-2:
+            return True
+	return False
 
     def traceOut1(self, outputDir, a):
 	tmpStr = "Articulation " + a.__str__() + " is inconsistent with "
 	tmpTm = copy.deepcopy(self)
 	i = 0
         while i < len(tmpTm.articulationSet.articulations):
-	    a = tmpTm.articulationSet.articulations.pop(i)
+	    b = tmpTm.articulationSet.articulations.pop(i)
+	    if(self.nonrelatedArticulation(a, b)):
+	        tmpTm.articulationSet.articulations.insert(i, b)
+		i=i+1
+                continue
 	    tmpTm.hypothesisType = "possible"
-	    tmpTm.hypothesis = Articulation(a.toString(), self)
+	    tmpTm.hypothesis = Articulation(b.toString(), self)
 	    goal = tmpTm.testConsistencyWithGoal(outputDir, False, False)
 	    #print tmpTm.articulationSet.articulations
 	    if(goal[0].find("true") != -1):
-	        tmpTm.articulationSet.articulations.insert(i, a)
+	        tmpTm.articulationSet.articulations.insert(i, b)
 		i=i+1
 	tmpStr += tmpTm.articulationSet.articulations.__str__()
 	print tmpStr
@@ -973,6 +992,8 @@ class TaxonomyMapping:
 	return self.BCS1(arti[1]+self.BCS1(arti1+arti[0], inTaxMap, outputDir), inTaxMap, outputDir)
 
     def testConsistency(self, outputDir):
+	def handler(signum, frame):
+	    raise Exception("Timed out!")
         
         ltaxRules = ""
 	outputFileName = outputDir + self.name + self.ltaAbbrevString() + "tmp.txt"
@@ -1000,7 +1021,18 @@ class TaxonomyMapping:
         if (maceOutput[0] == "model found"):
             return True
         else:
-            return False
+	  signal.signal(signal.SIGALRM, handler)
+	  signal.alarm(120)
+	  try:
+	    proverOutput = self.prover.run(outputFileName, False)
+	    print proverOutput[0]
+            if(proverOutput[0] == "not proved"):
+		return True
+	    else:
+		return False
+	  except Exception, msg:
+		print "Timed out!"
+		return False
         
     
     def testConsistencyWithoutGoal(self, outputDir):

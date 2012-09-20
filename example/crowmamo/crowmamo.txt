@@ -1,4 +1,9 @@
-taxonomy 2 Taxonomy2
+taxonomy c Taxonomy1
+(1 2 3 4 5 9 10 11 12 16 17)
+(5 6 7 8)
+(12 13 14 15)
+
+taxonomy m Taxonomy2
 (348 349 352)
 (349 350 351)
 (352 353 354)
@@ -12,56 +17,31 @@ taxonomy 2 Taxonomy2
 (368 369 370)
 (370 371 372)
 
-taxonomy 1 Taxonomy1
-(1 2 3 4 5 9 10 11 12 16 17)
-(5 6 7 8)
-(12 13 14 15)
-
 articulation crow crowmamo
-[2.348 equals 1.1]
-[2.350 equals 1.4]
-[2.351 equals 1.16]
-[2.353 overlaps 1.10]
-[2.355 equals 1.9]
-[2.357 is_included_in 1.10]
-[2.359 includes 1.5]
-[2.359 includes 1.6]
-[2.359 includes 1.7]
-[2.359 includes 1.8]
-[2.359 includes 1.11]
-[2.360 equals 1.12]
-[2.361 is_included_in 1.13]
-[2.362 is_included_in 1.12]
-[2.362 overlaps 1.13]
-[2.362 includes 1.14]
-[2.362 includes 1.15]
-[2.363 is_included_in 1.13]
-[2.364 is_included_in 1.12]
-[2.364 overlaps 1.13]
-[2.364 includes 1.14]
-[2.364 includes 1.15]
-[2.365 is_included_in 1.13]
-[2.366 is_included_in 1.12]
-[2.367 overlaps 1.13]
-[2.366 includes 1.14]
-[2.366 includes 1.15]
-[2.367 is_included_in 1.13]
-[2.368 is_included_in 1.12]
-[2.368 overlaps 1.13]
-[2.368 includes 1.14]
-[2.368 includes 1.15]
-[2.369 is_included_in 1.13]
-[2.370 is_included_in 1.12]
-[2.370 overlaps 1.13]
-[2.370 includes 1.14]
-[2.370 includes 1.15]
-[2.371 is_included_in 1.12]
-[2.371 overlaps 1.13]
-[2.371 includes 1.14]
-[2.371 includes 1.15]
-[2.372 is_included_in 1.13]
-[2.353 includes 1.2]
-[2.353 includes 1.3]
-[2.353 includes 1.17]
-[2.349 rsum 1.4 1.16]
-[2.359 rsum 1.5 1.11]
+[m.348 equals c.1]
+[m.350 equals c.4]
+[m.351 equals c.16]
+[m.353 overlaps c.10]
+[m.355 equals c.9]
+[m.357 is_included_in c.10]
+[m.359 rsum c.5 c.11]
+[m.360 equals c.12]
+[m.361 is_included_in c.13]
+[m.362 overlaps c.13]
+[m.363 is_included_in c.13]
+[m.364 overlaps c.13]
+[m.365 is_included_in c.13]
+[m.366 overlaps c.13]
+[m.367 is_included_in c.13]
+[m.368 overlaps c.13]
+[m.369 is_included_in c.13]
+[m.370 overlaps c.13]
+[m.371 overlaps c.13]
+[m.371 includes c.14]
+[m.371 includes c.15]
+[m.372 is_included_in c.13]
+[m.353 includes c.2]
+[m.353 includes c.3]
+[m.353 includes c.17]
+[m.349 rsum c.4 c.16]
+[m.359 rsum c.5 c.11]
