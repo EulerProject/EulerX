@@ -23,6 +23,7 @@ config = {
     "memory" : False,
     "ltas" :LatentTaxAssumption(),
     "uncertaintyRed" : False,
+    "pw" : False,
 }
 
 
