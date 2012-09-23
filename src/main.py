@@ -71,7 +71,7 @@ def runDirReasoner(outputDir, inputDir):
     return result   
           
 
-def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, outputType, outputFile, numberOutputCols, reasonerDir, reasonerTimeout, compression, htmlDir, memory, uncertaintyRed = True):
+def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, outputType, outputFile, numberOutputCols, reasonerDir, reasonerTimeout, compression, htmlDir, memory, uncertaintyRed = True, pw = False):
 
     #ltaClass = LatentTaxAssumption()
 
@@ -178,18 +178,19 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
                     for t in threads:
 
 		        while sleepT < 600:
-			    sleepT += 10
-			    time.sleep(10)
+			    t.join(1)
 			    if not t.isAlive():
 				break
+			    sleepT += 10
+			    time.sleep(9)
 		        if t.isAlive():
 			    t.stop()
 			    t.join()
 			if t.result == None:
-			    print "FFF",
+			    #print "F",
 			    consistencyCheck = ["unclear", "", "", "", ""]
 		        else:
-			    print "TTT",
+			    #print "T",
 		    	    consistencyCheck = t.result
 
 		        goalRelation = t.goalRelation
@@ -255,7 +256,9 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
     taxMap.generateDot(outputDir, taxMap.name, taxMap)
 
     # Generating all possible worlds
-    #taxMap.generatePW(outputDir, taxMap.name)
+    if pw:
+        taxMap.generatePW(outputDir, taxMap.name)
+
     outputResult(result, outputType, outputFile, numberOutputCols, goalTypes, outputDir, htmlDir)
     
 class ThreadProve(threading.Thread):
@@ -356,6 +359,8 @@ def usage():
              PROGRAM OUTPUT OPTIONS
              -h : html table output
              * -? : latex table output
+             -u : uncertainty reduction
+             -P : output possible worlds
              
              XML PARSING OPTIONS
              -x : xml file to parse into TLI files
@@ -640,6 +645,8 @@ def getConfig(opts, config):
                     config["ltaList"] = powerSet(myList)
         elif o == "-u":
 	    config["uncertaintyRed"] = True
+        elif o == "-P":
+	    config["pw"] = True
 
 
     if (not(config.has_key("ltaList")) or ((len(config["ltaList"]) == 0))):
@@ -660,7 +667,7 @@ def main(optInfo):
 
 
     try:
-        opts, args = getopt.getopt(optInfo, "a:c:d:D:H:i:I:l:m:n:o:p:r:s:t:T:x:v:w:x:huzM")
+        opts, args = getopt.getopt(optInfo, "a:c:d:D:H:i:I:l:m:n:o:p:Pr:s:t:T:x:v:w:x:huzM")
     except getopt.GetoptError:
         # print help information and exit:
         usage()
@@ -684,7 +691,7 @@ def main(optInfo):
         parsedTLIs = parseTCS(config["inputLocation"], config["taxonomies"], config["species"], config["outputDir"])
         runDir(parsedTLIs, config["ltaList"], config["goals"], config["goalRelations"], config["goalTypes"], config["outputDir"], config["outputType"], config["outputFile"], numberOutputCols,config["reasonerDir"],config["reasonerTimeout"],config["compression"],config["htmlDir"], config["memory"])
     elif (config["inputType"] == "single"):
-        runSingle(config["inputLocation"], config["ltaList"], config["goals"], config["goalRelations"], config["goalTypes"], config["outputDir"], config["outputType"], config["outputFile"], numberOutputCols, config["reasonerDir"], config["reasonerTimeout"], config["compression"], config["htmlDir"], config["memory"], config["uncertaintyRed"])
+        runSingle(config["inputLocation"], config["ltaList"], config["goals"], config["goalRelations"], config["goalTypes"], config["outputDir"], config["outputType"], config["outputFile"], numberOutputCols, config["reasonerDir"], config["reasonerTimeout"], config["compression"], config["htmlDir"], config["memory"], config["uncertaintyRed"], config["pw"])
     elif (config["inputType"] == "directory"):
         runDir(config["inputLocation"], config["ltaList"], config["goals"], config["goalRelations"], config["goalTypes"], config["outputDir"], config["outputType"], config["outputFile"], numberOutputCols,config["reasonerDir"],config["reasonerTimeout"],config["compression"],config["htmlDir"], config["memory"])
     elif (config["inputType"] == "single_reasoner"):
