@@ -1,7 +1,7 @@
 ============================== Prover9 ===============================
 Prover9 (64) version 2009-02A, February 2009.
-Process 28882 was started by michen on lore,
-Wed Jul 11 22:44:43 2012
+Process 10186 was started by michen on lore,
+Sun Sep 23 01:14:23 2012
 The command was "prover9 -t 10 -f output/abstract2/reasonerFiles/abstract2N_C_D_equals_1.A_2.A_possible_Prover.txt".
 ============================== end of head ===========================
 
@@ -804,4 +804,4 @@ SEARCH FAILED
 
 Exiting with failure.
 
-Process 28882 exit (sos_empty) Wed Jul 11 22:44:43 2012
+Process 10186 exit (sos_empty) Sun Sep 23 01:14:23 2012

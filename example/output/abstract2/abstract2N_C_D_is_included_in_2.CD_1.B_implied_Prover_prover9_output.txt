@@ -1,7 +1,7 @@
 ============================== Prover9 ===============================
 Prover9 (64) version 2009-02A, February 2009.
-Process 29249 was started by michen on lore,
-Wed Jul 11 22:44:55 2012
+Process 10728 was started by michen on lore,
+Sun Sep 23 01:14:30 2012
 The command was "prover9 -t 10 -f output/abstract2/abstract2N_C_D_is_included_in_2.CD_1.B_implied_Prover.txt".
 ============================== end of head ===========================
 
@@ -463,4 +463,4 @@ THEOREM PROVED
 
 Exiting with 1 proof.
 
-Process 29249 exit (max_proofs) Wed Jul 11 22:44:55 2012
+Process 10728 exit (max_proofs) Sun Sep 23 01:14:30 2012
