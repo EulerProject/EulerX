@@ -14,4 +14,3 @@ articulation abs abstract
 [1.C includes 2.G]
 [1.C includes 2.H]
 [1.C includes 2.I]
-[1.A disjoint 2.F]
