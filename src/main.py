@@ -237,8 +237,8 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
 			    # Uncertainty Reduction
 			    while(uncertaintyRed):
 			        toBeReduced = tmpGoal.rstrip().split(' ')
-			        tmpGoal=""
 			        if(len(toBeReduced) != 1):
+			          tmpGoal=""
 			          for i in range(len(toBeReduced)):
 				    usrInput = raw_input("Is it possible that "+thisGoal[0]+" "+toBeReduced[i]+" "+thisGoal[1]+"? [Y]n:")
 				    if usrInput != "n":
