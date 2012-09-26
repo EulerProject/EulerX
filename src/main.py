@@ -235,8 +235,8 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
 		            fMir.write(thisGoal[0] + "," + thisGoal[1] + ",inferred,unclear\n")
                         else:
 			    # Uncertainty Reduction
+			    toBeReduced = tmpGoal.rstrip().split(' ')
 			    while(uncertaintyRed):
-			        toBeReduced = tmpGoal.rstrip().split(' ')
 			        if(len(toBeReduced) != 1):
 			          tmpGoal=""
 			          for i in range(len(toBeReduced)):
