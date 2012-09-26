@@ -501,6 +501,8 @@ class TaxonomyMapping:
 	    return None
 	else:
 	    r=r.rstrip()
+	    #print t1+" "+r+" "+t2
+	    #self.articulationSet.addArticulationWithList(t1+" "+r+" "+t2, self)
 	    tmpStr=r.replace("{", "")
 	    tmpStr=tmpStr.replace("}", "")
 	    tmpStr=tmpStr.replace(" ", ",")
