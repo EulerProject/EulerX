@@ -820,12 +820,13 @@ class TaxonomyMapping:
                 if(a.confidence != 3-c):
 	            self.articulationSet.articulations.insert(i, a)
                     continue
-		print a
-		print self.articulationSet.articulations
 	        if(self.testConsistency(outputDir)):
 	            self.removeMir(a.__str__())
+                    fIE = open(outputDir + "../" + self.name + "_ie.txt", 'w')
 		    print "Remedial measure: remove [" + a.toString() + "]"
-                    self.traceOut1(outputDir, a)
+		    fIE.write("Remedial measure: remove [" + a.toString() + "]\n")
+                    self.traceOut1(outputDir, a, fIE)
+                    fIE.close()
                     #self.traceOut(outputDir, a)
 		    return True
 	        self.articulationSet.articulations.insert(i, a)
@@ -841,8 +842,8 @@ class TaxonomyMapping:
             return True
 	return False
 
-    def traceOut1(self, outputDir, a):
-	tmpStr = "Articulation " + a.__str__() + " is inconsistent with "
+    def traceOut1(self, outputDir, a, fIE):
+	tmpStr = "Articulation <" + a.__str__() + "> is inconsistent with "
 	tmpTm = copy.deepcopy(self)
 	i = 0
         while i < len(tmpTm.articulationSet.articulations):
@@ -860,6 +861,7 @@ class TaxonomyMapping:
 		i=i+1
 	tmpStr += tmpTm.articulationSet.articulations.__str__()
 	print tmpStr
+        fIE.write(tmpStr+"\n")
 	
     def traceOut(self, outputDir, a):
 	tmpStr = "Articulation " + a.__str__() + " is inconsistent with [ "
@@ -883,7 +885,6 @@ class TaxonomyMapping:
 	print "BCS choose [" + ','.join(map(str,consArti)) + "] as the consistent articulation subset"
 	for a in self.articulationSet.articulations:
 	    if not (a in consArti):
-		print a
 		self.removeMir(a.__str__())
 	return True
 
@@ -1025,7 +1026,6 @@ class TaxonomyMapping:
 	  signal.alarm(120)
 	  try:
 	    proverOutput = self.prover.run(outputFileName, False)
-	    print proverOutput[0]
             if(proverOutput[0] == "not proved"):
 		return True
 	    else:

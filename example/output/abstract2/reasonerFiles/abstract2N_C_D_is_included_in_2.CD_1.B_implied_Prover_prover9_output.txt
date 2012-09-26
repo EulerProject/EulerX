@@ -1,7 +1,7 @@
 ============================== Prover9 ===============================
 Prover9 (64) version 2009-02A, February 2009.
-Process 29236 was started by michen on lore,
-Wed Jul 11 22:44:54 2012
+Process 10715 was started by michen on lore,
+Sun Sep 23 01:14:30 2012
 The command was "prover9 -t 10 -f output/abstract2/reasonerFiles/abstract2N_C_D_is_included_in_2.CD_1.B_implied_Prover.txt".
 ============================== end of head ===========================
 
@@ -618,7 +618,7 @@ given #60 (T,wt=2): 193 2_CD(c21).  [resolve(150,a,145,b),unit_del(b,158)].
 
 ============================== PROOF =================================
 
-% Proof 1 at 0.02 (+ 0.00) seconds.
+% Proof 1 at 0.01 (+ 0.01) seconds.
 % Length of proof is 23.
 % Level of proof is 6.
 % Maximum clause weight is 8.
@@ -662,7 +662,7 @@ Demod_attempts=0. Demod_rewrites=0.
 Res_instance_prunes=0. Para_instance_prunes=0. Basic_paramod_prunes=0.
 Nonunit_fsub_feature_tests=19. Nonunit_bsub_feature_tests=66.
 Megabytes=0.26.
-User_CPU=0.02, System_CPU=0.00, Wall_clock=0.
+User_CPU=0.01, System_CPU=0.01, Wall_clock=0.
 
 ============================== end of statistics =====================
 
@@ -672,4 +672,4 @@ THEOREM PROVED
 
 Exiting with 1 proof.
 
-Process 29236 exit (max_proofs) Wed Jul 11 22:44:54 2012
+Process 10715 exit (max_proofs) Sun Sep 23 01:14:30 2012
