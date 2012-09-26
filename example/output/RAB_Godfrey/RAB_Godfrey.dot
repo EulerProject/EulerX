@@ -1,0 +1,11 @@
+digraph {
+
+rankdir = RL
+
+"G_36" -> "G_35" [style=filled, color=black];
+"G_37" -> "G_35" [style=filled, color=black];
+"G_34" -> "R_31,G_33" [style=filled, color=black];
+"G_35" -> "R_31,G_33" [style=filled, color=black];
+"G_38" -> "R_31,G_33" [style=filled, color=black];
+"G_38" -> "R_32,G_33" [style=filled, color=red];
+}

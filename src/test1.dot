@@ -1,0 +1,14 @@
+ digraph G {
+	         compound=true;
+		         nodesep=1.0;
+			         subgraph cluster_A {
+					           a -> b;
+						             a -> c;
+							             }
+								             subgraph cluster_B {
+										               d -> e;
+											                 f -> e;
+													         }
+														         a -> e [ ltail=cluster_A,
+															                  lhead=cluster_B ];
+																	        }
