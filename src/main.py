@@ -1,4 +1,5 @@
 from taxonomy import *
+from windows import *
 from subprocess import Popen
 from latent_tax_assumption import *
 from tcsParser import *
@@ -236,7 +237,10 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
                         else:
 			    # Uncertainty Reduction
 			    toBeReduced = tmpGoal.rstrip().split(' ')
-			    while(uncertaintyRed):
+			    if(len(toBeReduced) != 1):
+                                userQuestion = Window(thisGoal, toBeReduced)
+			        tmpGoal = userQuestion.main()
+			    """while(uncertaintyRed):
 			        if(len(toBeReduced) != 1):
 			          tmpGoal=""
 			          for i in range(len(toBeReduced)):
@@ -247,7 +251,7 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
 				    print "At least ONE should be answered affirmatively!!!"
 				    continue
 				break
-
+			"""
 			    ###################################
 			    taxMap.addPMir(thisGoal[0], thisGoal[1], tmpGoal, 1)
 		            fMir.write(thisGoal[0] + "," + thisGoal[1] + ",inferred,{" + tmpGoal.rstrip() + "}\n")
