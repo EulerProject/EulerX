@@ -1,0 +1,16 @@
+taxonomy 1 Taxonomy1
+(A B C D)
+
+taxonomy 2 Taxonomy2
+(E F G H I)
+(J)
+(K)
+
+articulation abs abstract
+[1.A includes 2.E]
+[1.B equals 2.K]
+[1.D equals 2.J]
+[1.C includes 2.F]
+[1.C includes 2.G]
+[1.C includes 2.H]
+[1.C includes 2.I]

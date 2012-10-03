@@ -1,0 +1,9 @@
+1_A,2_C,mir,{equals}
+1_A,2_D,mir,{includes}
+1_A,2_F,mir,{includes}
+1_B,2_C,inferred,{is_included_in}
+1_B,2_D,mir,{is_included_in,equals}
+1_B,2_F,inferred,{disjoint}
+1_E,2_C,inferred,{is_included_in}
+1_E,2_D,inferred,{disjoint overlaps}
+1_E,2_F,mir,{includes,equals}
