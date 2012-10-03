@@ -175,7 +175,6 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
 			     t.start()
 			     threads.append(t)
 		    sleepT = 0
-                    #print "#"
                     for t in threads:
 
 		        while sleepT < 600:
@@ -188,7 +187,6 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
 			    t.stop()
 			    t.join()
 			if t.result == None:
-			    #print "F",
 			    consistencyCheck = ["unclear", "", "", "", ""]
 		        else:
 			    #print "T",
@@ -240,18 +238,6 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
 			    if(len(toBeReduced) != 1):
                                 userQuestion = Window(thisGoal, toBeReduced)
 			        tmpGoal = userQuestion.main()
-			    """while(uncertaintyRed):
-			        if(len(toBeReduced) != 1):
-			          tmpGoal=""
-			          for i in range(len(toBeReduced)):
-				    usrInput = raw_input("Is it possible that "+thisGoal[0]+" "+toBeReduced[i]+" "+thisGoal[1]+"? [Y]n:")
-				    if usrInput != "n":
-				        tmpGoal+=toBeReduced[i]+" "
-				if tmpGoal == "":
-				    print "At least ONE should be answered affirmatively!!!"
-				    continue
-				break
-			"""
 			    ###################################
 			    taxMap.addPMir(thisGoal[0], thisGoal[1], tmpGoal, 1)
 		            fMir.write(thisGoal[0] + "," + thisGoal[1] + ",inferred,{" + tmpGoal.rstrip() + "}\n")
