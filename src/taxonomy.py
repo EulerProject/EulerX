@@ -237,7 +237,8 @@ class Articulation:
 
     def toLTax(self):
         result = ""
-	if self.relations == [relationDict["+="]] or self.relations == [relationDict["=+"]]:
+	if self.numTaxon > 2:
+        #self.relations == [relationDict["+="]] or self.relations == [relationDict["=+"]]:
             result = self.sArticulationSubtitution(self.taxon1, self.taxon2, self.taxon3, self.relations[0])
         elif len(self.relations) == 1:
             result = self.articulationSubtitution(self.taxon1, self.taxon2, self.relations[0])
