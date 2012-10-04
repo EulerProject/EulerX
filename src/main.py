@@ -189,7 +189,6 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
 			if t.result == None:
 			    consistencyCheck = ["unclear", "", "", "", ""]
 		        else:
-			    #print "T",
 		    	    consistencyCheck = t.result
 
 		        goalRelation = t.goalRelation
@@ -235,7 +234,7 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
                         else:
 			    # Uncertainty Reduction
 			    toBeReduced = tmpGoal.rstrip().split(' ')
-			    if(len(toBeReduced) != 1):
+			    if(uncertaintyRed and len(toBeReduced) != 1):
                                 userQuestion = Window(thisGoal, toBeReduced)
 			        tmpGoal = userQuestion.main()
 			    ###################################
