@@ -1,0 +1,834 @@
+============================== Mace4 =================================
+Mace4 (64) version 2009-02A, February 2009.
+Process 29275 was started by michen on lore,
+Wed Jul 11 22:44:56 2012
+The command was "mace4 -t 10 -N 200 -b 2000 -f output/abstract2/reasonerFiles/abstract2_pw0N_C_D_noGoal.txt".
+============================== end of head ===========================
+
+============================== INPUT =================================
+
+% Reading from file output/abstract2/reasonerFiles/abstract2_pw0N_C_D_noGoal.txt
+
+
+formulas(assumptions).
+1_B(x) -> 1_A(x).
+1_C(x) -> 1_B(x).
+1_D(x) -> 1_B(x).
+1_E(x) -> 1_B(x).
+1_F(x) -> 1_A(x).
+1_G(x) -> 1_F(x).
+1_H(x) -> 1_F(x).
+2_B(x) -> 2_A(x).
+2_CD(x) -> 2_B(x).
+2_E(x) -> 2_B(x).
+2_F(x) -> 2_A(x).
+2_GH(x) -> 2_F(x).
+(all x (1_B(x) <-> 2_B(x))).
+(all x (1_F(x) -> -2_E(x))).
+(all x (1_F(x) -> -2_B(x))).
+(all x (2_E(x) -> 1_B(x))) & (exists x (1_B(x) & -2_E(x))).
+(all x (1_E(x) -> -1_D(x))).
+(all x (2_GH(x) -> 1_A(x))) & (exists x (1_A(x) & -2_GH(x))).
+(all x (2_E(x) -> 1_A(x))) & (exists x (1_A(x) & -2_E(x))).
+(all x (1_D(x) -> 2_CD(x))) & (exists x (2_CD(x) & -1_D(x))).
+(all x (1_E(x) -> -1_C(x))).
+(all x (2_GH(x) -> 2_A(x))) & (exists x (2_A(x) & -2_GH(x))).
+(all x (1_G(x) -> 2_F(x))) & (exists x (2_F(x) & -1_G(x))).
+(all x (1_H(x) -> -2_CD(x))).
+(all x (1_B(x) -> 2_A(x))) & (exists x (2_A(x) & -1_B(x))).
+(all x (1_B(x) -> -2_F(x))).
+(all x (1_E(x) -> -2_CD(x))).
+(all x (1_F(x) -> 2_A(x))) & (exists x (2_A(x) & -1_F(x))).
+(all x (1_H(x) -> 2_GH(x))) & (exists x (2_GH(x) & -1_H(x))).
+(all x (1_E(x) -> 2_B(x))) & (exists x (2_B(x) & -1_E(x))).
+(all x (1_C(x) -> 2_B(x))) & (exists x (2_B(x) & -1_C(x))).
+(all x (2_GH(x) -> -1_B(x))).
+(all x (1_G(x) -> 2_GH(x))) & (exists x (2_GH(x) & -1_G(x))).
+(all x (1_E(x) -> 1_B(x))) & (exists x (1_B(x) & -1_E(x))).
+(all x (1_D(x) -> 1_B(x))) & (exists x (1_B(x) & -1_D(x))).
+(all x (1_B(x) -> -1_F(x))).
+(all x (1_C(x) -> 1_B(x))) & (exists x (1_B(x) & -1_C(x))).
+(all x (1_G(x) -> 2_GH(x))) & (exists x (2_GH(x) & -1_G(x))).
+(all x (1_C(x) -> 2_CD(x))) & (exists x (2_CD(x) & -1_C(x))).
+(all x (2_GH(x) -> -2_E(x))).
+(all x (1_G(x) -> -2_B(x))).
+(all x (1_G(x) -> 2_A(x))) & (exists x (2_A(x) & -1_G(x))).
+(all x (2_GH(x) -> 2_A(x))) & (exists x (2_A(x) & -2_GH(x))).
+(all x (1_G(x) -> 2_F(x))) & (exists x (2_F(x) & -1_G(x))).
+(all x (1_G(x) -> -2_E(x))).
+(all x (2_GH(x) -> -2_B(x))).
+(all x (2_E(x) -> -1_D(x))).
+(all x (1_H(x) -> 2_F(x))) & (exists x (2_F(x) & -1_H(x))).
+(all x (1_E(x) -> -2_GH(x))).
+(all x (2_E(x) -> -1_C(x))).
+(all x (2_F(x) -> -2_B(x))).
+(all x (1_F(x) -> -2_CD(x))).
+(all x (1_B(x) -> -2_GH(x))).
+(all x (2_CD(x) -> 2_B(x))) & (exists x (2_B(x) & -2_CD(x))).
+(all x (1_E(x) -> 2_A(x))) & (exists x (2_A(x) & -1_E(x))).
+(all x (1_E(x) -> 2_B(x))) & (exists x (2_B(x) & -1_E(x))).
+(all x (1_E(x) <-> 2_E(x))).
+(all x (1_D(x) -> -1_F(x))).
+(all x (1_D(x) -> -1_E(x))).
+(all x (1_E(x) -> -2_F(x))).
+(all x (1_H(x) -> 1_A(x))) & (exists x (1_A(x) & -1_H(x))).
+(all x (1_B(x) -> 1_A(x))) & (exists x (1_A(x) & -1_B(x))).
+(all x (1_C(x) -> 1_A(x))) & (exists x (1_A(x) & -1_C(x))).
+(all x (1_F(x) -> 1_A(x))) & (exists x (1_A(x) & -1_F(x))).
+(all x (1_G(x) -> 1_A(x))) & (exists x (1_A(x) & -1_G(x))).
+(all x (1_D(x) -> 1_A(x))) & (exists x (1_A(x) & -1_D(x))).
+(all x (1_E(x) -> 1_A(x))) & (exists x (1_A(x) & -1_E(x))).
+(all x (1_H(x) -> 2_A(x))) & (exists x (2_A(x) & -1_H(x))).
+(all x (1_H(x) -> -2_B(x))).
+(all x (1_H(x) -> -2_E(x))).
+(all x (1_H(x) -> 2_F(x))) & (exists x (2_F(x) & -1_H(x))).
+(all x (2_CD(x) -> 1_A(x))) & (exists x (1_A(x) & -2_CD(x))).
+(all x (2_E(x) -> 2_B(x))) & (exists x (2_B(x) & -2_E(x))).
+(all x (2_B(x) -> -2_F(x))).
+(all x (2_CD(x) -> 2_A(x))) & (exists x (2_A(x) & -2_CD(x))).
+(all x (2_E(x) -> -2_CD(x))).
+(all x (1_D(x) -> -2_GH(x))).
+(all x (1_H(x) -> 2_GH(x))) & (exists x (2_GH(x) & -1_H(x))).
+(all x (1_E(x) -> -1_F(x))).
+(all x (1_C(x) -> -2_F(x))).
+(all x (1_C(x) -> -2_E(x))).
+(all x (1_C(x) -> 2_B(x))) & (exists x (2_B(x) & -1_C(x))).
+(all x (1_C(x) -> 2_A(x))) & (exists x (2_A(x) & -1_C(x))).
+(all x (1_G(x) -> 1_F(x))) & (exists x (1_F(x) & -1_G(x))).
+(all x (2_CD(x) -> 1_B(x))) & (exists x (1_B(x) & -2_CD(x))).
+(all x (1_G(x) -> -1_H(x))).
+(all x (1_D(x) -> -1_C(x))).
+(all x (1_D(x) -> -2_E(x))).
+(all x (1_D(x) -> -2_F(x))).
+(all x (1_D(x) -> 2_A(x))) & (exists x (2_A(x) & -1_D(x))).
+(all x (1_D(x) -> 2_B(x))) & (exists x (2_B(x) & -1_D(x))).
+(all x (2_CD(x) -> -1_E(x))).
+(all x (1_H(x) -> 1_F(x))) & (exists x (1_F(x) & -1_H(x))).
+(all x (1_C(x) -> 2_A(x))) & (exists x (2_A(x) & -1_C(x))).
+(all x (1_B(x) -> 2_A(x))) & (exists x (2_A(x) & -1_B(x))).
+(all x (1_E(x) -> 2_A(x))) & (exists x (2_A(x) & -1_E(x))).
+(all x (1_D(x) -> 2_A(x))) & (exists x (2_A(x) & -1_D(x))).
+(all x (1_G(x) -> 2_A(x))) & (exists x (2_A(x) & -1_G(x))).
+(all x (1_F(x) -> 2_A(x))) & (exists x (2_A(x) & -1_F(x))).
+(all x (1_H(x) -> 2_A(x))) & (exists x (2_A(x) & -1_H(x))).
+(all x (1_F(x) -> -1_B(x))).
+(all x (1_C(x) -> -2_GH(x))).
+(all x (1_G(x) -> 1_F(x))) & (exists x (1_F(x) & -1_G(x))).
+(all x (2_F(x) -> 2_A(x))) & (exists x (2_A(x) & -2_F(x))).
+(all x (2_E(x) -> 2_A(x))) & (exists x (2_A(x) & -2_E(x))).
+(all x (2_B(x) -> 2_A(x))) & (exists x (2_A(x) & -2_B(x))).
+(all x (1_G(x) -> -2_CD(x))).
+(all x (2_CD(x) -> -2_E(x))).
+(all x (2_F(x) -> 1_A(x))) & (exists x (1_A(x) & -2_F(x))).
+(all x (1_A(x) <-> 2_A(x))).
+(all x (2_B(x) -> 1_A(x))) & (exists x (1_A(x) & -2_B(x))).
+(all x (1_H(x) -> -1_G(x))).
+(all x (1_H(x) -> 1_F(x))) & (exists x (1_F(x) & -1_H(x))).
+(all x (1_C(x) -> -1_D(x))).
+(all x (1_C(x) -> -1_E(x))).
+(all x (1_C(x) -> -1_F(x))).
+(all x (1_F(x) <-> 2_GH(x))).
+(all x (2_GH(x) -> -2_CD(x))).
+(exists x 1_A(x)).
+(exists x 1_C(x)).
+(exists x 1_B(x)).
+(exists x 1_E(x)).
+(exists x 1_D(x)).
+(exists x 1_G(x)).
+(exists x 1_F(x)).
+(exists x 1_H(x)).
+(exists x 2_A(x)).
+(exists x 2_B(x)).
+(exists x 2_E(x)).
+(exists x 2_F(x)).
+(exists x 2_CD(x)).
+(exists x 2_GH(x)).
+1_A(x) -> 1_B(x) | 1_F(x).
+1_B(x) -> 1_C(x) | 1_D(x) | 1_E(x).
+1_F(x) -> 1_G(x) | 1_H(x).
+2_A(x) -> 2_B(x) | 2_F(x).
+2_B(x) -> 2_CD(x) | 2_E(x).
+2_F(x) -> 2_GH(x).
+(all x (1_F(x) -> -1_B(x))).
+(all x (1_D(x) -> -1_C(x))).
+(all x (1_E(x) -> -1_C(x))).
+(all x (1_E(x) -> -1_D(x))).
+(all x (1_H(x) -> -1_G(x))).
+(all x (2_F(x) -> -2_B(x))).
+(all x (2_E(x) -> -2_CD(x))).
+end_of_list.
+
+% From the command line: assign(max_seconds, 10).
+
+% From the command line: assign(end_size, 200).
+
+% From the command line: assign(max_megs, 2000).
+
+============================== end of input ==========================
+
+============================== PROCESS NON-CLAUSAL FORMULAS ==========
+
+% Formulas that are not ordinary clauses:
+1 1_B(x) -> 1_A(x) # label(non_clause).  [assumption].
+2 1_C(x) -> 1_B(x) # label(non_clause).  [assumption].
+3 1_D(x) -> 1_B(x) # label(non_clause).  [assumption].
+4 1_E(x) -> 1_B(x) # label(non_clause).  [assumption].
+5 1_F(x) -> 1_A(x) # label(non_clause).  [assumption].
+6 1_G(x) -> 1_F(x) # label(non_clause).  [assumption].
+7 1_H(x) -> 1_F(x) # label(non_clause).  [assumption].
+8 2_B(x) -> 2_A(x) # label(non_clause).  [assumption].
+9 2_CD(x) -> 2_B(x) # label(non_clause).  [assumption].
+10 2_E(x) -> 2_B(x) # label(non_clause).  [assumption].
+11 2_F(x) -> 2_A(x) # label(non_clause).  [assumption].
+12 2_GH(x) -> 2_F(x) # label(non_clause).  [assumption].
+13 (all x (1_B(x) <-> 2_B(x))) # label(non_clause).  [assumption].
+14 (all x (1_F(x) -> -2_E(x))) # label(non_clause).  [assumption].
+15 (all x (1_F(x) -> -2_B(x))) # label(non_clause).  [assumption].
+16 (all x (2_E(x) -> 1_B(x))) & (exists x (1_B(x) & -2_E(x))) # label(non_clause).  [assumption].
+17 (all x (1_E(x) -> -1_D(x))) # label(non_clause).  [assumption].
+18 (all x (2_GH(x) -> 1_A(x))) & (exists x (1_A(x) & -2_GH(x))) # label(non_clause).  [assumption].
+19 (all x (2_E(x) -> 1_A(x))) & (exists x (1_A(x) & -2_E(x))) # label(non_clause).  [assumption].
+20 (all x (1_D(x) -> 2_CD(x))) & (exists x (2_CD(x) & -1_D(x))) # label(non_clause).  [assumption].
+21 (all x (1_E(x) -> -1_C(x))) # label(non_clause).  [assumption].
+22 (all x (2_GH(x) -> 2_A(x))) & (exists x (2_A(x) & -2_GH(x))) # label(non_clause).  [assumption].
+23 (all x (1_G(x) -> 2_F(x))) & (exists x (2_F(x) & -1_G(x))) # label(non_clause).  [assumption].
+24 (all x (1_H(x) -> -2_CD(x))) # label(non_clause).  [assumption].
+25 (all x (1_B(x) -> 2_A(x))) & (exists x (2_A(x) & -1_B(x))) # label(non_clause).  [assumption].
+26 (all x (1_B(x) -> -2_F(x))) # label(non_clause).  [assumption].
+27 (all x (1_E(x) -> -2_CD(x))) # label(non_clause).  [assumption].
+28 (all x (1_F(x) -> 2_A(x))) & (exists x (2_A(x) & -1_F(x))) # label(non_clause).  [assumption].
+29 (all x (1_H(x) -> 2_GH(x))) & (exists x (2_GH(x) & -1_H(x))) # label(non_clause).  [assumption].
+30 (all x (1_E(x) -> 2_B(x))) & (exists x (2_B(x) & -1_E(x))) # label(non_clause).  [assumption].
+31 (all x (1_C(x) -> 2_B(x))) & (exists x (2_B(x) & -1_C(x))) # label(non_clause).  [assumption].
+32 (all x (2_GH(x) -> -1_B(x))) # label(non_clause).  [assumption].
+33 (all x (1_G(x) -> 2_GH(x))) & (exists x (2_GH(x) & -1_G(x))) # label(non_clause).  [assumption].
+34 (all x (1_E(x) -> 1_B(x))) & (exists x (1_B(x) & -1_E(x))) # label(non_clause).  [assumption].
+35 (all x (1_D(x) -> 1_B(x))) & (exists x (1_B(x) & -1_D(x))) # label(non_clause).  [assumption].
+36 (all x (1_B(x) -> -1_F(x))) # label(non_clause).  [assumption].
+37 (all x (1_C(x) -> 1_B(x))) & (exists x (1_B(x) & -1_C(x))) # label(non_clause).  [assumption].
+38 (all x (1_G(x) -> 2_GH(x))) & (exists x (2_GH(x) & -1_G(x))) # label(non_clause).  [assumption].
+39 (all x (1_C(x) -> 2_CD(x))) & (exists x (2_CD(x) & -1_C(x))) # label(non_clause).  [assumption].
+40 (all x (2_GH(x) -> -2_E(x))) # label(non_clause).  [assumption].
+41 (all x (1_G(x) -> -2_B(x))) # label(non_clause).  [assumption].
+42 (all x (1_G(x) -> 2_A(x))) & (exists x (2_A(x) & -1_G(x))) # label(non_clause).  [assumption].
+43 (all x (2_GH(x) -> 2_A(x))) & (exists x (2_A(x) & -2_GH(x))) # label(non_clause).  [assumption].
+44 (all x (1_G(x) -> 2_F(x))) & (exists x (2_F(x) & -1_G(x))) # label(non_clause).  [assumption].
+45 (all x (1_G(x) -> -2_E(x))) # label(non_clause).  [assumption].
+46 (all x (2_GH(x) -> -2_B(x))) # label(non_clause).  [assumption].
+47 (all x (2_E(x) -> -1_D(x))) # label(non_clause).  [assumption].
+48 (all x (1_H(x) -> 2_F(x))) & (exists x (2_F(x) & -1_H(x))) # label(non_clause).  [assumption].
+49 (all x (1_E(x) -> -2_GH(x))) # label(non_clause).  [assumption].
+50 (all x (2_E(x) -> -1_C(x))) # label(non_clause).  [assumption].
+51 (all x (2_F(x) -> -2_B(x))) # label(non_clause).  [assumption].
+52 (all x (1_F(x) -> -2_CD(x))) # label(non_clause).  [assumption].
+53 (all x (1_B(x) -> -2_GH(x))) # label(non_clause).  [assumption].
+54 (all x (2_CD(x) -> 2_B(x))) & (exists x (2_B(x) & -2_CD(x))) # label(non_clause).  [assumption].
+55 (all x (1_E(x) -> 2_A(x))) & (exists x (2_A(x) & -1_E(x))) # label(non_clause).  [assumption].
+56 (all x (1_E(x) -> 2_B(x))) & (exists x (2_B(x) & -1_E(x))) # label(non_clause).  [assumption].
+57 (all x (1_E(x) <-> 2_E(x))) # label(non_clause).  [assumption].
+58 (all x (1_D(x) -> -1_F(x))) # label(non_clause).  [assumption].
+59 (all x (1_D(x) -> -1_E(x))) # label(non_clause).  [assumption].
+60 (all x (1_E(x) -> -2_F(x))) # label(non_clause).  [assumption].
+61 (all x (1_H(x) -> 1_A(x))) & (exists x (1_A(x) & -1_H(x))) # label(non_clause).  [assumption].
+62 (all x (1_B(x) -> 1_A(x))) & (exists x (1_A(x) & -1_B(x))) # label(non_clause).  [assumption].
+63 (all x (1_C(x) -> 1_A(x))) & (exists x (1_A(x) & -1_C(x))) # label(non_clause).  [assumption].
+64 (all x (1_F(x) -> 1_A(x))) & (exists x (1_A(x) & -1_F(x))) # label(non_clause).  [assumption].
+65 (all x (1_G(x) -> 1_A(x))) & (exists x (1_A(x) & -1_G(x))) # label(non_clause).  [assumption].
+66 (all x (1_D(x) -> 1_A(x))) & (exists x (1_A(x) & -1_D(x))) # label(non_clause).  [assumption].
+67 (all x (1_E(x) -> 1_A(x))) & (exists x (1_A(x) & -1_E(x))) # label(non_clause).  [assumption].
+68 (all x (1_H(x) -> 2_A(x))) & (exists x (2_A(x) & -1_H(x))) # label(non_clause).  [assumption].
+69 (all x (1_H(x) -> -2_B(x))) # label(non_clause).  [assumption].
+70 (all x (1_H(x) -> -2_E(x))) # label(non_clause).  [assumption].
+71 (all x (1_H(x) -> 2_F(x))) & (exists x (2_F(x) & -1_H(x))) # label(non_clause).  [assumption].
+72 (all x (2_CD(x) -> 1_A(x))) & (exists x (1_A(x) & -2_CD(x))) # label(non_clause).  [assumption].
+73 (all x (2_E(x) -> 2_B(x))) & (exists x (2_B(x) & -2_E(x))) # label(non_clause).  [assumption].
+74 (all x (2_B(x) -> -2_F(x))) # label(non_clause).  [assumption].
+75 (all x (2_CD(x) -> 2_A(x))) & (exists x (2_A(x) & -2_CD(x))) # label(non_clause).  [assumption].
+76 (all x (2_E(x) -> -2_CD(x))) # label(non_clause).  [assumption].
+77 (all x (1_D(x) -> -2_GH(x))) # label(non_clause).  [assumption].
+78 (all x (1_H(x) -> 2_GH(x))) & (exists x (2_GH(x) & -1_H(x))) # label(non_clause).  [assumption].
+79 (all x (1_E(x) -> -1_F(x))) # label(non_clause).  [assumption].
+80 (all x (1_C(x) -> -2_F(x))) # label(non_clause).  [assumption].
+81 (all x (1_C(x) -> -2_E(x))) # label(non_clause).  [assumption].
+82 (all x (1_C(x) -> 2_B(x))) & (exists x (2_B(x) & -1_C(x))) # label(non_clause).  [assumption].
+83 (all x (1_C(x) -> 2_A(x))) & (exists x (2_A(x) & -1_C(x))) # label(non_clause).  [assumption].
+84 (all x (1_G(x) -> 1_F(x))) & (exists x (1_F(x) & -1_G(x))) # label(non_clause).  [assumption].
+85 (all x (2_CD(x) -> 1_B(x))) & (exists x (1_B(x) & -2_CD(x))) # label(non_clause).  [assumption].
+86 (all x (1_G(x) -> -1_H(x))) # label(non_clause).  [assumption].
+87 (all x (1_D(x) -> -1_C(x))) # label(non_clause).  [assumption].
+88 (all x (1_D(x) -> -2_E(x))) # label(non_clause).  [assumption].
+89 (all x (1_D(x) -> -2_F(x))) # label(non_clause).  [assumption].
+90 (all x (1_D(x) -> 2_A(x))) & (exists x (2_A(x) & -1_D(x))) # label(non_clause).  [assumption].
+91 (all x (1_D(x) -> 2_B(x))) & (exists x (2_B(x) & -1_D(x))) # label(non_clause).  [assumption].
+92 (all x (2_CD(x) -> -1_E(x))) # label(non_clause).  [assumption].
+93 (all x (1_H(x) -> 1_F(x))) & (exists x (1_F(x) & -1_H(x))) # label(non_clause).  [assumption].
+94 (all x (1_C(x) -> 2_A(x))) & (exists x (2_A(x) & -1_C(x))) # label(non_clause).  [assumption].
+95 (all x (1_B(x) -> 2_A(x))) & (exists x (2_A(x) & -1_B(x))) # label(non_clause).  [assumption].
+96 (all x (1_E(x) -> 2_A(x))) & (exists x (2_A(x) & -1_E(x))) # label(non_clause).  [assumption].
+97 (all x (1_D(x) -> 2_A(x))) & (exists x (2_A(x) & -1_D(x))) # label(non_clause).  [assumption].
+98 (all x (1_G(x) -> 2_A(x))) & (exists x (2_A(x) & -1_G(x))) # label(non_clause).  [assumption].
+99 (all x (1_F(x) -> 2_A(x))) & (exists x (2_A(x) & -1_F(x))) # label(non_clause).  [assumption].
+100 (all x (1_H(x) -> 2_A(x))) & (exists x (2_A(x) & -1_H(x))) # label(non_clause).  [assumption].
+101 (all x (1_F(x) -> -1_B(x))) # label(non_clause).  [assumption].
+102 (all x (1_C(x) -> -2_GH(x))) # label(non_clause).  [assumption].
+103 (all x (1_G(x) -> 1_F(x))) & (exists x (1_F(x) & -1_G(x))) # label(non_clause).  [assumption].
+104 (all x (2_F(x) -> 2_A(x))) & (exists x (2_A(x) & -2_F(x))) # label(non_clause).  [assumption].
+105 (all x (2_E(x) -> 2_A(x))) & (exists x (2_A(x) & -2_E(x))) # label(non_clause).  [assumption].
+106 (all x (2_B(x) -> 2_A(x))) & (exists x (2_A(x) & -2_B(x))) # label(non_clause).  [assumption].
+107 (all x (1_G(x) -> -2_CD(x))) # label(non_clause).  [assumption].
+108 (all x (2_CD(x) -> -2_E(x))) # label(non_clause).  [assumption].
+109 (all x (2_F(x) -> 1_A(x))) & (exists x (1_A(x) & -2_F(x))) # label(non_clause).  [assumption].
+110 (all x (1_A(x) <-> 2_A(x))) # label(non_clause).  [assumption].
+111 (all x (2_B(x) -> 1_A(x))) & (exists x (1_A(x) & -2_B(x))) # label(non_clause).  [assumption].
+112 (all x (1_H(x) -> -1_G(x))) # label(non_clause).  [assumption].
+113 (all x (1_H(x) -> 1_F(x))) & (exists x (1_F(x) & -1_H(x))) # label(non_clause).  [assumption].
+114 (all x (1_C(x) -> -1_D(x))) # label(non_clause).  [assumption].
+115 (all x (1_C(x) -> -1_E(x))) # label(non_clause).  [assumption].
+116 (all x (1_C(x) -> -1_F(x))) # label(non_clause).  [assumption].
+117 (all x (1_F(x) <-> 2_GH(x))) # label(non_clause).  [assumption].
+118 (all x (2_GH(x) -> -2_CD(x))) # label(non_clause).  [assumption].
+119 (exists x 1_A(x)) # label(non_clause).  [assumption].
+120 (exists x 1_C(x)) # label(non_clause).  [assumption].
+121 (exists x 1_B(x)) # label(non_clause).  [assumption].
+122 (exists x 1_E(x)) # label(non_clause).  [assumption].
+123 (exists x 1_D(x)) # label(non_clause).  [assumption].
+124 (exists x 1_G(x)) # label(non_clause).  [assumption].
+125 (exists x 1_F(x)) # label(non_clause).  [assumption].
+126 (exists x 1_H(x)) # label(non_clause).  [assumption].
+127 (exists x 2_A(x)) # label(non_clause).  [assumption].
+128 (exists x 2_B(x)) # label(non_clause).  [assumption].
+129 (exists x 2_E(x)) # label(non_clause).  [assumption].
+130 (exists x 2_F(x)) # label(non_clause).  [assumption].
+131 (exists x 2_CD(x)) # label(non_clause).  [assumption].
+132 (exists x 2_GH(x)) # label(non_clause).  [assumption].
+133 1_A(x) -> 1_B(x) | 1_F(x) # label(non_clause).  [assumption].
+134 1_B(x) -> 1_C(x) | 1_D(x) | 1_E(x) # label(non_clause).  [assumption].
+135 1_F(x) -> 1_G(x) | 1_H(x) # label(non_clause).  [assumption].
+136 2_A(x) -> 2_B(x) | 2_F(x) # label(non_clause).  [assumption].
+137 2_B(x) -> 2_CD(x) | 2_E(x) # label(non_clause).  [assumption].
+138 2_F(x) -> 2_GH(x) # label(non_clause).  [assumption].
+139 (all x (1_F(x) -> -1_B(x))) # label(non_clause).  [assumption].
+140 (all x (1_D(x) -> -1_C(x))) # label(non_clause).  [assumption].
+141 (all x (1_E(x) -> -1_C(x))) # label(non_clause).  [assumption].
+142 (all x (1_E(x) -> -1_D(x))) # label(non_clause).  [assumption].
+143 (all x (1_H(x) -> -1_G(x))) # label(non_clause).  [assumption].
+144 (all x (2_F(x) -> -2_B(x))) # label(non_clause).  [assumption].
+145 (all x (2_E(x) -> -2_CD(x))) # label(non_clause).  [assumption].
+
+============================== end of process non-clausal formulas ===
+
+============================== CLAUSES FOR SEARCH ====================
+
+formulas(mace4_clauses).
+-1_B(x) | 1_A(x).
+-1_C(x) | 1_B(x).
+-1_D(x) | 1_B(x).
+-1_E(x) | 1_B(x).
+-1_F(x) | 1_A(x).
+-1_G(x) | 1_F(x).
+-1_H(x) | 1_F(x).
+-2_B(x) | 2_A(x).
+-2_CD(x) | 2_B(x).
+-2_E(x) | 2_B(x).
+-2_F(x) | 2_A(x).
+-2_GH(x) | 2_F(x).
+-1_B(x) | 2_B(x).
+1_B(x) | -2_B(x).
+-1_F(x) | -2_E(x).
+-1_F(x) | -2_B(x).
+-2_E(x) | 1_B(x).
+1_B(c1).
+-2_E(c1).
+-1_E(x) | -1_D(x).
+-2_GH(x) | 1_A(x).
+1_A(c2).
+-2_GH(c2).
+-2_E(x) | 1_A(x).
+1_A(c3).
+-2_E(c3).
+-1_D(x) | 2_CD(x).
+2_CD(c4).
+-1_D(c4).
+-1_E(x) | -1_C(x).
+-2_GH(x) | 2_A(x).
+2_A(c5).
+-2_GH(c5).
+-1_G(x) | 2_F(x).
+2_F(c6).
+-1_G(c6).
+-1_H(x) | -2_CD(x).
+-1_B(x) | 2_A(x).
+2_A(c7).
+-1_B(c7).
+-1_B(x) | -2_F(x).
+-1_E(x) | -2_CD(x).
+-1_F(x) | 2_A(x).
+2_A(c8).
+-1_F(c8).
+-1_H(x) | 2_GH(x).
+2_GH(c9).
+-1_H(c9).
+-1_E(x) | 2_B(x).
+2_B(c10).
+-1_E(c10).
+-1_C(x) | 2_B(x).
+2_B(c11).
+-1_C(c11).
+-2_GH(x) | -1_B(x).
+-1_G(x) | 2_GH(x).
+2_GH(c12).
+-1_G(c12).
+-1_E(x) | 1_B(x).
+1_B(c13).
+-1_E(c13).
+-1_D(x) | 1_B(x).
+1_B(c14).
+-1_D(c14).
+-1_B(x) | -1_F(x).
+-1_C(x) | 1_B(x).
+1_B(c15).
+-1_C(c15).
+-1_G(x) | 2_GH(x).
+2_GH(c16).
+-1_G(c16).
+-1_C(x) | 2_CD(x).
+2_CD(c17).
+-1_C(c17).
+-2_GH(x) | -2_E(x).
+-1_G(x) | -2_B(x).
+-1_G(x) | 2_A(x).
+2_A(c18).
+-1_G(c18).
+-2_GH(x) | 2_A(x).
+2_A(c19).
+-2_GH(c19).
+-1_G(x) | 2_F(x).
+2_F(c20).
+-1_G(c20).
+-1_G(x) | -2_E(x).
+-2_GH(x) | -2_B(x).
+-2_E(x) | -1_D(x).
+-1_H(x) | 2_F(x).
+2_F(c21).
+-1_H(c21).
+-1_E(x) | -2_GH(x).
+-2_E(x) | -1_C(x).
+-2_F(x) | -2_B(x).
+-1_F(x) | -2_CD(x).
+-1_B(x) | -2_GH(x).
+-2_CD(x) | 2_B(x).
+2_B(c22).
+-2_CD(c22).
+-1_E(x) | 2_A(x).
+2_A(c23).
+-1_E(c23).
+-1_E(x) | 2_B(x).
+2_B(c24).
+-1_E(c24).
+-1_E(x) | 2_E(x).
+1_E(x) | -2_E(x).
+-1_D(x) | -1_F(x).
+-1_D(x) | -1_E(x).
+-1_E(x) | -2_F(x).
+-1_H(x) | 1_A(x).
+1_A(c25).
+-1_H(c25).
+-1_B(x) | 1_A(x).
+1_A(c26).
+-1_B(c26).
+-1_C(x) | 1_A(x).
+1_A(c27).
+-1_C(c27).
+-1_F(x) | 1_A(x).
+1_A(c28).
+-1_F(c28).
+-1_G(x) | 1_A(x).
+1_A(c29).
+-1_G(c29).
+-1_D(x) | 1_A(x).
+1_A(c30).
+-1_D(c30).
+-1_E(x) | 1_A(x).
+1_A(c31).
+-1_E(c31).
+-1_H(x) | 2_A(x).
+2_A(c32).
+-1_H(c32).
+-1_H(x) | -2_B(x).
+-1_H(x) | -2_E(x).
+-1_H(x) | 2_F(x).
+2_F(c33).
+-1_H(c33).
+-2_CD(x) | 1_A(x).
+1_A(c34).
+-2_CD(c34).
+-2_E(x) | 2_B(x).
+2_B(c35).
+-2_E(c35).
+-2_B(x) | -2_F(x).
+-2_CD(x) | 2_A(x).
+2_A(c36).
+-2_CD(c36).
+-2_E(x) | -2_CD(x).
+-1_D(x) | -2_GH(x).
+-1_H(x) | 2_GH(x).
+2_GH(c37).
+-1_H(c37).
+-1_E(x) | -1_F(x).
+-1_C(x) | -2_F(x).
+-1_C(x) | -2_E(x).
+-1_C(x) | 2_B(x).
+2_B(c38).
+-1_C(c38).
+-1_C(x) | 2_A(x).
+2_A(c39).
+-1_C(c39).
+-1_G(x) | 1_F(x).
+1_F(c40).
+-1_G(c40).
+-2_CD(x) | 1_B(x).
+1_B(c41).
+-2_CD(c41).
+-1_G(x) | -1_H(x).
+-1_D(x) | -1_C(x).
+-1_D(x) | -2_E(x).
+-1_D(x) | -2_F(x).
+-1_D(x) | 2_A(x).
+2_A(c42).
+-1_D(c42).
+-1_D(x) | 2_B(x).
+2_B(c43).
+-1_D(c43).
+-2_CD(x) | -1_E(x).
+-1_H(x) | 1_F(x).
+1_F(c44).
+-1_H(c44).
+-1_C(x) | 2_A(x).
+2_A(c45).
+-1_C(c45).
+-1_B(x) | 2_A(x).
+2_A(c46).
+-1_B(c46).
+-1_E(x) | 2_A(x).
+2_A(c47).
+-1_E(c47).
+-1_D(x) | 2_A(x).
+2_A(c48).
+-1_D(c48).
+-1_G(x) | 2_A(x).
+2_A(c49).
+-1_G(c49).
+-1_F(x) | 2_A(x).
+2_A(c50).
+-1_F(c50).
+-1_H(x) | 2_A(x).
+2_A(c51).
+-1_H(c51).
+-1_F(x) | -1_B(x).
+-1_C(x) | -2_GH(x).
+-1_G(x) | 1_F(x).
+1_F(c52).
+-1_G(c52).
+-2_F(x) | 2_A(x).
+2_A(c53).
+-2_F(c53).
+-2_E(x) | 2_A(x).
+2_A(c54).
+-2_E(c54).
+-2_B(x) | 2_A(x).
+2_A(c55).
+-2_B(c55).
+-1_G(x) | -2_CD(x).
+-2_CD(x) | -2_E(x).
+-2_F(x) | 1_A(x).
+1_A(c56).
+-2_F(c56).
+-1_A(x) | 2_A(x).
+1_A(x) | -2_A(x).
+-2_B(x) | 1_A(x).
+1_A(c57).
+-2_B(c57).
+-1_H(x) | -1_G(x).
+-1_H(x) | 1_F(x).
+1_F(c58).
+-1_H(c58).
+-1_C(x) | -1_D(x).
+-1_C(x) | -1_E(x).
+-1_C(x) | -1_F(x).
+-1_F(x) | 2_GH(x).
+1_F(x) | -2_GH(x).
+-2_GH(x) | -2_CD(x).
+1_A(c59).
+1_C(c60).
+1_B(c61).
+1_E(c62).
+1_D(c63).
+1_G(c64).
+1_F(c65).
+1_H(c66).
+2_A(c67).
+2_B(c68).
+2_E(c69).
+2_F(c70).
+2_CD(c71).
+2_GH(c72).
+-1_A(x) | 1_B(x) | 1_F(x).
+-1_B(x) | 1_C(x) | 1_D(x) | 1_E(x).
+-1_F(x) | 1_G(x) | 1_H(x).
+-2_A(x) | 2_B(x) | 2_F(x).
+-2_B(x) | 2_CD(x) | 2_E(x).
+-2_F(x) | 2_GH(x).
+-1_F(x) | -1_B(x).
+-1_D(x) | -1_C(x).
+-1_E(x) | -1_C(x).
+-1_E(x) | -1_D(x).
+-1_H(x) | -1_G(x).
+-2_F(x) | -2_B(x).
+-2_E(x) | -2_CD(x).
+end_of_list.
+
+============================== end of clauses for search =============
+
+% There are no natural numbers in the input.
+
+============================== DOMAIN SIZE 2 =========================
+
+============================== STATISTICS ============================
+
+For domain size 2.
+
+Current CPU time: 0.00 seconds (total CPU time: 0.01 seconds).
+Ground clauses: seen=400, kept=400.
+Selections=1, assignments=1, propagations=28, current_models=0.
+Rewrite_terms=7, rewrite_bools=106, indexes=5.
+Rules_from_neg_clauses=9, cross_offs=9.
+
+============================== end of statistics =====================
+
+============================== DOMAIN SIZE 3 =========================
+
+============================== STATISTICS ============================
+
+For domain size 3.
+
+Current CPU time: 0.00 seconds (total CPU time: 0.01 seconds).
+Ground clauses: seen=535, kept=535.
+Selections=2, assignments=3, propagations=41, current_models=0.
+Rewrite_terms=19, rewrite_bools=279, indexes=6.
+Rules_from_neg_clauses=7, cross_offs=41.
+
+============================== end of statistics =====================
+
+============================== DOMAIN SIZE 4 =========================
+
+============================== STATISTICS ============================
+
+For domain size 4.
+
+Current CPU time: 0.00 seconds (total CPU time: 0.01 seconds).
+Ground clauses: seen=670, kept=670.
+Selections=3, assignments=6, propagations=79, current_models=0.
+Rewrite_terms=49, rewrite_bools=737, indexes=9.
+Rules_from_neg_clauses=23, cross_offs=135.
+
+============================== end of statistics =====================
+
+============================== DOMAIN SIZE 5 =========================
+
+============================== MODEL =================================
+
+interpretation( 5, [number=1, seconds=0], [
+
+        function(c1, [ 0 ]),
+
+        function(c2, [ 0 ]),
+
+        function(c3, [ 0 ]),
+
+        function(c4, [ 0 ]),
+
+        function(c5, [ 0 ]),
+
+        function(c6, [ 1 ]),
+
+        function(c7, [ 1 ]),
+
+        function(c8, [ 0 ]),
+
+        function(c9, [ 2 ]),
+
+        function(c10, [ 0 ]),
+
+        function(c11, [ 3 ]),
+
+        function(c12, [ 1 ]),
+
+        function(c13, [ 0 ]),
+
+        function(c14, [ 0 ]),
+
+        function(c15, [ 3 ]),
+
+        function(c16, [ 1 ]),
+
+        function(c17, [ 4 ]),
+
+        function(c18, [ 0 ]),
+
+        function(c19, [ 0 ]),
+
+        function(c20, [ 1 ]),
+
+        function(c21, [ 2 ]),
+
+        function(c22, [ 3 ]),
+
+        function(c23, [ 0 ]),
+
+        function(c24, [ 0 ]),
+
+        function(c25, [ 0 ]),
+
+        function(c26, [ 1 ]),
+
+        function(c27, [ 1 ]),
+
+        function(c28, [ 0 ]),
+
+        function(c29, [ 0 ]),
+
+        function(c30, [ 0 ]),
+
+        function(c31, [ 0 ]),
+
+        function(c32, [ 0 ]),
+
+        function(c33, [ 2 ]),
+
+        function(c34, [ 1 ]),
+
+        function(c35, [ 0 ]),
+
+        function(c36, [ 1 ]),
+
+        function(c37, [ 2 ]),
+
+        function(c38, [ 3 ]),
+
+        function(c39, [ 1 ]),
+
+        function(c40, [ 1 ]),
+
+        function(c41, [ 3 ]),
+
+        function(c42, [ 0 ]),
+
+        function(c43, [ 0 ]),
+
+        function(c44, [ 2 ]),
+
+        function(c45, [ 1 ]),
+
+        function(c46, [ 1 ]),
+
+        function(c47, [ 0 ]),
+
+        function(c48, [ 0 ]),
+
+        function(c49, [ 0 ]),
+
+        function(c50, [ 0 ]),
+
+        function(c51, [ 0 ]),
+
+        function(c52, [ 1 ]),
+
+        function(c53, [ 0 ]),
+
+        function(c54, [ 0 ]),
+
+        function(c55, [ 1 ]),
+
+        function(c56, [ 0 ]),
+
+        function(c57, [ 1 ]),
+
+        function(c58, [ 2 ]),
+
+        function(c59, [ 0 ]),
+
+        function(c60, [ 0 ]),
+
+        function(c61, [ 0 ]),
+
+        function(c62, [ 3 ]),
+
+        function(c63, [ 4 ]),
+
+        function(c64, [ 2 ]),
+
+        function(c65, [ 1 ]),
+
+        function(c66, [ 1 ]),
+
+        function(c67, [ 0 ]),
+
+        function(c68, [ 0 ]),
+
+        function(c69, [ 3 ]),
+
+        function(c70, [ 1 ]),
+
+        function(c71, [ 0 ]),
+
+        function(c72, [ 1 ]),
+
+        relation(1_A(_), [ 1, 1, 1, 1, 1 ]),
+
+        relation(1_B(_), [ 1, 0, 0, 1, 1 ]),
+
+        relation(1_C(_), [ 1, 0, 0, 0, 0 ]),
+
+        relation(1_D(_), [ 0, 0, 0, 0, 1 ]),
+
+        relation(1_E(_), [ 0, 0, 0, 1, 0 ]),
+
+        relation(1_F(_), [ 0, 1, 1, 0, 0 ]),
+
+        relation(1_G(_), [ 0, 0, 1, 0, 0 ]),
+
+        relation(1_H(_), [ 0, 1, 0, 0, 0 ]),
+
+        relation(2_A(_), [ 1, 1, 1, 1, 1 ]),
+
+        relation(2_B(_), [ 1, 0, 0, 1, 1 ]),
+
+        relation(2_CD(_), [ 1, 0, 0, 0, 1 ]),
+
+        relation(2_E(_), [ 0, 0, 0, 1, 0 ]),
+
+        relation(2_F(_), [ 0, 1, 1, 0, 0 ]),
+
+        relation(2_GH(_), [ 0, 1, 1, 0, 0 ])
+]).
+
+============================== end of model ==========================
+
+============================== STATISTICS ============================
+
+For domain size 5.
+
+Current CPU time: 0.00 seconds (total CPU time: 0.02 seconds).
+Ground clauses: seen=805, kept=805.
+Selections=54, assignments=82, propagations=88, current_models=1.
+Rewrite_terms=168, rewrite_bools=1045, indexes=10.
+Rules_from_neg_clauses=18, cross_offs=176.
+
+============================== end of statistics =====================
+
+User_CPU=0.02, System_CPU=0.01, Wall_clock=0.
+
+Exiting with 1 model.
+
+Process 29275 exit (max_models) Wed Jul 11 22:44:56 2012
+The process finished Wed Jul 11 22:44:56 2012
