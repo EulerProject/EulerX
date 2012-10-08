@@ -1,7 +1,7 @@
 ============================== Prover9 ===============================
-Prover9 (64) version 2009-02A, February 2009.
-Process 28832 was started by michen on lore,
-Wed Jul 11 22:43:11 2012
+Prover9 (64) version 2009-11A, November 2009.
+Process 27158 was started by McChen on McChens-MacBook-Pro.local,
+Mon Sep 24 01:10:31 2012
 The command was "prover9 -t 10 -f output/abstract2/reasonerFiles/abstract2N_C_D_noGoal.txt".
 ============================== end of head ===========================
 
@@ -531,7 +531,7 @@ end_of_list.
 
 ============================== SEARCH ================================
 
-% Starting search at 0.02 seconds.
+% Starting search at 0.01 seconds.
 
 given #1 (I,wt=4): 109 -1_D(x) | 1_B(x).  [clausify(3)].
 
@@ -619,10 +619,10 @@ given #42 (I,wt=4): 156 -2_GH(x) | 1_F(x).  [copy(155),merge(c)].
 
 ============================== PROOF =================================
 
-% Proof 1 at 0.02 (+ 0.00) seconds.
+% Proof 1 at 0.01 (+ 0.01) seconds.
 % Length of proof is 16.
 % Level of proof is 5.
-% Maximum clause weight is 4.
+% Maximum clause weight is 4.000.
 % Given clauses 42.
 
 6 1_G(x) -> 1_F(x) # label(non_clause).  [assumption].
@@ -656,7 +656,7 @@ Demod_attempts=0. Demod_rewrites=0.
 Res_instance_prunes=0. Para_instance_prunes=0. Basic_paramod_prunes=0.
 Nonunit_fsub_feature_tests=20. Nonunit_bsub_feature_tests=66.
 Megabytes=0.29.
-User_CPU=0.02, System_CPU=0.00, Wall_clock=0.
+User_CPU=0.01, System_CPU=0.01, Wall_clock=0.
 
 ============================== end of statistics =====================
 
@@ -666,4 +666,4 @@ THEOREM PROVED
 
 Exiting with 1 proof.
 
-Process 28832 exit (max_proofs) Wed Jul 11 22:43:11 2012
+Process 27158 exit (max_proofs) Mon Sep 24 01:10:31 2012

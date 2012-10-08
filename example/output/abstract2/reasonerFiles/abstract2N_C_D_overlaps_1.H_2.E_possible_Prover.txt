@@ -16,7 +16,7 @@ formulas(assumptions).
 (all x (1_C(x) -> 2_CD(x))) & (exists x (2_CD(x) & -1_C(x))).
 ((all x (1_D(x) -> 2_CD(x))) & (exists x (2_CD(x) & -1_D(x)))) | ((exists a exists b exists c (1_D(a) & 2_CD(a) & 1_D(b) & -2_CD(b) & -1_D(c) & 2_CD(c)))).
 (all x (1_E(x) <-> 2_E(x))).
-(1_G(x) | 1_H(x) <-> 2_GH(x)).
+(1_G(x) | 1_H(x) <-> $z(x)).
 exists x 1_A(x).
 exists x 1_C(x).
 exists x 1_B(x).

@@ -1,7 +1,7 @@
 ============================== Mace4 =================================
-Mace4 (64) version 2009-02A, February 2009.
-Process 28880 was started by michen on lore,
-Wed Jul 11 22:44:42 2012
+Mace4 (64) version 2009-11A, November 2009.
+Process 27172 was started by McChen on McChens-MacBook-Pro.local,
+Mon Sep 24 01:11:19 2012
 The command was "mace4 -t 10 -N 200 -b 2000 -f output/abstract2/reasonerFiles/abstract2N_C_D_tmp.txt".
 ============================== end of head ===========================
 
@@ -334,5 +334,5 @@ User_CPU=0.01, System_CPU=0.00, Wall_clock=0.
 
 Exiting with 1 model.
 
-Process 28880 exit (max_models) Wed Jul 11 22:44:42 2012
-The process finished Wed Jul 11 22:44:42 2012
+Process 27172 exit (max_models) Mon Sep 24 01:11:19 2012
+The process finished Mon Sep 24 01:11:19 2012

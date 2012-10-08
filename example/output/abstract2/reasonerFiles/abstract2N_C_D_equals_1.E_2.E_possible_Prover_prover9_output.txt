@@ -1,7 +1,7 @@
 ============================== Prover9 ===============================
-Prover9 (64) version 2009-02A, February 2009.
-Process 28890 was started by michen on lore,
-Wed Jul 11 22:44:43 2012
+Prover9 (64) version 2009-11A, November 2009.
+Process 27177 was started by McChen on McChens-MacBook-Pro.local,
+Mon Sep 24 01:11:19 2012
 The command was "prover9 -t 10 -f output/abstract2/reasonerFiles/abstract2N_C_D_equals_1.E_2.E_possible_Prover.txt".
 ============================== end of head ===========================
 
@@ -505,7 +505,7 @@ end_of_list.
 
 ============================== SEARCH ================================
 
-% Starting search at 0.02 seconds.
+% Starting search at 0.01 seconds.
 
 given #1 (I,wt=4): 108 -1_D(x) | 1_B(x).  [clausify(3)].
 
@@ -795,7 +795,7 @@ Demod_attempts=0. Demod_rewrites=0.
 Res_instance_prunes=0. Para_instance_prunes=0. Basic_paramod_prunes=0.
 Nonunit_fsub_feature_tests=146. Nonunit_bsub_feature_tests=110.
 Megabytes=0.36.
-User_CPU=0.02, System_CPU=0.00, Wall_clock=0.
+User_CPU=0.02, System_CPU=0.01, Wall_clock=0.
 
 ============================== end of statistics =====================
 
@@ -805,4 +805,4 @@ SEARCH FAILED
 
 Exiting with failure.
 
-Process 28890 exit (sos_empty) Wed Jul 11 22:44:43 2012
+Process 27177 exit (sos_empty) Mon Sep 24 01:11:19 2012

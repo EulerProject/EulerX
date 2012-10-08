@@ -820,8 +820,6 @@ class TaxonomyMapping:
                 if(a.confidence != 3-c):
 	            self.articulationSet.articulations.insert(i, a)
                     continue
-		print a
-		print self.articulationSet.articulations
 	        if(self.testConsistency(outputDir)):
 	            self.removeMir(a.__str__())
 		    print "Remedial measure: remove [" + a.toString() + "]"
@@ -842,7 +840,7 @@ class TaxonomyMapping:
 	return False
 
     def traceOut1(self, outputDir, a):
-	tmpStr = "Articulation " + a.__str__() + " is inconsistent with "
+	tmpStr = "Articulation <" + a.__str__() + "> is inconsistent with "
 	tmpTm = copy.deepcopy(self)
 	i = 0
         while i < len(tmpTm.articulationSet.articulations):
@@ -1025,7 +1023,6 @@ class TaxonomyMapping:
 	  signal.alarm(120)
 	  try:
 	    proverOutput = self.prover.run(outputFileName, False)
-	    print proverOutput[0]
             if(proverOutput[0] == "not proved"):
 		return True
 	    else:

@@ -1,7 +1,7 @@
 ============================== Prover9 ===============================
-Prover9 (64) version 2009-02A, February 2009.
-Process 29051 was started by michen on lore,
-Wed Jul 11 22:44:49 2012
+Prover9 (64) version 2009-11A, November 2009.
+Process 27257 was started by McChen on McChens-MacBook-Pro.local,
+Mon Sep 24 01:11:22 2012
 The command was "prover9 -t 10 -f output/abstract2/reasonerFiles/abstract2N_C_D_overlaps_1.D_2.F_possible_Prover.txt".
 ============================== end of head ===========================
 
@@ -28,7 +28,7 @@ formulas(assumptions).
 (all x (1_C(x) -> 2_CD(x))) & (exists x (2_CD(x) & -1_C(x))).
 (all x (1_D(x) -> 2_CD(x))) & (exists x (2_CD(x) & -1_D(x))) | (exists a exists b exists c (1_D(a) & 2_CD(a) & 1_D(b) & -2_CD(b) & -1_D(c) & 2_CD(c))).
 (all x (1_E(x) <-> 2_E(x))).
-1_G(x) | 1_H(x) <-> 2_GH(x).
+1_G(x) | 1_H(x) <-> $z(x).
 (exists x 1_A(x)).
 (exists x 1_C(x)).
 (exists x 1_B(x)).
@@ -86,7 +86,7 @@ end_of_list.
 15 (all x (1_C(x) -> 2_CD(x))) & (exists x (2_CD(x) & -1_C(x))) # label(non_clause).  [assumption].
 16 (all x (1_D(x) -> 2_CD(x))) & (exists x (2_CD(x) & -1_D(x))) | (exists a exists b exists c (1_D(a) & 2_CD(a) & 1_D(b) & -2_CD(b) & -1_D(c) & 2_CD(c))) # label(non_clause).  [assumption].
 17 (all x (1_E(x) <-> 2_E(x))) # label(non_clause).  [assumption].
-18 1_G(x) | 1_H(x) <-> 2_GH(x) # label(non_clause).  [assumption].
+18 1_G(x) | 1_H(x) <-> $z(x) # label(non_clause).  [assumption].
 19 (exists x 1_A(x)) # label(non_clause).  [assumption].
 20 (exists x 1_C(x)) # label(non_clause).  [assumption].
 21 (exists x 1_B(x)) # label(non_clause).  [assumption].
@@ -169,9 +169,9 @@ formulas(sos).
 -1_D(c3) | 2_CD(c6).  [clausify(16)].
 -1_E(x) | 2_E(x).  [clausify(17)].
 1_E(x) | -2_E(x).  [clausify(17)].
--1_G(x) | 2_GH(x).  [clausify(18)].
--1_H(x) | 2_GH(x).  [clausify(18)].
-1_G(x) | 1_H(x) | -2_GH(x).  [clausify(18)].
+-1_G(x) | $z(x).  [clausify(18)].
+-1_H(x) | $z(x).  [clausify(18)].
+1_G(x) | 1_H(x) | -$z(x).  [clausify(18)].
 1_A(c7).  [clausify(19)].
 1_C(c8).  [clausify(20)].
 1_B(c9).  [clausify(21)].
@@ -260,28 +260,28 @@ Derived: -2_E(c8).  [resolve(67,a,60,a)].
 Derived: -1_B(c8) | 1_D(c8) | 2_CD(c8).  [resolve(67,a,65,c)].
 
 Eliminating 1_G/1
-68 1_G(x) | 1_H(x) | -2_GH(x).  [clausify(18)].
+68 1_G(x) | 1_H(x) | -$z(x).  [clausify(18)].
 69 -1_G(x) | 1_F(x).  [clausify(6)].
-70 -1_G(x) | 2_GH(x).  [clausify(18)].
-Derived: 1_H(x) | -2_GH(x) | 1_F(x).  [resolve(68,a,69,a)].
+70 -1_G(x) | $z(x).  [clausify(18)].
+Derived: 1_H(x) | -$z(x) | 1_F(x).  [resolve(68,a,69,a)].
 71 1_G(c12).  [clausify(24)].
 Derived: 1_F(c12).  [resolve(71,a,69,a)].
-Derived: 2_GH(c12).  [resolve(71,a,70,a)].
+Derived: $z(c12).  [resolve(71,a,70,a)].
 72 -1_F(x) | 1_G(x) | 1_H(x).  [clausify(35)].
-Derived: -1_F(x) | 1_H(x) | 2_GH(x).  [resolve(72,b,70,a)].
+Derived: -1_F(x) | 1_H(x) | $z(x).  [resolve(72,b,70,a)].
 73 -1_H(x) | -1_G(x).  [clausify(43)].
 Derived: -1_H(c12).  [resolve(73,b,71,a)].
 
 Eliminating 1_H/1
 74 1_H(c14).  [clausify(26)].
 75 -1_H(x) | 1_F(x).  [clausify(7)].
-76 -1_H(x) | 2_GH(x).  [clausify(18)].
+76 -1_H(x) | $z(x).  [clausify(18)].
 Derived: 1_F(c14).  [resolve(74,a,75,a)].
-Derived: 2_GH(c14).  [resolve(74,a,76,a)].
-77 1_H(x) | -2_GH(x) | 1_F(x).  [resolve(68,a,69,a)].
-Derived: -2_GH(x) | 1_F(x) | 1_F(x).  [resolve(77,a,75,a)].
-78 -1_F(x) | 1_H(x) | 2_GH(x).  [resolve(72,b,70,a)].
-Derived: -1_F(x) | 2_GH(x) | 2_GH(x).  [resolve(78,b,76,a)].
+Derived: $z(c14).  [resolve(74,a,76,a)].
+77 1_H(x) | -$z(x) | 1_F(x).  [resolve(68,a,69,a)].
+Derived: -$z(x) | 1_F(x) | 1_F(x).  [resolve(77,a,75,a)].
+78 -1_F(x) | 1_H(x) | $z(x).  [resolve(72,b,70,a)].
+Derived: -1_F(x) | $z(x) | $z(x).  [resolve(78,b,76,a)].
 79 -1_H(c12).  [resolve(73,b,71,a)].
 
 Eliminating 2_A/1
@@ -326,45 +326,42 @@ Derived: -1_B(c2) | 1_D(c2) | -2_CD(c2).  [resolve(96,c,91,a)].
 97 -2_E(c8).  [resolve(67,a,60,a)].
 Derived: -2_B(c8) | 2_CD(c8).  [resolve(97,a,90,c)].
 
-Eliminating 2_F/1
-98 -2_F(x) | 2_GH(x).  [clausify(38)].
+Eliminating 2_GH/1
+98 2_GH(c20).  [clausify(32)].
 99 -2_GH(x) | 2_F(x).  [clausify(12)].
-100 2_F(c18).  [clausify(30)].
-Derived: 2_GH(c18).  [resolve(98,a,100,a)].
+Derived: 2_F(c20).  [resolve(98,a,99,a)].
+100 -2_F(x) | 2_GH(x).  [clausify(38)].
+
+Eliminating 2_F/1
 101 -2_F(x) | -2_B(x).  [clausify(44)].
-Derived: -2_B(x) | -2_GH(x).  [resolve(101,a,99,b)].
-Derived: -2_B(c18).  [resolve(101,a,100,a)].
-102 2_F(c21).  [deny(46)].
-Derived: 2_GH(c21).  [resolve(102,a,98,a)].
-Derived: -2_B(c21).  [resolve(102,a,101,a)].
-103 -2_F(c22).  [deny(46)].
-Derived: -2_GH(c22).  [resolve(103,a,99,b)].
-104 2_F(c23).  [deny(46)].
-Derived: 2_GH(c23).  [resolve(104,a,98,a)].
-Derived: -2_B(c23).  [resolve(104,a,101,a)].
-105 2_B(c15) | 2_F(c15).  [resolve(80,a,83,a)].
-Derived: 2_B(c15) | 2_GH(c15).  [resolve(105,b,98,a)].
-106 -1_B(x) | 2_B(x) | 2_F(x).  [resolve(84,a,80,a)].
-Derived: -1_B(x) | 2_B(x) | 2_GH(x).  [resolve(106,c,98,a)].
-Derived: -1_B(c22) | 2_B(c22).  [resolve(106,c,103,a)].
-107 -1_F(x) | 2_B(x) | 2_F(x).  [resolve(85,a,80,a)].
-Derived: -1_F(x) | 2_B(x) | 2_GH(x).  [resolve(107,c,98,a)].
-Derived: -1_F(c22) | 2_B(c22).  [resolve(107,c,103,a)].
-108 2_B(c7) | 2_F(c7).  [resolve(86,a,80,a)].
-Derived: 2_B(c7) | 2_GH(c7).  [resolve(108,b,98,a)].
-109 1_B(x) | 1_F(x) | -2_F(x).  [resolve(87,c,82,b)].
-Derived: 1_B(x) | 1_F(x) | -2_GH(x).  [resolve(109,c,99,b)].
-Derived: 1_B(c18) | 1_F(c18).  [resolve(109,c,100,a)].
-Derived: 1_B(c21) | 1_F(c21).  [resolve(109,c,102,a)].
-Derived: 1_B(c23) | 1_F(c23).  [resolve(109,c,104,a)].
-Derived: 1_B(c7) | 1_F(c7) | 2_B(c7).  [resolve(109,c,108,b)].
+102 2_F(c18).  [clausify(30)].
+Derived: -2_B(c18).  [resolve(101,a,102,a)].
+103 2_F(c21).  [deny(46)].
+Derived: -2_B(c21).  [resolve(103,a,101,a)].
+104 -2_F(c22).  [deny(46)].
+105 2_F(c23).  [deny(46)].
+Derived: -2_B(c23).  [resolve(105,a,101,a)].
+106 2_B(c15) | 2_F(c15).  [resolve(80,a,83,a)].
+107 -1_B(x) | 2_B(x) | 2_F(x).  [resolve(84,a,80,a)].
+Derived: -1_B(c22) | 2_B(c22).  [resolve(107,c,104,a)].
+108 -1_F(x) | 2_B(x) | 2_F(x).  [resolve(85,a,80,a)].
+Derived: -1_F(c22) | 2_B(c22).  [resolve(108,c,104,a)].
+109 2_B(c7) | 2_F(c7).  [resolve(86,a,80,a)].
+110 1_B(x) | 1_F(x) | -2_F(x).  [resolve(87,c,82,b)].
+Derived: 1_B(c18) | 1_F(c18).  [resolve(110,c,102,a)].
+Derived: 1_B(c21) | 1_F(c21).  [resolve(110,c,103,a)].
+Derived: 1_B(c23) | 1_F(c23).  [resolve(110,c,105,a)].
+Derived: 1_B(c7) | 1_F(c7) | 2_B(c7).  [resolve(110,c,109,b)].
+111 2_F(c20).  [resolve(98,a,99,a)].
+Derived: -2_B(c20).  [resolve(111,a,101,a)].
+Derived: 1_B(c20) | 1_F(c20).  [resolve(111,a,110,c)].
 
 ============================== end predicate elimination =============
 
 Auto_denials:  (non-Horn, no changes).
 
 Term ordering decisions:
-Predicate symbol precedence:  predicate_order([ 1_B, 2_CD, 1_D, 2_B, 1_F, 2_GH ]).
+Predicate symbol precedence:  predicate_order([ 1_B, 2_CD, 1_D, 2_B, 1_F, $z ]).
 Function symbol precedence:  function_order([ c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, c23 ]).
 After inverse_order:  (no changes).
 Unfolding symbols: (none).
@@ -377,91 +374,84 @@ Auto_process settings:
   % set(factor).  % (non-Horn)
   % set(unit_deletion).  % (non-Horn)
 
-kept:      110 -1_D(x) | 1_B(x).  [clausify(3)].
-kept:      111 -2_CD(x) | 2_B(x).  [clausify(9)].
-kept:      112 -1_B(x) | 2_B(x) | -2_B(y) | 1_B(y).  [clausify(14)].
-kept:      113 -1_B(x) | 2_B(x) | 1_B(c1).  [clausify(14)].
-kept:      114 -1_B(x) | 2_B(x) | -2_B(c1).  [clausify(14)].
-kept:      115 1_B(x) | -2_B(x) | -2_B(y) | 1_B(y).  [clausify(14)].
-kept:      116 1_B(x) | -2_B(x) | 1_B(c1).  [clausify(14)].
-kept:      117 1_B(x) | -2_B(x) | -2_B(c1).  [clausify(14)].
-kept:      118 2_CD(c2).  [clausify(15)].
-kept:      119 -1_D(x) | 2_CD(x) | 1_D(c4).  [clausify(16)].
-kept:      120 -1_D(x) | 2_CD(x) | 2_CD(c4).  [clausify(16)].
-kept:      121 -1_D(x) | 2_CD(x) | 1_D(c5).  [clausify(16)].
-kept:      122 -1_D(x) | 2_CD(x) | -2_CD(c5).  [clausify(16)].
-kept:      123 -1_D(x) | 2_CD(x) | -1_D(c6).  [clausify(16)].
-kept:      124 -1_D(x) | 2_CD(x) | 2_CD(c6).  [clausify(16)].
-kept:      125 2_CD(c3) | 1_D(c4).  [clausify(16)].
-kept:      126 2_CD(c3) | 2_CD(c4).  [clausify(16)].
-kept:      127 2_CD(c3) | 1_D(c5).  [clausify(16)].
-kept:      128 2_CD(c3) | -2_CD(c5).  [clausify(16)].
-kept:      129 2_CD(c3) | -1_D(c6).  [clausify(16)].
-kept:      130 2_CD(c3) | 2_CD(c6).  [clausify(16)].
-kept:      131 -1_D(c3) | 1_D(c4).  [clausify(16)].
-kept:      132 -1_D(c3) | 2_CD(c4).  [clausify(16)].
-kept:      133 -1_D(c3) | 1_D(c5).  [clausify(16)].
-kept:      134 -1_D(c3) | -2_CD(c5).  [clausify(16)].
-kept:      135 -1_D(c3) | -1_D(c6).  [clausify(16)].
-kept:      136 -1_D(c3) | 2_CD(c6).  [clausify(16)].
-kept:      137 1_B(c9).  [clausify(21)].
-kept:      138 1_D(c11).  [clausify(23)].
-kept:      139 1_F(c13).  [clausify(25)].
-kept:      140 2_B(c16).  [clausify(28)].
-kept:      141 2_CD(c19).  [clausify(31)].
-kept:      142 2_GH(c20).  [clausify(32)].
-kept:      143 -1_F(x) | -1_B(x).  [clausify(39)].
-kept:      144 1_D(c21).  [deny(46)].
-kept:      145 1_D(c22).  [deny(46)].
-kept:      146 -1_D(c23).  [deny(46)].
-kept:      147 1_B(c7) | 1_F(c7).  [resolve(52,a,51,a)].
-kept:      148 1_B(c8).  [resolve(53,a,54,a)].
-kept:      149 2_CD(c8).  [resolve(53,a,55,a)].
-kept:      150 -1_D(c8).  [resolve(58,b,53,a)].
-kept:      151 1_B(c10).  [resolve(63,a,61,a)].
-kept:      152 -1_D(c10).  [resolve(64,a,63,a)].
-           153 -1_B(c8) | 1_D(c8) | 2_CD(c8).  [resolve(67,a,65,c)].
-kept:      154 1_F(c12).  [resolve(71,a,69,a)].
-kept:      155 2_GH(c12).  [resolve(71,a,70,a)].
-kept:      156 1_F(c14).  [resolve(74,a,75,a)].
-kept:      157 2_GH(c14).  [resolve(74,a,76,a)].
-           158 -2_GH(x) | 1_F(x) | 1_F(x).  [resolve(77,a,75,a)].
-kept:      159 -2_GH(x) | 1_F(x).  [copy(158),merge(c)].
-           160 -1_F(x) | 2_GH(x) | 2_GH(x).  [resolve(78,b,76,a)].
-kept:      161 -1_F(x) | 2_GH(x).  [copy(160),merge(c)].
-kept:      162 1_B(x) | 1_F(x) | -2_B(x).  [resolve(87,c,81,b)].
-kept:      163 1_B(c15) | 1_F(c15).  [resolve(87,c,83,a)].
-kept:      164 2_B(c17).  [resolve(88,a,89,a)].
-kept:      165 -2_CD(c17).  [resolve(91,a,88,a)].
-kept:      166 1_B(c17).  [resolve(92,a,88,a)].
-kept:      167 1_B(x) | -2_B(x) | 2_CD(x).  [resolve(92,a,90,c)].
-kept:      168 2_B(c10).  [resolve(93,a,89,a)].
-kept:      169 -2_CD(c10).  [resolve(93,a,91,a)].
-kept:      170 -1_D(c17).  [resolve(94,b,88,a)].
-kept:      171 -1_D(x) | -2_B(x) | 2_CD(x).  [resolve(94,b,90,c)].
-kept:      172 -1_B(x) | 1_D(x) | 2_CD(x) | 2_B(x).  [resolve(95,d,89,a)].
-kept:      173 -1_B(c2) | 1_D(c2) | 2_B(c2).  [resolve(96,c,89,a)].
-           174 -1_B(c2) | 1_D(c2) | -2_CD(c2).  [resolve(96,c,91,a)].
-kept:      175 -1_B(c2) | 1_D(c2).  [copy(174),unit_del(c,118)].
-kept:      176 2_GH(c18).  [resolve(98,a,100,a)].
-kept:      177 -2_B(x) | -2_GH(x).  [resolve(101,a,99,b)].
-kept:      178 -2_B(c18).  [resolve(101,a,100,a)].
-kept:      179 2_GH(c21).  [resolve(102,a,98,a)].
-kept:      180 -2_B(c21).  [resolve(102,a,101,a)].
-kept:      181 -2_GH(c22).  [resolve(103,a,99,b)].
-kept:      182 2_GH(c23).  [resolve(104,a,98,a)].
-kept:      183 -2_B(c23).  [resolve(104,a,101,a)].
-kept:      184 2_B(c15) | 2_GH(c15).  [resolve(105,b,98,a)].
-kept:      185 -1_B(x) | 2_B(x) | 2_GH(x).  [resolve(106,c,98,a)].
-kept:      186 -1_B(c22) | 2_B(c22).  [resolve(106,c,103,a)].
-kept:      187 -1_F(c22) | 2_B(c22).  [resolve(107,c,103,a)].
-kept:      188 2_B(c7) | 2_GH(c7).  [resolve(108,b,98,a)].
-kept:      189 1_B(c18) | 1_F(c18).  [resolve(109,c,100,a)].
-kept:      190 1_B(c21) | 1_F(c21).  [resolve(109,c,102,a)].
-kept:      191 1_B(c23) | 1_F(c23).  [resolve(109,c,104,a)].
-kept:      192 1_B(x) | -2_B(x).  [factor(115,a,d),merge(c)].
-kept:      193 -1_D(c4) | 2_CD(c4).  [factor(120,b,c)].
-kept:      194 -1_D(c6) | 2_CD(c6).  [factor(123,a,c)].
+kept:      112 -1_D(x) | 1_B(x).  [clausify(3)].
+kept:      113 -2_CD(x) | 2_B(x).  [clausify(9)].
+kept:      114 -1_B(x) | 2_B(x) | -2_B(y) | 1_B(y).  [clausify(14)].
+kept:      115 -1_B(x) | 2_B(x) | 1_B(c1).  [clausify(14)].
+kept:      116 -1_B(x) | 2_B(x) | -2_B(c1).  [clausify(14)].
+kept:      117 1_B(x) | -2_B(x) | -2_B(y) | 1_B(y).  [clausify(14)].
+kept:      118 1_B(x) | -2_B(x) | 1_B(c1).  [clausify(14)].
+kept:      119 1_B(x) | -2_B(x) | -2_B(c1).  [clausify(14)].
+kept:      120 2_CD(c2).  [clausify(15)].
+kept:      121 -1_D(x) | 2_CD(x) | 1_D(c4).  [clausify(16)].
+kept:      122 -1_D(x) | 2_CD(x) | 2_CD(c4).  [clausify(16)].
+kept:      123 -1_D(x) | 2_CD(x) | 1_D(c5).  [clausify(16)].
+kept:      124 -1_D(x) | 2_CD(x) | -2_CD(c5).  [clausify(16)].
+kept:      125 -1_D(x) | 2_CD(x) | -1_D(c6).  [clausify(16)].
+kept:      126 -1_D(x) | 2_CD(x) | 2_CD(c6).  [clausify(16)].
+kept:      127 2_CD(c3) | 1_D(c4).  [clausify(16)].
+kept:      128 2_CD(c3) | 2_CD(c4).  [clausify(16)].
+kept:      129 2_CD(c3) | 1_D(c5).  [clausify(16)].
+kept:      130 2_CD(c3) | -2_CD(c5).  [clausify(16)].
+kept:      131 2_CD(c3) | -1_D(c6).  [clausify(16)].
+kept:      132 2_CD(c3) | 2_CD(c6).  [clausify(16)].
+kept:      133 -1_D(c3) | 1_D(c4).  [clausify(16)].
+kept:      134 -1_D(c3) | 2_CD(c4).  [clausify(16)].
+kept:      135 -1_D(c3) | 1_D(c5).  [clausify(16)].
+kept:      136 -1_D(c3) | -2_CD(c5).  [clausify(16)].
+kept:      137 -1_D(c3) | -1_D(c6).  [clausify(16)].
+kept:      138 -1_D(c3) | 2_CD(c6).  [clausify(16)].
+kept:      139 1_B(c9).  [clausify(21)].
+kept:      140 1_D(c11).  [clausify(23)].
+kept:      141 1_F(c13).  [clausify(25)].
+kept:      142 2_B(c16).  [clausify(28)].
+kept:      143 2_CD(c19).  [clausify(31)].
+kept:      144 -1_F(x) | -1_B(x).  [clausify(39)].
+kept:      145 1_D(c21).  [deny(46)].
+kept:      146 1_D(c22).  [deny(46)].
+kept:      147 -1_D(c23).  [deny(46)].
+kept:      148 1_B(c7) | 1_F(c7).  [resolve(52,a,51,a)].
+kept:      149 1_B(c8).  [resolve(53,a,54,a)].
+kept:      150 2_CD(c8).  [resolve(53,a,55,a)].
+kept:      151 -1_D(c8).  [resolve(58,b,53,a)].
+kept:      152 1_B(c10).  [resolve(63,a,61,a)].
+kept:      153 -1_D(c10).  [resolve(64,a,63,a)].
+           154 -1_B(c8) | 1_D(c8) | 2_CD(c8).  [resolve(67,a,65,c)].
+kept:      155 1_F(c12).  [resolve(71,a,69,a)].
+kept:      156 $z(c12).  [resolve(71,a,70,a)].
+kept:      157 1_F(c14).  [resolve(74,a,75,a)].
+kept:      158 $z(c14).  [resolve(74,a,76,a)].
+           159 -$z(x) | 1_F(x) | 1_F(x).  [resolve(77,a,75,a)].
+kept:      160 -$z(x) | 1_F(x).  [copy(159),merge(c)].
+           161 -1_F(x) | $z(x) | $z(x).  [resolve(78,b,76,a)].
+kept:      162 -1_F(x) | $z(x).  [copy(161),merge(c)].
+kept:      163 1_B(x) | 1_F(x) | -2_B(x).  [resolve(87,c,81,b)].
+kept:      164 1_B(c15) | 1_F(c15).  [resolve(87,c,83,a)].
+kept:      165 2_B(c17).  [resolve(88,a,89,a)].
+kept:      166 -2_CD(c17).  [resolve(91,a,88,a)].
+kept:      167 1_B(c17).  [resolve(92,a,88,a)].
+kept:      168 1_B(x) | -2_B(x) | 2_CD(x).  [resolve(92,a,90,c)].
+kept:      169 2_B(c10).  [resolve(93,a,89,a)].
+kept:      170 -2_CD(c10).  [resolve(93,a,91,a)].
+kept:      171 -1_D(c17).  [resolve(94,b,88,a)].
+kept:      172 -1_D(x) | -2_B(x) | 2_CD(x).  [resolve(94,b,90,c)].
+kept:      173 -1_B(x) | 1_D(x) | 2_CD(x) | 2_B(x).  [resolve(95,d,89,a)].
+kept:      174 -1_B(c2) | 1_D(c2) | 2_B(c2).  [resolve(96,c,89,a)].
+           175 -1_B(c2) | 1_D(c2) | -2_CD(c2).  [resolve(96,c,91,a)].
+kept:      176 -1_B(c2) | 1_D(c2).  [copy(175),unit_del(c,120)].
+kept:      177 -2_B(c18).  [resolve(101,a,102,a)].
+kept:      178 -2_B(c21).  [resolve(103,a,101,a)].
+kept:      179 -2_B(c23).  [resolve(105,a,101,a)].
+kept:      180 -1_B(c22) | 2_B(c22).  [resolve(107,c,104,a)].
+kept:      181 -1_F(c22) | 2_B(c22).  [resolve(108,c,104,a)].
+kept:      182 1_B(c18) | 1_F(c18).  [resolve(110,c,102,a)].
+kept:      183 1_B(c21) | 1_F(c21).  [resolve(110,c,103,a)].
+kept:      184 1_B(c23) | 1_F(c23).  [resolve(110,c,105,a)].
+kept:      185 -2_B(c20).  [resolve(111,a,101,a)].
+kept:      186 1_B(c20) | 1_F(c20).  [resolve(111,a,110,c)].
+kept:      187 1_B(x) | -2_B(x).  [factor(117,a,d),merge(c)].
+kept:      188 -1_D(c4) | 2_CD(c4).  [factor(122,b,c)].
+kept:      189 -1_D(c6) | 2_CD(c6).  [factor(125,a,c)].
 
 ============================== end of process initial clauses ========
 
@@ -473,80 +463,73 @@ formulas(usable).
 end_of_list.
 
 formulas(sos).
-110 -1_D(x) | 1_B(x).  [clausify(3)].
-111 -2_CD(x) | 2_B(x).  [clausify(9)].
-113 -1_B(x) | 2_B(x) | 1_B(c1).  [clausify(14)].
-114 -1_B(x) | 2_B(x) | -2_B(c1).  [clausify(14)].
-118 2_CD(c2).  [clausify(15)].
-119 -1_D(x) | 2_CD(x) | 1_D(c4).  [clausify(16)].
-120 -1_D(x) | 2_CD(x) | 2_CD(c4).  [clausify(16)].
-121 -1_D(x) | 2_CD(x) | 1_D(c5).  [clausify(16)].
-122 -1_D(x) | 2_CD(x) | -2_CD(c5).  [clausify(16)].
-123 -1_D(x) | 2_CD(x) | -1_D(c6).  [clausify(16)].
-124 -1_D(x) | 2_CD(x) | 2_CD(c6).  [clausify(16)].
-125 2_CD(c3) | 1_D(c4).  [clausify(16)].
-126 2_CD(c3) | 2_CD(c4).  [clausify(16)].
-127 2_CD(c3) | 1_D(c5).  [clausify(16)].
-128 2_CD(c3) | -2_CD(c5).  [clausify(16)].
-129 2_CD(c3) | -1_D(c6).  [clausify(16)].
-130 2_CD(c3) | 2_CD(c6).  [clausify(16)].
-131 -1_D(c3) | 1_D(c4).  [clausify(16)].
-132 -1_D(c3) | 2_CD(c4).  [clausify(16)].
-133 -1_D(c3) | 1_D(c5).  [clausify(16)].
-134 -1_D(c3) | -2_CD(c5).  [clausify(16)].
-135 -1_D(c3) | -1_D(c6).  [clausify(16)].
-136 -1_D(c3) | 2_CD(c6).  [clausify(16)].
-137 1_B(c9).  [clausify(21)].
-138 1_D(c11).  [clausify(23)].
-139 1_F(c13).  [clausify(25)].
-140 2_B(c16).  [clausify(28)].
-141 2_CD(c19).  [clausify(31)].
-142 2_GH(c20).  [clausify(32)].
-143 -1_F(x) | -1_B(x).  [clausify(39)].
-144 1_D(c21).  [deny(46)].
-145 1_D(c22).  [deny(46)].
-146 -1_D(c23).  [deny(46)].
-147 1_B(c7) | 1_F(c7).  [resolve(52,a,51,a)].
-148 1_B(c8).  [resolve(53,a,54,a)].
-149 2_CD(c8).  [resolve(53,a,55,a)].
-150 -1_D(c8).  [resolve(58,b,53,a)].
-151 1_B(c10).  [resolve(63,a,61,a)].
-152 -1_D(c10).  [resolve(64,a,63,a)].
-154 1_F(c12).  [resolve(71,a,69,a)].
-155 2_GH(c12).  [resolve(71,a,70,a)].
-156 1_F(c14).  [resolve(74,a,75,a)].
-157 2_GH(c14).  [resolve(74,a,76,a)].
-159 -2_GH(x) | 1_F(x).  [copy(158),merge(c)].
-161 -1_F(x) | 2_GH(x).  [copy(160),merge(c)].
-163 1_B(c15) | 1_F(c15).  [resolve(87,c,83,a)].
-164 2_B(c17).  [resolve(88,a,89,a)].
-165 -2_CD(c17).  [resolve(91,a,88,a)].
-166 1_B(c17).  [resolve(92,a,88,a)].
-168 2_B(c10).  [resolve(93,a,89,a)].
-169 -2_CD(c10).  [resolve(93,a,91,a)].
-170 -1_D(c17).  [resolve(94,b,88,a)].
-171 -1_D(x) | -2_B(x) | 2_CD(x).  [resolve(94,b,90,c)].
-172 -1_B(x) | 1_D(x) | 2_CD(x) | 2_B(x).  [resolve(95,d,89,a)].
-175 -1_B(c2) | 1_D(c2).  [copy(174),unit_del(c,118)].
-176 2_GH(c18).  [resolve(98,a,100,a)].
-177 -2_B(x) | -2_GH(x).  [resolve(101,a,99,b)].
-178 -2_B(c18).  [resolve(101,a,100,a)].
-179 2_GH(c21).  [resolve(102,a,98,a)].
-180 -2_B(c21).  [resolve(102,a,101,a)].
-181 -2_GH(c22).  [resolve(103,a,99,b)].
-182 2_GH(c23).  [resolve(104,a,98,a)].
-183 -2_B(c23).  [resolve(104,a,101,a)].
-184 2_B(c15) | 2_GH(c15).  [resolve(105,b,98,a)].
-185 -1_B(x) | 2_B(x) | 2_GH(x).  [resolve(106,c,98,a)].
-186 -1_B(c22) | 2_B(c22).  [resolve(106,c,103,a)].
-187 -1_F(c22) | 2_B(c22).  [resolve(107,c,103,a)].
-188 2_B(c7) | 2_GH(c7).  [resolve(108,b,98,a)].
-189 1_B(c18) | 1_F(c18).  [resolve(109,c,100,a)].
-190 1_B(c21) | 1_F(c21).  [resolve(109,c,102,a)].
-191 1_B(c23) | 1_F(c23).  [resolve(109,c,104,a)].
-192 1_B(x) | -2_B(x).  [factor(115,a,d),merge(c)].
-193 -1_D(c4) | 2_CD(c4).  [factor(120,b,c)].
-194 -1_D(c6) | 2_CD(c6).  [factor(123,a,c)].
+112 -1_D(x) | 1_B(x).  [clausify(3)].
+113 -2_CD(x) | 2_B(x).  [clausify(9)].
+115 -1_B(x) | 2_B(x) | 1_B(c1).  [clausify(14)].
+116 -1_B(x) | 2_B(x) | -2_B(c1).  [clausify(14)].
+120 2_CD(c2).  [clausify(15)].
+121 -1_D(x) | 2_CD(x) | 1_D(c4).  [clausify(16)].
+122 -1_D(x) | 2_CD(x) | 2_CD(c4).  [clausify(16)].
+123 -1_D(x) | 2_CD(x) | 1_D(c5).  [clausify(16)].
+124 -1_D(x) | 2_CD(x) | -2_CD(c5).  [clausify(16)].
+125 -1_D(x) | 2_CD(x) | -1_D(c6).  [clausify(16)].
+126 -1_D(x) | 2_CD(x) | 2_CD(c6).  [clausify(16)].
+127 2_CD(c3) | 1_D(c4).  [clausify(16)].
+128 2_CD(c3) | 2_CD(c4).  [clausify(16)].
+129 2_CD(c3) | 1_D(c5).  [clausify(16)].
+130 2_CD(c3) | -2_CD(c5).  [clausify(16)].
+131 2_CD(c3) | -1_D(c6).  [clausify(16)].
+132 2_CD(c3) | 2_CD(c6).  [clausify(16)].
+133 -1_D(c3) | 1_D(c4).  [clausify(16)].
+134 -1_D(c3) | 2_CD(c4).  [clausify(16)].
+135 -1_D(c3) | 1_D(c5).  [clausify(16)].
+136 -1_D(c3) | -2_CD(c5).  [clausify(16)].
+137 -1_D(c3) | -1_D(c6).  [clausify(16)].
+138 -1_D(c3) | 2_CD(c6).  [clausify(16)].
+139 1_B(c9).  [clausify(21)].
+140 1_D(c11).  [clausify(23)].
+141 1_F(c13).  [clausify(25)].
+142 2_B(c16).  [clausify(28)].
+143 2_CD(c19).  [clausify(31)].
+144 -1_F(x) | -1_B(x).  [clausify(39)].
+145 1_D(c21).  [deny(46)].
+146 1_D(c22).  [deny(46)].
+147 -1_D(c23).  [deny(46)].
+148 1_B(c7) | 1_F(c7).  [resolve(52,a,51,a)].
+149 1_B(c8).  [resolve(53,a,54,a)].
+150 2_CD(c8).  [resolve(53,a,55,a)].
+151 -1_D(c8).  [resolve(58,b,53,a)].
+152 1_B(c10).  [resolve(63,a,61,a)].
+153 -1_D(c10).  [resolve(64,a,63,a)].
+155 1_F(c12).  [resolve(71,a,69,a)].
+156 $z(c12).  [resolve(71,a,70,a)].
+157 1_F(c14).  [resolve(74,a,75,a)].
+158 $z(c14).  [resolve(74,a,76,a)].
+160 -$z(x) | 1_F(x).  [copy(159),merge(c)].
+162 -1_F(x) | $z(x).  [copy(161),merge(c)].
+164 1_B(c15) | 1_F(c15).  [resolve(87,c,83,a)].
+165 2_B(c17).  [resolve(88,a,89,a)].
+166 -2_CD(c17).  [resolve(91,a,88,a)].
+167 1_B(c17).  [resolve(92,a,88,a)].
+169 2_B(c10).  [resolve(93,a,89,a)].
+170 -2_CD(c10).  [resolve(93,a,91,a)].
+171 -1_D(c17).  [resolve(94,b,88,a)].
+172 -1_D(x) | -2_B(x) | 2_CD(x).  [resolve(94,b,90,c)].
+173 -1_B(x) | 1_D(x) | 2_CD(x) | 2_B(x).  [resolve(95,d,89,a)].
+176 -1_B(c2) | 1_D(c2).  [copy(175),unit_del(c,120)].
+177 -2_B(c18).  [resolve(101,a,102,a)].
+178 -2_B(c21).  [resolve(103,a,101,a)].
+179 -2_B(c23).  [resolve(105,a,101,a)].
+180 -1_B(c22) | 2_B(c22).  [resolve(107,c,104,a)].
+181 -1_F(c22) | 2_B(c22).  [resolve(108,c,104,a)].
+182 1_B(c18) | 1_F(c18).  [resolve(110,c,102,a)].
+183 1_B(c21) | 1_F(c21).  [resolve(110,c,103,a)].
+184 1_B(c23) | 1_F(c23).  [resolve(110,c,105,a)].
+185 -2_B(c20).  [resolve(111,a,101,a)].
+186 1_B(c20) | 1_F(c20).  [resolve(111,a,110,c)].
+187 1_B(x) | -2_B(x).  [factor(117,a,d),merge(c)].
+188 -1_D(c4) | 2_CD(c4).  [factor(122,b,c)].
+189 -1_D(c6) | 2_CD(c6).  [factor(125,a,c)].
 end_of_list.
 
 formulas(demodulators).
@@ -556,211 +539,320 @@ end_of_list.
 
 ============================== SEARCH ================================
 
-% Starting search at 0.02 seconds.
+% Starting search at 0.01 seconds.
 
-given #1 (I,wt=4): 110 -1_D(x) | 1_B(x).  [clausify(3)].
+given #1 (I,wt=4): 112 -1_D(x) | 1_B(x).  [clausify(3)].
 
-given #2 (I,wt=4): 111 -2_CD(x) | 2_B(x).  [clausify(9)].
+given #2 (I,wt=4): 113 -2_CD(x) | 2_B(x).  [clausify(9)].
 
-given #3 (I,wt=6): 113 -1_B(x) | 2_B(x) | 1_B(c1).  [clausify(14)].
+given #3 (I,wt=6): 115 -1_B(x) | 2_B(x) | 1_B(c1).  [clausify(14)].
 
-given #4 (I,wt=6): 114 -1_B(x) | 2_B(x) | -2_B(c1).  [clausify(14)].
+given #4 (I,wt=6): 116 -1_B(x) | 2_B(x) | -2_B(c1).  [clausify(14)].
 
-given #5 (I,wt=2): 118 2_CD(c2).  [clausify(15)].
+given #5 (I,wt=2): 120 2_CD(c2).  [clausify(15)].
 
-given #6 (I,wt=6): 119 -1_D(x) | 2_CD(x) | 1_D(c4).  [clausify(16)].
+given #6 (I,wt=6): 121 -1_D(x) | 2_CD(x) | 1_D(c4).  [clausify(16)].
 
-given #7 (I,wt=6): 120 -1_D(x) | 2_CD(x) | 2_CD(c4).  [clausify(16)].
+given #7 (I,wt=6): 122 -1_D(x) | 2_CD(x) | 2_CD(c4).  [clausify(16)].
 
-given #8 (I,wt=6): 121 -1_D(x) | 2_CD(x) | 1_D(c5).  [clausify(16)].
+given #8 (I,wt=6): 123 -1_D(x) | 2_CD(x) | 1_D(c5).  [clausify(16)].
 
-given #9 (I,wt=6): 122 -1_D(x) | 2_CD(x) | -2_CD(c5).  [clausify(16)].
+given #9 (I,wt=6): 124 -1_D(x) | 2_CD(x) | -2_CD(c5).  [clausify(16)].
 
-given #10 (I,wt=6): 123 -1_D(x) | 2_CD(x) | -1_D(c6).  [clausify(16)].
+given #10 (I,wt=6): 125 -1_D(x) | 2_CD(x) | -1_D(c6).  [clausify(16)].
 
-given #11 (I,wt=6): 124 -1_D(x) | 2_CD(x) | 2_CD(c6).  [clausify(16)].
+given #11 (I,wt=6): 126 -1_D(x) | 2_CD(x) | 2_CD(c6).  [clausify(16)].
 
-given #12 (I,wt=4): 125 2_CD(c3) | 1_D(c4).  [clausify(16)].
+given #12 (I,wt=4): 127 2_CD(c3) | 1_D(c4).  [clausify(16)].
 
-given #13 (I,wt=4): 126 2_CD(c3) | 2_CD(c4).  [clausify(16)].
+given #13 (I,wt=4): 128 2_CD(c3) | 2_CD(c4).  [clausify(16)].
 
-given #14 (I,wt=4): 127 2_CD(c3) | 1_D(c5).  [clausify(16)].
+given #14 (I,wt=4): 129 2_CD(c3) | 1_D(c5).  [clausify(16)].
 
-given #15 (I,wt=4): 128 2_CD(c3) | -2_CD(c5).  [clausify(16)].
+given #15 (I,wt=4): 130 2_CD(c3) | -2_CD(c5).  [clausify(16)].
 
-given #16 (I,wt=4): 129 2_CD(c3) | -1_D(c6).  [clausify(16)].
+given #16 (I,wt=4): 131 2_CD(c3) | -1_D(c6).  [clausify(16)].
 
-given #17 (I,wt=4): 130 2_CD(c3) | 2_CD(c6).  [clausify(16)].
+given #17 (I,wt=4): 132 2_CD(c3) | 2_CD(c6).  [clausify(16)].
 
-given #18 (I,wt=4): 131 -1_D(c3) | 1_D(c4).  [clausify(16)].
+given #18 (I,wt=4): 133 -1_D(c3) | 1_D(c4).  [clausify(16)].
 
-given #19 (I,wt=4): 132 -1_D(c3) | 2_CD(c4).  [clausify(16)].
+given #19 (I,wt=4): 134 -1_D(c3) | 2_CD(c4).  [clausify(16)].
 
-given #20 (I,wt=4): 133 -1_D(c3) | 1_D(c5).  [clausify(16)].
+given #20 (I,wt=4): 135 -1_D(c3) | 1_D(c5).  [clausify(16)].
 
-given #21 (I,wt=4): 134 -1_D(c3) | -2_CD(c5).  [clausify(16)].
+given #21 (I,wt=4): 136 -1_D(c3) | -2_CD(c5).  [clausify(16)].
 
-given #22 (I,wt=4): 135 -1_D(c3) | -1_D(c6).  [clausify(16)].
+given #22 (I,wt=4): 137 -1_D(c3) | -1_D(c6).  [clausify(16)].
 
-given #23 (I,wt=4): 136 -1_D(c3) | 2_CD(c6).  [clausify(16)].
+given #23 (I,wt=4): 138 -1_D(c3) | 2_CD(c6).  [clausify(16)].
 
-given #24 (I,wt=2): 137 1_B(c9).  [clausify(21)].
+given #24 (I,wt=2): 139 1_B(c9).  [clausify(21)].
 
-given #25 (I,wt=2): 138 1_D(c11).  [clausify(23)].
+given #25 (I,wt=2): 140 1_D(c11).  [clausify(23)].
 
-given #26 (I,wt=2): 139 1_F(c13).  [clausify(25)].
+given #26 (I,wt=2): 141 1_F(c13).  [clausify(25)].
 
-given #27 (I,wt=2): 140 2_B(c16).  [clausify(28)].
+given #27 (I,wt=2): 142 2_B(c16).  [clausify(28)].
 
-given #28 (I,wt=2): 141 2_CD(c19).  [clausify(31)].
+given #28 (I,wt=2): 143 2_CD(c19).  [clausify(31)].
 
-given #29 (I,wt=2): 142 2_GH(c20).  [clausify(32)].
+given #29 (I,wt=4): 144 -1_F(x) | -1_B(x).  [clausify(39)].
 
-given #30 (I,wt=4): 143 -1_F(x) | -1_B(x).  [clausify(39)].
+given #30 (I,wt=2): 145 1_D(c21).  [deny(46)].
 
-given #31 (I,wt=2): 144 1_D(c21).  [deny(46)].
+given #31 (I,wt=2): 146 1_D(c22).  [deny(46)].
 
-given #32 (I,wt=2): 145 1_D(c22).  [deny(46)].
+given #32 (I,wt=2): 147 -1_D(c23).  [deny(46)].
 
-given #33 (I,wt=2): 146 -1_D(c23).  [deny(46)].
+given #33 (I,wt=4): 148 1_B(c7) | 1_F(c7).  [resolve(52,a,51,a)].
 
-given #34 (I,wt=4): 147 1_B(c7) | 1_F(c7).  [resolve(52,a,51,a)].
+given #34 (I,wt=2): 149 1_B(c8).  [resolve(53,a,54,a)].
 
-given #35 (I,wt=2): 148 1_B(c8).  [resolve(53,a,54,a)].
+given #35 (I,wt=2): 150 2_CD(c8).  [resolve(53,a,55,a)].
 
-given #36 (I,wt=2): 149 2_CD(c8).  [resolve(53,a,55,a)].
+given #36 (I,wt=2): 151 -1_D(c8).  [resolve(58,b,53,a)].
 
-given #37 (I,wt=2): 150 -1_D(c8).  [resolve(58,b,53,a)].
+given #37 (I,wt=2): 152 1_B(c10).  [resolve(63,a,61,a)].
 
-given #38 (I,wt=2): 151 1_B(c10).  [resolve(63,a,61,a)].
+given #38 (I,wt=2): 153 -1_D(c10).  [resolve(64,a,63,a)].
 
-given #39 (I,wt=2): 152 -1_D(c10).  [resolve(64,a,63,a)].
+given #39 (I,wt=2): 155 1_F(c12).  [resolve(71,a,69,a)].
 
-given #40 (I,wt=2): 154 1_F(c12).  [resolve(71,a,69,a)].
+given #40 (I,wt=2): 156 $z(c12).  [resolve(71,a,70,a)].
 
-given #41 (I,wt=2): 155 2_GH(c12).  [resolve(71,a,70,a)].
+given #41 (I,wt=2): 157 1_F(c14).  [resolve(74,a,75,a)].
 
-given #42 (I,wt=2): 156 1_F(c14).  [resolve(74,a,75,a)].
+given #42 (I,wt=2): 158 $z(c14).  [resolve(74,a,76,a)].
 
-given #43 (I,wt=2): 157 2_GH(c14).  [resolve(74,a,76,a)].
+given #43 (I,wt=4): 160 -$z(x) | 1_F(x).  [copy(159),merge(c)].
 
-given #44 (I,wt=4): 159 -2_GH(x) | 1_F(x).  [copy(158),merge(c)].
+given #44 (I,wt=4): 162 -1_F(x) | $z(x).  [copy(161),merge(c)].
 
-given #45 (I,wt=4): 161 -1_F(x) | 2_GH(x).  [copy(160),merge(c)].
+given #45 (I,wt=4): 164 1_B(c15) | 1_F(c15).  [resolve(87,c,83,a)].
 
-given #46 (I,wt=4): 163 1_B(c15) | 1_F(c15).  [resolve(87,c,83,a)].
+given #46 (I,wt=2): 165 2_B(c17).  [resolve(88,a,89,a)].
 
-given #47 (I,wt=2): 164 2_B(c17).  [resolve(88,a,89,a)].
+given #47 (I,wt=2): 166 -2_CD(c17).  [resolve(91,a,88,a)].
 
-given #48 (I,wt=2): 165 -2_CD(c17).  [resolve(91,a,88,a)].
+given #48 (I,wt=2): 167 1_B(c17).  [resolve(92,a,88,a)].
 
-given #49 (I,wt=2): 166 1_B(c17).  [resolve(92,a,88,a)].
+given #49 (I,wt=2): 169 2_B(c10).  [resolve(93,a,89,a)].
 
-given #50 (I,wt=2): 168 2_B(c10).  [resolve(93,a,89,a)].
+given #50 (I,wt=2): 170 -2_CD(c10).  [resolve(93,a,91,a)].
 
-given #51 (I,wt=2): 169 -2_CD(c10).  [resolve(93,a,91,a)].
+given #51 (I,wt=2): 171 -1_D(c17).  [resolve(94,b,88,a)].
 
-given #52 (I,wt=2): 170 -1_D(c17).  [resolve(94,b,88,a)].
+given #52 (I,wt=6): 172 -1_D(x) | -2_B(x) | 2_CD(x).  [resolve(94,b,90,c)].
 
-given #53 (I,wt=6): 171 -1_D(x) | -2_B(x) | 2_CD(x).  [resolve(94,b,90,c)].
+given #53 (I,wt=8): 173 -1_B(x) | 1_D(x) | 2_CD(x) | 2_B(x).  [resolve(95,d,89,a)].
 
-given #54 (I,wt=8): 172 -1_B(x) | 1_D(x) | 2_CD(x) | 2_B(x).  [resolve(95,d,89,a)].
+given #54 (I,wt=4): 176 -1_B(c2) | 1_D(c2).  [copy(175),unit_del(c,120)].
 
-given #55 (I,wt=4): 175 -1_B(c2) | 1_D(c2).  [copy(174),unit_del(c,118)].
+given #55 (I,wt=2): 177 -2_B(c18).  [resolve(101,a,102,a)].
 
-given #56 (I,wt=2): 176 2_GH(c18).  [resolve(98,a,100,a)].
+given #56 (I,wt=2): 178 -2_B(c21).  [resolve(103,a,101,a)].
 
-given #57 (I,wt=4): 177 -2_B(x) | -2_GH(x).  [resolve(101,a,99,b)].
+given #57 (I,wt=2): 179 -2_B(c23).  [resolve(105,a,101,a)].
 
-given #58 (I,wt=2): 178 -2_B(c18).  [resolve(101,a,100,a)].
+given #58 (I,wt=4): 182 1_B(c18) | 1_F(c18).  [resolve(110,c,102,a)].
 
-given #59 (I,wt=2): 179 2_GH(c21).  [resolve(102,a,98,a)].
+given #59 (I,wt=4): 184 1_B(c23) | 1_F(c23).  [resolve(110,c,105,a)].
 
-given #60 (I,wt=2): 180 -2_B(c21).  [resolve(102,a,101,a)].
+given #60 (I,wt=2): 185 -2_B(c20).  [resolve(111,a,101,a)].
 
-given #61 (I,wt=2): 181 -2_GH(c22).  [resolve(103,a,99,b)].
+given #61 (I,wt=4): 186 1_B(c20) | 1_F(c20).  [resolve(111,a,110,c)].
 
-given #62 (I,wt=2): 182 2_GH(c23).  [resolve(104,a,98,a)].
+given #62 (I,wt=4): 187 1_B(x) | -2_B(x).  [factor(117,a,d),merge(c)].
 
-given #63 (I,wt=2): 183 -2_B(c23).  [resolve(104,a,101,a)].
+given #63 (A,wt=2): 190 2_B(c2).  [resolve(120,a,113,a)].
 
-given #64 (I,wt=4): 184 2_B(c15) | 2_GH(c15).  [resolve(105,b,98,a)].
+given #64 (F,wt=2): 204 -1_B(c13).  [resolve(144,a,141,a)].
 
-given #65 (I,wt=6): 185 -1_B(x) | 2_B(x) | 2_GH(x).  [resolve(106,c,98,a)].
+given #65 (F,wt=2): 205 -1_F(c9).  [ur(144,b,139,a)].
 
-given #66 (I,wt=4): 188 2_B(c7) | 2_GH(c7).  [resolve(108,b,98,a)].
+given #66 (F,wt=2): 222 -1_F(c8).  [ur(144,b,149,a)].
 
-given #67 (I,wt=4): 192 1_B(x) | -2_B(x).  [factor(115,a,d),merge(c)].
+given #67 (F,wt=2): 224 -1_F(c10).  [ur(144,b,152,a)].
 
-given #68 (A,wt=2): 195 2_B(c2).  [resolve(118,a,111,a)].
+given #68 (T,wt=2): 202 1_B(c11).  [resolve(140,a,112,a)].
 
-given #69 (F,wt=2): 209 -1_B(c13).  [resolve(143,a,139,a)].
+given #69 (T,wt=2): 203 2_B(c19).  [resolve(143,a,113,a)].
 
-given #70 (F,wt=2): 210 -1_F(c9).  [ur(143,b,137,a)].
+given #70 (T,wt=2): 212 1_B(c21).  [resolve(145,a,112,a)].
 
-given #71 (F,wt=2): 227 -1_F(c8).  [ur(143,b,148,a)].
+given #71 (T,wt=2): 219 1_B(c22).  [resolve(146,a,112,a)].
 
-given #72 (F,wt=2): 229 -1_F(c10).  [ur(143,b,151,a)].
+given #72 (A,wt=4): 191 2_CD(c3) | 1_B(c4).  [resolve(127,b,112,a)].
 
-given #73 (T,wt=2): 207 1_B(c11).  [resolve(138,a,110,a)].
+given #73 (F,wt=2): 225 -1_B(c12).  [resolve(155,a,144,a)].
 
-given #74 (T,wt=2): 208 2_B(c19).  [resolve(141,a,111,a)].
+given #74 (F,wt=2): 226 -1_B(c14).  [resolve(157,a,144,a)].
 
-given #75 (T,wt=2): 217 1_B(c21).  [resolve(144,a,110,a)].
+given #75 (F,wt=2): 230 -1_F(c17).  [ur(144,b,167,a)].
 
-============================== PROOF =================================
+given #76 (F,wt=2): 233 -2_CD(c18).  [ur(113,b,177,a)].
 
-% Proof 1 at 0.02 (+ 0.00) seconds.
-% Length of proof is 22.
-% Level of proof is 6.
-% Maximum clause weight is 4.
-% Given clauses 75.
+given #77 (T,wt=2): 220 2_B(c22).  [back_unit_del(180),unit_del(a,219)].
 
-3 1_D(x) -> 1_B(x) # label(non_clause).  [assumption].
-6 1_G(x) -> 1_F(x) # label(non_clause).  [assumption].
-7 1_H(x) -> 1_F(x) # label(non_clause).  [assumption].
-18 1_G(x) | 1_H(x) <-> 2_GH(x) # label(non_clause).  [assumption].
-38 2_F(x) -> 2_GH(x) # label(non_clause).  [assumption].
-39 (all x (1_F(x) -> -1_B(x))) # label(non_clause).  [assumption].
-46 -(exists a exists b exists c (1_D(a) & 2_F(a) & 1_D(b) & -2_F(b) & -1_D(c) & 2_F(c))) # label(non_clause) # label(goal).  [goal].
-68 1_G(x) | 1_H(x) | -2_GH(x).  [clausify(18)].
-69 -1_G(x) | 1_F(x).  [clausify(6)].
-75 -1_H(x) | 1_F(x).  [clausify(7)].
-77 1_H(x) | -2_GH(x) | 1_F(x).  [resolve(68,a,69,a)].
-98 -2_F(x) | 2_GH(x).  [clausify(38)].
-102 2_F(c21).  [deny(46)].
-110 -1_D(x) | 1_B(x).  [clausify(3)].
-143 -1_F(x) | -1_B(x).  [clausify(39)].
-144 1_D(c21).  [deny(46)].
-158 -2_GH(x) | 1_F(x) | 1_F(x).  [resolve(77,a,75,a)].
-159 -2_GH(x) | 1_F(x).  [copy(158),merge(c)].
-179 2_GH(c21).  [resolve(102,a,98,a)].
-217 1_B(c21).  [resolve(144,a,110,a)].
-247 1_F(c21).  [resolve(179,a,159,a)].
-276 $F.  [ur(143,b,217,a),unit_del(a,247)].
+given #78 (T,wt=2): 223 2_B(c8).  [resolve(150,a,113,a)].
 
-============================== end of proof ==========================
+given #79 (T,wt=2): 228 $z(c13).  [resolve(162,a,141,a)].
+
+given #80 (T,wt=2): 235 1_D(c4).  [back_unit_del(211),unit_del(a,234)].
+
+given #81 (A,wt=4): 192 2_CD(c3) | 2_B(c4).  [resolve(128,b,113,a)].
+
+given #82 (F,wt=2): 234 -2_CD(c21).  [ur(113,b,178,a)].
+
+given #83 (F,wt=2): 238 -2_CD(c5).  [back_unit_del(208),unit_del(a,234)].
+
+given #84 (F,wt=2): 239 -1_D(c6).  [back_unit_del(207),unit_del(a,234)].
+
+given #85 (F,wt=2): 241 -2_CD(c23).  [ur(113,b,179,a)].
+
+given #86 (T,wt=2): 236 2_CD(c4).  [back_unit_del(210),unit_del(a,234)].
+
+given #87 (T,wt=2): 237 1_D(c5).  [back_unit_del(209),unit_del(a,234)].
+
+given #88 (T,wt=2): 240 2_CD(c6).  [back_unit_del(206),unit_del(a,234)].
+
+given #89 (T,wt=2): 246 1_B(c16).  [resolve(187,b,142,a)].
+
+given #90 (A,wt=4): 227 $z(c7) | 1_B(c7).  [resolve(162,a,148,b)].
+
+given #91 (F,wt=2): 244 -2_CD(c20).  [ur(113,b,185,a)].
+
+given #92 (F,wt=2): 249 -2_B(c13).  [ur(187,a,204,a)].
+
+given #93 (F,wt=2): 250 -1_D(c13).  [ur(112,b,204,a)].
+
+given #94 (F,wt=2): 251 -$z(c9).  [ur(160,b,205,a)].
+
+given #95 (T,wt=2): 247 1_B(c2).  [resolve(190,a,187,b)].
+
+given #96 (T,wt=2): 248 1_D(c2).  [back_unit_del(176),unit_del(a,247)].
+
+given #97 (T,wt=2): 256 1_B(c19).  [resolve(203,a,187,b)].
+
+given #98 (T,wt=2): 257 1_B(c1).  [resolve(212,a,115,a),unit_del(a,178)].
+
+given #99 (A,wt=4): 229 1_B(c15) | $z(c15).  [resolve(164,b,162,a)].
+
+given #100 (F,wt=2): 252 -$z(c8).  [ur(160,b,222,a)].
+
+given #101 (F,wt=2): 253 -$z(c10).  [ur(160,b,224,a)].
+
+given #102 (F,wt=2): 255 -1_F(c11).  [ur(144,b,202,a)].
+
+given #103 (F,wt=2): 258 -1_F(c21).  [ur(144,b,212,a)].
+
+given #104 (T,wt=2): 267 2_CD(c22).  [resolve(220,a,172,b),unit_del(a,146)].
+
+given #105 (T,wt=2): 268 1_B(c4).  [resolve(235,a,112,a)].
+
+given #106 (T,wt=2): 270 $z(c23).  [back_unit_del(243),unit_del(a,269)].
+
+given #107 (T,wt=2): 271 1_F(c23).  [back_unit_del(184),unit_del(a,269)].
+
+given #108 (A,wt=4): 231 -1_D(c16) | 2_CD(c16).  [resolve(172,b,142,a)].
+
+given #109 (F,wt=2): 259 -2_B(c1).  [ur(116,a,212,a,b,178,a)].
+
+given #110 (F,wt=2): 260 -1_F(c22).  [ur(144,b,219,a)].
+
+given #111 (F,wt=2): 262 -2_B(c12).  [ur(187,a,225,a)].
+
+given #112 (F,wt=2): 263 -1_D(c12).  [ur(112,b,225,a)].
+
+given #113 (T,wt=2): 272 2_B(c4).  [resolve(236,a,113,a)].
+
+given #114 (T,wt=2): 273 1_B(c5).  [resolve(237,a,112,a)].
+
+given #115 (T,wt=2): 275 2_B(c6).  [resolve(240,a,113,a)].
+
+given #116 (T,wt=2): 286 1_D(c1).  [back_unit_del(280),unit_del(b,285)].
+
+given #117 (A,wt=6): 232 1_D(c9) | 2_CD(c9) | 2_B(c9).  [resolve(173,a,139,a)].
+
+given #118 (F,wt=2): 264 -2_B(c14).  [ur(187,a,226,a)].
+
+given #119 (F,wt=2): 265 -1_D(c14).  [ur(112,b,226,a)].
+
+given #120 (F,wt=2): 266 -$z(c17).  [ur(160,b,230,a)].
+
+given #121 (F,wt=2): 269 -1_B(c23).  [ur(173,b,147,a,c,241,a,d,179,a)].
+
+given #122 (T,wt=2): 290 1_B(c6).  [resolve(275,a,187,b)].
+
+given #123 (T,wt=4): 242 1_B(c18) | $z(c18).  [resolve(182,b,162,a)].
+
+given #124 (T,wt=4): 245 1_B(c20) | $z(c20).  [resolve(186,b,162,a)].
+
+given #125 (A,wt=2): 274 -2_B(c5).  [ur(172,a,237,a,c,238,a)].
+
+given #126 (F,wt=2): 276 -1_F(c16).  [ur(144,b,246,a)].
+
+given #127 (F,wt=2): 277 -2_CD(c13).  [ur(113,b,249,a)].
+
+given #128 (F,wt=2): 278 -1_F(c2).  [ur(144,b,247,a)].
+
+given #129 (F,wt=2): 279 -1_F(c19).  [ur(144,b,256,a)].
+
+given #130 (A,wt=2): 281 -1_F(c1).  [ur(144,b,257,a)].
+
+given #131 (F,wt=2): 282 -$z(c11).  [ur(160,b,255,a)].
+
+given #132 (F,wt=2): 283 -$z(c21).  [ur(160,b,258,a)].
+
+given #133 (F,wt=2): 284 -1_F(c4).  [ur(144,b,268,a)].
+
+given #134 (F,wt=2): 285 -2_CD(c1).  [ur(113,b,259,a)].
+
+given #135 (A,wt=2): 287 -$z(c22).  [ur(160,b,260,a)].
+
+given #136 (F,wt=2): 288 -2_CD(c12).  [ur(113,b,262,a)].
+
+given #137 (F,wt=2): 289 -1_F(c5).  [ur(144,b,273,a)].
+
+given #138 (F,wt=2): 291 -2_CD(c14).  [ur(113,b,264,a)].
+
+given #139 (F,wt=2): 292 -1_F(c6).  [ur(144,b,290,a)].
+
+given #140 (A,wt=2): 293 -$z(c16).  [ur(160,b,276,a)].
+
+given #141 (F,wt=2): 294 -$z(c2).  [ur(160,b,278,a)].
+
+given #142 (F,wt=2): 295 -$z(c19).  [ur(160,b,279,a)].
+
+given #143 (F,wt=2): 296 -$z(c1).  [ur(160,b,281,a)].
+
+given #144 (F,wt=2): 297 -$z(c4).  [ur(160,b,284,a)].
+
+given #145 (A,wt=2): 298 -$z(c5).  [ur(160,b,289,a)].
+
+given #146 (F,wt=2): 299 -$z(c6).  [ur(160,b,292,a)].
 
 ============================== STATISTICS ============================
 
-Given=75. Generated=226. Kept=162. proofs=1.
-Usable=56. Sos=50. Demods=0. Limbo=1, Disabled=202. Hints=0.
+Given=146. Generated=283. Kept=184. proofs=0.
+Usable=122. Sos=0. Demods=0. Limbo=0, Disabled=202. Hints=0.
 Kept_by_rule=0, Deleted_by_rule=0.
-Forward_subsumed=63. Back_subsumed=45.
+Forward_subsumed=99. Back_subsumed=50.
 Sos_limit_deleted=0. Sos_displaced=0. Sos_removed=0.
-New_demodulators=0 (0 lex), Back_demodulated=0. Back_unit_deleted=10.
+New_demodulators=0 (0 lex), Back_demodulated=0. Back_unit_deleted=12.
 Demod_attempts=0. Demod_rewrites=0.
 Res_instance_prunes=0. Para_instance_prunes=0. Basic_paramod_prunes=0.
-Nonunit_fsub_feature_tests=20. Nonunit_bsub_feature_tests=130.
+Nonunit_fsub_feature_tests=22. Nonunit_bsub_feature_tests=133.
 Megabytes=0.36.
-User_CPU=0.02, System_CPU=0.00, Wall_clock=0.
+User_CPU=0.02, System_CPU=0.01, Wall_clock=0.
 
 ============================== end of statistics =====================
 
 ============================== end of search =========================
 
-THEOREM PROVED
+SEARCH FAILED
 
-Exiting with 1 proof.
+Exiting with failure.
 
-Process 29051 exit (max_proofs) Wed Jul 11 22:44:49 2012
+Process 27257 exit (sos_empty) Mon Sep 24 01:11:22 2012
