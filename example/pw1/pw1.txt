@@ -5,6 +5,6 @@ taxonomy 2 Taxonomy2
 (C D F)
 
 articulation tw1 tw1
-[1_A equals 2_C]
-[1_B {is_included_in equals} 2_D]
-[1_E {includes equals} 2_F]
+[1.A equals 2.C]
+[1.B {is_included_in equals} 2.D]
+[1.E {includes equals} 2.F]

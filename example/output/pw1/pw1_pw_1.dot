@@ -2,10 +2,6 @@ digraph {
 
 rankdir = RL
 
-"2_F" -> "1_E" [style=filled, color=red];
-"1_B" -> "2_D" [style=filled, color=red];
-"1_E" -> "1_A,2_C" [style=filled, color=black];
-"2_D" -> "1_A,2_C" [style=filled, color=black];
-"2_F" -> "1_A,2_C" [style=dashed, color=grey];
-"1_B" -> "1_A,2_C" [style=dashed, color=grey];
+"1.B,2.D" -> "1.A,2.C" [style=filled, color=black];
+"1.E,2.F" -> "1.A,2.C" [style=filled, color=black];
 }
