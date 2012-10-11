@@ -1,6 +1,5 @@
 import re
 import copy
-import signal, time
 from relations import *
 from latent_tax_assumption import *
 from reasoner import *
@@ -22,12 +21,11 @@ class Authority:
 
 class Taxon:
    
-    def __init__(self, level=0):
+    def __init__(self):
         self.parent = ""
         self.children = []
         self.fullName = ""
         self.abbrev = ""
-	self.level = level
         self.taxonomy = Taxonomy()    
             
     def addChild(self, child):
@@ -40,9 +38,6 @@ class Taxon:
         return result
 
 
-    def stringOfReasoner(self):
-        return self.taxonomy.authority.abbrev + "_" + self.abbrev
-    
     def stringOf(self):
         return self.taxonomy.authority.abbrev + "." + self.abbrev
     
@@ -58,7 +53,7 @@ class Taxon:
     def depthFirstLTax(self):
         result = ""
         for child in self.children:
-            result += child.stringOfReasoner() + "(x) -> " + self.stringOfReasoner() + "(x).\n"
+            result += child.stringOf() + "(x) -> " + self.stringOf() + "(x).\n"
             result += child.depthFirstLTax()
         return result
  
@@ -111,7 +106,7 @@ class Taxonomy:
             if self.taxa.has_key(child):
                 thisChild = self.taxa[child]
             else:
-                thisChild = Taxon(thisParent.level+1)
+                thisChild = Taxon()
                 thisChild.abbrev = child
                 thisChild.taxonomy = self
                 self.taxa[child] = thisChild
@@ -252,15 +247,15 @@ class Articulation:
     
     def articulationSubtitution(self, taxon1, taxon2, relation):
         relString = relation.logicSymbol
-        relString = relString.replace("$x", taxon1.stringOfReasoner())
-        relString = relString.replace("$y", taxon2.stringOfReasoner())
+        relString = relString.replace("$x", taxon1.stringOf())
+        relString = relString.replace("$y", taxon2.stringOf())
         return relString
     
     def sArticulationSubtitution(self, taxon1, taxon2, taxon3, relation):
         relString = relation.logicSymbol
-        relString = relString.replace("$x", taxon1.stringOfReasoner())
-        relString = relString.replace("$y", taxon2.stringOfReasoner())
-        relString = relString.replace("$z", taxon3.stringOfReasoner())
+        relString = relString.replace("$x", taxon1.stringOf())
+        relString = relString.replace("$y", taxon2.stringOf())
+        relString = relString.replace("$z", taxon3.stringOf())
         return relString
     
     def __str__(self):
@@ -282,13 +277,12 @@ class Articulation:
                 
     
     def __repr__(self):
-	return "<"+self.__str__()+">"
-        #result = "Articulation: " + self.taxon1.stringOf() + " "
-        #for relation in self.relations:
-        #    result += relation.name + " " 
+        result = "Articulation: " + self.taxon1.stringOf() + " "
+        for relation in self.relations:
+            result += relation.name + " " 
     
-        #result += self.taxon2.stringOf() + " \n"
-        #return result
+        result += self.taxon2.stringOf() + " \n"
+        return result
   
 class ArticulationSet:
     
@@ -390,7 +384,7 @@ class TaxonomyMapping:
 	    tm = self.createTMfromPW(PW[i], i)
             consistencyCheck = tm.testConsistencyWithoutGoal(outputDir+"reasonerFiles/")
             if consistencyCheck[0] == "true":
-		tm.outputPW(outputDir, fileName+"_pw_"+consCnt.__str__(), self)
+		tm.outputPW(outputDir+fileName+"_pw_"+consCnt.__str__()+"_")
 		consCnt = consCnt + 1
 	print "There is (are) " + consCnt.__str__() + " outof " + tmpCnt.__str__() + " possible world(s)."
 
@@ -452,30 +446,13 @@ class TaxonomyMapping:
 	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=red];\n")
 		if(self == taxaMap):
 		    self.traceDown(outputDir, T1, T2)
-		    self.traceDown1(outputDir, T1, T2)
 	    elif(P == 2):
 	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
         fDot.write("}\n")
         fDot.close()
 
-    def traceDown1(self, outputDir, T1, T2):
-	tmpStr = "Red edge " + T1 + "->"+ T2 + " is related to "
-	tmpTm = copy.deepcopy(self)
-	i = 0
-        while i < len(tmpTm.articulationSet.articulations):
-	    a = tmpTm.articulationSet.articulations.pop(i)
-	    tmpTm.hypothesisType = "implied"
-	    tmpTm.hypothesis = Articulation(T1 + " is_included_in " + T2, tmpTm)
-	    goal = tmpTm.testConsistencyWithGoal(outputDir, False, False)
-	    #print tmpTm.articulationSet.articulations
-	    if(goal[0].find("true") == -1):
-	        tmpTm.articulationSet.articulations.insert(i, a)
-		i=i+1
-	tmpStr += tmpTm.articulationSet.articulations.__str__()
-	print tmpStr
-	
     def traceDown(self, outputDir, T1, T2):
-	tmpStr = "Red edge " + T1 + "->"+ T2 + " depends on ["
+	tmpStr = "Red edge " + T1 + "->"+ T2 + " is related to [ "
         s = len(self.articulationSet.articulations)
         for i in range(s):
 	    a = self.articulationSet.articulations.pop(i)
@@ -483,7 +460,7 @@ class TaxonomyMapping:
 	    self.hypothesis = Articulation(T1 + " is_included_in " + T2, self)
 	    goal = self.testConsistencyWithGoal(outputDir + "reasonerFiles/", False, False)
 	    if(goal[0].find("false") != -1):
-	        tmpStr += `a`+" "
+	        tmpStr = tmpStr + a.toString() + " "
 	    self.articulationSet.articulations.insert(i, a)
 	print tmpStr + "]"
 	
@@ -501,8 +478,6 @@ class TaxonomyMapping:
 	    return None
 	else:
 	    r=r.rstrip()
-	    #print t1+" "+r+" "+t2
-	    #self.articulationSet.addArticulationWithList(t1+" "+r+" "+t2, self)
 	    tmpStr=r.replace("{", "")
 	    tmpStr=tmpStr.replace("}", "")
 	    tmpStr=tmpStr.replace(" ", ",")
@@ -678,7 +653,7 @@ class TaxonomyMapping:
         if (1 == 1):
             if (memory == False):
                 proverOutputFile = outputDir  + self.name + self.ltaAbbrevString() + thisGoal + "Prover.txt"
-                self.writeGoalFile(proverOutputFile, ltaxRules, self.prover, self.hypothesisType != "implied")
+                self.writeGoalFile(proverOutputFile, ltaxRules, self.prover, True)
 
                 maceOutputFile = outputDir + self.name + self.ltaAbbrevString() + thisGoal + "Mace.txt"
                 self.writeGoalFile(maceOutputFile, ltaxRules, self.mace, False)
@@ -824,47 +799,12 @@ class TaxonomyMapping:
                     continue
 	        if(self.testConsistency(outputDir)):
 	            self.removeMir(a.__str__())
-                    fIE = open(outputDir + "../" + self.name + "_ie.txt", 'w')
 		    print "Remedial measure: remove [" + a.toString() + "]"
-		    fIE.write("Remedial measure: remove [" + a.toString() + "]\n")
-                    self.traceOut1(outputDir, a, fIE)
-                    fIE.close()
-                    #self.traceOut(outputDir, a)
+                    self.traceOut(outputDir, a)
 		    return True
 	        self.articulationSet.articulations.insert(i, a)
         return False
 
-    def nonrelatedArticulation(self, a, b):
-        A1 = Articulation(a.toString(), self)
-        A2 = Articulation(b.toString(), self)
-	if A1.taxon1.level > A2.taxon1.level+2 or\
-	   A1.taxon1.level < A2.taxon1.level-2 or\
-	   A1.taxon2.level > A2.taxon2.level+2 or\
-	   A1.taxon2.level < A2.taxon2.level-2:
-            return True
-	return False
-
-    def traceOut1(self, outputDir, a, fIE):
-	tmpStr = "Articulation <" + a.__str__() + "> is inconsistent with "
-	tmpTm = copy.deepcopy(self)
-	i = 0
-        while i < len(tmpTm.articulationSet.articulations):
-	    b = tmpTm.articulationSet.articulations.pop(i)
-	    if(self.nonrelatedArticulation(a, b)):
-	        tmpTm.articulationSet.articulations.insert(i, b)
-		i=i+1
-                continue
-	    tmpTm.hypothesisType = "possible"
-	    tmpTm.hypothesis = Articulation(b.toString(), self)
-	    goal = tmpTm.testConsistencyWithGoal(outputDir, False, False)
-	    #print tmpTm.articulationSet.articulations
-	    if(goal[0].find("true") != -1):
-	        tmpTm.articulationSet.articulations.insert(i, b)
-		i=i+1
-	tmpStr += tmpTm.articulationSet.articulations.__str__()
-	print tmpStr
-        fIE.write(tmpStr+"\n")
-	
     def traceOut(self, outputDir, a):
 	tmpStr = "Articulation " + a.__str__() + " is inconsistent with [ "
         s = len(self.articulationSet.articulations)
@@ -874,7 +814,7 @@ class TaxonomyMapping:
 	    self.hypothesis = Articulation(a.toString(), self)
 	    goal = self.testConsistencyWithGoal(outputDir, False, False)
 	    if(goal[0].find("false") != -1):
-	        tmpStr += "<" + a.toString() + "> "
+	        tmpStr = tmpStr + a.toString() + " "
 	    self.articulationSet.articulations.insert(i, a)
 	print tmpStr + "]"
 	
@@ -887,6 +827,7 @@ class TaxonomyMapping:
 	print "BCS choose [" + ','.join(map(str,consArti)) + "] as the consistent articulation subset"
 	for a in self.articulationSet.articulations:
 	    if not (a in consArti):
+		print a
 		self.removeMir(a.__str__())
 	return True
 
@@ -995,8 +936,6 @@ class TaxonomyMapping:
 	return self.BCS1(arti[1]+self.BCS1(arti1+arti[0], inTaxMap, outputDir), inTaxMap, outputDir)
 
     def testConsistency(self, outputDir):
-	def handler(signum, frame):
-	    raise Exception("Timed out!")
         
         ltaxRules = ""
 	outputFileName = outputDir + self.name + self.ltaAbbrevString() + "tmp.txt"
@@ -1024,17 +963,7 @@ class TaxonomyMapping:
         if (maceOutput[0] == "model found"):
             return True
         else:
-	  signal.signal(signal.SIGALRM, handler)
-	  signal.alarm(120)
-	  try:
-	    proverOutput = self.prover.run(outputFileName, False)
-            if(proverOutput[0] == "not proved"):
-		return True
-	    else:
-		return False
-	  except Exception, msg:
-		print "Timed out!"
-		return False
+            return False
         
     
     def testConsistencyWithoutGoal(self, outputDir):
@@ -1070,8 +999,9 @@ class TaxonomyMapping:
         timeoutString = ""
         # if theroem is proved without a goal, then things are 
         # incconsistent
-        result = "true"
-        if (maceOutput[0] != "model found"):
+        if (maceOutput[0] == "model found"):
+            result = "true"
+        else:
             if (maceOutput[0]) == "timeout":
                 timeoutString += " mace4 timeout "
 
@@ -1089,6 +1019,7 @@ class TaxonomyMapping:
               if (proverOutput[0] == "timeout"):
                   timeoutString += "prover9 timeout "
                   result = "unclear" + timeoutString
+              
         
         return [result, reasoners, inputs, outputs]
     

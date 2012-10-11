@@ -102,7 +102,6 @@ class Coverage(LatentTaxAssumption):
     
     def toLTax(self, taxonomies):
         result = ""
-        result = ""
         for taxonomy in taxonomies.taxonomies.values():
             for taxon in taxonomy.taxa.values():
                 if (taxon.hasChildren()):

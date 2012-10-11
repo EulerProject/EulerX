@@ -1,4 +1,5 @@
 from taxonomy import *
+from windows import *
 from subprocess import Popen
 from latent_tax_assumption import *
 from tcsParser import *
@@ -174,7 +175,6 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
 			     t.start()
 			     threads.append(t)
 		    sleepT = 0
-                    #print "#"
                     for t in threads:
 
 		        while sleepT < 600:
@@ -187,10 +187,8 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
 			    t.stop()
 			    t.join()
 			if t.result == None:
-			    #print "F",
 			    consistencyCheck = ["unclear", "", "", "", ""]
 		        else:
-			    #print "T",
 		    	    consistencyCheck = t.result
 
 		        goalRelation = t.goalRelation
@@ -236,18 +234,9 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
                         else:
 			    # Uncertainty Reduction
 			    toBeReduced = tmpGoal.rstrip().split(' ')
-			    while(uncertaintyRed):
-			        if(len(toBeReduced) != 1):
-			          tmpGoal=""
-			          for i in range(len(toBeReduced)):
-				    usrInput = raw_input("Is it possible that "+thisGoal[0]+" "+toBeReduced[i]+" "+thisGoal[1]+"? [Y]n:")
-				    if usrInput != "n":
-				        tmpGoal+=toBeReduced[i]+" "
-				if tmpGoal == "":
-				    print "At least ONE should be answered affirmatively!!!"
-				    continue
-				break
-
+			    if(uncertaintyRed and len(toBeReduced) != 1):
+                                userQuestion = Window(thisGoal, toBeReduced)
+			        tmpGoal = userQuestion.main()
 			    ###################################
 			    taxMap.addPMir(thisGoal[0], thisGoal[1], tmpGoal, 1)
 		            fMir.write(thisGoal[0] + "," + thisGoal[1] + ",inferred,{" + tmpGoal.rstrip() + "}\n")
