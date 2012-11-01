@@ -1,8 +1,5 @@
 from optparse import OptionParser
-
-class Callable:
-    def __init__(self, callable):
-        self.__call__ = callable
+from helper import *
 
 class CtiParser:
 
@@ -17,7 +14,7 @@ class CtiParser:
 
     instance = Callable(instance)
 
-class EulerCliParser:
+class EulerParser:
 
     global inst
     inst = None
@@ -28,6 +25,9 @@ class EulerCliParser:
             inst = OptionParser(usage="usage: %prog [options]",
                                 version="%prog 1.0")
             inst.add_option("-v", action="store_true", dest="verbose")
+            inst.add_option("-p", dest="projectname")
+            inst.add_option("-i", dest="inputfile")
+            inst.add_option("-r", dest="inputdir", default="")
 	return inst
 
     instance = Callable(instance)
