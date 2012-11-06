@@ -1,5 +1,6 @@
 from helper import *
 from taxonomy import *
+from alignment import *
 
 class EulerRunner:
 
