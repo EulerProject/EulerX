@@ -153,7 +153,7 @@ class TaxonomyMapping:
 
     def testConsistency(self):
         com = "dlv -silent -filter=vr -n=1 "+self.pwfile
-        if commands.getoutput(com) == "{vr(0)}":
+        if commands.getoutput(com) == "":
             return False
         return True
 

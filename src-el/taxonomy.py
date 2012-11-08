@@ -145,8 +145,7 @@ class Articulation:
         elif self.relations == (rcc5["equals"] | rcc5["overlaps"]):
             result  = ":- #count{X: vr(X), in(" + name1 + ",X), out(" + name2 + ",X)} > 0, #count{Y: vr(Y), in(" + name2 + ",Y), out(" + name1 + ",Y)} = 0.\n"
             result += ":- #count{X: vr(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, #count{Y: vr(Y), in(" + name2 + ",Y), out(" + name1 + ",Y)} > 0.\n"
-            result += "ir(Y) :- #count{X: vr(X), in(" + name1 + ",X), out(" + name2 + ",X)} > 0, in(" + name2 + ",Y), out(" + name1 + ",Y).\n"
-            result += "vr(X) :- in(" + name1 + ",X), in(" + name2 + ",X).\n" 
+            result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n"
         elif self.relations == (rcc5["is_included_in"] | rcc5["overlaps"]):
             result  = "vr(X) v ir(X) :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
             result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
