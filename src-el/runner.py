@@ -15,7 +15,8 @@ class EulerRunner:
     instance = Callable(instance)
 
     def run(self, options):
-        taxMap = TaxonomyMapping()
-        taxMap.readFile(options.inputdir+options.inputfile)
+        taxMap = TaxonomyMapping(options)
+        # Parse the cti file
+        taxMap.readFile()
         taxMap.run()
 

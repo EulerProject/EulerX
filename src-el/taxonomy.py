@@ -28,7 +28,6 @@ class Taxon:
 class Articulation:
     
     def __init__(self, initInput="", mapping=None):
-        # TODO relations
 	self.string = initInput
 	self.numTaxon = 2
 	self.confidence = 2
@@ -94,15 +93,15 @@ class Articulation:
           
             if (relString.find(" ") != -1):
                 if (relation.has_key(relString)):
-                    self.relations = relation[relString]
+                    self.relations = rcc5[relString]
                 else:
                     relElements = re.split("\s", relString)
           
                     for rel in relElements:
-                        self.relations |= relation[rel]
+                        self.relations |= rcc5[rel]
                   
             else:
-                self.relations = relation[relString]
+                self.relations = rcc5[relString]
               
             self.taxon1 = mapping.getTaxon(taxon1taxonomy, taxon1taxon)
             self.taxon2 = mapping.getTaxon(taxon2taxonomy, taxon2taxon)
@@ -110,23 +109,51 @@ class Articulation:
     def toDlv(self):
         name1 = self.taxon1.dlvName()
         name2 = self.taxon2.dlvName()
-        if self.relations == relation["equals"]:
+        if self.relations == rcc5["equals"]:
             result  = "ir(X) :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
             result += "ir(X) :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
-        elif self.relations == relation["includes"]:
+            result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
+        elif self.relations == rcc5["includes"]:
             result  = "ir(X) :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
-        elif self.relations == relation["is_included_in"]:
-            result  = "ir(X) :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
-        elif self.relations == relation["disjoint"]:
-            result  = "ir(X) :- in(" + name1 + ",X), in(" + name2 + ",X).\n"
-        elif self.relations == relation["overlaps"]:
-            result  = "\n"
-        elif self.relations == (relation["equals"] | relation["is_included_in"]):
+            result += ":- #count{X: vr(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0.\n" 
+            result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
+        elif self.relations == rcc5["is_included_in"]:
+            result  = ":- #count{X: vr(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
+            result += "ir(X) :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
+            result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
+        elif self.relations == rcc5["disjoint"]:
+            result  = ":- #count{X: vr(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n"
+            result += ":- #count{X: vr(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0.\n"
+            result += "ir(X) :- in(" + name1 + ",X), in(" + name2 + ",X).\n" 
+        elif self.relations == rcc5["overlaps"]:
+            result  = ":- #count{X: vr(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n"
+            result += ":- #count{X: vr(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0.\n" 
+            result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
+        elif self.relations == (rcc5["equals"] | rcc5["is_included_in"]):
             result  = "ir(X) :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
             result += "vr(X) v ir(X) :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
-        elif self.relations == (relation["equals"] | relation["includes"]):
+            result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
+        elif self.relations == (rcc5["equals"] | rcc5["includes"]):
             result  = "ir(X) :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
             result += "vr(X) v ir(X) :- out(" + name1 + ",X), in(" + name2 + ",X).\n" 
+            result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
+        elif self.relations == (rcc5["is_included_in"] | rcc5["includes"]):
+            result  = "ir(X) :- in(" + name1 + ",X), out(" + name2 + ",X), vr(Y), in(" + name2 + ",Y), out(" + name1 + ",Y).\n"
+            result += "ir(Y) :- #count{X: vr(X), in(" + name1 + ",X), out(" + name2 + ",X)} > 0, in(" + name2 + ",Y), out(" + name1 + ",Y).\n"
+        elif self.relations == (rcc5["disjoint"] | rcc5["overlaps"]):
+            result  = "ir(X) v vr(X) :- in(" + name1 + ",X), in(" + name2 + ",X).\n"
+        elif self.relations == (rcc5["equals"] | rcc5["overlaps"]):
+            result  = ":- #count{X: vr(X), in(" + name1 + ",X), out(" + name2 + ",X)} > 0, #count{Y: vr(Y), in(" + name2 + ",Y), out(" + name1 + ",Y)} = 0.\n"
+            result += ":- #count{X: vr(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, #count{Y: vr(Y), in(" + name2 + ",Y), out(" + name1 + ",Y)} > 0.\n"
+            result += "ir(Y) :- #count{X: vr(X), in(" + name1 + ",X), out(" + name2 + ",X)} > 0, in(" + name2 + ",Y), out(" + name1 + ",Y).\n"
+            result += "vr(X) :- in(" + name1 + ",X), in(" + name2 + ",X).\n" 
+        elif self.relations == (rcc5["is_included_in"] | rcc5["overlaps"]):
+            result  = "vr(X) v ir(X) :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
+            result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
+            result += ":- #count{X: vr(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
+        else:
+            print "Relation ",self.relations," is not yet supported!!!!"
+            result = "\n"
         return result
 
 class Taxonomy:
