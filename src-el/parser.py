@@ -26,9 +26,10 @@ class EulerParser:
                                 version="%prog 1.0")
             inst.add_option("-v", action="store_true", dest="verbose")
             inst.add_option("-p", dest="projectname")
+            inst.add_option("-e", dest="encode", default="vr")
             inst.add_option("-i", dest="inputfile")
             inst.add_option("-r", dest="inputdir", default="")
-            inst.add_option("-o", dest="outputdir", default=None)
+            inst.add_option("-o", dest="outputdir", default="./")
 	return inst
 
     instance = Callable(instance)
