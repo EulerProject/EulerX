@@ -168,24 +168,24 @@ class Articulation:
 			firstrel = False
 		    else:
 			result += " v " + prefix + "ls) "
-		if self.relations & rcc5["is_included_in"] == rcc5["is_included_in"]:
+		if self.relations & rcc5["overlaps"] == rcc5["overlaps"]:
 		    if firstrel:
-			result  = prefix + "ls) "
+			result  = prefix + "ol) "
 			firstrel = False
 		    else:
-			result += " v " + prefix + "ls) "
-		if self.relations & rcc5["is_included_in"] == rcc5["is_included_in"]:
+			result += " v " + prefix + "ol) "
+		if self.relations & rcc5["disjoint"] == rcc5["disjoint"]:
 		    if firstrel:
-			result  = prefix + "ls) "
+			result  = prefix + "ds) "
 			firstrel = False
 		    else:
-			result += " v " + prefix + "ls) "
-		if self.relations & rcc5["is_included_in"] == rcc5["is_included_in"]:
+			result += " v " + prefix + "ds) "
+		if self.relations & rcc5["equals"] == rcc5["equals"]:
 		    if firstrel:
-			result  = prefix + "ls) "
+			result  = prefix + "eq) "
 			firstrel = False
 		    else:
-			result += " v " + prefix + "ls) "
+			result += " v " + prefix + "eq) "
                 if not firstrel:
                     result += "."
             elif self.relations == relation["+="]:
