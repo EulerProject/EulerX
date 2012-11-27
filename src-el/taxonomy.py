@@ -109,52 +109,124 @@ class Articulation:
     def toDlv(self, enc):
         name1 = self.taxon1.dlvName()
         name2 = self.taxon2.dlvName()
-        if encode[enc] == encode["vr"]:
+        if encode[enc] & encode["vr"] or encode[enc] & encode["dl"]:
 	    if self.relations == rcc5["equals"]:
 		result  = "ir(X) :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
 		result += "ir(X) :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
 		result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
+		result += "in(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
+		result += "in(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
+		result += "out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
+		result += "out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
 	    elif self.relations == rcc5["includes"]:
 		result  = "ir(X) :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
 		result += ":- #count{X: vr(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0.\n" 
 		result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
+		result += "in(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
+		result += "out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
+		result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
+		result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
 	    elif self.relations == rcc5["is_included_in"]:
 		result  = ":- #count{X: vr(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
 		result += "ir(X) :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
 		result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
+		result += "in(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
+		result += "out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
+		result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
+		result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
 	    elif self.relations == rcc5["disjoint"]:
 		result  = ":- #count{X: vr(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n"
 		result += ":- #count{X: vr(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0.\n"
 		result += "ir(X) :- in(" + name1 + ",X), in(" + name2 + ",X).\n" 
+		result += "out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
+		result += "out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
+		result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
+		result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
 	    elif self.relations == rcc5["overlaps"]:
 		result  = ":- #count{X: vr(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n"
 		result += ":- #count{X: vr(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0.\n" 
 		result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
+		result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
+		result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
+		result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
+		result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
 	    elif self.relations == (rcc5["equals"] | rcc5["is_included_in"]):
 		result  = "ir(X) :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
 		result += "vr(X) v ir(X) :- out(" + name1 + ",X), in(" + name2 + ",X).\n" 
 		result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
+		result += "in(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
+		result += "out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
+		result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
+		result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
 	    elif self.relations == (rcc5["equals"] | rcc5["includes"]):
 		result  = "ir(X) :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
 		result += "vr(X) v ir(X) :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
 		result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
+		result += "in(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
+		result += "out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
+		result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
+		result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
 	    elif self.relations == (rcc5["is_included_in"] | rcc5["includes"]):
 		result  = "ir(X) :- in(" + name1 + ",X), out(" + name2 + ",X), vr(Y), in(" + name2 + ",Y), out(" + name1 + ",Y).\n"
 		result += "ir(Y) :- #count{X: vr(X), in(" + name1 + ",X), out(" + name2 + ",X)} > 0, in(" + name2 + ",Y), out(" + name1 + ",Y).\n"
+		result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
+		result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
+		result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
+		result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
 	    elif self.relations == (rcc5["disjoint"] | rcc5["overlaps"]):
 		result  = "ir(X) v vr(X) :- in(" + name1 + ",X), in(" + name2 + ",X).\n"
+		result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
+		result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
+		result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
+		result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
 	    elif self.relations == (rcc5["equals"] | rcc5["overlaps"]):
 		result  = ":- #count{X: vr(X), in(" + name1 + ",X), out(" + name2 + ",X)} > 0, #count{Y: vr(Y), in(" + name2 + ",Y), out(" + name1 + ",Y)} = 0.\n"
 		result += ":- #count{X: vr(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, #count{Y: vr(Y), in(" + name2 + ",Y), out(" + name1 + ",Y)} > 0.\n"
 		result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n"
+		result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
+		result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
+		result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
+		result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
 	    elif self.relations == (rcc5["is_included_in"] | rcc5["overlaps"]):
 		result  = "vr(X) v ir(X) :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
 		result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
 		result += ":- #count{X: vr(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
+		result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
+		result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
+		result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
+		result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
+            elif self.relations == relation["+="]:
+                name3 = self.taxon3.dlvName()
+		result  = ":- #count{X: vr(X), out(" + name1 + ",X), in(" + name3 + ",X)} = 0.\n" 
+		result += "ir(X) :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
+		result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name3 + ",X)} = 0.\n" 
+		result += ":- #count{X: vr(X), out(" + name2 + ",X), in(" + name3 + ",X)} = 0.\n" 
+		result += "ir(X) :- in(" + name2 + ",X), out(" + name3 + ",X).\n" 
+		result += ":- #count{X: vr(X), in(" + name2 + ",X), in(" + name3 + ",X)} = 0.\n" 
+		result += "in(" + name3 + ",X) :- in(" + name1 + ",X).\n" 
+		result += "in(" + name3 + ",X) :- in(" + name2 + ",X).\n" 
+		result += "out(" + name1 + ",X) :- out(" + name3 + ",X).\n" 
+		result += "out(" + name1 + ",X) :- out(" + name3 + ",X).\n" 
+		result += "in(" + name1 + ",X) v in(" + name2 + ",X) :- in(" + name3 + ",X).\n" 
+		result += "out(" +name3 + ",X) :- out(" + name1 + ",X), out(" + name2 + ",X).\n" 
+            elif self.relations == relation["=+"]:
+                name3 = self.taxon3.dlvName()
+		result  = ":- #count{X: vr(X), out(" + name2 + ",X), in(" + name1 + ",X)} = 0.\n" 
+		result += "ir(X) :- in(" + name2 + ",X), out(" + name1 + ",X).\n" 
+		result += ":- #count{X: vr(X), in(" + name2 + ",X), in(" + name1 + ",X)} = 0.\n" 
+		result += ":- #count{X: vr(X), out(" + name3 + ",X), in(" + name1 + ",X)} = 0.\n" 
+		result += "ir(X) :- in(" + name3 + ",X), out(" + name1 + ",X).\n" 
+		result += ":- #count{X: vr(X), in(" + name3 + ",X), in(" + name1 + ",X)} = 0.\n" 
+		result += "in(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
+		result += "in(" + name1 + ",X) :- in(" + name3 + ",X).\n" 
+		result += "out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
+		result += "out(" + name3 + ",X) :- out(" + name1 + ",X).\n" 
+		result += "in(" + name2 + ",X) v in(" + name3 + ",X) :- in(" + name1 + ",X).\n" 
+		result += "out(" +name1 + ",X) :- out(" + name2 + ",X), out(" + name3 + ",X).\n" 
 	    else:
 		print "Relation ",self.relations," is not yet supported!!!!"
 		result = "\n"
-        elif encode[enc] == encode["direct"]:
+        elif encode[enc] & encode["direct"]:
             prefix = "label(" + name1 + ", " + name2 +", "
             result = ""
             firstrel = True
@@ -211,6 +283,9 @@ class Taxonomy:
         self.abbrev = abbrev
         self.name = name
     
+    def dlvName(self):
+        return "t" + self.abbrev
+
     def addTaxon(self, parent):
         if self.taxa.has_key(parent):
             return None
@@ -232,17 +307,17 @@ class Taxonomy:
                 self.taxa[child] = thisChild
             
             thisChild.parent = thisParent
-	    #if(onlyOne):
-		#taxaMap.addEMir(parent, child)
-	    #else:
-	    	#taxaMap.addTMir(self.authority.abbrev, parent, child)
-	    	#for sibling in thisParent.children:
-	    	#    taxaMap.addDMir(self.abbrev, child, sibling.abbrev)
+	    if(onlyOne):
+		taxaMap.addEMir(parent, child)
+	    else:
+	    	taxaMap.addTMir(self.abbrev, parent, child)
+	    	for sibling in thisParent.children:
+	    	    taxaMap.addDMir(self.abbrev, child, sibling.abbrev)
             thisParent.addChild(thisChild)
 
     def getTaxon(self, theTaxon):
         if (not(self.taxa.has_key(theTaxon))):
-            print "no taxon " + theTaxon + " in " + self.authority.abbrev
+            print "no taxon " + theTaxon + " in " + self.abbrev
             return None
         else:
             return (self.taxa[theTaxon]);

@@ -62,8 +62,10 @@ class TaxonomyMapping:
         if not self.testConsistency():
             print "Input is inconsistent!!"
             return
-        self.genPW()
-        #self.decodeDlv()
+        if encode[self.options.encode] & encode["pw"]:
+            self.genPW()
+        else:
+            self.genMir()
 
     def decodeDlv(self):
         lines = StringIO.StringIO(self.pw).readlines()
@@ -75,8 +77,8 @@ class TaxonomyMapping:
 
     class ThreadProve(threading.Thread):
         def __init__(self, taxMap, pair, rel):
-	    threading.Thread.__init__(self)
-            self._stop = threading.Event()
+            super(TaxonomyMapping.ThreadProve, self).__init__()
+	    #threading.Thread.__init__(self)
 	    self.taxMap = taxMap
             self.pair = pair
             self.rel = rel
@@ -85,12 +87,6 @@ class TaxonomyMapping:
         def run(self):
             self.result = self.taxMap.testConsistencyGoal(self.pair, self.rel)
 
-        def stop(self):
-            self._stop.set()
-
-        def stopped(self):
-            return self._stop.isSet()
-    
 ## NF starts 
     def testConsistencyGoal(self, pair, rel):
         dn1 = pair[0].dotName()
@@ -104,22 +100,42 @@ class TaxonomyMapping:
             frsnr.write("ir(X) :- out(" + vn1 + ",X), in(" + vn2 + ",X).\n")
             frsnr.write("ir(X) :- in(" + vn1 + ",X), out(" + vn2 + ",X).\n")
             frsnr.write(":- #count{X: vr(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
+	    frsnr.write("in(" + vn1 + ",X) :- in(" + vn2 + ",X).\n")
+	    frsnr.write("in(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
+	    frsnr.write("out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n") 
+	    frsnr.write("out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n")
         elif rel == "includes":
             frsnr.write("ir(X) :- out(" + vn1 + ",X), in(" + vn2 + ",X).\n")
             frsnr.write(":- #count{X: vr(X), in(" + vn1 + ",X), out(" + vn2 + ",X)} = 0.\n")
             frsnr.write(":- #count{X: vr(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
+	    frsnr.write("in(" + vn1 + ",X) :- in(" + vn2 + ",X).\n") 
+	    frsnr.write("out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n") 
+	    frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n")
+	    frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- in(" + vn1 + ",X).\n") 
         elif rel == "is_included_in":
             frsnr.write(":- #count{X: vr(X), out(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
             frsnr.write("ir(X) :- in(" + vn1 + ",X), out(" + vn2 + ",X).\n")
             frsnr.write(":- #count{X: vr(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
+	    frsnr.write("in(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
+	    frsnr.write("out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n") 
+	    frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- in(" + vn2 + ",X).\n") 
+	    frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n") 
         elif rel == "disjoint":
             frsnr.write(":- #count{X: vr(X), out(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
             frsnr.write(":- #count{X: vr(X), in(" + vn1 + ",X), out(" + vn2 + ",X)} = 0.\n")
             frsnr.write("ir(X) :- in(" + vn1 + ",X), in(" + vn2 + ",X).\n")
+	    frsnr.write("out(" + vn1 + ",X) :- in(" + vn2 + ",X).\n")
+	    frsnr.write("out(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
+	    frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n")
+	    frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n")
         elif rel == "overlaps":
             frsnr.write(":- #count{X: vr(X), out(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
             frsnr.write(":- #count{X: vr(X), in(" + vn1 + ",X), out(" + vn2 + ",X)} = 0.\n")
             frsnr.write(":- #count{X: vr(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
+	    frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- in(" + vn2 + ",X).\n")
+	    frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n") 
+	    frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n") 
+	    frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
         frsnr.close()
         com = "dlv -silent -filter=rel -n=1 "+rsnrfile+" "+self.pwfile
         if commands.getoutput(com) == "":
@@ -134,7 +150,7 @@ class TaxonomyMapping:
         return True
 
     def genPW(self):
-        com = "dlv -silent -filter=rel "+self.pwfile
+        com = "dlv -silent -filter=rel "+self.pwfile+" | muniq -u"
         self.pw = commands.getoutput(com)
         print self.pw
 
@@ -144,7 +160,7 @@ class TaxonomyMapping:
         self.genDlvConcept()
         self.genDlvPC()
         self.genDlvAr()
-        if encode[self.options.encode] == encode["vr"]:
+        if encode[self.options.encode] & encode["vr"] or encode[self.options.encode] & encode["dl"]:
             self.genDlvDc()
         fdlv = open(self.pwfile, 'w')
         fdlv.write(self.baseDlv)
@@ -158,11 +174,40 @@ class TaxonomyMapping:
         for key in self.taxonomies.keys():
             for taxon in self.taxonomies[key].taxa.keys():
                 t = self.taxonomies[key].taxa[taxon]
-                self.map[t.dlvName()] = num
-                con += "concept(" + t.dlvName() + "," + num.__str__()+").\n"
-                num += 1
+                if encode[self.options.encode] & encode["dl"] and t.hasChildren():
+                    con += "concept(" + t.dlvName() + "," + self.taxonomies[key].dlvName() + ",i).\n"
+                else:
+                    self.map[t.dlvName()] = num
+                    con += "concept(" + t.dlvName() + "," + self.taxonomies[key].dlvName() + "," + num.__str__()+").\n"
+                    num += 1
 
-        if encode[self.options.encode] == encode["vr"]:
+        if encode[self.options.encode] & encode["dl"]:
+            maxint = int(self.options.dl)*num
+	    self.baseDlv = "#maxint=" + maxint.__str__() + ".\n\n"
+	    self.baseDlv += con
+	    self.baseDlv += "%%% regions\n"
+	    self.baseDlv += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
+
+	    self.baseDlv += "%%% bit\n"
+	    self.baseDlv += "bit(M, V):-r(M),#mod(M," + int(num).__str__() + ",V).\n\n"
+
+	    self.baseDlv += "%%% Meaning of regions\n"
+	    self.baseDlv += "in(X, M) :- r(M),concept(X,_,N),bit(M,N).\n"
+	    self.baseDlv += "in(X, M) :- r(M),concept(X,_,N),bit(M,N).\n"
+	    self.baseDlv += "in(X, M) v out(X, M) :- r(M),concept(X,_,N),bit(M,N1), N<>N1.\n"
+	    #self.baseDlv += "gin(X, M) v gout(X, M) :- r(M),concept(X,_,N),not cin(X, M), not cout(X, M).\n"
+	    #self.baseDlv += ":- gin(X, M), gout(X, M), r(M), concept(X,_,_).\n\n"
+            #self.baseDlv += "in(X, M) :- cin(X, M).\n"
+            #self.baseDlv += "in(X, M) :- gin(X, M).\n"
+            #self.baseDlv += "out(X, M) :- cout(X, M).\n"
+            #self.baseDlv += "out(X, M) :- gout(X, M).\n"
+	    self.baseDlv += "ir(M) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n\n"
+
+	    self.baseDlv += "%%% Constraints of regions.\n"
+	    self.baseDlv += "vr(X) :- r(X), not ir(X).\n"
+	    self.baseDlv += ":- vr(X), ir(X).\n\n"
+
+        elif encode[self.options.encode] & encode["vr"]:
 	    self.baseDlv = "#maxint=" + int(2**num).__str__() + ".\n\n"
 	    self.baseDlv += con
 	    self.baseDlv += "\n%%% power\n"
@@ -173,26 +218,27 @@ class TaxonomyMapping:
 	    self.baseDlv += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
 
 	    self.baseDlv += "%%% count of concepts\n"
-	    self.baseDlv += "count(N):- #int(N),N>=0,N<#count{Y:concept(Y,_)}.\n\n"
+	    self.baseDlv += "count(N):- #int(N),N>=0,N<#count{Y:concept(Y,_,_)}.\n\n"
 
 	    self.baseDlv += "%%% bit\n"
 	    self.baseDlv += "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P,#mod(M1,2,0).\n"
 	    self.baseDlv += "bit(M, N, 1):-r(M),count(N),not bit(M,N,0).\n\n"
 
 	    self.baseDlv += "%%% Meaning of regions\n"
-	    self.baseDlv += "in(X, M) v out(X, M) :- r(M),concept(X,N),count(N).\n"
-	    self.baseDlv += "in(X, M) :- r(M),concept(X,N),bit(M,N,1).\n"
-	    self.baseDlv += "out(X, M) :- r(M),concept(X,N),bit(M,N,0).\n\n"
+	    self.baseDlv += "in(X, M) v out(X, M) :- r(M),concept(X,_,N),count(N).\n"
+	    self.baseDlv += "in(X, M) :- r(M),concept(X,_,N),bit(M,N,1).\n"
+	    self.baseDlv += "out(X, M) :- r(M),concept(X,_,N),bit(M,N,0).\n\n"
+	    self.baseDlv += "ir(M) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n"
 
 	    self.baseDlv += "%%% Constraints of regions.\n"
 	    self.baseDlv += "ir(0).\n"
 	    self.baseDlv += "vr(X) v ir(X):- r(X).\n"
 	    self.baseDlv += ":- vr(X), ir(X).\n\n"
 
-        elif encode[self.options.encode] == encode["direct"]:
+        elif encode[self.options.encode] & encode["direct"]:
             self.baseDlv += con
             self.baseDlv += "\n% GENERATE possible labels\n"
-	    self.baseDlv += "node(X) :- concept(X, _).\n"
+	    self.baseDlv += "node(X) :- concept(X, _, _).\n"
             self.baseDlv += "rel(X, Y, R) :- label(X, Y, R), X < Y.\n"
 	    self.baseDlv += "label(X, X, eq) :- node(X).\n"
 
@@ -252,8 +298,13 @@ class TaxonomyMapping:
 	    self.baseDlv += "label(X,Z,ls) v label(X,Z,ol) v label(X,Z,ds) :- label(X,Y,ds), label(Y,Z,ls).\n"
 	    self.baseDlv += "label(X,Z,ls) v label(X,Z,ol) v label(X,Z,ds) :- label(X,Y,ds), label(Y,Z,ol).\n"
 	    self.baseDlv += "%% Any of RCC5 is possible for X vs Z\n"
-	    self.baseDlv += "%label(X,Z,eq) v label(X,Z,ds) v label(X,Z,in) v label(X,Z,ls) v label(X,Z,ol) :- label(X,Y,ds), label(Y,Z,ds).\n"
+	    self.baseDlv += "%label(X,Z,eq) v label(X,Z,ds) v label(X,Z,in) v label(X,Z,ls) v label(X,Z,ol) :- label(X,Y,ds), label(Y,Z,ds).\n\n"
+
             self.baseDlv += "label(X, Y, ds) :- sum(X, X1, X2), label(X1, Y, ds), label(X2, Y, ds).\n"
+            self.baseDlv += "sum(X, Y, X2) :- sum(X, X1, X2), label(X1, Y, eq).\n"
+            self.baseDlv += "sum(Y, X1, X2) :- sum(X, X1, X2), label(X, Y, eq).\n"
+            # A + (B + C) = (A + B) + C
+            self.baseDlv += "label(X, Y, eq) :- sum(X, A, X1), sum(X1, B, C), sum(Y, B, Y1), sum(Y1, A, C).\n"
             self.baseDlv += "label(X, Y, ol) v label(X, Y, in) :- sum(X, X1, X2), label(X1, Y, ol), label(X2, Y, ol).\n"
             self.baseDlv += "label(X, Y, R) :- sum(X, X1, X2), sum(Y, Y1, Y2), label(X1, Y1, eq), label(X2, Y2, R).\n"
             self.baseDlv += "label(X2, Y2, R) :- sum(X, X1, X2), sum(Y, Y1, Y2), label(X1, Y1, eq), label(X, Y, R).\n"
@@ -269,19 +320,31 @@ class TaxonomyMapping:
             while len(queue) != 0:
                 t = queue.pop(0)
                 if t.hasChildren:
-                    if encode[self.options.encode] == encode["vr"]:
+                    if encode[self.options.encode] & encode["vr"] or encode[self.options.encode] & encode["dl"]:
 			# ISA
 			self.baseDlv += "%% ISA\n"
 			coverage = "ir(X) :- in(" + t.dlvName() + ", X)"
+			coverin = ""
+			coverout = "out(" + t.dlvName() + ", X) :- "
 			for t1 in t.children:
 			    self.baseDlv += "% " + t1.dlvName() + " isa " + t.dlvName() + "\n"
+			    self.baseDlv += "in(" + t.dlvName() + ", X) :- in(" + t1.dlvName() + ", X).\n"
+			    self.baseDlv += "out(" + t1.dlvName() + ", X) :- out(" + t.dlvName() + ", X).\n"
+			    self.baseDlv += "in(" + t1.dlvName() + ", X) v out(" + t1.dlvName() + ", X) :- in(" + t.dlvName() + ", X).\n"
+			    self.baseDlv += "in(" + t.dlvName() + ", X) v out(" + t.dlvName() + ", X) :- out(" + t1.dlvName() + ", X).\n"
 			    self.baseDlv += "ir(X) :- in(" + t1.dlvName() + ", X), out(" + t.dlvName() + ", X).\n"
 			    self.baseDlv += ":- #count{X: vr(X), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0.\n\n"
 			    coverage += ",out(" + t1.dlvName() + ", X)"
+                            if coverin != "":
+                                coverin += " v "
+                                coverout += ", "
+                            coverin += "in(" + t1.dlvName() + ", X)"
+                            coverout += "out(" + t1.dlvName() + ", X)"
 			# C
-			if len(t.children) > 0:
-			    self.baseDlv += "%% coverage\n"
-			    self.baseDlv += coverage + ".\n\n"
+			self.baseDlv += "%% coverage\n"
+			self.baseDlv += coverin + " :- in(" + t.dlvName() + ", X).\n"
+			self.baseDlv += coverout + ".\n"
+			self.baseDlv += coverage + ".\n\n"
 			# D
 			self.baseDlv += "%% sibling disjointness\n"
 			for i in range(len(t.children) - 1):
@@ -289,10 +352,14 @@ class TaxonomyMapping:
 				name1 = t.children[i].dlvName()
 				name2 = t.children[j].dlvName()
 				self.baseDlv += "% " + name1 + " ! " + name2+ "\n"
+				self.baseDlv += "out(" + name1 + ", X) :- in(" + name2+ ", X).\n"
+				self.baseDlv += "out(" + name2 + ", X) :- in(" + name1+ ", X).\n"
+			        self.baseDlv += "in(" + name1 + ", X) v out(" + name1 + ", X) :- out(" + name2 + ", X).\n"
+			        self.baseDlv += "in(" + name2 + ", X) v out(" + name2 + ", X) :- out(" + name1 + ", X).\n"
 				self.baseDlv += "ir(X) :- in(" + name1 + ", X), in(" + name2+ ", X).\n"
 				self.baseDlv += ":- #count{X: vr(X), in(" + name1 + ", X), out(" + name2+ ", X)} = 0.\n"
 				self.baseDlv += ":- #count{X: vr(X), out(" + name1 + ", X), in(" + name2+ ", X)} = 0.\n\n"
-                    elif encode[self.options.encode] == encode["direct"]:
+                    elif encode[self.options.encode] & encode["direct"]:
 			# ISA
 			# C
 			self.baseDlv += "\n%% ISA\n"
@@ -311,7 +378,6 @@ class TaxonomyMapping:
                                 self.baseDlv += prefix + t1name + ", eq) v "
                                 self.baseDlv += prefix + t1name + ", in).\n"
                                 nex = t.dlvName() + t1.__str__()
-                                print nex
 				coverage += "sum(" + pre + "," + t1name + "," + nex + ").\n"
                                 pre = nex
 		            self.baseDlv += "% " + t.children[numkids - 2].dlvName() + " isa " + t.dlvName() + "\n"
@@ -342,11 +408,21 @@ class TaxonomyMapping:
 
     def genDlvDc(self):
         self.baseDlv += "%%% Decoding now\n"
-        self.baseDlv += "rel(X, Y, \"=\") v rel(X, Y, \"<\") v rel(X, Y, \">\") v rel(X, Y, \"><\") v rel(X, Y, \"!\") :-concept(X, _), concept(Y, _), X > Y.\n\n"
+        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \"<\"), concept(X, N1, _), concept(Y, N2, _).\n"
+        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \">\"), concept(X, N1, _), concept(Y, N2, _).\n"
+        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \"><\"), concept(X, N1, _), concept(Y, N2, _).\n"
+        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _).\n"
+        self.baseDlv += ":- rel(X, Y, \"<\"), rel(X, Y, \">\"), concept(X, N1, _), concept(Y, N2, _).\n"
+        self.baseDlv += ":- rel(X, Y, \"<\"), rel(X, Y, \"><\"), concept(X, N1, _), concept(Y, N2, _).\n"
+        self.baseDlv += ":- rel(X, Y, \"<\"), rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _).\n"
+        self.baseDlv += ":- rel(X, Y, \">\"), rel(X, Y, \"><\"), concept(X, N1, _), concept(Y, N2, _).\n"
+        self.baseDlv += ":- rel(X, Y, \">\"), rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _).\n"
+        self.baseDlv += ":- rel(X, Y, \"><\"), rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _).\n"
+        self.baseDlv += ":- not rel(X, Y, \"=\"), not rel(X, Y, \"<\"), not rel(X, Y, \">\"), not rel(X, Y, \"><\"), not rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _), N1 < N2.\n\n"
 
-        self.baseDlv += "hint(X, Y, 0) :- concept(X, _), concept(Y, _), X > Y, vr(R), in(X, R), out(Y, R).\n"
-        self.baseDlv += "hint(X, Y, 1) :- concept(X, _), concept(Y, _), X > Y, vr(R), in(X, R), in(Y, R).\n"
-        self.baseDlv += "hint(X, Y, 2) :- concept(X, _), concept(Y, _), X > Y, vr(R), out(X, R), in(Y, R).\n\n"
+        self.baseDlv += "hint(X, Y, 0) :- concept(X, N1, _), concept(Y, N2, _), N1 < N2, vr(R), in(X, R), out(Y, R).\n"
+        self.baseDlv += "hint(X, Y, 1) :- concept(X, N1, _), concept(Y, N2, _), N1 < N2, vr(R), in(X, R), in(Y, R).\n"
+        self.baseDlv += "hint(X, Y, 2) :- concept(X, N1, _), concept(Y, N2, _), N1 < N2, vr(R), out(X, R), in(Y, R).\n\n"
 
         self.baseDlv += "rel(X, Y, \"=\") :- not hint(X, Y, 0), hint(X, Y, 1), not hint(X, Y, 2).\n"
         self.baseDlv += "rel(X, Y, \"<\") :- not hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2).\n"
@@ -381,11 +457,11 @@ class TaxonomyMapping:
             elif (re.match("\[.*?\]", line)):
                 inside = re.match("\[(.*)\]", line).group(1)
                 self.articulations += [Articulation(inside, self)]
-		#if inside.find("{") != -1:
-		    #r = re.match("(.*) \{(.*)\} (.*)", inside)
-		    #self.addPMir(r.group(1), r.group(3), r.group(2).replace(" ",","), 0)
-		#else:
-		    #self.addAMir(inside, 0)
+		if inside.find("{") != -1:
+		    r = re.match("(.*) \{(.*)\} (.*)", inside)
+		    self.addPMir(r.group(1), r.group(3), r.group(2).replace(" ",","), 0)
+		else:
+		    self.addAMir(inside, 0)
               
            # elif (re.match("\<.*\>", line)):
             #    inside = re.match("\<(.*)\>", line).group(1)
@@ -397,3 +473,137 @@ class TaxonomyMapping:
                    
         return True              
  
+    def addTMir(self, tName, parent, child):
+	self.mir[tName + "." +parent +"," + tName + "." + child] = rcc5["includes"]
+	self.tr.append([tName + "." + child, tName + "." + parent, 0])
+	self.addIMir(tName + "." + parent, tName + "." + child, 0)
+
+    def addAMir(self, astring, provenance):
+    	r = astring.split(" ")
+        if(self.options.verbose):
+            print "Articulations: ",astring
+	if (r[1] == "includes"):
+	    self.addIMir(r[0], r[2], provenance)
+	    self.tr.append([r[2], r[0], provenance])
+	elif (r[1] == "is_included_in"):
+	    self.addIMir(r[2], r[0], provenance)
+	    self.tr.append([r[0], r[2], provenance])
+	elif (r[1] == "equals"):
+	    self.addEMir(r[0], r[2])
+            self.eq.append([r[0], r[2]])
+	elif (r[2] == "lsum"):
+	    self.addIMir(r[3], r[0], provenance)
+	    self.addIMir(r[3], r[1], provenance)
+	    self.mir[r[0] + "," + r[3]] = rcc5["is_included_in"]
+	    self.mir[r[1] + "," + r[3]] = rcc5["is_included_in"]
+	    self.tr.append([r[0],r[3], provenance])
+	    self.tr.append([r[1],r[3], provenance])
+	    return None
+	elif (r[1] == "rsum"):
+	    self.addIMir(r[0], r[2], provenance)
+	    self.addIMir(r[0], r[3], provenance)
+	    self.mir[r[0] + "," + r[2]] = rcc5["includes"]
+	    self.mir[r[0] + "," + r[3]] = rcc5["includes"]
+	    self.tr.append([r[2], r[0], provenance])
+	    self.tr.append([r[3], r[0], provenance])
+	    return None
+	elif (r[2] == "ldiff"):
+	    self.addIMir(r[0], r[3], provenance)
+	    self.mir[r[0] + "," + r[3]] = rcc5["includes"]
+	    self.tr.append([r[3], r[0], provenance])
+	    return None
+	elif (r[1] == "rdiff"):
+	    self.addIMir(r[3], r[0], provenance)
+	    self.mir[r[3] + "," + r[0]] = rcc5["is_included_in"]
+	    self.tr.append([r[3], r[0], provenance])
+	    return None
+        if rcc5.has_key(r[1]):
+	    self.mir[r[0] + "," + r[2]] = rcc5[r[1]]
+ 
+    def addDMir(self, tName, child, sibling):
+	self.mir[tName + "." + child + "," + tName + "." + sibling] = rcc5["disjoint"]
+	self.mir[tName + "." + sibling + "," + tName + "." + child] = rcc5["disjoint"]
+
+    def addPMir(self, t1, t2, r, provenance):
+    	if(self.mir.has_key(t1 + "," + t2)):
+	    return None
+	else:
+	    r=r.rstrip()
+	    #print t1+" "+r+" "+t2
+	    #self.articulationSet.addArticulationWithList(t1+" "+r+" "+t2, self)
+	    tmpStr=r.replace("{", "")
+	    tmpStr=tmpStr.replace("}", "")
+	    tmpStr=tmpStr.replace(" ", ",")
+	    self.addAMir(t1+" "+tmpStr+" "+t2, provenance)
+
+
+    # Equality mir
+    def addEMir(self, parent, child):
+	for pair in self.mir.keys():
+	    if (pair.find(parent+",") == 0):
+		newPair = pair.replace(parent+",", child+",")
+		self.mir[newPair] = self.mir[pair]
+	    elif (pair.find(child+",") == 0):
+		newPair = pair.replace(child+",", parent+",")
+	    	self.mir[newPair] = self.mir[pair]
+	    elif (pair.find(","+parent) == len(pair)-len(parent)-1):
+		newPair = pair.replace(","+parent, ","+child)
+		self.mir[newPair] = self.mir[pair]
+	    elif (pair.find(","+child) == len(pair)-len(child)-1):
+		newPair = pair.replace(","+child, ","+parent)
+	    	self.mir[newPair] = self.mir[pair]
+
+ 
+    # isa
+    def addIMir(self, parent, child, provenance):
+	for pair in self.mir.keys():
+	    if (self.mir[pair] == rcc5["includes"]):
+	        if (pair.find("," + parent) == len(pair) - len(parent) - 1):
+		    newPair = pair.replace("," + parent, "," + child)
+		    self.mir[newPair] = rcc5["includes"]
+		elif (pair.find(child + ",") == 0):
+		    newPair = pair.replace(child + ",", parent + ",")
+	    	    self.mir[newPair] = rcc5["includes"]
+    def genMir(self):       
+        fmir = open(self.mirfile, 'w')
+        for pair in self.getAllArticulationPairs():
+            pairkey = pair[0].dotName() + "," + pair[1].dotName()
+            if self.options.verbose:
+		print pairkey
+            if self.mir.has_key(pairkey) and self.mir[pairkey] != 0:
+                fmir.write(pairkey+",opt," + findkey(relation, self.mir[pairkey])+"\n")
+                if self.options.verbose:
+                    print pairkey+",opt," + findkey(relation, self.mir[pairkey])+"\n"
+            else:
+                self.mir[pairkey] = self.getPairMir(pair)
+                rl = findkey(relation, self.mir[pairkey])
+                fmir.write(pairkey + ",dlv," + rl +"\n")
+                if self.options.verbose:
+                    print pairkey + ",dlv," + rl +"\n"
+        fmir.close()
+ 
+    def getPairMir(self, pair):
+        result = 0
+        threads = []
+        for r in rcc5.keys():
+            t = self.ThreadProve(self, pair, r)   
+            t.start()
+            threads.append(t)
+        for t in threads:
+            sleept = 0
+            while sleept < 60:
+                t.join(1)
+                if not t.isAlive():
+                    break
+                sleept += 5
+                time.sleep(4)
+                if self.options.verbose:
+                    print "Sleept ",sleept," seconds!"
+            if t.isAlive():
+                t.join(1)
+                continue
+            if t.result == -1:
+                return 0
+            result = result | t.result
+        return result
+                
