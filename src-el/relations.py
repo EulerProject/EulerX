@@ -39,8 +39,14 @@ relation["{=, <, !, ><}"] = 1 << 0 | 1 << 2 | 1 << 3 | 1 << 4
 relation["{>, <, !, ><}"] = 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4
 relation["{=, >, <, !, ><}"] = 1 << 0 | 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4
 relation["+="] = 1 << 5
-relation["=+"] = 1 << 5 + 1
+relation["=+"] = (1 << 5) + 1
 
 encode = {}
-encode["direct"] = 0
-encode["vr"] = 1
+encode["dr"] = 1
+encode["direct"] = encode["dr"]
+encode["vr"] = 1 << 1
+encode["dl"] = 1 << 2
+encode["pw"] = 1 << 4
+encode["drpw"] = encode["dr"] | encode["pw"]
+encode["vrpw"] = encode["vr"] | encode["pw"]
+encode["dlpw"] = encode["dl"] | encode["pw"]
