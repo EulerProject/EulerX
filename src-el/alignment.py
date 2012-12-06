@@ -1,5 +1,6 @@
 import os
 import time
+import inspect
 import threading
 import StringIO
 from taxonomy import * 
@@ -152,7 +153,9 @@ class TaxonomyMapping:
         return True
 
     def genPW(self):
-        com = "dlv -silent -filter=rel "+self.pwfile+" | muniq -u"
+        path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+        print path
+        com = "dlv -silent -filter=rel "+self.pwfile+" | "+path+"/muniq -u"
         self.pw = commands.getoutput(com)
         print self.pw
 
