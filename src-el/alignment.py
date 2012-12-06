@@ -340,9 +340,6 @@ class TaxonomyMapping:
                                 coverout += ", "
                             coverin += "in(" + t1.dlvName() + ", X)"
                             coverout += "out(" + t1.dlvName() + ", X)"
-                            print t1.dlvName()
-                            print coverin
-                            print coverout
 			# C
 			self.baseDlv += "%% coverage\n"
 			self.baseDlv += coverin + " :- in(" + t.dlvName() + ", X).\n"
