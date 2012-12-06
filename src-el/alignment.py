@@ -319,7 +319,7 @@ class TaxonomyMapping:
             queue = copy.deepcopy(self.taxonomies[key].roots)
             while len(queue) != 0:
                 t = queue.pop(0)
-                if t.hasChildren:
+                if t.hasChildren():
                     if encode[self.options.encode] & encode["vr"] or encode[self.options.encode] & encode["dl"]:
 			# ISA
 			self.baseDlv += "%% ISA\n"
@@ -340,6 +340,9 @@ class TaxonomyMapping:
                                 coverout += ", "
                             coverin += "in(" + t1.dlvName() + ", X)"
                             coverout += "out(" + t1.dlvName() + ", X)"
+                            print t1.dlvName()
+                            print coverin
+                            print coverout
 			# C
 			self.baseDlv += "%% coverage\n"
 			self.baseDlv += coverin + " :- in(" + t.dlvName() + ", X).\n"
