@@ -64,6 +64,8 @@ class TaxonomyMapping:
             return
         if encode[self.options.encode] & encode["pw"]:
             self.genPW()
+        if encode[self.options.encode] & encode["ve"]:
+            self.genVE()
         else:
             self.genMir()
 
@@ -153,6 +155,11 @@ class TaxonomyMapping:
         com = "dlv -silent -filter=rel "+self.pwfile+" | muniq -u"
         self.pw = commands.getoutput(com)
         print self.pw
+
+    def genVE(self):
+        com = "dlv -silent -filter=vr "+self.pwfile
+        self.ve = commands.getoutput(com)
+        print self.ve
 
     def genDlv(self):
         if self.baseDlv != "":
