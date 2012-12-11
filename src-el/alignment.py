@@ -18,6 +18,7 @@ class TaxonomyMapping:
         self.baseDlv = ""
         self.pw = ""
         self.options = options
+        self.enc = encode[options.encode]
         self.name = os.path.splitext(os.path.basename(options.inputfile))[0]
         if options.outputdir is None:
             options.outputdir = options.inputdir
@@ -63,9 +64,9 @@ class TaxonomyMapping:
         if not self.testConsistency():
             print "Input is inconsistent!!"
             return
-        if encode[self.options.encode] & encode["pw"]:
+        if self.enc & encode["pw"]:
             self.genPW()
-        if encode[self.options.encode] & encode["ve"]:
+        if self.enc & encode["ve"]:
             self.genVE()
         else:
             self.genMir()
@@ -170,7 +171,7 @@ class TaxonomyMapping:
         self.genDlvConcept()
         self.genDlvPC()
         self.genDlvAr()
-        if encode[self.options.encode] & encode["vr"] or encode[self.options.encode] & encode["dl"]:
+        if self.enc & encode["vr"] or self.enc & encode["dl"] or self.enc & encode["pl"] or self.enc & encode["mn"]:
             self.genDlvDc()
         fdlv = open(self.pwfile, 'w')
         fdlv.write(self.baseDlv)
@@ -180,18 +181,33 @@ class TaxonomyMapping:
         con = "%%% Concepts\n"
 
         # numbering concepts
-        num = 0
+        num = 0    # number of taxa
+        prod = 0   # product
+        n = 0      # number of taxonomies
+        pro = 1    # product of num
+        couArray = []
+        proArray = []
         for key in self.taxonomies.keys():
+            cou = 0
             for taxon in self.taxonomies[key].taxa.keys():
                 t = self.taxonomies[key].taxa[taxon]
-                if encode[self.options.encode] & encode["dl"] and t.hasChildren():
-                    con += "concept(" + t.dlvName() + "," + self.taxonomies[key].dlvName() + ",i).\n"
+                con += "tax(" + self.taxonomies[key].dlvName() + "," + n.__str__() + ").\n"
+                if (self.enc & encode["dl"] or self.enc & encode["mn"]) and t.hasChildren():
+                    con += "concept(" + t.dlvName() + "," + n.__str__() + ",i).\n"
                 else:
                     self.map[t.dlvName()] = num
-                    con += "concept(" + t.dlvName() + "," + self.taxonomies[key].dlvName() + "," + num.__str__()+").\n"
-                    num += 1
+                    con += "concept(" + t.dlvName() + "," + n.__str__() + "," + cou.__str__()+").\n"
+                    cou += 1
+            n += 1
+            num += cou
+            couArray.append(cou+1)
+            proArray.append(pro)
+            pro *= (cou+1)
+            print pro
+            print proArray
+            prod = prod*cou + prod + cou
 
-        if encode[self.options.encode] & encode["dl"]:
+        if self.enc & encode["dl"]:
             maxint = int(self.options.dl)*num
 	    self.baseDlv = "#maxint=" + maxint.__str__() + ".\n\n"
 	    self.baseDlv += con
@@ -202,7 +218,6 @@ class TaxonomyMapping:
 	    self.baseDlv += "bit(M, V):-r(M),#mod(M," + int(num).__str__() + ",V).\n\n"
 
 	    self.baseDlv += "%%% Meaning of regions\n"
-	    self.baseDlv += "in(X, M) :- r(M),concept(X,_,N),bit(M,N).\n"
 	    self.baseDlv += "in(X, M) :- r(M),concept(X,_,N),bit(M,N).\n"
 	    self.baseDlv += "in(X, M) v out(X, M) :- r(M),concept(X,_,N),bit(M,N1), N<>N1.\n"
 	    #self.baseDlv += "gin(X, M) v gout(X, M) :- r(M),concept(X,_,N),not cin(X, M), not cout(X, M).\n"
@@ -217,7 +232,27 @@ class TaxonomyMapping:
 	    self.baseDlv += "vr(X) :- r(X), not ir(X).\n"
 	    self.baseDlv += ":- vr(X), ir(X).\n\n"
 
-        elif encode[self.options.encode] & encode["vr"]:
+        elif self.enc & encode["mn"]:
+            maxint = prod
+	    self.baseDlv = "#maxint=" + maxint.__str__() + ".\n\n"
+	    self.baseDlv += con
+	    self.baseDlv += "%%% regions\n"
+	    self.baseDlv += "r(M):- #int(M),M>=1,M<#maxint.\n\n"
+
+	    self.baseDlv += "%%% bit\n"
+            for i in range(len(couArray)):
+	        self.baseDlv += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n"
+
+	    self.baseDlv += "\n%%% Meaning of regions\n"
+	    self.baseDlv += "in(X, M) :- r(M),concept(X,T,N),N1=N+1,bit(M,T,N1).\n"
+	    self.baseDlv += "out(X, M) :- r(M),concept(X,T,N),N1=N+1,not bit(M,T,N1).\n"
+	    self.baseDlv += "ir(M) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n\n"
+
+	    self.baseDlv += "%%% Constraints of regions.\n"
+	    self.baseDlv += "vr(X) :- r(X), not ir(X).\n"
+	    self.baseDlv += ":- vr(X), ir(X).\n\n"
+
+        elif self.enc & encode["vr"]:
 	    self.baseDlv = "#maxint=" + int(2**num).__str__() + ".\n\n"
 	    self.baseDlv += con
 	    self.baseDlv += "\n%%% power\n"
@@ -245,7 +280,7 @@ class TaxonomyMapping:
 	    self.baseDlv += "vr(X) v ir(X):- r(X).\n"
 	    self.baseDlv += ":- vr(X), ir(X).\n\n"
 
-        elif encode[self.options.encode] & encode["direct"]:
+        elif self.enc & encode["direct"]:
             self.baseDlv += con
             self.baseDlv += "\n% GENERATE possible labels\n"
 	    self.baseDlv += "node(X) :- concept(X, _, _).\n"
@@ -330,7 +365,7 @@ class TaxonomyMapping:
             while len(queue) != 0:
                 t = queue.pop(0)
                 if t.hasChildren():
-                    if encode[self.options.encode] & encode["vr"] or encode[self.options.encode] & encode["dl"]:
+                    if self.enc & encode["vr"] or self.enc & encode["dl"] or self.enc & encode["mn"]:
 			# ISA
 			self.baseDlv += "%% ISA\n"
 			coverage = "ir(X) :- in(" + t.dlvName() + ", X)"
@@ -369,7 +404,7 @@ class TaxonomyMapping:
 				self.baseDlv += "ir(X) :- in(" + name1 + ", X), in(" + name2+ ", X).\n"
 				self.baseDlv += ":- #count{X: vr(X), in(" + name1 + ", X), out(" + name2+ ", X)} = 0.\n"
 				self.baseDlv += ":- #count{X: vr(X), out(" + name1 + ", X), in(" + name2+ ", X)} = 0.\n\n"
-                    elif encode[self.options.encode] & encode["direct"]:
+                    elif self.enc & encode["direct"]:
 			# ISA
 			# C
 			self.baseDlv += "\n%% ISA\n"
