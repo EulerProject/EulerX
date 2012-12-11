@@ -109,7 +109,7 @@ class Articulation:
     def toDlv(self, enc):
         name1 = self.taxon1.dlvName()
         name2 = self.taxon2.dlvName()
-        if encode[enc] & encode["vr"] or encode[enc] & encode["dl"]:
+        if encode[enc] & encode["vr"] or encode[enc] & encode["dl"] or encode[enc] & encode["mn"]:
 	    if self.relations == rcc5["equals"]:
 		result  = "ir(X) :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
 		result += "ir(X) :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
