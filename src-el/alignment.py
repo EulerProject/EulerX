@@ -155,7 +155,6 @@ class TaxonomyMapping:
 
     def genPW(self):
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-        print path
         com = "dlv -silent -filter=rel "+self.pwfile+" | "+path+"/muniq -u"
         self.pw = commands.getoutput(com)
         print self.pw
@@ -189,9 +188,9 @@ class TaxonomyMapping:
         proArray = []
         for key in self.taxonomies.keys():
             cou = 0
+            con += "tax(" + self.taxonomies[key].dlvName() + "," + n.__str__() + ").\n"
             for taxon in self.taxonomies[key].taxa.keys():
                 t = self.taxonomies[key].taxa[taxon]
-                con += "tax(" + self.taxonomies[key].dlvName() + "," + n.__str__() + ").\n"
                 if (self.enc & encode["dl"] or self.enc & encode["mn"]) and t.hasChildren():
                     con += "concept(" + t.dlvName() + "," + n.__str__() + ",i).\n"
                 else:
@@ -203,9 +202,9 @@ class TaxonomyMapping:
             couArray.append(cou+1)
             proArray.append(pro)
             pro *= (cou+1)
-            print pro
-            print proArray
             prod = prod*cou + prod + cou
+            if self.options.verbose:
+                print "count: ",cou,", product: ",prod
 
         if self.enc & encode["dl"]:
             maxint = int(self.options.dl)*num
@@ -237,7 +236,7 @@ class TaxonomyMapping:
 	    self.baseDlv = "#maxint=" + maxint.__str__() + ".\n\n"
 	    self.baseDlv += con
 	    self.baseDlv += "%%% regions\n"
-	    self.baseDlv += "r(M):- #int(M),M>=1,M<#maxint.\n\n"
+	    self.baseDlv += "r(M):- #int(M),M>=1,M<=#maxint.\n\n"
 
 	    self.baseDlv += "%%% bit\n"
             for i in range(len(couArray)):
@@ -363,8 +362,12 @@ class TaxonomyMapping:
         for key in self.taxonomies.keys():
             queue = copy.deepcopy(self.taxonomies[key].roots)
             while len(queue) != 0:
+                if self.options.verbose:
+                    print "PC: ",queue
                 t = queue.pop(0)
                 if t.hasChildren():
+                    if self.options.verbose:
+                        print "PC: ",t.dlvName()
                     if self.enc & encode["vr"] or self.enc & encode["dl"] or self.enc & encode["mn"]:
 			# ISA
 			self.baseDlv += "%% ISA\n"
@@ -372,6 +375,7 @@ class TaxonomyMapping:
 			coverin = ""
 			coverout = "out(" + t.dlvName() + ", X) :- "
 			for t1 in t.children:
+                            queue.append(t1)
 			    self.baseDlv += "% " + t1.dlvName() + " isa " + t.dlvName() + "\n"
 			    self.baseDlv += "in(" + t.dlvName() + ", X) :- in(" + t1.dlvName() + ", X).\n"
 			    self.baseDlv += "out(" + t1.dlvName() + ", X) :- out(" + t.dlvName() + ", X).\n"
