@@ -194,8 +194,11 @@ class TaxonomyMapping:
                 if (self.enc & encode["dl"] or self.enc & encode["mn"]) and t.hasChildren():
                     con += "concept(" + t.dlvName() + "," + n.__str__() + ",i).\n"
                 else:
+                    fl = cou
+                    if self.enc & encode["mn"]:
+                        fl = num + cou
                     self.map[t.dlvName()] = num
-                    con += "concept(" + t.dlvName() + "," + n.__str__() + "," + (num+cou).__str__()+").\n"
+                    con += "concept(" + t.dlvName() + "," + n.__str__() + "," + fl.__str__()+").\n"
                     cou += 1
             n += 1
             num += cou
