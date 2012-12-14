@@ -198,7 +198,7 @@ class Articulation:
             elif self.relations == relation["+="]:
                 name3 = self.taxon3.dlvName()
 		result  = ":- #count{X: vr(X), out(" + name1 + ",X), in(" + name3 + ",X)} = 0.\n" 
-		result += "ir(X) :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
+		result += "ir(X) :- in(" + name1 + ",X), out(" + name3 + ",X).\n" 
 		result += ":- #count{X: vr(X), in(" + name1 + ",X), in(" + name3 + ",X)} = 0.\n" 
 		result += ":- #count{X: vr(X), out(" + name2 + ",X), in(" + name3 + ",X)} = 0.\n" 
 		result += "ir(X) :- in(" + name2 + ",X), out(" + name3 + ",X).\n" 
@@ -206,7 +206,7 @@ class Articulation:
 		result += "in(" + name3 + ",X) :- in(" + name1 + ",X).\n" 
 		result += "in(" + name3 + ",X) :- in(" + name2 + ",X).\n" 
 		result += "out(" + name1 + ",X) :- out(" + name3 + ",X).\n" 
-		result += "out(" + name1 + ",X) :- out(" + name3 + ",X).\n" 
+		result += "out(" + name2 + ",X) :- out(" + name3 + ",X).\n" 
 		result += "in(" + name1 + ",X) v in(" + name2 + ",X) :- in(" + name3 + ",X).\n" 
 		result += "out(" +name3 + ",X) :- out(" + name1 + ",X), out(" + name2 + ",X).\n" 
             elif self.relations == relation["=+"]:
