@@ -195,7 +195,7 @@ class TaxonomyMapping:
                     con += "concept(" + t.dlvName() + "," + n.__str__() + ",i).\n"
                 else:
                     self.map[t.dlvName()] = num
-                    con += "concept(" + t.dlvName() + "," + n.__str__() + "," + cou.__str__()+").\n"
+                    con += "concept(" + t.dlvName() + "," + n.__str__() + "," + (num+cou).__str__()+").\n"
                     cou += 1
             n += 1
             num += cou
