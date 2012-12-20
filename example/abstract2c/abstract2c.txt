@@ -8,7 +8,7 @@ taxonomy 2 Taxonomy2
 (B CD E)
 (F GH)
 
-articulation abs abstract
+articulation abs abstract2c
 [1_A equals 2_A confidence=1]
 [1_B {equals includes} 2_B confidence=1]
 [1_C is_included_in 2_CD confidence=1]
