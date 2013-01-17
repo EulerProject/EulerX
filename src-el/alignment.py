@@ -12,6 +12,7 @@ class TaxonomyMapping:
         self.mir = {}                          # MIR
         self.tr = []                           # transitive reduction
         self.eq = []                           # euqlities
+        self.rules = []
         self.taxonomies = {}
         self.articulations = []
         self.map = {}
@@ -28,6 +29,8 @@ class TaxonomyMapping:
         if not os.path.exists(self.dlvdir):
             os.mkdir(self.dlvdir)
         self.pwfile = os.path.join(self.dlvdir, self.name+"_pw.dlv")
+        self.pwswitch = os.path.join(self.dlvdir, "pw.dlv")
+        self.ixswitch = os.path.join(self.dlvdir, "ix.dlv")
         self.mirfile = os.path.join(options.outputdir, self.name+"_mir.csv")
 
     def getTaxon(self, taxonomyName="", taxonName=""):
@@ -63,6 +66,8 @@ class TaxonomyMapping:
         self.genDlv()
         if not self.testConsistency():
             print "Input is inconsistent!!"
+            self.inconsistencyExplanation()
+            print self.rules
             return
         if self.enc & encode["pw"]:
             self.genPW()
@@ -141,26 +146,30 @@ class TaxonomyMapping:
 	    frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n") 
 	    frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
         frsnr.close()
-        com = "dlv -silent -filter=rel -n=1 "+rsnrfile+" "+self.pwfile
+        com = "dlv -silent -filter=rel -n=1 "+rsnrfile+" "+self.pwfile+" "+self.pwswitch
         if commands.getoutput(com) == "":
             return 0
         return rcc5[rel]
 ## NF ends
 
     def testConsistency(self):
-        com = "dlv -silent -filter=rel -n=1 "+self.pwfile
+        com = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+self.pwswitch
         if commands.getoutput(com) == "":
             return False
         return True
 
+    def inconsistencyExplanation(self):
+        com = "dlv -silent -filter=ie "+self.pwfile+" "+self.ixswitch
+        print commands.getoutput(com)
+
     def genPW(self):
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-        com = "dlv -silent -filter=rel "+self.pwfile+" | "+path+"/muniq -u"
+        com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
         self.pw = commands.getoutput(com)
         print self.pw
 
     def genVE(self):
-        com = "dlv -silent -filter=vr "+self.pwfile
+        com = "dlv -silent -filter=vr "+self.pwfile+" "+self.pwswitch
         self.ve = commands.getoutput(com)
         print self.ve
 
@@ -175,6 +184,12 @@ class TaxonomyMapping:
         fdlv = open(self.pwfile, 'w')
         fdlv.write(self.baseDlv)
         fdlv.close()
+        pdlv = open(self.pwswitch, 'w')
+        pdlv.write("pw.")
+        pdlv.close()
+        idlv = open(self.ixswitch, 'w')
+        idlv.write("ix.")
+        idlv.close()
 
     def genDlvConcept(self):
         con = "%%% Concepts\n"
@@ -243,16 +258,23 @@ class TaxonomyMapping:
 
 	    self.baseDlv += "%%% bit\n"
             for i in range(len(couArray)):
-	        self.baseDlv += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n"
+	        self.baseDlv += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n\n"
 
 	    self.baseDlv += "\n%%% Meaning of regions\n"
 	    self.baseDlv += "in(X, M) :- r(M),concept(X,T,N),N1=N+1,bit(M,T,N1).\n"
 	    self.baseDlv += "out(X, M) :- r(M),concept(X,T,N),N1=N+1,not bit(M,T,N1).\n"
-	    self.baseDlv += "ir(M) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n\n"
+	    self.baseDlv += "in(X, M) :- r(M),concept(X,_,_),not out(X, M).\n"
+	    self.baseDlv += "ir(M, fi) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n\n"
 
 	    self.baseDlv += "%%% Constraints of regions.\n"
-	    self.baseDlv += "vr(X) :- r(X), not ir(X).\n"
-	    self.baseDlv += ":- vr(X), ir(X).\n\n"
+	    self.baseDlv += "irs(X) :- ir(X, _).\n"
+	    self.baseDlv += "vr(X, X) :- r(X), not irs(X).\n"
+	    self.baseDlv += "ie(p(A,B)) :- vr(X, A), ir(X, B), ix.\n"
+	    self.baseDlv += ":- vr(X, _), ir(X, _), pw.\n\n"
+
+	    self.baseDlv += "%%% Inconsistency Explanation.\n"
+	    self.baseDlv += "ie(s(R, A, Y)) :- pie(R, A, Y), not cc(R, Y), ix.\n"
+	    self.baseDlv += "cc(R, Y) :- c(R, _, Y), ix.\n"
 
         elif self.enc & encode["vr"]:
 	    self.baseDlv = "#maxint=" + int(2**num).__str__() + ".\n\n"
@@ -374,18 +396,22 @@ class TaxonomyMapping:
                     if self.enc & encode["vr"] or self.enc & encode["dl"] or self.enc & encode["mn"]:
 			# ISA
 			self.baseDlv += "%% ISA\n"
-			coverage = "ir(X) :- in(" + t.dlvName() + ", X)"
+			coverage = ":- in(" + t.dlvName() + ", X)"
 			coverin = ""
 			coverout = "out(" + t.dlvName() + ", X) :- "
 			for t1 in t.children:
                             queue.append(t1)
 			    self.baseDlv += "% " + t1.dlvName() + " isa " + t.dlvName() + "\n"
-			    self.baseDlv += "in(" + t.dlvName() + ", X) :- in(" + t1.dlvName() + ", X).\n"
-			    self.baseDlv += "out(" + t1.dlvName() + ", X) :- out(" + t.dlvName() + ", X).\n"
-			    self.baseDlv += "in(" + t1.dlvName() + ", X) v out(" + t1.dlvName() + ", X) :- in(" + t.dlvName() + ", X).\n"
-			    self.baseDlv += "in(" + t.dlvName() + ", X) v out(" + t.dlvName() + ", X) :- out(" + t1.dlvName() + ", X).\n"
-			    self.baseDlv += "ir(X) :- in(" + t1.dlvName() + ", X), out(" + t.dlvName() + ", X).\n"
-			    self.baseDlv += ":- #count{X: vr(X), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0.\n\n"
+                            ruleNum = len(self.rules)
+			    self.rules.append("r" + ruleNum.__str__() + " : " + t1.dotName() + " isa " + t.dotName())
+			    #self.baseDlv += "in(" + t.dlvName() + ", X) :- in(" + t1.dlvName() + ", X).\n"
+			    #self.baseDlv += "out(" + t1.dlvName() + ", X) :- out(" + t.dlvName() + ", X).\n"
+			    #self.baseDlv += "in(" + t1.dlvName() + ", X) v out(" + t1.dlvName() + ", X) :- in(" + t.dlvName() + ", X).\n"
+			    #self.baseDlv += "in(" + t.dlvName() + ", X) v out(" + t.dlvName() + ", X) :- out(" + t1.dlvName() + ", X).\n"
+			    self.baseDlv += "ir(X, r" + ruleNum.__str__() +") :- in(" + t1.dlvName() + ", X), out(" + t.dlvName() + ", X).\n"
+			    self.baseDlv += ":- #count{X: vr(X, _), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0, pw.\n"
+			    self.baseDlv += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n"
+			    self.baseDlv += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n\n"
 			    coverage += ",out(" + t1.dlvName() + ", X)"
                             if coverin != "":
                                 coverin += " v "
@@ -394,23 +420,31 @@ class TaxonomyMapping:
                             coverout += "out(" + t1.dlvName() + ", X)"
 			# C
 			self.baseDlv += "%% coverage\n"
-			self.baseDlv += coverin + " :- in(" + t.dlvName() + ", X).\n"
-			self.baseDlv += coverout + ".\n"
-			self.baseDlv += coverage + ".\n\n"
+                        ruleNum = len(self.rules)
+		        self.rules.append("r" + ruleNum.__str__() + " : " + t.dotName() + " coverage")
+			#self.baseDlv += coverin + " :- in(" + t.dlvName() + ", X).\n"
+			#self.baseDlv += coverout + ".\n"
+			self.baseDlv += "ir(X, r" + ruleNum.__str__() + ") " +coverage + ".\n\n"
 			# D
 			self.baseDlv += "%% sibling disjointness\n"
 			for i in range(len(t.children) - 1):
 			    for j in range(i+1, len(t.children)):
 				name1 = t.children[i].dlvName()
 				name2 = t.children[j].dlvName()
+                                ruleNum = len(self.rules)
+		                self.rules.append("r" + ruleNum.__str__() + " : " + name1 + " ! " + name2)
 				self.baseDlv += "% " + name1 + " ! " + name2+ "\n"
-				self.baseDlv += "out(" + name1 + ", X) :- in(" + name2+ ", X).\n"
-				self.baseDlv += "out(" + name2 + ", X) :- in(" + name1+ ", X).\n"
-			        self.baseDlv += "in(" + name1 + ", X) v out(" + name1 + ", X) :- out(" + name2 + ", X).\n"
-			        self.baseDlv += "in(" + name2 + ", X) v out(" + name2 + ", X) :- out(" + name1 + ", X).\n"
-				self.baseDlv += "ir(X) :- in(" + name1 + ", X), in(" + name2+ ", X).\n"
-				self.baseDlv += ":- #count{X: vr(X), in(" + name1 + ", X), out(" + name2+ ", X)} = 0.\n"
-				self.baseDlv += ":- #count{X: vr(X), out(" + name1 + ", X), in(" + name2+ ", X)} = 0.\n\n"
+				#self.baseDlv += "out(" + name1 + ", X) :- in(" + name2+ ", X).\n"
+				#self.baseDlv += "out(" + name2 + ", X) :- in(" + name1+ ", X).\n"
+			        #self.baseDlv += "in(" + name1 + ", X) v out(" + name1 + ", X) :- out(" + name2 + ", X).\n"
+			        #self.baseDlv += "in(" + name2 + ", X) v out(" + name2 + ", X) :- out(" + name1 + ", X).\n"
+				self.baseDlv += "ir(X, r" + ruleNum.__str__() + ") :- in(" + name1 + ", X), in(" + name2+ ", X).\n"
+				self.baseDlv += ":- #count{X: vr(X, _), in(" + name1 + ", X), out(" + name2+ ", X)} = 0, pw.\n"
+				self.baseDlv += ":- #count{X: vr(X, _), out(" + name1 + ", X), in(" + name2+ ", X)} = 0, pw.\n"
+			        self.baseDlv += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
+			        self.baseDlv += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
+			        self.baseDlv += "pie(r" + ruleNum.__str__() + ", A, 2) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
+			        self.baseDlv += "c(r" + ruleNum.__str__() + ", A, 2) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                     elif self.enc & encode["direct"]:
 			# ISA
 			# C
@@ -456,31 +490,34 @@ class TaxonomyMapping:
         self.baseDlv += "\n%%% Articulations\n"
         for i in range(len(self.articulations)):
             self.baseDlv += "% " + self.articulations[i].string + "\n"
+            ruleNum = len(self.rules)
+            self.articulations[i].ruleNum = ruleNum
+            self.rules.append("r" + ruleNum.__str__() + " : " + self.articulations[i].string)
             self.baseDlv += self.articulations[i].toDlv(self.options.encode)+ "\n"
 
     def genDlvDc(self):
         self.baseDlv += "%%% Decoding now\n"
-        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \"<\"), concept(X, N1, _), concept(Y, N2, _).\n"
-        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \">\"), concept(X, N1, _), concept(Y, N2, _).\n"
-        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \"><\"), concept(X, N1, _), concept(Y, N2, _).\n"
-        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _).\n"
-        self.baseDlv += ":- rel(X, Y, \"<\"), rel(X, Y, \">\"), concept(X, N1, _), concept(Y, N2, _).\n"
-        self.baseDlv += ":- rel(X, Y, \"<\"), rel(X, Y, \"><\"), concept(X, N1, _), concept(Y, N2, _).\n"
-        self.baseDlv += ":- rel(X, Y, \"<\"), rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _).\n"
-        self.baseDlv += ":- rel(X, Y, \">\"), rel(X, Y, \"><\"), concept(X, N1, _), concept(Y, N2, _).\n"
-        self.baseDlv += ":- rel(X, Y, \">\"), rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _).\n"
-        self.baseDlv += ":- rel(X, Y, \"><\"), rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _).\n"
-        self.baseDlv += ":- not rel(X, Y, \"=\"), not rel(X, Y, \"<\"), not rel(X, Y, \">\"), not rel(X, Y, \"><\"), not rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _), N1 < N2.\n\n"
+        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \"<\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
+        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \">\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
+        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \"><\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
+        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
+        self.baseDlv += ":- rel(X, Y, \"<\"), rel(X, Y, \">\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
+        self.baseDlv += ":- rel(X, Y, \"<\"), rel(X, Y, \"><\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
+        self.baseDlv += ":- rel(X, Y, \"<\"), rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
+        self.baseDlv += ":- rel(X, Y, \">\"), rel(X, Y, \"><\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
+        self.baseDlv += ":- rel(X, Y, \">\"), rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
+        self.baseDlv += ":- rel(X, Y, \"><\"), rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
+        self.baseDlv += ":- not rel(X, Y, \"=\"), not rel(X, Y, \"<\"), not rel(X, Y, \">\"), not rel(X, Y, \"><\"), not rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _), N1 < N2, pw.\n\n"
 
-        self.baseDlv += "hint(X, Y, 0) :- concept(X, N1, _), concept(Y, N2, _), N1 < N2, vr(R), in(X, R), out(Y, R).\n"
-        self.baseDlv += "hint(X, Y, 1) :- concept(X, N1, _), concept(Y, N2, _), N1 < N2, vr(R), in(X, R), in(Y, R).\n"
-        self.baseDlv += "hint(X, Y, 2) :- concept(X, N1, _), concept(Y, N2, _), N1 < N2, vr(R), out(X, R), in(Y, R).\n\n"
+        self.baseDlv += "hint(X, Y, 0) :- concept(X, N1, _), concept(Y, N2, _), N1 < N2, vr(R, _), in(X, R), out(Y, R), pw.\n"
+        self.baseDlv += "hint(X, Y, 1) :- concept(X, N1, _), concept(Y, N2, _), N1 < N2, vr(R, _), in(X, R), in(Y, R), pw.\n"
+        self.baseDlv += "hint(X, Y, 2) :- concept(X, N1, _), concept(Y, N2, _), N1 < N2, vr(R, _), out(X, R), in(Y, R), pw.\n\n"
 
-        self.baseDlv += "rel(X, Y, \"=\") :- not hint(X, Y, 0), hint(X, Y, 1), not hint(X, Y, 2).\n"
-        self.baseDlv += "rel(X, Y, \"<\") :- not hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2).\n"
-        self.baseDlv += "rel(X, Y, \">\") :- hint(X, Y, 0), hint(X, Y, 1), not hint(X, Y, 2).\n"
-        self.baseDlv += "rel(X, Y, \"><\") :- hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2).\n"
-        self.baseDlv += "rel(X, Y, \"!\") :- hint(X, Y, 0), not hint(X, Y, 1), hint(X, Y, 2).\n"
+        self.baseDlv += "rel(X, Y, \"=\") :- not hint(X, Y, 0), hint(X, Y, 1), not hint(X, Y, 2), pw.\n"
+        self.baseDlv += "rel(X, Y, \"<\") :- not hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2), pw.\n"
+        self.baseDlv += "rel(X, Y, \">\") :- hint(X, Y, 0), hint(X, Y, 1), not hint(X, Y, 2), pw.\n"
+        self.baseDlv += "rel(X, Y, \"><\") :- hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2), pw.\n"
+        self.baseDlv += "rel(X, Y, \"!\") :- hint(X, Y, 0), not hint(X, Y, 1), hint(X, Y, 2), pw.\n"
 
     def readFile(self):
         file = open(os.path.join(self.options.inputdir, self.options.inputfile), 'r')
