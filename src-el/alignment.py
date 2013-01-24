@@ -12,7 +12,7 @@ class TaxonomyMapping:
         self.mir = {}                          # MIR
         self.tr = []                           # transitive reduction
         self.eq = []                           # euqlities
-        self.rules = []
+        self.rules = {}
         self.taxonomies = {}
         self.articulations = []
         self.map = {}
@@ -32,6 +32,8 @@ class TaxonomyMapping:
         self.pwswitch = os.path.join(self.dlvdir, "pw.dlv")
         self.ixswitch = os.path.join(self.dlvdir, "ix.dlv")
         self.mirfile = os.path.join(options.outputdir, self.name+"_mir.csv")
+        self.iefile = os.path.join(options.outputdir, self.name+"_ie.dot")
+        self.iepdf = os.path.join(options.outputdir, self.name+"_ie.pdf")
 
     def getTaxon(self, taxonomyName="", taxonName=""):
         taxonomy = self.taxonomies[taxonomyName]
@@ -67,7 +69,6 @@ class TaxonomyMapping:
         if not self.testConsistency():
             print "Input is inconsistent!!"
             self.inconsistencyExplanation()
-            print self.rules
             return
         if self.enc & encode["pw"]:
             self.genPW()
@@ -160,7 +161,43 @@ class TaxonomyMapping:
 
     def inconsistencyExplanation(self):
         com = "dlv -silent -filter=ie "+self.pwfile+" "+self.ixswitch
-        print commands.getoutput(com)
+        ie = commands.getoutput(com)
+        self.postProcessIE(ie);
+
+    def postProcessIE(self, ie):
+        if ie != "{}":
+            print "Please see "+self.name+"_ie.pdf for the inconsistency relations between all the rules."
+            ies = (re.match("\{(.*)\}", ie)).group(1).split(", ")
+            tmpmap = {}
+            for i in range(len(ies)):
+               item = re.match("ie\(s\((.*),(.*),(.*)\)\)", ies[i])
+               key = item.group(1)+","+item.group(3)
+               if key in tmpmap.keys():
+                   value = tmpmap[key]
+                   value.append(item.group(2))
+                   tmpmap[key] = value
+               else:
+                   tmpmap[key] = [item.group(1), item.group(2)]
+            fie = open(self.iefile, 'w')
+            fie.write("digraph "+self.name+"_ie {\n\nrankdir = LR\n\n")
+            #fie.write("subgraph rules {\n")
+            #for key in self.rules.keys():
+            #    fie.write(key+"\n")
+            #fie.write("}\n")
+            #fie.write("subgraph inconsistencies {\n")
+            #for key in tmpmap.keys():
+            #    fie.write("\""+key+"\"\n")
+            #fie.write("}\n")
+            for key in tmpmap.keys():
+                for value in tmpmap[key]:
+                    fie.write("\""+value+"\" -> \"inconsistency="+tmpmap[key].__str__()+"\" \n")
+            label=""
+            for key in self.rules.keys():
+                label += key+" : "+self.rules[key]+"\n"
+            fie.write("graph [label=\""+label+"\"]\n")
+            fie.write("}")
+            fie.close()
+            commands.getoutput("dot -Tpdf "+self.iefile+" -o "+self.iepdf)
 
     def genPW(self):
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -403,7 +440,7 @@ class TaxonomyMapping:
                             queue.append(t1)
 			    self.baseDlv += "% " + t1.dlvName() + " isa " + t.dlvName() + "\n"
                             ruleNum = len(self.rules)
-			    self.rules.append("r" + ruleNum.__str__() + " : " + t1.dotName() + " isa " + t.dotName())
+			    self.rules["r" + ruleNum.__str__()] = t1.dotName() + " isa " + t.dotName()
 			    #self.baseDlv += "in(" + t.dlvName() + ", X) :- in(" + t1.dlvName() + ", X).\n"
 			    #self.baseDlv += "out(" + t1.dlvName() + ", X) :- out(" + t.dlvName() + ", X).\n"
 			    #self.baseDlv += "in(" + t1.dlvName() + ", X) v out(" + t1.dlvName() + ", X) :- in(" + t.dlvName() + ", X).\n"
@@ -421,7 +458,7 @@ class TaxonomyMapping:
 			# C
 			self.baseDlv += "%% coverage\n"
                         ruleNum = len(self.rules)
-		        self.rules.append("r" + ruleNum.__str__() + " : " + t.dotName() + " coverage")
+		        self.rules["r" + ruleNum.__str__()] = t.dotName() + " coverage"
 			#self.baseDlv += coverin + " :- in(" + t.dlvName() + ", X).\n"
 			#self.baseDlv += coverout + ".\n"
 			self.baseDlv += "ir(X, r" + ruleNum.__str__() + ") " +coverage + ".\n\n"
@@ -432,7 +469,7 @@ class TaxonomyMapping:
 				name1 = t.children[i].dlvName()
 				name2 = t.children[j].dlvName()
                                 ruleNum = len(self.rules)
-		                self.rules.append("r" + ruleNum.__str__() + " : " + name1 + " ! " + name2)
+		                self.rules["r" + ruleNum.__str__()] = t.children[i].dotName() + " disjoint " + t.children[j].dotName()
 				self.baseDlv += "% " + name1 + " ! " + name2+ "\n"
 				#self.baseDlv += "out(" + name1 + ", X) :- in(" + name2+ ", X).\n"
 				#self.baseDlv += "out(" + name2 + ", X) :- in(" + name1+ ", X).\n"
@@ -492,7 +529,7 @@ class TaxonomyMapping:
             self.baseDlv += "% " + self.articulations[i].string + "\n"
             ruleNum = len(self.rules)
             self.articulations[i].ruleNum = ruleNum
-            self.rules.append("r" + ruleNum.__str__() + " : " + self.articulations[i].string)
+            self.rules["r" + ruleNum.__str__()] = self.articulations[i].string
             self.baseDlv += self.articulations[i].toDlv(self.options.encode)+ "\n"
 
     def genDlvDc(self):
