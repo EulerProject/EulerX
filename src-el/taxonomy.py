@@ -111,8 +111,8 @@ class Articulation:
         name2 = self.taxon2.dlvName()
         if encode[enc] & encode["vr"] or encode[enc] & encode["dl"] or encode[enc] & encode["mn"]:
 	    if self.relations == rcc5["equals"]:
-		result  = "ir(X, r" + self.ruleNum.__str__() + " :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
-		result += "ir(X, r" + self.ruleNum.__str__() + " :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
+		result  = "ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
+		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
 		result += ":- #count{X: vr(X, _), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
 	        result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
 	        result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
