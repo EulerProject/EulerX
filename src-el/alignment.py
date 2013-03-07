@@ -179,7 +179,7 @@ class TaxonomyMapping:
                else:
                    tmpmap[key] = [item.group(1), item.group(2)]
             fie = open(self.iefile, 'w')
-            fie.write("digraph "+self.name+"_ie {\n\nrankdir = LR\n\n")
+            fie.write("strict digraph "+self.name+"_ie {\n\nrankdir = LR\n\n")
             #fie.write("subgraph rules {\n")
             #for key in self.rules.keys():
             #    fie.write(key+"\n")
