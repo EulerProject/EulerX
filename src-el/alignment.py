@@ -10,6 +10,7 @@ class TaxonomyMapping:
 
     def __init__(self, options):
         self.mir = {}                          # MIR
+        self.obs = []                          # OBS
         self.tr = []                           # transitive reduction
         self.eq = []                           # euqlities
         self.rules = {}
@@ -72,8 +73,10 @@ class TaxonomyMapping:
             return
         if self.enc & encode["pw"]:
             self.genPW()
-        if self.enc & encode["ve"]:
+        elif self.enc & encode["ve"]:
             self.genVE()
+        elif self.enc & encode["ob"]:
+            self.genOB()
         else:
             self.genMir()
 
@@ -165,7 +168,7 @@ class TaxonomyMapping:
         self.postProcessIE(ie);
 
     def postProcessIE(self, ie):
-        if ie != "{}":
+        if ie != "{}" and ie != "":
             print "Please see "+self.name+"_ie.pdf for the inconsistency relations between all the rules."
             ies = (re.match("\{(.*)\}", ie)).group(1).split(", ")
             tmpmap = {}
@@ -205,6 +208,12 @@ class TaxonomyMapping:
         self.pw = commands.getoutput(com)
         print self.pw
 
+    def genOB(self):
+        path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+        com = "dlv -silent -filter=p "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
+        self.pw = commands.getoutput(com)
+        print self.pw
+
     def genVE(self):
         com = "dlv -silent -filter=vr "+self.pwfile+" "+self.pwswitch
         self.ve = commands.getoutput(com)
@@ -218,6 +227,8 @@ class TaxonomyMapping:
         self.genDlvAr()
         if self.enc & encode["vr"] or self.enc & encode["dl"] or self.enc & encode["pl"] or self.enc & encode["mn"]:
             self.genDlvDc()
+        if self.obs is not [] and self.enc & encode["ob"]:
+            self.genDlvObs()
         fdlv = open(self.pwfile, 'w')
         fdlv.write(self.baseDlv)
         fdlv.close()
@@ -305,7 +316,7 @@ class TaxonomyMapping:
 
 	    self.baseDlv += "%%% Constraints of regions.\n"
 	    self.baseDlv += "irs(X) :- ir(X, _).\n"
-	    self.baseDlv += "vr(X, X) :- r(X), not irs(X).\n"
+	    self.baseDlv += "vr(X, X) v ir(X, X) :- r(X).\n"
 	    self.baseDlv += "ie(p(A,B)) :- vr(X, A), ir(X, B), ix.\n"
 	    self.baseDlv += ":- vr(X, _), ir(X, _), pw.\n\n"
 
@@ -554,7 +565,28 @@ class TaxonomyMapping:
         self.baseDlv += "rel(X, Y, \"<\") :- not hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2), pw.\n"
         self.baseDlv += "rel(X, Y, \">\") :- hint(X, Y, 0), hint(X, Y, 1), not hint(X, Y, 2), pw.\n"
         self.baseDlv += "rel(X, Y, \"><\") :- hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2), pw.\n"
-        self.baseDlv += "rel(X, Y, \"!\") :- hint(X, Y, 0), not hint(X, Y, 1), hint(X, Y, 2), pw.\n"
+        self.baseDlv += "rel(X, Y, \"!\") :- hint(X, Y, 0), not hint(X, Y, 1), hint(X, Y, 2), pw.\n\n\n"
+
+    def genDlvObs(self):
+        self.baseDlv += "%% Observation Information\n\n"
+        self.baseDlv += "p(X) v n(X) :- r(X).\n"
+        self.baseDlv += ":- p(X), n(X).\n"
+        self.baseDlv += "n(X) :- ir(X, _).\n"
+        for i in range(len(self.obs)):
+            tmp = ""
+            for j in range(1, len(self.obs[i])):
+                if self.obs[i][j][1] == "Y":
+                  pre = "in"
+                else:
+                  pre = "out"
+                if tmp != "": tmp += ", "
+                cpt = self.obs[i][j][0]
+                tmp += pre + "(" + cpt + ", X)"
+            if self.obs[i][0] == "N":
+                self.baseDlv += ":- p(X)," + tmp + ".\n" 
+            else:
+                self.baseDlv += ":- #count{X: p(X), " + tmp + "} = 0.\n"
+            
 
     def readFile(self):
         file = open(os.path.join(self.options.inputdir, self.options.inputfile), 'r')
@@ -589,6 +621,14 @@ class TaxonomyMapping:
 		else:
 		    self.addAMir(inside, 0)
               
+            elif (re.match("\<.*\>", line)):
+                inside = re.match("\<(.*)\>", line).group(1)
+                obs = re.split(" ", inside)
+                if len(obs) != 2 or ( obs[1] !="P" and obs[1] != "N" ):
+                    print "Syntax error in observation portion"
+                    return False
+                self.addObs(obs[0], obs[1])
+                
            # elif (re.match("\<.*\>", line)):
             #    inside = re.match("\<(.*)\>", line).group(1)
              #   hypElements = re.split("\s*\?\s*", inside)
@@ -598,6 +638,23 @@ class TaxonomyMapping:
                # self.hypothesis = hypArticulation
                    
         return True              
+
+    def addObs(self, obs1, obs2):
+        items = obs1.split("*")
+        obs = []
+        obs.append(obs2)
+        for i in range(len(items)):
+            if items[i].find("-") == -1:
+                elems = re.match("(.*)\.(.*)", items[i])
+                obs.append(["c" + elems.group(1) + elems.group(2), "Y"])
+            else:
+                elems = re.match("-(.*)\.(.*)", items[i])
+                obs.append(["c" + elems.group(1) + elems.group(2), "N"])
+        self.obs.append(obs)
+
+    #class Observation:
+     #   def __init__(self, , flag):
+             
  
     def addTMir(self, tName, parent, child):
 	self.mir[tName + "." +parent +"," + tName + "." + child] = rcc5["includes"]
