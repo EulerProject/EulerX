@@ -23,7 +23,7 @@ class Taxon:
         return self.taxonomy.abbrev + "." + self.abbrev
 
     def dlvName(self):
-        return "c" + self.taxonomy.abbrev + self.abbrev
+        return "c" + self.taxonomy.abbrev + "_" + self.abbrev
     
 class Articulation:
     
