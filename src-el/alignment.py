@@ -210,9 +210,35 @@ class TaxonomyMapping:
 
     def genOB(self):
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-        com = "dlv -silent -filter=p "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
-        self.pw = commands.getoutput(com)
-        print self.pw
+        com = "dlv -silent -filter=pinout "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
+        raw = commands.getoutput(com).replace("{","").replace("}","").replace(" ","").replace("),",");")
+        pws = raw.split("\n")
+        for i in range(len(pws)):
+            outputstr = "Possible world "+i.__str__()+": {"
+            items = pws[i].split(";")
+            pmapping = {}
+            for j in range(len(items)):
+                inout = items[j].replace("pinout(","").replace(")","").split(",")
+                dotConcept = self.dlvName2dot(inout[0])
+                if inout[2] == "in":
+                    if pmapping.has_key(inout[1]):
+                        pmapping[inout[1]].append(dotConcept)
+                    else:
+                        pmapping[inout[1]]=[dotConcept]
+                #else:
+                 #   if pmapping.has_key(inout[1]):
+                  #      pmapping[inout[1]].append("-"+dotConcept)
+                  #  else:
+                   #     pmapping[inout[1]]=["-"+dotConcept]
+            keys = pmapping.keys()
+            for j in range(len(keys)):
+                if j != 0: outputstr += ", "
+                values = pmapping[keys[j]]
+                for k in range(len(values)):
+                    if k != 0: outputstr += "*"
+                    outputstr += values[k]
+            print outputstr + "}"
+            
 
     def genVE(self):
         com = "dlv -silent -filter=vr "+self.pwfile+" "+self.pwswitch
@@ -306,9 +332,9 @@ class TaxonomyMapping:
 
 	    self.baseDlv += "%%% bit\n"
             for i in range(len(couArray)):
-	        self.baseDlv += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n\n"
+	        self.baseDlv += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n"
 
-	    self.baseDlv += "\n%%% Meaning of regions\n"
+	    self.baseDlv += "\n\n%%% Meaning of regions\n"
 	    self.baseDlv += "in(X, M) :- r(M),concept(X,T,N),N1=N+1,bit(M,T,N1).\n"
 	    self.baseDlv += "out(X, M) :- r(M),concept(X,T,N),N1=N+1,not bit(M,T,N1).\n"
 	    self.baseDlv += "in(X, M) :- r(M),concept(X,_,_),not out(X, M).\n"
@@ -317,7 +343,7 @@ class TaxonomyMapping:
 	    self.baseDlv += "%%% Constraints of regions.\n"
 	    self.baseDlv += "irs(X) :- ir(X, _).\n"
 	    self.baseDlv += "vr(X, X) v ir(X, X) :- r(X).\n"
-	    self.baseDlv += "ie(p(A,B)) :- vr(X, A), ir(X, B), ix.\n"
+	    self.baseDlv += "ie(prod(A,B)) :- vr(X, A), ir(X, B), ix.\n"
 	    self.baseDlv += ":- vr(X, _), ir(X, _), pw.\n\n"
 
 	    self.baseDlv += "%%% Inconsistency Explanation.\n"
@@ -569,9 +595,9 @@ class TaxonomyMapping:
 
     def genDlvObs(self):
         self.baseDlv += "%% Observation Information\n\n"
-        self.baseDlv += "p(X) v n(X) :- r(X).\n"
-        self.baseDlv += ":- p(X), n(X).\n"
-        self.baseDlv += "n(X) :- ir(X, _).\n"
+        self.baseDlv += "present(X) v absent(X) :- r(X).\n"
+        self.baseDlv += ":- present(X), absent(X).\n"
+        self.baseDlv += "absent(X) :- ir(X, _).\n"
         for i in range(len(self.obs)):
             tmp = ""
             for j in range(1, len(self.obs[i])):
@@ -583,9 +609,11 @@ class TaxonomyMapping:
                 cpt = self.obs[i][j][0]
                 tmp += pre + "(" + cpt + ", X)"
             if self.obs[i][0] == "N":
-                self.baseDlv += ":- p(X)," + tmp + ".\n" 
+                self.baseDlv += ":- present(X)," + tmp + ".\n" 
             else:
-                self.baseDlv += ":- #count{X: p(X), " + tmp + "} = 0.\n"
+                self.baseDlv += ":- #count{X: present(X), " + tmp + "} = 0.\n"
+        self.baseDlv += "pinout(C, X, in) :- present(X), concept(C, _, N), #int(N), in(C, X).\n"
+        self.baseDlv += "pinout(C, X, out) :- present(X), concept(C, _, N), #int(N), out(C, X).\n"
             
 
     def readFile(self):
@@ -645,17 +673,22 @@ class TaxonomyMapping:
         obs.append(obs2)
         for i in range(len(items)):
             if items[i].find("-") == -1:
-                elems = re.match("(.*)\.(.*)", items[i])
-                obs.append(["c" + elems.group(1) + elems.group(2), "Y"])
+                obs.append([self.dotName2dlv(items[i]), "Y"])
             else:
-                elems = re.match("-(.*)\.(.*)", items[i])
-                obs.append(["c" + elems.group(1) + elems.group(2), "N"])
+                obs.append([self.dotName2dlv(items[i]), "N"])
         self.obs.append(obs)
 
     #class Observation:
      #   def __init__(self, , flag):
-             
- 
+
+    def dotName2dlv(self, dotName):
+        elems = re.match("(.*)\.(.*)", dotName)
+        return "c" + elems.group(1) + "_" + elems.group(2)
+                     
+    def dlvName2dot(self, dlvName):
+        elems = re.match("c(.*)_(.*)", dlvName)
+        return elems.group(1) + "." + elems.group(2)
+                     
     def addTMir(self, tName, parent, child):
 	self.mir[tName + "." +parent +"," + tName + "." + child] = rcc5["includes"]
 	self.tr.append([tName + "." + child, tName + "." + parent, 0])
