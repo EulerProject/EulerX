@@ -368,15 +368,29 @@ class TaxonomyMapping:
 	    self.baseDlv += "bit(M, N, 1):-r(M),count(N),not bit(M,N,0).\n\n"
 
 	    self.baseDlv += "%%% Meaning of regions\n"
-	    self.baseDlv += "in(X, M) v out(X, M) :- r(M),concept(X,_,N),count(N).\n"
-	    self.baseDlv += "in(X, M) :- r(M),concept(X,_,N),bit(M,N,1).\n"
-	    self.baseDlv += "out(X, M) :- r(M),concept(X,_,N),bit(M,N,0).\n\n"
-	    self.baseDlv += "ir(M) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n"
+	    self.baseDlv += "in(X, M) :- r(M),concept(X,T,N),N1=N+1,bit(M,T,N1).\n"
+	    self.baseDlv += "out(X, M) :- r(M),concept(X,T,N),N1=N+1,not bit(M,T,N1).\n"
+	    self.baseDlv += "in(X, M) :- r(M),concept(X,_,_),not out(X, M).\n"
+	    self.baseDlv += "ir(M, fi) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n\n"
 
 	    self.baseDlv += "%%% Constraints of regions.\n"
-	    self.baseDlv += "ir(0).\n"
-	    self.baseDlv += "vr(X) v ir(X):- r(X).\n"
-	    self.baseDlv += ":- vr(X), ir(X).\n\n"
+	    self.baseDlv += "irs(X) :- ir(X, _).\n"
+	    self.baseDlv += "vr(X, X) v ir(X, X) :- r(X).\n"
+	    self.baseDlv += "ie(prod(A,B)) :- vr(X, A), ir(X, B), ix.\n"
+	    self.baseDlv += ":- vr(X, _), ir(X, _), pw.\n\n"
+
+	    self.baseDlv += "%%% Inconsistency Explanation.\n"
+	    self.baseDlv += "ie(s(R, A, Y)) :- pie(R, A, Y), not cc(R, Y), ix.\n"
+	    self.baseDlv += "cc(R, Y) :- c(R, _, Y), ix.\n"
+#	    self.baseDlv += "in(X, M) v out(X, M) :- r(M),concept(X,_,N),count(N).\n"
+#	    self.baseDlv += "in(X, M) :- r(M),concept(X,_,N),bit(M,N,1).\n"
+#	    self.baseDlv += "out(X, M) :- r(M),concept(X,_,N),bit(M,N,0).\n\n"
+#	    self.baseDlv += "ir(M) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n"
+#
+#	    self.baseDlv += "%%% Constraints of regions.\n"
+#	    self.baseDlv += "ir(0).\n"
+#	    self.baseDlv += "vr(X) v ir(X):- r(X).\n"
+#	    self.baseDlv += ":- vr(X), ir(X).\n\n"
 
         elif self.enc & encode["direct"]:
             self.baseDlv += con
