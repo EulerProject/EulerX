@@ -168,8 +168,9 @@ class TaxonomyMapping:
         self.postProcessIE(ie);
 
     def postProcessIE(self, ie):
-        if ie != "{}" and ie != "":
-            print "Please see "+self.name+"_ie.pdf for the inconsistency relations between all the rules."
+        print "Please see "+self.name+"_ie.pdf for the inconsistency relations between all the rules."
+        print ie
+        if ie.find("{}") == -1 and ie != "":
             ies = (re.match("\{(.*)\}", ie)).group(1).split(", ")
             tmpmap = {}
             for i in range(len(ies)):
@@ -342,7 +343,9 @@ class TaxonomyMapping:
 
 	    self.baseDlv += "%%% Constraints of regions.\n"
 	    self.baseDlv += "irs(X) :- ir(X, _).\n"
-	    self.baseDlv += "vr(X, X) v ir(X, X) :- r(X).\n"
+	    self.baseDlv += "vrs(X) :- vr(X, _).\n"
+	    self.baseDlv += "vr(X, X) :- not irs(X), r(X).\n"
+	    self.baseDlv += "ir(X, X) :- not vrs(X), r(X).\n"
 	    self.baseDlv += "ie(prod(A,B)) :- vr(X, A), ir(X, B), ix.\n"
 	    self.baseDlv += ":- vr(X, _), ir(X, _), pw.\n\n"
 
@@ -375,7 +378,9 @@ class TaxonomyMapping:
 
 	    self.baseDlv += "%%% Constraints of regions.\n"
 	    self.baseDlv += "irs(X) :- ir(X, _).\n"
-	    self.baseDlv += "vr(X, X) v ir(X, X) :- r(X).\n"
+	    self.baseDlv += "vrs(X) :- vr(X, _).\n"
+	    self.baseDlv += "vr(X, X) :- not irs(X), r(X).\n"
+	    self.baseDlv += "ir(X, X) :- not vrs(X), r(X).\n"
 	    self.baseDlv += "ie(prod(A,B)) :- vr(X, A), ir(X, B), ix.\n"
 	    self.baseDlv += ":- vr(X, _), ir(X, _), pw.\n\n"
 
