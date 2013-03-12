@@ -191,7 +191,7 @@ class Articulation:
 		#result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
 		#result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
 	    elif self.relations == (rcc5["is_included_in"] | rcc5["includes"]):
-		result  = "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X), vr(Y), in(" + name2 + ",Y), out(" + name1 + ",Y).\n"
+		result  = "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X), vr(Y, _), in(" + name2 + ",Y), out(" + name1 + ",Y).\n"
 		result += "ir(Y, r" + self.ruleNum.__str__() + ") :- #count{X: vr(X, _), in(" + name1 + ",X), out(" + name2 + ",X)} > 0, in(" + name2 + ",Y), out(" + name1 + ",Y).\n"
 		#result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
 		#result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
@@ -204,8 +204,8 @@ class Articulation:
 		#result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
 		#result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
 	    elif self.relations == (rcc5["equals"] | rcc5["overlaps"]):
-		result  = ":- #count{X: vr(X, _), in(" + name1 + ",X), out(" + name2 + ",X)} > 0, #count{Y: vr(Y), in(" + name2 + ",Y), out(" + name1 + ",Y)} = 0.\n"
-		result += ":- #count{X: vr(X, _), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, #count{Y: vr(Y), in(" + name2 + ",Y), out(" + name1 + ",Y)} > 0.\n"
+		result  = ":- #count{X: vr(X, _), in(" + name1 + ",X), out(" + name2 + ",X)} > 0, #count{Y: vr(Y, _), in(" + name2 + ",Y), out(" + name1 + ",Y)} = 0.\n"
+		result += ":- #count{X: vr(X, _), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, #count{Y: vr(Y, _), in(" + name2 + ",Y), out(" + name1 + ",Y)} > 0.\n"
 		result += ":- #count{X: vr(X, _), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n"
 		#result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
 		#result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
