@@ -371,10 +371,11 @@ class TaxonomyMapping:
 	    self.baseDlv += "bit(M, N, 1):-r(M),count(N),not bit(M,N,0).\n\n"
 
 	    self.baseDlv += "%%% Meaning of regions\n"
-	    self.baseDlv += "in(X, M) :- r(M),concept(X,T,N),N1=N+1,bit(M,T,N1).\n"
-	    self.baseDlv += "out(X, M) :- r(M),concept(X,T,N),N1=N+1,not bit(M,T,N1).\n"
-	    self.baseDlv += "in(X, M) :- r(M),concept(X,_,_),not out(X, M).\n"
-	    self.baseDlv += "ir(M, fi) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n\n"
+            self.baseDlv += "in(X, M) :- not out(X, M), r(M),concept(X,_,N),count(N).\n"
+            self.baseDlv += "out(X, M) :- not in(X, M), r(M),concept(X,_,N),count(N).\n"
+	    self.baseDlv += "in(X, M) :- r(M),concept(X,_,N),bit(M,N,1).\n"
+	    self.baseDlv += "out(X, M) :- r(M),concept(X,_,N),bit(M,N,0).\n\n"
+	    self.baseDlv += "ir(M, fi) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n"
 
 	    self.baseDlv += "%%% Constraints of regions.\n"
 	    self.baseDlv += "irs(X) :- ir(X, _).\n"
