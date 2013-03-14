@@ -11,6 +11,9 @@ class TaxonomyMapping:
     def __init__(self, options):
         self.mir = {}                          # MIR
         self.obs = []                          # OBS
+        self.obslen = 0                        # OBS time / location?
+        self.location = []                     # location set
+        self.temporal = []                     # temporal set
         self.tr = []                           # transitive reduction
         self.eq = []                           # euqlities
         self.rules = {}
@@ -221,11 +224,15 @@ class TaxonomyMapping:
             for j in range(len(items)):
                 inout = items[j].replace("pinout(","").replace(")","").split(",")
                 dotConcept = self.dlvName2dot(inout[0])
-                if inout[2] == "in":
-                    if pmapping.has_key(inout[1]):
-                        pmapping[inout[1]].append(dotConcept)
+                key = ""
+                for k in range(2,self.obslen+1):
+                    if key != "": key += "@"
+                    key += inout[k]
+                if inout[1] == "in":
+                    if pmapping.has_key(key):
+                        pmapping[key].append("*"+dotConcept)
                     else:
-                        pmapping[inout[1]]=[dotConcept]
+                        pmapping[key]=[dotConcept]
                 #else:
                  #   if pmapping.has_key(inout[1]):
                   #      pmapping[inout[1]].append("-"+dotConcept)
@@ -236,8 +243,10 @@ class TaxonomyMapping:
                 if j != 0: outputstr += ", "
                 values = pmapping[keys[j]]
                 for k in range(len(values)):
-                    if k != 0: outputstr += "*"
                     outputstr += values[k]
+                s = keys[j].find("@")
+                if s != -1:
+                    outputstr += keys[j][s:]
             print outputstr + "}"
             
 
@@ -615,25 +624,49 @@ class TaxonomyMapping:
 
     def genDlvObs(self):
         self.baseDlv += "%% Observation Information\n\n"
-        self.baseDlv += "present(X) v absent(X) :- r(X).\n"
-        self.baseDlv += ":- present(X), absent(X).\n"
-        self.baseDlv += "absent(X) :- irs(X).\n"
+        if self.temporal is []:
+            self.baseDlv += "present(X) v absent(X) :- r(X).\n"
+            self.baseDlv += ":- present(X), absent(X).\n"
+            self.baseDlv += "absent(X) :- irs(X).\n"
+        else:
+            for i in range(len(self.temporal)):
+                pair = self.temporal[i]
+                pairstr = ""
+                for j in range(len(pair)):
+                    pairstr += ", " + pair[j]
+                self.baseDlv += "present(X" + pairstr + ") v absent(X" + pairstr + ") :- r(X).\n"
+                self.baseDlv += ":- present(X" + pairstr + "), absent(X" + pairstr + ").\n"
+                self.baseDlv += "absent(X" + pairstr + ") :- irs(X).\n"
+                
+        if self.obslen == 2:
+            appendd = ""
+        elif self.obslen == 3:
+            appendd = ", Y"
+        elif self.obslen == 4:
+            appendd = ", Y, Z"
+        else:
+            print "Syntax error in observation portion of input file!!"
         for i in range(len(self.obs)):
             tmp = ""
-            for j in range(1, len(self.obs[i])):
-                if self.obs[i][j][1] == "Y":
+            for j in range(len(self.obs[i][0])):
+                if self.obs[i][0][j][1] == "Y":
                   pre = "in"
                 else:
                   pre = "out"
                 if tmp != "": tmp += ", "
-                cpt = self.obs[i][j][0]
+                cpt = self.obs[i][0][j][0]
                 tmp += pre + "(" + cpt + ", X)"
-            if self.obs[i][0] == "N":
-                self.baseDlv += ":- present(X)," + tmp + ".\n" 
+            pair = ""
+	    if self.obslen > 2:
+                pair += ", " + self.obs[i][2]
+	        if self.obslen > 3:
+                    pair += ", " + self.obs[i][3]
+            if self.obs[i][1] == "N":
+                self.baseDlv += ":- present(X" + pair + ")," + tmp + ".\n" 
             else:
-                self.baseDlv += ":- #count{X: present(X), " + tmp + "} = 0.\n"
-        self.baseDlv += "pinout(C, X, in) :- present(X), concept(C, _, N), #int(N), in(C, X).\n"
-        self.baseDlv += "pinout(C, X, out) :- present(X), concept(C, _, N), #int(N), out(C, X).\n"
+                self.baseDlv += ":- #count{X: present(X" + pair + "), " + tmp + "} = 0.\n"
+	self.baseDlv += "pinout(C, in, X" + appendd + ") :- present(X" + appendd + "), concept(C, _, N), #int(N), in(C, X).\n"
+	self.baseDlv += "pinout(C, out, X" + appendd + ") :- present(X" + appendd + "), concept(C, _, N), #int(N), out(C, X).\n"
             
 
     def readFile(self):
@@ -672,10 +705,15 @@ class TaxonomyMapping:
             elif (re.match("\<.*\>", line)):
                 inside = re.match("\<(.*)\>", line).group(1)
                 obs = re.split(" ", inside)
-                if len(obs) != 2 or ( obs[1] !="P" and obs[1] != "N" ):
+                if self.obslen == 0:
+                    self.obslen = len(obs)
+                elif self.obslen != len(obs):
+                    print "Syntax error location / time information missing in observation protion"
+                    return False
+                if len(obs) < 2 or ( obs[1] !="P" and obs[1] != "N" ):
                     print "Syntax error in observation portion"
                     return False
-                self.addObs(obs[0], obs[1])
+                self.addObs(obs)
                 
            # elif (re.match("\<.*\>", line)):
             #    inside = re.match("\<(.*)\>", line).group(1)
@@ -687,15 +725,25 @@ class TaxonomyMapping:
                    
         return True              
 
-    def addObs(self, obs1, obs2):
-        items = obs1.split("*")
+    def addObs(self, obsin):
+        items = obsin[0].split("*")
         obs = []
-        obs.append(obs2)
+        obsconcept = []
         for i in range(len(items)):
             if items[i].find("-") == -1:
-                obs.append([self.dotName2dlv(items[i]), "Y"])
+                obsconcept.append([self.dotName2dlv(items[i]), "Y"])
             else:
-                obs.append([self.dotName2dlv(items[i]), "N"])
+                obsconcept.append([self.dotName2dlv(items[i]), "N"])
+        obs.append(obsconcept)
+        for i in range(1,self.obslen):
+            obs.append(obsin[i])
+        tem = []
+        if self.obslen > 2:
+            tem.append(obsin[2])
+        if self.obslen > 3:
+            tem.append(obsin[3])
+        if tem != []:
+            self.temporal.append(tem)
         self.obs.append(obs)
 
     #class Observation:
