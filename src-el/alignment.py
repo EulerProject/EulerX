@@ -347,7 +347,7 @@ class TaxonomyMapping:
 	    self.baseDlv += "vr(X, X) :- not irs(X), r(X).\n"
 	    self.baseDlv += "ir(X, X) :- not vrs(X), r(X).\n"
 	    self.baseDlv += "ie(prod(A,B)) :- vr(X, A), ir(X, B), ix.\n"
-	    self.baseDlv += ":- vr(X, _), ir(X, _), pw.\n\n"
+	    self.baseDlv += ":- vrs(X), irs(X), pw.\n\n"
 
 	    self.baseDlv += "%%% Inconsistency Explanation.\n"
 	    self.baseDlv += "ie(s(R, A, Y)) :- pie(R, A, Y), not cc(R, Y), ix.\n"
@@ -383,7 +383,7 @@ class TaxonomyMapping:
 	    self.baseDlv += "vr(X, X) :- not irs(X), r(X).\n"
 	    self.baseDlv += "ir(X, X) :- not vrs(X), r(X).\n"
 	    self.baseDlv += "ie(prod(A,B)) :- vr(X, A), ir(X, B), ix.\n"
-	    self.baseDlv += ":- vr(X, _), ir(X, _), pw.\n\n"
+	    self.baseDlv += ":- vrs(X), irs(X), pw.\n\n"
 
 	    self.baseDlv += "%%% Inconsistency Explanation.\n"
 	    self.baseDlv += "ie(s(R, A, Y)) :- pie(R, A, Y), not cc(R, Y), ix.\n"
@@ -503,7 +503,7 @@ class TaxonomyMapping:
 			    #self.baseDlv += "in(" + t1.dlvName() + ", X) v out(" + t1.dlvName() + ", X) :- in(" + t.dlvName() + ", X).\n"
 			    #self.baseDlv += "in(" + t.dlvName() + ", X) v out(" + t.dlvName() + ", X) :- out(" + t1.dlvName() + ", X).\n"
 			    self.baseDlv += "ir(X, r" + ruleNum.__str__() +") :- in(" + t1.dlvName() + ", X), out(" + t.dlvName() + ", X).\n"
-			    self.baseDlv += ":- #count{X: vr(X, _), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0, pw.\n"
+			    self.baseDlv += ":- #count{X: vrs(X), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0, pw.\n"
 			    self.baseDlv += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n"
 			    self.baseDlv += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n\n"
 			    coverage += ",out(" + t1.dlvName() + ", X)"
@@ -533,8 +533,8 @@ class TaxonomyMapping:
 			        #self.baseDlv += "in(" + name1 + ", X) v out(" + name1 + ", X) :- out(" + name2 + ", X).\n"
 			        #self.baseDlv += "in(" + name2 + ", X) v out(" + name2 + ", X) :- out(" + name1 + ", X).\n"
 				self.baseDlv += "ir(X, r" + ruleNum.__str__() + ") :- in(" + name1 + ", X), in(" + name2+ ", X).\n"
-				self.baseDlv += ":- #count{X: vr(X, _), in(" + name1 + ", X), out(" + name2+ ", X)} = 0, pw.\n"
-				self.baseDlv += ":- #count{X: vr(X, _), out(" + name1 + ", X), in(" + name2+ ", X)} = 0, pw.\n"
+				self.baseDlv += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2+ ", X)} = 0, pw.\n"
+				self.baseDlv += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2+ ", X)} = 0, pw.\n"
 			        self.baseDlv += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
 			        self.baseDlv += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
 			        self.baseDlv += "pie(r" + ruleNum.__str__() + ", A, 2) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
@@ -617,7 +617,7 @@ class TaxonomyMapping:
         self.baseDlv += "%% Observation Information\n\n"
         self.baseDlv += "present(X) v absent(X) :- r(X).\n"
         self.baseDlv += ":- present(X), absent(X).\n"
-        self.baseDlv += "absent(X) :- ir(X, _).\n"
+        self.baseDlv += "absent(X) :- irs(X).\n"
         for i in range(len(self.obs)):
             tmp = ""
             for j in range(1, len(self.obs[i])):
