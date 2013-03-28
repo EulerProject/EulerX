@@ -40,6 +40,8 @@ class TaxonomyMapping:
         self.iepdf = os.path.join(options.outputdir, self.name+"_ie.pdf")
 
     def getTaxon(self, taxonomyName="", taxonName=""):
+        if(self.options.verbose):
+            print self.taxonomies, taxonomyName, taxonName
         taxonomy = self.taxonomies[taxonomyName]
         taxon = taxonomy.getTaxon(taxonName)
         return taxon

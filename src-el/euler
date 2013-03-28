@@ -1,17 +1,29 @@
 #!/usr/bin/env python
 from parser import *
 from runner import *
+from generator import *
 
 def main():
 
     elParser = EulerParser.instance()
     ctiParser = CtiParser.instance()
     (options, args) = elParser.parse_args()
+    if options.verbose:
+      print options
     if options.inputfile is None:
-        print "input file cannot be None"
+      if options.generateCti is False:
+        print "Invalid input: -i/-g must be specified, please run euler -h for more information"
         return None
-    elRunner = EulerRunner.instance()
-    elRunner.run(options)
+      else:
+        generator = CtiGenerator.instance()
+        generator.run(options)
+    else:
+      if options.generateCti is False:
+        elRunner = EulerRunner.instance()
+        elRunner.run(options)
+      else:
+        print "Invalid input: -i/-g cannot be both specified, please run euler -h for more information"
+        return None
 
 if __name__ == '__main__':
     main()
