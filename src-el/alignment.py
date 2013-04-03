@@ -528,8 +528,8 @@ class TaxonomyMapping:
                         ruleNum = len(self.rules)
 		        self.rules["r" + ruleNum.__str__()] = t.dotName() + " coverage"
 			#self.baseDlv += coverin + " :- in(" + t.dlvName() + ", X).\n"
-			#self.baseDlv += coverout + ".\n"
-			self.baseDlv += "ir(X, r" + ruleNum.__str__() + ") " +coverage + ".\n\n"
+			self.baseDlv += coverout + ".\n"
+			#self.baseDlv += "ir(X, r" + ruleNum.__str__() + ") " +coverage + ".\n\n"
 			# D
 			self.baseDlv += "%% sibling disjointness\n"
 			for i in range(len(t.children) - 1):
