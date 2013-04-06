@@ -212,7 +212,8 @@ class TaxonomyMapping:
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
         self.pw = commands.getoutput(com)
-        print self.pw
+        if self.options.output:
+            print self.pw
 
     def genOB(self):
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
