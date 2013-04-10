@@ -11,6 +11,7 @@ relation["="] = 1 << 0
 relation[">"] = 1 << 1
 relation["<"] = 1 << 2
 relation["!"] = 1 << 3
+relation["<>"] = 1 << 3
 relation["><"] = 1 << 4
 relation["{=, >}"] = 1 << 0 | 1 << 1
 relation["{=, <}"] = 1 << 0 | 1 << 2
@@ -40,6 +41,13 @@ relation["{>, <, !, ><}"] = 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4
 relation["{=, >, <, !, ><}"] = 1 << 0 | 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4
 relation["+="] = 1 << 5
 relation["=+"] = (1 << 5) + 1
+
+relstr={}
+relstr[0] = "equals"
+relstr[1] = "includes"
+relstr[2] = "is_included_in"
+relstr[3] = "disjoint"
+relstr[4] = "overlaps"
 
 encode = {}
 encode["dr"] = 1
