@@ -21,7 +21,7 @@ class CtiGenerator:
 
         # Create a complete n-nary tree
 	if options.nary != 0:
-	    self.ofile = os.path.join(options.outputdir, options.projectname+"_"+options.nary.__str__()+"_"+options.depth.__str__()+".txt")
+	    self.ofile = os.path.join(options.outputdir, options.projectname+"_n"+options.nary.__str__()+"_"+options.depth.__str__()+".txt")
 	    fcti = open(self.ofile, 'w')
 	    for i in range(1,3):
 		fcti.write("taxonomy "+i.__str__()+" T"+i.__str__()+"\n")
