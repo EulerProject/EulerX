@@ -1,2 +1,2 @@
-euler -g -n $1 -d $2
-time for (( i=0; i<10; i++ )); do euler -i foo_$1_$2.txt -e mnpw -N; done;
+euler -g -$1 $2 -d $3 $4
+time for (( i=0; i<$4; i++ )); do euler -i foo_$1$2_$3.txt -e mnpw -N; done;
