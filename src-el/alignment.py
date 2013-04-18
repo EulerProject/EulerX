@@ -627,11 +627,11 @@ class TaxonomyMapping:
 
     def genDlvObs(self):
         self.baseDlv += "%% Observation Information\n\n"
-        self.baseDlv += "present(X) v absent(X) :- r(X).\n"
-        self.baseDlv += ":- present(X), absent(X).\n"
-        self.baseDlv += "absent(X) :- irs(X).\n"
-
-        if self.temporal is not []:
+        if self.temporal is []:
+            self.baseDlv += "present(X) v absent(X) :- r(X).\n"
+            self.baseDlv += ":- present(X), absent(X).\n"
+            self.baseDlv += "absent(X) :- irs(X).\n"
+        else:
             for i in range(len(self.temporal)):
                 pair = self.temporal[i]
                 pairstr = ""
@@ -745,7 +745,7 @@ class TaxonomyMapping:
             tem.append(obsin[2])
         if self.obslen > 3:
             tem.append(obsin[3])
-        if tem != []:
+        if tem is not []:
             self.temporal.append(tem)
         self.obs.append(obs)
 
