@@ -14,6 +14,8 @@ class TaxonomyMapping:
         self.obslen = 0                        # OBS time / location?
         self.location = []                     # location set
         self.temporal = []                     # temporal set
+        self.exploc = False
+        self.exptmp = False
         self.tr = []                           # transitive reduction
         self.eq = []                           # euqlities
         self.rules = {}
@@ -266,7 +268,7 @@ class TaxonomyMapping:
         self.genDlvAr()
         if self.enc & encode["vr"] or self.enc & encode["dl"] or self.enc & encode["pl"] or self.enc & encode["mn"]:
             self.genDlvDc()
-        if self.obs is not [] and self.enc & encode["ob"]:
+        if self.obs != [] and self.enc & encode["ob"]:
             self.genDlvObs()
         fdlv = open(self.pwfile, 'w')
         fdlv.write(self.baseDlv)
@@ -627,19 +629,45 @@ class TaxonomyMapping:
 
     def genDlvObs(self):
         self.baseDlv += "%% Observation Information\n\n"
-        if self.temporal is []:
+        if self.location == []:
             self.baseDlv += "present(X) v absent(X) :- r(X).\n"
             self.baseDlv += ":- present(X), absent(X).\n"
             self.baseDlv += "absent(X) :- irs(X).\n"
         else:
-            for i in range(len(self.temporal)):
-                pair = self.temporal[i]
-                pairstr = ""
-                for j in range(len(pair)):
-                    pairstr += ", " + pair[j]
-                self.baseDlv += "present(X" + pairstr + ") v absent(X" + pairstr + ") :- r(X).\n"
-                self.baseDlv += ":- present(X" + pairstr + "), absent(X" + pairstr + ").\n"
-                self.baseDlv += "absent(X" + pairstr + ") :- irs(X).\n"
+            if self.exploc:
+                self.baseDlv += "subl(X, Z) :- subl(X, Y), subl(Y, Z).\n" 
+                for i in range(len(self.location)):
+                    self.baseDlv += "l(" + self.location[i][0] + ").\n"
+                    for j in range(1, len(self.location[i])):
+                        self.baseDlv += "l(" + self.location[i][j] + ").\n"
+                        self.baseDlv += "subl(" + self.location[i][j] + ", " + self.location[i][0] +").\n"
+            else:
+                for i in range(len(self.location)):
+                    self.baseDlv += "l(" + self.location[i] + ").\n"
+            if self.temporal == []:
+                self.baseDlv += "present(X, L) v absent(X, L) :- r(X), l(L).\n"
+                self.baseDlv += ":- present(X, L), absent(X, L).\n"
+                self.baseDlv += "absent(X, L) :- irs(X), l(L).\n"
+                self.baseDlv += "present(X, L) :- present(X, L1), subl(L1, L).\n"
+                self.baseDlv += "absent(X, L) :- absent(X, L1), subl(L, L1).\n"
+            else:
+                if self.exptmp:
+                    self.baseDlv += "subt(X, Z) :- subt(X, Y), subt(Y, Z).\n" 
+                    for i in range(len(self.temporal)):
+                        self.baseDlv += "l(" + self.temporal[i][0] + ").\n"
+                        for j in range(1, len(sef.temporal[i])):
+                            self.baseDlv += "t(" + self.temporal[i][j] + ").\n"
+                            self.baseDlv += "subt(" + self.temporal[i][j] + ", " + self.temporal[i][0] +").\n"
+                else:
+                    for i in range(len(self.temporal)):
+                        self.baseDlv += "t(" + self.temporal[i] + ").\n"
+                self.baseDlv += "present(X, L, T) v absent(X, L, T) :- r(X), l(L), t(T).\n"
+                self.baseDlv += ":- present(X, L, T), absent(X, L, T).\n"
+                self.baseDlv += "absent(X, L, T) :- irs(X), l(L), t(T).\n"
+                self.baseDlv += "present(X, L, T) :- present(X, L1, T), subl(L1, L), t(T).\n"
+                self.baseDlv += "absent(X, L, T) :- absent(X, L1, T), subl(L, L1), t(T).\n"
+                self.baseDlv += "present(X, L, T) :- present(X, L, T1), subt(T1, T), l(L).\n"
+                self.baseDlv += "absent(X, L, T) :- absent(X, L, T1), subt(T, T1), l(L).\n"
                 
         if self.obslen == 2:
             appendd = ""
@@ -675,6 +703,7 @@ class TaxonomyMapping:
     def readFile(self):
         file = open(os.path.join(self.options.inputdir, self.options.inputfile), 'r')
         lines = file.readlines()
+        flag = ""
         for line in lines:
 
             if (re.match("taxonomy", line)):
@@ -687,11 +716,25 @@ class TaxonomyMapping:
                     taxonomy.nameit(taxName.group(1), taxName.group(2))
                   
                 self.taxonomies[taxonomy.abbrev] = taxonomy
+                flag = "taxonomy"
+
+            elif (re.match("location", line)):
+                flag = "location"
+              
+            elif (re.match("temporal", line)):
+                flag = "temporal"
               
             # reads in lines of the form (a b c) where a is the parent
             # and b c are the children
             elif (re.match("\(.*\)", line)):
-                taxonomy.addTaxaWithList(self, line)
+                if flag == "taxonomy":
+                    taxonomy.addTaxaWithList(self, line)
+                elif flag == "location":
+                    self.addLocation(line)
+                elif flag == "temporal":
+                    self.addTemporal(line)
+                else:
+                    None
 
             elif (re.match("articulation", line)):
                 None
@@ -728,6 +771,30 @@ class TaxonomyMapping:
                    
         return True              
 
+    def addLocation(self, line):
+        self.exploc = True
+        noParens = re.match("\((.*)\)", line).group(1)
+        if (noParens.find(" ") != -1):
+            elements = re.split("\s", noParens)
+            llist = [elements[0]]
+            for index in range (1, len(elements)):
+                llist.append(elements[index])
+            self.location.append(llist)
+        else:
+            self.location.append([noParens]) 
+        
+    def addTemporal(self, line):
+        self.exptmp = True
+        noParens = re.match("\((.*)\)", line).group(1)
+        if (noParens.find(" ") != -1):
+            elements = re.split("\s", noParens)
+            tlist = [elements[0]]
+            for index in range (1, len(elements)):
+                tlist.append(elements[index])
+            self.temporal.append(tlist)
+        else:
+            self.temporal.append([noParens]) 
+        
     def addObs(self, obsin):
         items = obsin[0].split("*")
         obs = []
@@ -740,13 +807,11 @@ class TaxonomyMapping:
         obs.append(obsconcept)
         for i in range(1,self.obslen):
             obs.append(obsin[i])
-        tem = []
         if self.obslen > 2:
-            tem.append(obsin[2])
-        if self.obslen > 3:
-            tem.append(obsin[3])
-        if tem is not []:
-            self.temporal.append(tem)
+            if not self.exploc:
+                self.location.append(obsin[2])
+            if self.obslen > 3 and not self.exptmp:
+                self.temporal.append(obsin[3])
         self.obs.append(obs)
 
     #class Observation:
