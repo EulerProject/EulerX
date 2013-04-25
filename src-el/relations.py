@@ -4,6 +4,18 @@ rcc5["includes"] = 1 << 1
 rcc5["is_included_in"] = 1 << 2
 rcc5["disjoint"] = 1 << 3
 rcc5["overlaps"] = 1 << 4
+rcc5['"="'] = 1 << 0
+rcc5['">"'] = 1 << 1
+rcc5['"<"'] = 1 << 2
+rcc5['"!"'] = 1 << 3
+rcc5['"><"'] = 1 << 4
+
+logmap = {}
+logmap[1<<0] = 0
+logmap[1<<1] = 1
+logmap[1<<2] = 2
+logmap[1<<3] = 3
+logmap[1<<4] = 4
 
 relation = {}
 relation["no"] = 0
@@ -13,11 +25,6 @@ relation["<"] = 1 << 2
 relation["!"] = 1 << 3
 relation["<>"] = 1 << 3
 relation["><"] = 1 << 4
-relation['"="'] = 1 << 0
-relation['">"'] = 1 << 1
-relation['"<"'] = 1 << 2
-relation['"!"'] = 1 << 3
-relation['"><"'] = 1 << 4
 relation["{=, >}"] = 1 << 0 | 1 << 1
 relation["{=, <}"] = 1 << 0 | 1 << 2
 relation["{=, !}"] = 1 << 0 | 1 << 3
