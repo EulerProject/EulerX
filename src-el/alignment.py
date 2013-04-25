@@ -10,6 +10,7 @@ class TaxonomyMapping:
 
     def __init__(self, options):
         self.mir = {}                          # MIR
+        self.mirc = {}                         # MIRC
         self.obs = []                          # OBS
         self.obslen = 0                        # OBS time / location?
         self.location = []                     # location set
@@ -24,6 +25,7 @@ class TaxonomyMapping:
         self.map = {}
         self.baseDlv = ""
         self.pw = ""
+        self.npw = 0                           # # of pws
         self.options = options
         self.enc = encode[options.encode]
         self.name = os.path.splitext(os.path.basename(options.inputfile))[0]
@@ -218,6 +220,7 @@ class TaxonomyMapping:
         self.pw = commands.getoutput(com)
         raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
         pws = raw.split("\n")
+        self.npw = len(pws)
         for i in range(len(pws)):
             outputstr = "Possible world "+i.__str__()+": {"
             items = pws[i].split(";")
@@ -229,9 +232,13 @@ class TaxonomyMapping:
                 outputstr += dotc1+rel[2]+dotc2
                 pair = dotc1+","+dotc2
                 if i == 0:
-                    self.mir[pair] = relation[rel[2]]
+                    self.mir[pair] = rcc5[rel[2]]
+                    self.mirc[pair] = []
+                    for k in range(5):
+                        self.mirc[pair].append(0)
                 else:
-                    self.mir[pair] |= relation[rel[2]]
+                    self.mir[pair] |= rcc5[rel[2]]
+                self.mirc[pair][logmap[rcc5[rel[2]]]] += 1
             if self.options.output and pwflag:
                 print outputstr + "}"
         self.genMir()
@@ -241,6 +248,7 @@ class TaxonomyMapping:
         com = "dlv -silent -filter=pinout "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
         raw = commands.getoutput(com).replace("{","").replace("}","").replace(" ","").replace("),",");")
         pws = raw.split("\n")
+        self.npw = len(pws)
         for i in range(len(pws)):
             outputstr = "Possible world "+i.__str__()+": {"
             items = pws[i].split(";")
@@ -946,6 +954,12 @@ class TaxonomyMapping:
             if self.options.verbose:
 		print pairkey
             if self.mir.has_key(pairkey) and self.mir[pairkey] != 0:
+              if self.options.countOn:
+                for i in range(5):
+                  if self.mirc[pairkey][i] != 0:
+                    fmir.write(pairkey+",opt," + findkey(relation, 1 << i)+","\
+                               +self.mirc[pairkey][i].__str__()+","+self.npw.__str__()+"\n")
+              else:
                 fmir.write(pairkey+",opt," + findkey(relation, self.mir[pairkey])+"\n")
                 if self.options.verbose:
                     print pairkey+",opt," + findkey(relation, self.mir[pairkey])+"\n"
