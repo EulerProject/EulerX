@@ -29,7 +29,7 @@ class EulerParser:
             inst.add_option("-e", dest="encode", default="vr")
             inst.add_option("-b", dest="dl", default=2)
             inst.add_option("-g", action="store_true", dest="generateCti", default=False)
-            inst.add_option("-dc", action="store_false", dest="enableCov", default=True)
+            inst.add_option("--dc", action="store_false", dest="enableCov", default=True)
             inst.add_option("-N", action="store_false", dest="output", default=True)
             inst.add_option("-n", dest="nary", type="int", default=0)
             inst.add_option("-m", dest="nnodes", type="int", default=0)

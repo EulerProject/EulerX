@@ -79,13 +79,15 @@ class TaxonomyMapping:
             self.inconsistencyExplanation()
             return
         if self.enc & encode["pw"]:
-            self.genPW()
+            self.genPW(True)
         elif self.enc & encode["ve"]:
             self.genVE()
         elif self.enc & encode["ob"]:
             self.genOB()
-        else:
+        elif self.enc & encode["ct"]:
             self.genMir()
+        else:
+            self.genPW(False)
 
     def decodeDlv(self):
         lines = StringIO.StringIO(self.pw).readlines()
@@ -117,41 +119,41 @@ class TaxonomyMapping:
         frsnr = open(rsnrfile, "w")
         frsnr.write("\n%%% Assumption" + vn1 + "_" + vn2 + "_" + rel + "\n")
         if rel == "equals":
-            frsnr.write("ir(X) :- out(" + vn1 + ",X), in(" + vn2 + ",X).\n")
-            frsnr.write("ir(X) :- in(" + vn1 + ",X), out(" + vn2 + ",X).\n")
-            frsnr.write(":- #count{X: vr(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
+            frsnr.write("irs(X) :- out(" + vn1 + ",X), in(" + vn2 + ",X).\n")
+            frsnr.write("irs(X) :- in(" + vn1 + ",X), out(" + vn2 + ",X).\n")
+            frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
 	    frsnr.write("in(" + vn1 + ",X) :- in(" + vn2 + ",X).\n")
 	    frsnr.write("in(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
 	    frsnr.write("out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n") 
 	    frsnr.write("out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n")
         elif rel == "includes":
-            frsnr.write("ir(X) :- out(" + vn1 + ",X), in(" + vn2 + ",X).\n")
-            frsnr.write(":- #count{X: vr(X), in(" + vn1 + ",X), out(" + vn2 + ",X)} = 0.\n")
-            frsnr.write(":- #count{X: vr(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
+            frsnr.write("irs(X) :- out(" + vn1 + ",X), in(" + vn2 + ",X).\n")
+            frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), out(" + vn2 + ",X)} = 0.\n")
+            frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
 	    frsnr.write("in(" + vn1 + ",X) :- in(" + vn2 + ",X).\n") 
 	    frsnr.write("out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n") 
 	    frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n")
 	    frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- in(" + vn1 + ",X).\n") 
         elif rel == "is_included_in":
-            frsnr.write(":- #count{X: vr(X), out(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
-            frsnr.write("ir(X) :- in(" + vn1 + ",X), out(" + vn2 + ",X).\n")
-            frsnr.write(":- #count{X: vr(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
+            frsnr.write(":- #count{X: vrs(X), out(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
+            frsnr.write("irs(X) :- in(" + vn1 + ",X), out(" + vn2 + ",X).\n")
+            frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
 	    frsnr.write("in(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
 	    frsnr.write("out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n") 
 	    frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- in(" + vn2 + ",X).\n") 
 	    frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n") 
         elif rel == "disjoint":
-            frsnr.write(":- #count{X: vr(X), out(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
-            frsnr.write(":- #count{X: vr(X), in(" + vn1 + ",X), out(" + vn2 + ",X)} = 0.\n")
-            frsnr.write("ir(X) :- in(" + vn1 + ",X), in(" + vn2 + ",X).\n")
+            frsnr.write(":- #count{X: vrs(X), out(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
+            frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), out(" + vn2 + ",X)} = 0.\n")
+            frsnr.write("irs(X) :- in(" + vn1 + ",X), in(" + vn2 + ",X).\n")
 	    frsnr.write("out(" + vn1 + ",X) :- in(" + vn2 + ",X).\n")
 	    frsnr.write("out(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
 	    frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n")
 	    frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n")
         elif rel == "overlaps":
-            frsnr.write(":- #count{X: vr(X), out(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
-            frsnr.write(":- #count{X: vr(X), in(" + vn1 + ",X), out(" + vn2 + ",X)} = 0.\n")
-            frsnr.write(":- #count{X: vr(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
+            frsnr.write(":- #count{X: vrs(X), out(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
+            frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), out(" + vn2 + ",X)} = 0.\n")
+            frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
 	    frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- in(" + vn2 + ",X).\n")
 	    frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n") 
 	    frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n") 
@@ -210,12 +212,29 @@ class TaxonomyMapping:
             fie.close()
             commands.getoutput("dot -Tpdf "+self.iefile+" -o "+self.iepdf)
 
-    def genPW(self):
+    def genPW(self, pwflag):
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
         self.pw = commands.getoutput(com)
-        if self.options.output:
-            print self.pw
+        raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
+        pws = raw.split("\n")
+        for i in range(len(pws)):
+            outputstr = "Possible world "+i.__str__()+": {"
+            items = pws[i].split(";")
+            for j in range(len(items)):
+                rel = items[j].replace("rel(","").replace(")","").split(",")
+                dotc1 = self.dlvName2dot(rel[0])
+                dotc2 = self.dlvName2dot(rel[1])
+                if j != 0: outputstr += ", "
+                outputstr += dotc1+rel[2]+dotc2
+                pair = dotc1+","+dotc2
+                if i == 0:
+                    self.mir[pair] = relation[rel[2]]
+                else:
+                    self.mir[pair] |= relation[rel[2]]
+            if self.options.output and pwflag:
+                print outputstr + "}"
+        self.genMir()
 
     def genOB(self):
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -252,13 +271,15 @@ class TaxonomyMapping:
                 s = keys[j].find("@")
                 if s != -1:
                     outputstr += keys[j][s:]
-            print outputstr + "}"
+            if self.options.output:
+                print outputstr + "}"
             
 
     def genVE(self):
         com = "dlv -silent -filter=vr "+self.pwfile+" "+self.pwswitch
         self.ve = commands.getoutput(com)
-        print self.ve
+        if self.options.output:
+            print self.ve
 
     def genDlv(self):
         if self.baseDlv != "":
@@ -335,8 +356,8 @@ class TaxonomyMapping:
 	    self.baseDlv += "ir(M) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n\n"
 
 	    self.baseDlv += "%%% Constraints of regions.\n"
-	    self.baseDlv += "vr(X) :- r(X), not ir(X).\n"
-	    self.baseDlv += ":- vr(X), ir(X).\n\n"
+	    self.baseDlv += "vrs(X) :- r(X), not irs(X).\n"
+	    self.baseDlv += ":- vrs(X), irs(X).\n\n"
 
         elif self.enc & encode["mn"]:
             maxint = prod
@@ -409,8 +430,8 @@ class TaxonomyMapping:
 #
 #	    self.baseDlv += "%%% Constraints of regions.\n"
 #	    self.baseDlv += "ir(0).\n"
-#	    self.baseDlv += "vr(X) v ir(X):- r(X).\n"
-#	    self.baseDlv += ":- vr(X), ir(X).\n\n"
+#	    self.baseDlv += "vrs(X) v irs(X):- r(X).\n"
+#	    self.baseDlv += ":- vrs(X), irs(X).\n\n"
 
         elif self.enc & encode["direct"]:
             self.baseDlv += con
@@ -560,7 +581,7 @@ class TaxonomyMapping:
 			# C
 			self.baseDlv += "\n%% ISA\n"
                         
-			coverage = "ir(X) :- in(" + t.dlvName() + ", X)"
+			coverage = "irs(X) :- in(" + t.dlvName() + ", X)"
                         numkids = len(t.children)
                         if numkids == 1:
                             self.baseDlv += "label(" + t.dlvName() + "," + t.children[0] + ", eq).\n"
