@@ -13,6 +13,11 @@ relation["<"] = 1 << 2
 relation["!"] = 1 << 3
 relation["<>"] = 1 << 3
 relation["><"] = 1 << 4
+relation['"="'] = 1 << 0
+relation['">"'] = 1 << 1
+relation['"<"'] = 1 << 2
+relation['"!"'] = 1 << 3
+relation['"><"'] = 1 << 4
 relation["{=, >}"] = 1 << 0 | 1 << 1
 relation["{=, <}"] = 1 << 0 | 1 << 2
 relation["{=, !}"] = 1 << 0 | 1 << 3
@@ -59,6 +64,7 @@ encode["mn"] = 1 << 4
 encode["pw"] = 1 << 5
 encode["ve"] = 1 << 6
 encode["ob"] = 1 << 7
+encode["ct"] = 1 << 8
 encode["drpw"] = encode["dr"] | encode["pw"]
 encode["vrpw"] = encode["vr"] | encode["pw"]
 encode["dlpw"] = encode["dl"] | encode["pw"]
@@ -70,3 +76,4 @@ encode["plve"] = encode["pl"] | encode["ve"]
 encode["mnve"] = encode["mn"] | encode["ve"]
 encode["mnvr"] = encode["mn"] | encode["vr"]
 encode["mnob"] = encode["mn"] | encode["ob"]
+encode["mnct"] = encode["mn"] | encode["ct"]
