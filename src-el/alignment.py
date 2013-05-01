@@ -263,16 +263,42 @@ class TaxonomyMapping:
         fcldot = open(self.cldot, 'w')
         fcldot.write("graph "+self.name+"_cluster {\n"+\
                      "overlap=false\nsplines=true\n")
+        dmatrix = []
         for i in range(self.npw):
+            dmatrix.append([])
             for j in range(i+1):
-                if i == j : fcl.write("0 "); continue
+                if i == j :
+                    dmatrix[i].append(0)
+                    fcl.write("0 "); continue
                 d = 0
                 for key in pwmirs[i].keys():
-                     if pwmirs[i][key] != pwmirs[j][key]: d += 1
+                    if pwmirs[i][key] != pwmirs[j][key]: d += 1
                 fcl.write(d.__str__()+" ")
-                if i != j : fcldot.write("\"pw"+i.__str__()+"\" -- \"pw"+j.__str__()+\
+                dmatrix[i].append(d)
+                if i != j and not self.options.simpCluster:
+                    fcldot.write("\"pw"+i.__str__()+"\" -- \"pw"+j.__str__()+\
                             "\" [label="+d.__str__()+",len="+d.__str__()+"]\n")
             fcl.write("\n")
+        if self.options.simpCluster:
+            for i in range(self.npw):
+                for j in range(i):
+                    for k in range(self.npw):
+                        if i == k or j == k: continue
+                        if j < k and k < i and dmatrix[i][j] > 0 and dmatrix[i][k] > 0 and dmatrix[k][j] > 0:
+                            if dmatrix[i][j] == dmatrix[i][k] + dmatrix[k][j]:
+                                dmatrix[i][j] = None
+                                break
+                        elif i < k and dmatrix[i][j] > 0 and dmatrix[k][i] > 0 and dmatrix[k][j] > 0:
+                            if dmatrix[i][j] == dmatrix[k][i] + dmatrix[k][j]:
+                                dmatrix[i][j] = None
+                                break
+                        elif k < j and dmatrix[i][j] > 0 and dmatrix[i][k] > 0 and dmatrix[j][k] > 0:
+                            if dmatrix[i][j] == dmatrix[i][k] + dmatrix[j][k]:
+                                dmatrix[i][j] = None
+                                break
+                    if dmatrix[i][j] > 0:
+                        fcldot.write("\"pw"+i.__str__()+"\" -- \"pw"+j.__str__()+\
+                            "\" [label="+dmatrix[i][j].__str__()+",len="+dmatrix[i][j].__str__()+"]\n")
         fcldot.write("}")
         fcl.close()
         fcldot.close()
