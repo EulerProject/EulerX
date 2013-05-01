@@ -39,10 +39,12 @@ class TaxonomyMapping:
         self.pwfile = os.path.join(self.dlvdir, self.name+"_pw.dlv")
         self.pwswitch = os.path.join(self.dlvdir, "pw.dlv")
         self.ixswitch = os.path.join(self.dlvdir, "ix.dlv")
+        self.pwout = os.path.join(options.outputdir, self.name+"_pw.txt")
         self.mirfile = os.path.join(options.outputdir, self.name+"_mir.csv")
         self.clfile = os.path.join(options.outputdir, self.name+"_cl.csv")
         self.cldot = os.path.join(options.outputdir, self.name+"_cl.dot")
-        self.clpdf = os.path.join(options.outputdir, self.name+"_cl.pdf")
+        self.cldotpdf = os.path.join(options.outputdir, self.name+"_cl_dot.pdf")
+        self.clneatopdf = os.path.join(options.outputdir, self.name+"_cl_neato.pdf")
         self.iefile = os.path.join(options.outputdir, self.name+"_ie.dot")
         self.iepdf = os.path.join(options.outputdir, self.name+"_ie.pdf")
 
@@ -224,11 +226,12 @@ class TaxonomyMapping:
         raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
         pws = raw.split("\n")
         self.npw = len(pws)
+        outputstr = ""
         # mirs for each pw
         if self.options.cluster: pwmirs = []
         for i in range(len(pws)):
             if self.options.cluster: pwmirs.append({})
-            outputstr = "Possible world "+i.__str__()+": {"
+            outputstr += "Possible world "+i.__str__()+": {"
             items = pws[i].split(";")
             for j in range(len(items)):
                 rel = items[j].replace("rel(","").replace(")","").split(",")
@@ -246,15 +249,20 @@ class TaxonomyMapping:
                 else:
                     self.mir[pair] |= rcc5[rel[2]]
                 self.mirc[pair][logmap[rcc5[rel[2]]]] += 1
-            if self.options.output and pwflag:
-                print outputstr + "}"
+            outputstr += "}\n"
+        if pwflag:
+            if self.options.output: print outputstr
+            fpw = open(self.pwout, 'w')
+            fpw.write(outputstr)
+            fpw.close()
         self.genMir()
         if self.options.cluster: self.genPwCluster(pwmirs)
 
     def genPwCluster(self, pwmirs):
         fcl = open(self.clfile, 'w')
         fcldot = open(self.cldot, 'w')
-        fcldot.write("graph "+self.name+"_cluster {\n\n")
+        fcldot.write("graph "+self.name+"_cluster {\n"+\
+                     "overlap=false\nsplines=true\n")
         for i in range(self.npw):
             for j in range(i+1):
                 if i == j : fcl.write("0 "); continue
@@ -263,12 +271,13 @@ class TaxonomyMapping:
                      if pwmirs[i][key] != pwmirs[j][key]: d += 1
                 fcl.write(d.__str__()+" ")
                 if i != j : fcldot.write("\"pw"+i.__str__()+"\" -- \"pw"+j.__str__()+\
-                            "\" [label="+d.__str__()+",labeldistance="+d.__str__()+"]\n")
+                            "\" [label="+d.__str__()+",len="+d.__str__()+"]\n")
             fcl.write("\n")
         fcldot.write("}")
         fcl.close()
         fcldot.close()
-        commands.getoutput("dot -Tpdf "+self.cldot+" -o "+self.clpdf)
+        commands.getoutput("dot -Tpdf "+self.cldot+" -o "+self.cldotpdf)
+        commands.getoutput("neato -Tpdf "+self.cldot+" -o "+self.clneatopdf)
 
     def genOB(self):
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -276,8 +285,9 @@ class TaxonomyMapping:
         raw = commands.getoutput(com).replace("{","").replace("}","").replace(" ","").replace("),",");")
         pws = raw.split("\n")
         self.npw = len(pws)
+        outputstr = ""
         for i in range(len(pws)):
-            outputstr = "Possible world "+i.__str__()+": {"
+            outputstr += "Possible world "+i.__str__()+": {"
             items = pws[i].split(";")
             pmapping = {}
             for j in range(len(items)):
@@ -306,8 +316,9 @@ class TaxonomyMapping:
                 s = keys[j].find("@")
                 if s != -1:
                     outputstr += keys[j][s:]
-            if self.options.output:
-                print outputstr + "}"
+            outputstr += "}\n"
+        if self.options.output:
+            print outputstr
             
 
     def genVE(self):
