@@ -1,0 +1,248 @@
+============================== Prover9 ===============================
+Prover9 (64) version 2009-02A, February 2009.
+Process 6163 was started by szyu on lore,
+Mon Apr 22 14:24:05 2013
+The command was "prover9 -t 10 -f output/pw1/reasonerFiles/pw1N_C_D_overlaps_1.E_2.C_possible_Prover.txt".
+============================== end of head ===========================
+
+============================== INPUT =================================
+
+% Reading from file output/pw1/reasonerFiles/pw1N_C_D_overlaps_1.E_2.C_possible_Prover.txt
+
+
+formulas(assumptions).
+1_B(x) -> 1_A(x).
+1_E(x) -> 1_A(x).
+2_D(x) -> 2_C(x).
+2_F(x) -> 2_C(x).
+(all x (1_A(x) <-> 2_C(x))).
+(all x (1_B(x) -> 2_D(x))) & (exists x (2_D(x) & -1_B(x))) | (all x (1_B(x) <-> 2_D(x))).
+(all x (2_F(x) -> 1_E(x))) & (exists x (1_E(x) & -2_F(x))) | (all x (1_E(x) <-> 2_F(x))).
+(exists x 1_A(x)).
+(exists x 1_B(x)).
+(exists x 1_E(x)).
+(exists x 2_C(x)).
+(exists x 2_D(x)).
+(exists x 2_F(x)).
+1_A(x) -> 1_B(x) | 1_E(x).
+2_C(x) -> 2_D(x) | 2_F(x).
+(all x (1_E(x) -> -1_B(x))).
+(all x (2_F(x) -> -2_D(x))).
+end_of_list.
+
+formulas(goals).
+-(exists a exists b exists c (1_E(a) & 2_C(a) & 1_E(b) & -2_C(b) & -1_E(c) & 2_C(c))).
+end_of_list.
+
+============================== end of input ==========================
+
+% From the command line: assign(max_seconds, 10).
+
+============================== PROCESS NON-CLAUSAL FORMULAS ==========
+
+% Formulas that are not ordinary clauses:
+1 1_B(x) -> 1_A(x) # label(non_clause).  [assumption].
+2 1_E(x) -> 1_A(x) # label(non_clause).  [assumption].
+3 2_D(x) -> 2_C(x) # label(non_clause).  [assumption].
+4 2_F(x) -> 2_C(x) # label(non_clause).  [assumption].
+5 (all x (1_A(x) <-> 2_C(x))) # label(non_clause).  [assumption].
+6 (all x (1_B(x) -> 2_D(x))) & (exists x (2_D(x) & -1_B(x))) | (all x (1_B(x) <-> 2_D(x))) # label(non_clause).  [assumption].
+7 (all x (2_F(x) -> 1_E(x))) & (exists x (1_E(x) & -2_F(x))) | (all x (1_E(x) <-> 2_F(x))) # label(non_clause).  [assumption].
+8 (exists x 1_A(x)) # label(non_clause).  [assumption].
+9 (exists x 1_B(x)) # label(non_clause).  [assumption].
+10 (exists x 1_E(x)) # label(non_clause).  [assumption].
+11 (exists x 2_C(x)) # label(non_clause).  [assumption].
+12 (exists x 2_D(x)) # label(non_clause).  [assumption].
+13 (exists x 2_F(x)) # label(non_clause).  [assumption].
+14 1_A(x) -> 1_B(x) | 1_E(x) # label(non_clause).  [assumption].
+15 2_C(x) -> 2_D(x) | 2_F(x) # label(non_clause).  [assumption].
+16 (all x (1_E(x) -> -1_B(x))) # label(non_clause).  [assumption].
+17 (all x (2_F(x) -> -2_D(x))) # label(non_clause).  [assumption].
+18 -(exists a exists b exists c (1_E(a) & 2_C(a) & 1_E(b) & -2_C(b) & -1_E(c) & 2_C(c))) # label(non_clause) # label(goal).  [goal].
+
+============================== end of process non-clausal formulas ===
+
+============================== PROCESS INITIAL CLAUSES ===============
+
+% Clauses before input processing:
+
+formulas(usable).
+end_of_list.
+
+formulas(sos).
+-1_B(x) | 1_A(x).  [clausify(1)].
+-1_E(x) | 1_A(x).  [clausify(2)].
+-2_D(x) | 2_C(x).  [clausify(3)].
+-2_F(x) | 2_C(x).  [clausify(4)].
+-1_A(x) | 2_C(x).  [clausify(5)].
+1_A(x) | -2_C(x).  [clausify(5)].
+-1_B(x) | 2_D(x) | -1_B(y) | 2_D(y).  [clausify(6)].
+-1_B(x) | 2_D(x) | 1_B(y) | -2_D(y).  [clausify(6)].
+2_D(c1) | -1_B(x) | 2_D(x).  [clausify(6)].
+2_D(c1) | 1_B(x) | -2_D(x).  [clausify(6)].
+-1_B(c1) | -1_B(x) | 2_D(x).  [clausify(6)].
+-1_B(c1) | 1_B(x) | -2_D(x).  [clausify(6)].
+-2_F(x) | 1_E(x) | -1_E(y) | 2_F(y).  [clausify(7)].
+-2_F(x) | 1_E(x) | 1_E(y) | -2_F(y).  [clausify(7)].
+1_E(c2) | -1_E(x) | 2_F(x).  [clausify(7)].
+1_E(c2) | 1_E(x) | -2_F(x).  [clausify(7)].
+-2_F(c2) | -1_E(x) | 2_F(x).  [clausify(7)].
+-2_F(c2) | 1_E(x) | -2_F(x).  [clausify(7)].
+1_A(c3).  [clausify(8)].
+1_B(c4).  [clausify(9)].
+1_E(c5).  [clausify(10)].
+2_C(c6).  [clausify(11)].
+2_D(c7).  [clausify(12)].
+2_F(c8).  [clausify(13)].
+-1_A(x) | 1_B(x) | 1_E(x).  [clausify(14)].
+-2_C(x) | 2_D(x) | 2_F(x).  [clausify(15)].
+-1_E(x) | -1_B(x).  [clausify(16)].
+-2_F(x) | -2_D(x).  [clausify(17)].
+1_E(c9).  [deny(18)].
+2_C(c9).  [deny(18)].
+1_E(c10).  [deny(18)].
+-2_C(c10).  [deny(18)].
+-1_E(c11).  [deny(18)].
+2_C(c11).  [deny(18)].
+end_of_list.
+
+formulas(demodulators).
+end_of_list.
+
+============================== PREDICATE ELIMINATION =================
+
+Eliminating 1_A/1
+19 -1_A(x) | 2_C(x).  [clausify(5)].
+20 -1_B(x) | 1_A(x).  [clausify(1)].
+21 -1_E(x) | 1_A(x).  [clausify(2)].
+Derived: 2_C(x) | -1_B(x).  [resolve(19,a,20,b)].
+Derived: 2_C(x) | -1_E(x).  [resolve(19,a,21,b)].
+22 1_A(x) | -2_C(x).  [clausify(5)].
+23 1_A(c3).  [clausify(8)].
+Derived: 2_C(c3).  [resolve(23,a,19,a)].
+24 -1_A(x) | 1_B(x) | 1_E(x).  [clausify(14)].
+Derived: 1_B(x) | 1_E(x) | -2_C(x).  [resolve(24,a,22,a)].
+Derived: 1_B(c3) | 1_E(c3).  [resolve(24,a,23,a)].
+
+Eliminating 2_C/1
+25 -2_C(x) | 2_D(x) | 2_F(x).  [clausify(15)].
+26 -2_D(x) | 2_C(x).  [clausify(3)].
+27 -2_F(x) | 2_C(x).  [clausify(4)].
+28 2_C(c6).  [clausify(11)].
+Derived: 2_D(c6) | 2_F(c6).  [resolve(25,a,28,a)].
+29 2_C(c9).  [deny(18)].
+Derived: 2_D(c9) | 2_F(c9).  [resolve(29,a,25,a)].
+30 -2_C(c10).  [deny(18)].
+Derived: -2_D(c10).  [resolve(30,a,26,b)].
+Derived: -2_F(c10).  [resolve(30,a,27,b)].
+31 2_C(c11).  [deny(18)].
+Derived: 2_D(c11) | 2_F(c11).  [resolve(31,a,25,a)].
+32 2_C(x) | -1_B(x).  [resolve(19,a,20,b)].
+Derived: -1_B(x) | 2_D(x) | 2_F(x).  [resolve(32,a,25,a)].
+Derived: -1_B(c10).  [resolve(32,a,30,a)].
+33 2_C(x) | -1_E(x).  [resolve(19,a,21,b)].
+Derived: -1_E(x) | 2_D(x) | 2_F(x).  [resolve(33,a,25,a)].
+Derived: -1_E(c10).  [resolve(33,a,30,a)].
+34 2_C(c3).  [resolve(23,a,19,a)].
+Derived: 2_D(c3) | 2_F(c3).  [resolve(34,a,25,a)].
+35 1_B(x) | 1_E(x) | -2_C(x).  [resolve(24,a,22,a)].
+Derived: 1_B(x) | 1_E(x) | -2_D(x).  [resolve(35,c,26,b)].
+Derived: 1_B(x) | 1_E(x) | -2_F(x).  [resolve(35,c,27,b)].
+Derived: 1_B(c6) | 1_E(c6).  [resolve(35,c,28,a)].
+Derived: 1_B(c9) | 1_E(c9).  [resolve(35,c,29,a)].
+Derived: 1_B(c11) | 1_E(c11).  [resolve(35,c,31,a)].
+
+============================== end predicate elimination =============
+
+Auto_denials:  (non-Horn, no changes).
+
+Term ordering decisions:
+Predicate symbol precedence:  predicate_order([ 1_E, 1_B, 2_D, 2_F ]).
+Function symbol precedence:  function_order([ c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11 ]).
+After inverse_order:  (no changes).
+Unfolding symbols: (none).
+
+Auto_inference settings:
+  % set(binary_resolution).  % (non-Horn)
+  % set(neg_ur_resolution).  % (non-Horn, less than 100 clauses)
+
+Auto_process settings:
+  % set(factor).  % (non-Horn)
+  % set(unit_deletion).  % (non-Horn)
+
+kept:      36 -1_B(x) | 2_D(x) | -1_B(y) | 2_D(y).  [clausify(6)].
+kept:      37 -1_B(x) | 2_D(x) | 1_B(y) | -2_D(y).  [clausify(6)].
+kept:      38 2_D(c1) | -1_B(x) | 2_D(x).  [clausify(6)].
+kept:      39 2_D(c1) | 1_B(x) | -2_D(x).  [clausify(6)].
+kept:      40 -1_B(c1) | -1_B(x) | 2_D(x).  [clausify(6)].
+kept:      41 -1_B(c1) | 1_B(x) | -2_D(x).  [clausify(6)].
+kept:      42 -2_F(x) | 1_E(x) | -1_E(y) | 2_F(y).  [clausify(7)].
+kept:      43 -2_F(x) | 1_E(x) | 1_E(y) | -2_F(y).  [clausify(7)].
+kept:      44 1_E(c2) | -1_E(x) | 2_F(x).  [clausify(7)].
+kept:      45 1_E(c2) | 1_E(x) | -2_F(x).  [clausify(7)].
+kept:      46 -2_F(c2) | -1_E(x) | 2_F(x).  [clausify(7)].
+kept:      47 -2_F(c2) | 1_E(x) | -2_F(x).  [clausify(7)].
+kept:      48 1_B(c4).  [clausify(9)].
+kept:      49 1_E(c5).  [clausify(10)].
+kept:      50 2_D(c7).  [clausify(12)].
+kept:      51 2_F(c8).  [clausify(13)].
+kept:      52 -1_E(x) | -1_B(x).  [clausify(16)].
+kept:      53 -2_F(x) | -2_D(x).  [clausify(17)].
+kept:      54 1_E(c9).  [deny(18)].
+kept:      55 1_E(c10).  [deny(18)].
+kept:      56 -1_E(c11).  [deny(18)].
+kept:      57 1_B(c3) | 1_E(c3).  [resolve(24,a,23,a)].
+kept:      58 2_D(c6) | 2_F(c6).  [resolve(25,a,28,a)].
+kept:      59 2_D(c9) | 2_F(c9).  [resolve(29,a,25,a)].
+kept:      60 -2_D(c10).  [resolve(30,a,26,b)].
+kept:      61 -2_F(c10).  [resolve(30,a,27,b)].
+kept:      62 2_D(c11) | 2_F(c11).  [resolve(31,a,25,a)].
+kept:      63 -1_B(x) | 2_D(x) | 2_F(x).  [resolve(32,a,25,a)].
+kept:      64 -1_B(c10).  [resolve(32,a,30,a)].
+kept:      65 -1_E(x) | 2_D(x) | 2_F(x).  [resolve(33,a,25,a)].
+           66 -1_E(c10).  [resolve(33,a,30,a)].
+
+============================== PROOF =================================
+
+% Proof 1 at 0.01 (+ 0.00) seconds.
+% Length of proof is 10.
+% Level of proof is 4.
+% Maximum clause weight is 2.
+% Given clauses 0.
+
+2 1_E(x) -> 1_A(x) # label(non_clause).  [assumption].
+5 (all x (1_A(x) <-> 2_C(x))) # label(non_clause).  [assumption].
+18 -(exists a exists b exists c (1_E(a) & 2_C(a) & 1_E(b) & -2_C(b) & -1_E(c) & 2_C(c))) # label(non_clause) # label(goal).  [goal].
+19 -1_A(x) | 2_C(x).  [clausify(5)].
+21 -1_E(x) | 1_A(x).  [clausify(2)].
+30 -2_C(c10).  [deny(18)].
+33 2_C(x) | -1_E(x).  [resolve(19,a,21,b)].
+55 1_E(c10).  [deny(18)].
+66 -1_E(c10).  [resolve(33,a,30,a)].
+67 $F.  [copy(66),unit_del(a,55)].
+
+============================== end of proof ==========================
+
+============================== STATISTICS ============================
+
+Given=0. Generated=31. Kept=30. proofs=1.
+Usable=0. Sos=0. Demods=0. Limbo=30, Disabled=48. Hints=0.
+Kept_by_rule=0, Deleted_by_rule=0.
+Forward_subsumed=0. Back_subsumed=0.
+Sos_limit_deleted=0. Sos_displaced=0. Sos_removed=0.
+New_demodulators=0 (0 lex), Back_demodulated=0. Back_unit_deleted=0.
+Demod_attempts=0. Demod_rewrites=0.
+Res_instance_prunes=0. Para_instance_prunes=0. Basic_paramod_prunes=0.
+Nonunit_fsub_feature_tests=0. Nonunit_bsub_feature_tests=0.
+Megabytes=0.11.
+User_CPU=0.01, System_CPU=0.00, Wall_clock=0.
+
+============================== end of statistics =====================
+
+============================== end of search =========================
+
+THEOREM PROVED
+
+Exiting with 1 proof.
+
+Process 6163 exit (max_proofs) Mon Apr 22 14:24:05 2013

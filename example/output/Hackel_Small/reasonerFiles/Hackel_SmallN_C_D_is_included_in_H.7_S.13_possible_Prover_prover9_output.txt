@@ -1,0 +1,1188 @@
+============================== Prover9 ===============================
+Prover9 (64) version 2009-02A, February 2009.
+Process 6515 was started by szyu on lore,
+Mon Apr 22 14:24:13 2013
+The command was "prover9 -t 10 -f output/Hackel_Small/reasonerFiles/Hackel_SmallN_C_D_is_included_in_H.7_S.13_possible_Prover.txt".
+============================== end of head ===========================
+
+============================== INPUT =================================
+
+% Reading from file output/Hackel_Small/reasonerFiles/Hackel_SmallN_C_D_is_included_in_H.7_S.13_possible_Prover.txt
+
+
+formulas(assumptions).
+H_2(x) -> H_1(x).
+H_3(x) -> H_2(x).
+H_4(x) -> H_3(x).
+H_5(x) -> H_3(x).
+H_6(x) -> H_2(x).
+H_7(x) -> H_6(x).
+H_8(x) -> H_1(x).
+H_9(x) -> H_8(x).
+H_10(x) -> H_8(x).
+H_11(x) -> H_8(x).
+H_12(x) -> H_8(x).
+S_14(x) -> S_13(x).
+S_15(x) -> S_13(x).
+S_16(x) -> S_13(x).
+(all x (H_1(x) <-> S_13(x))).
+(all x (H_2(x) -> S_13(x))) & (exists x (S_13(x) & -H_2(x))).
+H_2(x) <-> S_14(x) | S_15(x).
+(all x (H_3(x) <-> S_14(x))).
+H_4(x) | H_5(x) <-> S_14(x).
+(all x (H_6(x) <-> S_15(x))).
+(all x (H_7(x) <-> S_15(x))).
+(all x (H_8(x) <-> S_16(x))).
+(exists x H_11(x)).
+(exists x H_10(x)).
+(exists x H_12(x)).
+(exists x H_1(x)).
+(exists x H_3(x)).
+(exists x H_2(x)).
+(exists x H_5(x)).
+(exists x H_4(x)).
+(exists x H_7(x)).
+(exists x H_6(x)).
+(exists x H_9(x)).
+(exists x H_8(x)).
+(exists x S_13(x)).
+(exists x S_15(x)).
+(exists x S_14(x)).
+(exists x S_16(x)).
+H_1(x) -> H_2(x) | H_8(x).
+H_3(x) -> H_4(x) | H_5(x).
+H_2(x) -> H_3(x) | H_6(x).
+H_6(x) -> H_7(x).
+H_8(x) -> H_9(x) | H_10(x) | H_11(x) | H_12(x).
+S_13(x) -> S_14(x) | S_15(x) | S_16(x).
+(all x (H_8(x) -> -H_2(x))).
+(all x (H_5(x) -> -H_4(x))).
+(all x (H_6(x) -> -H_3(x))).
+(all x (H_9(x) -> -H_10(x))).
+(all x (H_9(x) -> -H_11(x))).
+(all x (H_9(x) -> -H_12(x))).
+(all x (H_11(x) -> -H_10(x))).
+(all x (H_12(x) -> -H_10(x))).
+(all x (H_12(x) -> -H_11(x))).
+(all x (S_15(x) -> -S_14(x))).
+(all x (S_16(x) -> -S_14(x))).
+(all x (S_16(x) -> -S_15(x))).
+end_of_list.
+
+formulas(goals).
+-((all x (H_7(x) -> S_13(x))) & (exists x (S_13(x) & -H_7(x)))).
+end_of_list.
+
+============================== end of input ==========================
+
+% From the command line: assign(max_seconds, 10).
+
+============================== PROCESS NON-CLAUSAL FORMULAS ==========
+
+% Formulas that are not ordinary clauses:
+1 H_2(x) -> H_1(x) # label(non_clause).  [assumption].
+2 H_3(x) -> H_2(x) # label(non_clause).  [assumption].
+3 H_4(x) -> H_3(x) # label(non_clause).  [assumption].
+4 H_5(x) -> H_3(x) # label(non_clause).  [assumption].
+5 H_6(x) -> H_2(x) # label(non_clause).  [assumption].
+6 H_7(x) -> H_6(x) # label(non_clause).  [assumption].
+7 H_8(x) -> H_1(x) # label(non_clause).  [assumption].
+8 H_9(x) -> H_8(x) # label(non_clause).  [assumption].
+9 H_10(x) -> H_8(x) # label(non_clause).  [assumption].
+10 H_11(x) -> H_8(x) # label(non_clause).  [assumption].
+11 H_12(x) -> H_8(x) # label(non_clause).  [assumption].
+12 S_14(x) -> S_13(x) # label(non_clause).  [assumption].
+13 S_15(x) -> S_13(x) # label(non_clause).  [assumption].
+14 S_16(x) -> S_13(x) # label(non_clause).  [assumption].
+15 (all x (H_1(x) <-> S_13(x))) # label(non_clause).  [assumption].
+16 (all x (H_2(x) -> S_13(x))) & (exists x (S_13(x) & -H_2(x))) # label(non_clause).  [assumption].
+17 H_2(x) <-> S_14(x) | S_15(x) # label(non_clause).  [assumption].
+18 (all x (H_3(x) <-> S_14(x))) # label(non_clause).  [assumption].
+19 H_4(x) | H_5(x) <-> S_14(x) # label(non_clause).  [assumption].
+20 (all x (H_6(x) <-> S_15(x))) # label(non_clause).  [assumption].
+21 (all x (H_7(x) <-> S_15(x))) # label(non_clause).  [assumption].
+22 (all x (H_8(x) <-> S_16(x))) # label(non_clause).  [assumption].
+23 (exists x H_11(x)) # label(non_clause).  [assumption].
+24 (exists x H_10(x)) # label(non_clause).  [assumption].
+25 (exists x H_12(x)) # label(non_clause).  [assumption].
+26 (exists x H_1(x)) # label(non_clause).  [assumption].
+27 (exists x H_3(x)) # label(non_clause).  [assumption].
+28 (exists x H_2(x)) # label(non_clause).  [assumption].
+29 (exists x H_5(x)) # label(non_clause).  [assumption].
+30 (exists x H_4(x)) # label(non_clause).  [assumption].
+31 (exists x H_7(x)) # label(non_clause).  [assumption].
+32 (exists x H_6(x)) # label(non_clause).  [assumption].
+33 (exists x H_9(x)) # label(non_clause).  [assumption].
+34 (exists x H_8(x)) # label(non_clause).  [assumption].
+35 (exists x S_13(x)) # label(non_clause).  [assumption].
+36 (exists x S_15(x)) # label(non_clause).  [assumption].
+37 (exists x S_14(x)) # label(non_clause).  [assumption].
+38 (exists x S_16(x)) # label(non_clause).  [assumption].
+39 H_1(x) -> H_2(x) | H_8(x) # label(non_clause).  [assumption].
+40 H_3(x) -> H_4(x) | H_5(x) # label(non_clause).  [assumption].
+41 H_2(x) -> H_3(x) | H_6(x) # label(non_clause).  [assumption].
+42 H_6(x) -> H_7(x) # label(non_clause).  [assumption].
+43 H_8(x) -> H_9(x) | H_10(x) | H_11(x) | H_12(x) # label(non_clause).  [assumption].
+44 S_13(x) -> S_14(x) | S_15(x) | S_16(x) # label(non_clause).  [assumption].
+45 (all x (H_8(x) -> -H_2(x))) # label(non_clause).  [assumption].
+46 (all x (H_5(x) -> -H_4(x))) # label(non_clause).  [assumption].
+47 (all x (H_6(x) -> -H_3(x))) # label(non_clause).  [assumption].
+48 (all x (H_9(x) -> -H_10(x))) # label(non_clause).  [assumption].
+49 (all x (H_9(x) -> -H_11(x))) # label(non_clause).  [assumption].
+50 (all x (H_9(x) -> -H_12(x))) # label(non_clause).  [assumption].
+51 (all x (H_11(x) -> -H_10(x))) # label(non_clause).  [assumption].
+52 (all x (H_12(x) -> -H_10(x))) # label(non_clause).  [assumption].
+53 (all x (H_12(x) -> -H_11(x))) # label(non_clause).  [assumption].
+54 (all x (S_15(x) -> -S_14(x))) # label(non_clause).  [assumption].
+55 (all x (S_16(x) -> -S_14(x))) # label(non_clause).  [assumption].
+56 (all x (S_16(x) -> -S_15(x))) # label(non_clause).  [assumption].
+57 -((all x (H_7(x) -> S_13(x))) & (exists x (S_13(x) & -H_7(x)))) # label(non_clause) # label(goal).  [goal].
+
+============================== end of process non-clausal formulas ===
+
+============================== PROCESS INITIAL CLAUSES ===============
+
+% Clauses before input processing:
+
+formulas(usable).
+end_of_list.
+
+formulas(sos).
+-H_2(x) | H_1(x).  [clausify(1)].
+-H_3(x) | H_2(x).  [clausify(2)].
+-H_4(x) | H_3(x).  [clausify(3)].
+-H_5(x) | H_3(x).  [clausify(4)].
+-H_6(x) | H_2(x).  [clausify(5)].
+-H_7(x) | H_6(x).  [clausify(6)].
+-H_8(x) | H_1(x).  [clausify(7)].
+-H_9(x) | H_8(x).  [clausify(8)].
+-H_10(x) | H_8(x).  [clausify(9)].
+-H_11(x) | H_8(x).  [clausify(10)].
+-H_12(x) | H_8(x).  [clausify(11)].
+-S_14(x) | S_13(x).  [clausify(12)].
+-S_15(x) | S_13(x).  [clausify(13)].
+-S_16(x) | S_13(x).  [clausify(14)].
+-H_1(x) | S_13(x).  [clausify(15)].
+H_1(x) | -S_13(x).  [clausify(15)].
+-H_2(x) | S_13(x).  [clausify(16)].
+S_13(c1).  [clausify(16)].
+-H_2(c1).  [clausify(16)].
+-H_2(x) | S_14(x) | S_15(x).  [clausify(17)].
+H_2(x) | -S_14(x).  [clausify(17)].
+H_2(x) | -S_15(x).  [clausify(17)].
+-H_3(x) | S_14(x).  [clausify(18)].
+H_3(x) | -S_14(x).  [clausify(18)].
+-H_4(x) | S_14(x).  [clausify(19)].
+-H_5(x) | S_14(x).  [clausify(19)].
+H_4(x) | H_5(x) | -S_14(x).  [clausify(19)].
+-H_6(x) | S_15(x).  [clausify(20)].
+H_6(x) | -S_15(x).  [clausify(20)].
+-H_7(x) | S_15(x).  [clausify(21)].
+H_7(x) | -S_15(x).  [clausify(21)].
+-H_8(x) | S_16(x).  [clausify(22)].
+H_8(x) | -S_16(x).  [clausify(22)].
+H_11(c2).  [clausify(23)].
+H_10(c3).  [clausify(24)].
+H_12(c4).  [clausify(25)].
+H_1(c5).  [clausify(26)].
+H_3(c6).  [clausify(27)].
+H_2(c7).  [clausify(28)].
+H_5(c8).  [clausify(29)].
+H_4(c9).  [clausify(30)].
+H_7(c10).  [clausify(31)].
+H_6(c11).  [clausify(32)].
+H_9(c12).  [clausify(33)].
+H_8(c13).  [clausify(34)].
+S_13(c14).  [clausify(35)].
+S_15(c15).  [clausify(36)].
+S_14(c16).  [clausify(37)].
+S_16(c17).  [clausify(38)].
+-H_1(x) | H_2(x) | H_8(x).  [clausify(39)].
+-H_3(x) | H_4(x) | H_5(x).  [clausify(40)].
+-H_2(x) | H_3(x) | H_6(x).  [clausify(41)].
+-H_6(x) | H_7(x).  [clausify(42)].
+-H_8(x) | H_9(x) | H_10(x) | H_11(x) | H_12(x).  [clausify(43)].
+-S_13(x) | S_14(x) | S_15(x) | S_16(x).  [clausify(44)].
+-H_8(x) | -H_2(x).  [clausify(45)].
+-H_5(x) | -H_4(x).  [clausify(46)].
+-H_6(x) | -H_3(x).  [clausify(47)].
+-H_9(x) | -H_10(x).  [clausify(48)].
+-H_9(x) | -H_11(x).  [clausify(49)].
+-H_9(x) | -H_12(x).  [clausify(50)].
+-H_11(x) | -H_10(x).  [clausify(51)].
+-H_12(x) | -H_10(x).  [clausify(52)].
+-H_12(x) | -H_11(x).  [clausify(53)].
+-S_15(x) | -S_14(x).  [clausify(54)].
+-S_16(x) | -S_14(x).  [clausify(55)].
+-S_16(x) | -S_15(x).  [clausify(56)].
+-H_7(x) | S_13(x).  [deny(57)].
+S_13(c18).  [deny(57)].
+-H_7(c18).  [deny(57)].
+end_of_list.
+
+formulas(demodulators).
+end_of_list.
+
+============================== PREDICATE ELIMINATION =================
+
+Eliminating H_2/1
+58 -H_3(x) | H_2(x).  [clausify(2)].
+59 -H_2(x) | H_1(x).  [clausify(1)].
+Derived: -H_3(x) | H_1(x).  [resolve(58,b,59,a)].
+60 -H_6(x) | H_2(x).  [clausify(5)].
+Derived: -H_6(x) | H_1(x).  [resolve(60,b,59,a)].
+61 -H_2(x) | S_13(x).  [clausify(16)].
+Derived: S_13(x) | -H_3(x).  [resolve(61,a,58,b)].
+Derived: S_13(x) | -H_6(x).  [resolve(61,a,60,b)].
+62 -H_2(c1).  [clausify(16)].
+Derived: -H_3(c1).  [resolve(62,a,58,b)].
+Derived: -H_6(c1).  [resolve(62,a,60,b)].
+63 -H_2(x) | S_14(x) | S_15(x).  [clausify(17)].
+64 H_2(x) | -S_14(x).  [clausify(17)].
+Derived: -S_14(x) | H_1(x).  [resolve(64,a,59,a)].
+Derived: -S_14(x) | S_13(x).  [resolve(64,a,61,a)].
+Derived: -S_14(c1).  [resolve(64,a,62,a)].
+65 H_2(x) | -S_15(x).  [clausify(17)].
+Derived: -S_15(x) | H_1(x).  [resolve(65,a,59,a)].
+Derived: -S_15(x) | S_13(x).  [resolve(65,a,61,a)].
+Derived: -S_15(c1).  [resolve(65,a,62,a)].
+66 H_2(c7).  [clausify(28)].
+Derived: H_1(c7).  [resolve(66,a,59,a)].
+Derived: S_13(c7).  [resolve(66,a,61,a)].
+Derived: S_14(c7) | S_15(c7).  [resolve(66,a,63,a)].
+67 -H_1(x) | H_2(x) | H_8(x).  [clausify(39)].
+Derived: -H_1(x) | H_8(x) | S_13(x).  [resolve(67,b,61,a)].
+Derived: -H_1(c1) | H_8(c1).  [resolve(67,b,62,a)].
+Derived: -H_1(x) | H_8(x) | S_14(x) | S_15(x).  [resolve(67,b,63,a)].
+68 -H_2(x) | H_3(x) | H_6(x).  [clausify(41)].
+Derived: H_3(x) | H_6(x) | -S_14(x).  [resolve(68,a,64,a)].
+Derived: H_3(x) | H_6(x) | -S_15(x).  [resolve(68,a,65,a)].
+Derived: H_3(c7) | H_6(c7).  [resolve(68,a,66,a)].
+Derived: H_3(x) | H_6(x) | -H_1(x) | H_8(x).  [resolve(68,a,67,b)].
+69 -H_8(x) | -H_2(x).  [clausify(45)].
+Derived: -H_8(x) | -H_3(x).  [resolve(69,b,58,b)].
+Derived: -H_8(x) | -H_6(x).  [resolve(69,b,60,b)].
+Derived: -H_8(x) | -S_14(x).  [resolve(69,b,64,a)].
+Derived: -H_8(x) | -S_15(x).  [resolve(69,b,65,a)].
+Derived: -H_8(c7).  [resolve(69,b,66,a)].
+
+Eliminating H_4/1
+70 H_4(x) | H_5(x) | -S_14(x).  [clausify(19)].
+71 -H_4(x) | H_3(x).  [clausify(3)].
+72 -H_4(x) | S_14(x).  [clausify(19)].
+Derived: H_5(x) | -S_14(x) | H_3(x).  [resolve(70,a,71,a)].
+73 H_4(c9).  [clausify(30)].
+Derived: H_3(c9).  [resolve(73,a,71,a)].
+Derived: S_14(c9).  [resolve(73,a,72,a)].
+74 -H_3(x) | H_4(x) | H_5(x).  [clausify(40)].
+Derived: -H_3(x) | H_5(x) | S_14(x).  [resolve(74,b,72,a)].
+75 -H_5(x) | -H_4(x).  [clausify(46)].
+Derived: -H_5(c9).  [resolve(75,b,73,a)].
+
+Eliminating H_5/1
+76 H_5(c8).  [clausify(29)].
+77 -H_5(x) | H_3(x).  [clausify(4)].
+78 -H_5(x) | S_14(x).  [clausify(19)].
+Derived: H_3(c8).  [resolve(76,a,77,a)].
+Derived: S_14(c8).  [resolve(76,a,78,a)].
+79 H_5(x) | -S_14(x) | H_3(x).  [resolve(70,a,71,a)].
+Derived: -S_14(x) | H_3(x) | H_3(x).  [resolve(79,a,77,a)].
+80 -H_3(x) | H_5(x) | S_14(x).  [resolve(74,b,72,a)].
+Derived: -H_3(x) | S_14(x) | S_14(x).  [resolve(80,b,78,a)].
+81 -H_5(c9).  [resolve(75,b,73,a)].
+
+Eliminating H_7/1
+82 H_7(x) | -S_15(x).  [clausify(21)].
+83 -H_7(x) | H_6(x).  [clausify(6)].
+84 -H_7(x) | S_15(x).  [clausify(21)].
+Derived: -S_15(x) | H_6(x).  [resolve(82,a,83,a)].
+85 H_7(c10).  [clausify(31)].
+Derived: H_6(c10).  [resolve(85,a,83,a)].
+Derived: S_15(c10).  [resolve(85,a,84,a)].
+86 -H_6(x) | H_7(x).  [clausify(42)].
+Derived: -H_6(x) | S_15(x).  [resolve(86,b,84,a)].
+87 -H_7(x) | S_13(x).  [deny(57)].
+Derived: S_13(c10).  [resolve(87,a,85,a)].
+88 -H_7(c18).  [deny(57)].
+Derived: -S_15(c18).  [resolve(88,a,82,a)].
+Derived: -H_6(c18).  [resolve(88,a,86,b)].
+
+Eliminating H_8/1
+89 -H_9(x) | H_8(x).  [clausify(8)].
+90 -H_8(x) | H_1(x).  [clausify(7)].
+Derived: -H_9(x) | H_1(x).  [resolve(89,b,90,a)].
+91 -H_10(x) | H_8(x).  [clausify(9)].
+Derived: -H_10(x) | H_1(x).  [resolve(91,b,90,a)].
+92 -H_11(x) | H_8(x).  [clausify(10)].
+Derived: -H_11(x) | H_1(x).  [resolve(92,b,90,a)].
+93 -H_12(x) | H_8(x).  [clausify(11)].
+Derived: -H_12(x) | H_1(x).  [resolve(93,b,90,a)].
+94 -H_8(x) | S_16(x).  [clausify(22)].
+Derived: S_16(x) | -H_9(x).  [resolve(94,a,89,b)].
+Derived: S_16(x) | -H_10(x).  [resolve(94,a,91,b)].
+Derived: S_16(x) | -H_11(x).  [resolve(94,a,92,b)].
+Derived: S_16(x) | -H_12(x).  [resolve(94,a,93,b)].
+95 H_8(x) | -S_16(x).  [clausify(22)].
+Derived: -S_16(x) | H_1(x).  [resolve(95,a,90,a)].
+96 H_8(c13).  [clausify(34)].
+Derived: H_1(c13).  [resolve(96,a,90,a)].
+Derived: S_16(c13).  [resolve(96,a,94,a)].
+97 -H_8(x) | H_9(x) | H_10(x) | H_11(x) | H_12(x).  [clausify(43)].
+Derived: H_9(x) | H_10(x) | H_11(x) | H_12(x) | -S_16(x).  [resolve(97,a,95,a)].
+Derived: H_9(c13) | H_10(c13) | H_11(c13) | H_12(c13).  [resolve(97,a,96,a)].
+98 -H_1(x) | H_8(x) | S_13(x).  [resolve(67,b,61,a)].
+Derived: -H_1(x) | S_13(x) | S_16(x).  [resolve(98,b,94,a)].
+Derived: -H_1(x) | S_13(x) | H_9(x) | H_10(x) | H_11(x) | H_12(x).  [resolve(98,b,97,a)].
+99 -H_1(c1) | H_8(c1).  [resolve(67,b,62,a)].
+Derived: -H_1(c1) | S_16(c1).  [resolve(99,b,94,a)].
+Derived: -H_1(c1) | H_9(c1) | H_10(c1) | H_11(c1) | H_12(c1).  [resolve(99,b,97,a)].
+100 -H_1(x) | H_8(x) | S_14(x) | S_15(x).  [resolve(67,b,63,a)].
+Derived: -H_1(x) | S_14(x) | S_15(x) | S_16(x).  [resolve(100,b,94,a)].
+Derived: -H_1(x) | S_14(x) | S_15(x) | H_9(x) | H_10(x) | H_11(x) | H_12(x).  [resolve(100,b,97,a)].
+101 H_3(x) | H_6(x) | -H_1(x) | H_8(x).  [resolve(68,a,67,b)].
+Derived: H_3(x) | H_6(x) | -H_1(x) | S_16(x).  [resolve(101,d,94,a)].
+Derived: H_3(x) | H_6(x) | -H_1(x) | H_9(x) | H_10(x) | H_11(x) | H_12(x).  [resolve(101,d,97,a)].
+102 -H_8(x) | -H_3(x).  [resolve(69,b,58,b)].
+Derived: -H_3(x) | -H_9(x).  [resolve(102,a,89,b)].
+Derived: -H_3(x) | -H_10(x).  [resolve(102,a,91,b)].
+Derived: -H_3(x) | -H_11(x).  [resolve(102,a,92,b)].
+Derived: -H_3(x) | -H_12(x).  [resolve(102,a,93,b)].
+Derived: -H_3(x) | -S_16(x).  [resolve(102,a,95,a)].
+Derived: -H_3(c13).  [resolve(102,a,96,a)].
+Derived: -H_3(x) | -H_1(x) | S_13(x).  [resolve(102,a,98,b)].
+Derived: -H_3(c1) | -H_1(c1).  [resolve(102,a,99,b)].
+103 -H_8(x) | -H_6(x).  [resolve(69,b,60,b)].
+Derived: -H_6(x) | -H_9(x).  [resolve(103,a,89,b)].
+Derived: -H_6(x) | -H_10(x).  [resolve(103,a,91,b)].
+Derived: -H_6(x) | -H_11(x).  [resolve(103,a,92,b)].
+Derived: -H_6(x) | -H_12(x).  [resolve(103,a,93,b)].
+Derived: -H_6(x) | -S_16(x).  [resolve(103,a,95,a)].
+Derived: -H_6(c13).  [resolve(103,a,96,a)].
+Derived: -H_6(x) | -H_1(x) | S_13(x).  [resolve(103,a,98,b)].
+Derived: -H_6(c1) | -H_1(c1).  [resolve(103,a,99,b)].
+104 -H_8(x) | -S_14(x).  [resolve(69,b,64,a)].
+Derived: -S_14(x) | -H_9(x).  [resolve(104,a,89,b)].
+Derived: -S_14(x) | -H_10(x).  [resolve(104,a,91,b)].
+Derived: -S_14(x) | -H_11(x).  [resolve(104,a,92,b)].
+Derived: -S_14(x) | -H_12(x).  [resolve(104,a,93,b)].
+Derived: -S_14(x) | -S_16(x).  [resolve(104,a,95,a)].
+Derived: -S_14(c13).  [resolve(104,a,96,a)].
+Derived: -S_14(x) | -H_1(x) | S_13(x).  [resolve(104,a,98,b)].
+Derived: -S_14(c1) | -H_1(c1).  [resolve(104,a,99,b)].
+105 -H_8(x) | -S_15(x).  [resolve(69,b,65,a)].
+Derived: -S_15(x) | -H_9(x).  [resolve(105,a,89,b)].
+Derived: -S_15(x) | -H_10(x).  [resolve(105,a,91,b)].
+Derived: -S_15(x) | -H_11(x).  [resolve(105,a,92,b)].
+Derived: -S_15(x) | -H_12(x).  [resolve(105,a,93,b)].
+Derived: -S_15(x) | -S_16(x).  [resolve(105,a,95,a)].
+Derived: -S_15(c13).  [resolve(105,a,96,a)].
+Derived: -S_15(x) | -H_1(x) | S_13(x).  [resolve(105,a,98,b)].
+Derived: -S_15(c1) | -H_1(c1).  [resolve(105,a,99,b)].
+106 -H_8(c7).  [resolve(69,b,66,a)].
+Derived: -H_9(c7).  [resolve(106,a,89,b)].
+Derived: -H_10(c7).  [resolve(106,a,91,b)].
+Derived: -H_11(c7).  [resolve(106,a,92,b)].
+Derived: -H_12(c7).  [resolve(106,a,93,b)].
+Derived: -S_16(c7).  [resolve(106,a,95,a)].
+Derived: -H_1(c7) | S_13(c7).  [resolve(106,a,98,b)].
+Derived: -H_1(c7) | S_14(c7) | S_15(c7).  [resolve(106,a,100,b)].
+Derived: H_3(c7) | H_6(c7) | -H_1(c7).  [resolve(106,a,101,d)].
+
+Eliminating S_13/1
+107 H_1(x) | -S_13(x).  [clausify(15)].
+108 -S_14(x) | S_13(x).  [clausify(12)].
+109 -S_15(x) | S_13(x).  [clausify(13)].
+110 -S_16(x) | S_13(x).  [clausify(14)].
+111 -H_1(x) | S_13(x).  [clausify(15)].
+112 S_13(c1).  [clausify(16)].
+Derived: H_1(c1).  [resolve(112,a,107,b)].
+113 S_13(c14).  [clausify(35)].
+Derived: H_1(c14).  [resolve(113,a,107,b)].
+114 -S_13(x) | S_14(x) | S_15(x) | S_16(x).  [clausify(44)].
+Derived: S_14(c1) | S_15(c1) | S_16(c1).  [resolve(114,a,112,a)].
+Derived: S_14(c14) | S_15(c14) | S_16(c14).  [resolve(114,a,113,a)].
+115 S_13(c18).  [deny(57)].
+Derived: H_1(c18).  [resolve(115,a,107,b)].
+Derived: S_14(c18) | S_15(c18) | S_16(c18).  [resolve(115,a,114,a)].
+116 S_13(x) | -H_3(x).  [resolve(61,a,58,b)].
+Derived: -H_3(x) | H_1(x).  [resolve(116,a,107,b)].
+117 S_13(x) | -H_6(x).  [resolve(61,a,60,b)].
+Derived: -H_6(x) | H_1(x).  [resolve(117,a,107,b)].
+118 -S_14(x) | S_13(x).  [resolve(64,a,61,a)].
+Derived: -S_14(x) | H_1(x).  [resolve(118,b,107,b)].
+119 -S_15(x) | S_13(x).  [resolve(65,a,61,a)].
+Derived: -S_15(x) | H_1(x).  [resolve(119,b,107,b)].
+120 S_13(c7).  [resolve(66,a,61,a)].
+Derived: H_1(c7).  [resolve(120,a,107,b)].
+121 S_13(c10).  [resolve(87,a,85,a)].
+Derived: H_1(c10).  [resolve(121,a,107,b)].
+Derived: S_14(c10) | S_15(c10) | S_16(c10).  [resolve(121,a,114,a)].
+122 -H_1(x) | S_13(x) | S_16(x).  [resolve(98,b,94,a)].
+123 -H_1(x) | S_13(x) | H_9(x) | H_10(x) | H_11(x) | H_12(x).  [resolve(98,b,97,a)].
+124 -H_3(x) | -H_1(x) | S_13(x).  [resolve(102,a,98,b)].
+Derived: -H_3(x) | -H_1(x) | S_14(x) | S_15(x) | S_16(x).  [resolve(124,c,114,a)].
+125 -H_6(x) | -H_1(x) | S_13(x).  [resolve(103,a,98,b)].
+Derived: -H_6(x) | -H_1(x) | S_14(x) | S_15(x) | S_16(x).  [resolve(125,c,114,a)].
+126 -S_14(x) | -H_1(x) | S_13(x).  [resolve(104,a,98,b)].
+127 -S_15(x) | -H_1(x) | S_13(x).  [resolve(105,a,98,b)].
+128 -H_1(c7) | S_13(c7).  [resolve(106,a,98,b)].
+
+Eliminating H_6/1
+129 H_6(x) | -S_15(x).  [clausify(20)].
+130 -H_6(x) | S_15(x).  [clausify(20)].
+131 H_6(c11).  [clausify(32)].
+Derived: S_15(c11).  [resolve(131,a,130,a)].
+132 -H_6(x) | -H_3(x).  [clausify(47)].
+Derived: -H_3(x) | -S_15(x).  [resolve(132,a,129,a)].
+Derived: -H_3(c11).  [resolve(132,a,131,a)].
+133 -H_6(x) | H_1(x).  [resolve(60,b,59,a)].
+Derived: H_1(c11).  [resolve(133,a,131,a)].
+134 -H_6(c1).  [resolve(62,a,60,b)].
+135 H_3(x) | H_6(x) | -S_14(x).  [resolve(68,a,64,a)].
+136 H_3(x) | H_6(x) | -S_15(x).  [resolve(68,a,65,a)].
+Derived: H_3(c1) | -S_15(c1).  [resolve(136,b,134,a)].
+137 H_3(c7) | H_6(c7).  [resolve(68,a,66,a)].
+Derived: H_3(c7) | S_15(c7).  [resolve(137,b,130,a)].
+138 -S_15(x) | H_6(x).  [resolve(82,a,83,a)].
+Derived: -S_15(c1).  [resolve(138,b,134,a)].
+139 H_6(c10).  [resolve(85,a,83,a)].
+Derived: -H_3(c10).  [resolve(139,a,132,a)].
+140 -H_6(x) | S_15(x).  [resolve(86,b,84,a)].
+Derived: S_15(x) | H_3(x) | -S_14(x).  [resolve(140,a,135,b)].
+Derived: S_15(c10).  [resolve(140,a,139,a)].
+141 -H_6(c18).  [resolve(88,a,86,b)].
+Derived: -S_15(c18).  [resolve(141,a,129,a)].
+Derived: H_3(c18) | -S_14(c18).  [resolve(141,a,135,b)].
+142 H_3(x) | H_6(x) | -H_1(x) | S_16(x).  [resolve(101,d,94,a)].
+Derived: H_3(x) | -H_1(x) | S_16(x) | S_15(x).  [resolve(142,b,130,a)].
+Derived: H_3(c1) | -H_1(c1) | S_16(c1).  [resolve(142,b,134,a)].
+Derived: H_3(c18) | -H_1(c18) | S_16(c18).  [resolve(142,b,141,a)].
+143 H_3(x) | H_6(x) | -H_1(x) | H_9(x) | H_10(x) | H_11(x) | H_12(x).  [resolve(101,d,97,a)].
+Derived: H_3(x) | -H_1(x) | H_9(x) | H_10(x) | H_11(x) | H_12(x) | S_15(x).  [resolve(143,b,130,a)].
+Derived: H_3(c1) | -H_1(c1) | H_9(c1) | H_10(c1) | H_11(c1) | H_12(c1).  [resolve(143,b,134,a)].
+Derived: H_3(c18) | -H_1(c18) | H_9(c18) | H_10(c18) | H_11(c18) | H_12(c18).  [resolve(143,b,141,a)].
+144 -H_6(x) | -H_9(x).  [resolve(103,a,89,b)].
+Derived: -H_9(c11).  [resolve(144,a,131,a)].
+Derived: -H_9(c10).  [resolve(144,a,139,a)].
+Derived: -H_9(x) | H_3(x) | -H_1(x) | S_16(x).  [resolve(144,a,142,b)].
+145 -H_6(x) | -H_10(x).  [resolve(103,a,91,b)].
+Derived: -H_10(c11).  [resolve(145,a,131,a)].
+Derived: -H_10(c10).  [resolve(145,a,139,a)].
+Derived: -H_10(x) | H_3(x) | -H_1(x) | S_16(x).  [resolve(145,a,142,b)].
+146 -H_6(x) | -H_11(x).  [resolve(103,a,92,b)].
+Derived: -H_11(c11).  [resolve(146,a,131,a)].
+Derived: -H_11(c10).  [resolve(146,a,139,a)].
+Derived: -H_11(x) | H_3(x) | -H_1(x) | S_16(x).  [resolve(146,a,142,b)].
+147 -H_6(x) | -H_12(x).  [resolve(103,a,93,b)].
+Derived: -H_12(c11).  [resolve(147,a,131,a)].
+Derived: -H_12(c10).  [resolve(147,a,139,a)].
+Derived: -H_12(x) | H_3(x) | -H_1(x) | S_16(x).  [resolve(147,a,142,b)].
+148 -H_6(x) | -S_16(x).  [resolve(103,a,95,a)].
+Derived: -S_16(c11).  [resolve(148,a,131,a)].
+Derived: -S_16(c10).  [resolve(148,a,139,a)].
+Derived: -S_16(x) | H_3(x) | -H_1(x) | H_9(x) | H_10(x) | H_11(x) | H_12(x).  [resolve(148,a,143,b)].
+149 -H_6(c13).  [resolve(103,a,96,a)].
+Derived: H_3(c13) | -H_1(c13) | S_16(c13).  [resolve(149,a,142,b)].
+Derived: H_3(c13) | -H_1(c13) | H_9(c13) | H_10(c13) | H_11(c13) | H_12(c13).  [resolve(149,a,143,b)].
+150 -H_6(c1) | -H_1(c1).  [resolve(103,a,99,b)].
+151 H_3(c7) | H_6(c7) | -H_1(c7).  [resolve(106,a,101,d)].
+Derived: H_3(c7) | -H_1(c7) | -H_9(c7).  [resolve(151,b,144,a)].
+Derived: H_3(c7) | -H_1(c7) | -H_10(c7).  [resolve(151,b,145,a)].
+Derived: H_3(c7) | -H_1(c7) | -H_11(c7).  [resolve(151,b,146,a)].
+Derived: H_3(c7) | -H_1(c7) | -H_12(c7).  [resolve(151,b,147,a)].
+Derived: H_3(c7) | -H_1(c7) | -S_16(c7).  [resolve(151,b,148,a)].
+152 -H_6(x) | H_1(x).  [resolve(117,a,107,b)].
+153 -H_6(x) | -H_1(x) | S_14(x) | S_15(x) | S_16(x).  [resolve(125,c,114,a)].
+
+Eliminating H_11/1
+154 -H_9(x) | -H_11(x).  [clausify(49)].
+155 H_11(c2).  [clausify(23)].
+Derived: -H_9(c2).  [resolve(154,b,155,a)].
+156 -H_11(x) | -H_10(x).  [clausify(51)].
+Derived: -H_10(c2).  [resolve(156,a,155,a)].
+157 -H_12(x) | -H_11(x).  [clausify(53)].
+Derived: -H_12(c2).  [resolve(157,b,155,a)].
+158 -H_11(x) | H_1(x).  [resolve(92,b,90,a)].
+Derived: H_1(c2).  [resolve(158,a,155,a)].
+159 S_16(x) | -H_11(x).  [resolve(94,a,92,b)].
+Derived: S_16(c2).  [resolve(159,b,155,a)].
+160 H_9(x) | H_10(x) | H_11(x) | H_12(x) | -S_16(x).  [resolve(97,a,95,a)].
+Derived: H_9(x) | H_10(x) | H_12(x) | -S_16(x) | H_1(x).  [resolve(160,c,158,a)].
+161 H_9(c13) | H_10(c13) | H_11(c13) | H_12(c13).  [resolve(97,a,96,a)].
+Derived: H_9(c13) | H_10(c13) | H_12(c13) | H_1(c13).  [resolve(161,c,158,a)].
+Derived: H_9(c13) | H_10(c13) | H_12(c13) | S_16(c13).  [resolve(161,c,159,b)].
+162 -H_1(c1) | H_9(c1) | H_10(c1) | H_11(c1) | H_12(c1).  [resolve(99,b,97,a)].
+Derived: -H_1(c1) | H_9(c1) | H_10(c1) | H_12(c1) | S_16(c1).  [resolve(162,d,159,b)].
+163 -H_1(x) | S_14(x) | S_15(x) | H_9(x) | H_10(x) | H_11(x) | H_12(x).  [resolve(100,b,97,a)].
+Derived: -H_1(x) | S_14(x) | S_15(x) | H_9(x) | H_10(x) | H_12(x) | S_16(x).  [resolve(163,f,159,b)].
+164 -H_3(x) | -H_11(x).  [resolve(102,a,92,b)].
+Derived: -H_3(c2).  [resolve(164,b,155,a)].
+Derived: -H_3(x) | -H_1(x) | S_14(x) | S_15(x) | H_9(x) | H_10(x) | H_12(x).  [resolve(164,b,163,f)].
+165 -S_14(x) | -H_11(x).  [resolve(104,a,92,b)].
+Derived: -S_14(c2).  [resolve(165,b,155,a)].
+166 -S_15(x) | -H_11(x).  [resolve(105,a,92,b)].
+Derived: -S_15(c2).  [resolve(166,b,155,a)].
+167 -H_11(c7).  [resolve(106,a,92,b)].
+168 H_3(x) | -H_1(x) | H_9(x) | H_10(x) | H_11(x) | H_12(x) | S_15(x).  [resolve(143,b,130,a)].
+Derived: H_3(x) | -H_1(x) | H_9(x) | H_10(x) | H_12(x) | S_15(x) | S_16(x).  [resolve(168,e,159,b)].
+Derived: H_3(x) | -H_1(x) | H_9(x) | H_10(x) | H_12(x) | S_15(x) | -S_14(x).  [resolve(168,e,165,b)].
+Derived: H_3(c7) | -H_1(c7) | H_9(c7) | H_10(c7) | H_12(c7) | S_15(c7).  [resolve(168,e,167,a)].
+169 H_3(c1) | -H_1(c1) | H_9(c1) | H_10(c1) | H_11(c1) | H_12(c1).  [resolve(143,b,134,a)].
+Derived: H_3(c1) | -H_1(c1) | H_9(c1) | H_10(c1) | H_12(c1) | -S_14(c1).  [resolve(169,e,165,b)].
+Derived: H_3(c1) | -H_1(c1) | H_9(c1) | H_10(c1) | H_12(c1) | -S_15(c1).  [resolve(169,e,166,b)].
+170 H_3(c18) | -H_1(c18) | H_9(c18) | H_10(c18) | H_11(c18) | H_12(c18).  [resolve(143,b,141,a)].
+Derived: H_3(c18) | -H_1(c18) | H_9(c18) | H_10(c18) | H_12(c18) | S_16(c18).  [resolve(170,e,159,b)].
+Derived: H_3(c18) | -H_1(c18) | H_9(c18) | H_10(c18) | H_12(c18) | -S_14(c18).  [resolve(170,e,165,b)].
+Derived: H_3(c18) | -H_1(c18) | H_9(c18) | H_10(c18) | H_12(c18) | -S_15(c18).  [resolve(170,e,166,b)].
+171 -H_11(c11).  [resolve(146,a,131,a)].
+Derived: -H_1(c11) | S_14(c11) | S_15(c11) | H_9(c11) | H_10(c11) | H_12(c11).  [resolve(171,a,163,f)].
+Derived: H_3(c11) | -H_1(c11) | H_9(c11) | H_10(c11) | H_12(c11) | S_15(c11).  [resolve(171,a,168,e)].
+172 -H_11(c10).  [resolve(146,a,139,a)].
+Derived: -H_1(c10) | S_14(c10) | S_15(c10) | H_9(c10) | H_10(c10) | H_12(c10).  [resolve(172,a,163,f)].
+Derived: H_3(c10) | -H_1(c10) | H_9(c10) | H_10(c10) | H_12(c10) | S_15(c10).  [resolve(172,a,168,e)].
+173 -H_11(x) | H_3(x) | -H_1(x) | S_16(x).  [resolve(146,a,142,b)].
+174 -S_16(x) | H_3(x) | -H_1(x) | H_9(x) | H_10(x) | H_11(x) | H_12(x).  [resolve(148,a,143,b)].
+Derived: -S_16(x) | H_3(x) | -H_1(x) | H_9(x) | H_10(x) | H_12(x) | -S_14(x).  [resolve(174,f,165,b)].
+Derived: -S_16(x) | H_3(x) | -H_1(x) | H_9(x) | H_10(x) | H_12(x) | -S_15(x).  [resolve(174,f,166,b)].
+Derived: -S_16(c11) | H_3(c11) | -H_1(c11) | H_9(c11) | H_10(c11) | H_12(c11).  [resolve(174,f,171,a)].
+Derived: -S_16(c10) | H_3(c10) | -H_1(c10) | H_9(c10) | H_10(c10) | H_12(c10).  [resolve(174,f,172,a)].
+175 H_3(c13) | -H_1(c13) | H_9(c13) | H_10(c13) | H_11(c13) | H_12(c13).  [resolve(149,a,143,b)].
+Derived: H_3(c13) | -H_1(c13) | H_9(c13) | H_10(c13) | H_12(c13) | -S_14(c13).  [resolve(175,e,165,b)].
+Derived: H_3(c13) | -H_1(c13) | H_9(c13) | H_10(c13) | H_12(c13) | -S_15(c13).  [resolve(175,e,166,b)].
+176 H_3(c7) | -H_1(c7) | -H_11(c7).  [resolve(151,b,146,a)].
+
+Eliminating H_10/1
+177 -H_9(x) | -H_10(x).  [clausify(48)].
+178 H_10(c3).  [clausify(24)].
+Derived: -H_9(c3).  [resolve(177,b,178,a)].
+179 -H_12(x) | -H_10(x).  [clausify(52)].
+Derived: -H_12(c3).  [resolve(179,b,178,a)].
+180 -H_10(x) | H_1(x).  [resolve(91,b,90,a)].
+Derived: H_1(c3).  [resolve(180,a,178,a)].
+181 S_16(x) | -H_10(x).  [resolve(94,a,91,b)].
+Derived: S_16(c3).  [resolve(181,b,178,a)].
+182 -H_3(x) | -H_10(x).  [resolve(102,a,91,b)].
+Derived: -H_3(c3).  [resolve(182,b,178,a)].
+183 -S_14(x) | -H_10(x).  [resolve(104,a,91,b)].
+Derived: -S_14(c3).  [resolve(183,b,178,a)].
+184 -S_15(x) | -H_10(x).  [resolve(105,a,91,b)].
+Derived: -S_15(c3).  [resolve(184,b,178,a)].
+185 -H_10(c7).  [resolve(106,a,91,b)].
+186 -H_10(c11).  [resolve(145,a,131,a)].
+187 -H_10(c10).  [resolve(145,a,139,a)].
+188 -H_10(x) | H_3(x) | -H_1(x) | S_16(x).  [resolve(145,a,142,b)].
+189 H_3(c7) | -H_1(c7) | -H_10(c7).  [resolve(151,b,145,a)].
+190 -H_10(c2).  [resolve(156,a,155,a)].
+191 H_9(x) | H_10(x) | H_12(x) | -S_16(x) | H_1(x).  [resolve(160,c,158,a)].
+Derived: H_9(x) | H_12(x) | -S_16(x) | H_1(x) | H_1(x).  [resolve(191,b,180,a)].
+192 H_9(c13) | H_10(c13) | H_12(c13) | H_1(c13).  [resolve(161,c,158,a)].
+Derived: H_9(c13) | H_12(c13) | H_1(c13) | H_1(c13).  [resolve(192,b,180,a)].
+193 H_9(c13) | H_10(c13) | H_12(c13) | S_16(c13).  [resolve(161,c,159,b)].
+Derived: H_9(c13) | H_12(c13) | S_16(c13) | S_16(c13).  [resolve(193,b,181,b)].
+194 -H_1(c1) | H_9(c1) | H_10(c1) | H_12(c1) | S_16(c1).  [resolve(162,d,159,b)].
+Derived: -H_1(c1) | H_9(c1) | H_12(c1) | S_16(c1) | S_16(c1).  [resolve(194,c,181,b)].
+195 -H_1(x) | S_14(x) | S_15(x) | H_9(x) | H_10(x) | H_12(x) | S_16(x).  [resolve(163,f,159,b)].
+Derived: -H_1(x) | S_14(x) | S_15(x) | H_9(x) | H_12(x) | S_16(x) | S_16(x).  [resolve(195,e,181,b)].
+196 -H_3(x) | -H_1(x) | S_14(x) | S_15(x) | H_9(x) | H_10(x) | H_12(x).  [resolve(164,b,163,f)].
+Derived: -H_3(x) | -H_1(x) | S_14(x) | S_15(x) | H_9(x) | H_12(x) | -H_3(x).  [resolve(196,f,182,b)].
+197 H_3(x) | -H_1(x) | H_9(x) | H_10(x) | H_12(x) | S_15(x) | S_16(x).  [resolve(168,e,159,b)].
+Derived: H_3(x) | -H_1(x) | H_9(x) | H_12(x) | S_15(x) | S_16(x) | S_16(x).  [resolve(197,d,181,b)].
+198 H_3(x) | -H_1(x) | H_9(x) | H_10(x) | H_12(x) | S_15(x) | -S_14(x).  [resolve(168,e,165,b)].
+Derived: H_3(x) | -H_1(x) | H_9(x) | H_12(x) | S_15(x) | -S_14(x) | -S_14(x).  [resolve(198,d,183,b)].
+199 H_3(c7) | -H_1(c7) | H_9(c7) | H_10(c7) | H_12(c7) | S_15(c7).  [resolve(168,e,167,a)].
+Derived: H_3(c7) | -H_1(c7) | H_9(c7) | H_12(c7) | S_15(c7).  [resolve(199,d,185,a)].
+200 H_3(c1) | -H_1(c1) | H_9(c1) | H_10(c1) | H_12(c1) | -S_14(c1).  [resolve(169,e,165,b)].
+Derived: H_3(c1) | -H_1(c1) | H_9(c1) | H_12(c1) | -S_14(c1) | -S_14(c1).  [resolve(200,d,183,b)].
+201 H_3(c1) | -H_1(c1) | H_9(c1) | H_10(c1) | H_12(c1) | -S_15(c1).  [resolve(169,e,166,b)].
+Derived: H_3(c1) | -H_1(c1) | H_9(c1) | H_12(c1) | -S_15(c1) | -S_15(c1).  [resolve(201,d,184,b)].
+202 H_3(c18) | -H_1(c18) | H_9(c18) | H_10(c18) | H_12(c18) | S_16(c18).  [resolve(170,e,159,b)].
+Derived: H_3(c18) | -H_1(c18) | H_9(c18) | H_12(c18) | S_16(c18) | S_16(c18).  [resolve(202,d,181,b)].
+203 H_3(c18) | -H_1(c18) | H_9(c18) | H_10(c18) | H_12(c18) | -S_14(c18).  [resolve(170,e,165,b)].
+Derived: H_3(c18) | -H_1(c18) | H_9(c18) | H_12(c18) | -S_14(c18) | -S_14(c18).  [resolve(203,d,183,b)].
+204 H_3(c18) | -H_1(c18) | H_9(c18) | H_10(c18) | H_12(c18) | -S_15(c18).  [resolve(170,e,166,b)].
+Derived: H_3(c18) | -H_1(c18) | H_9(c18) | H_12(c18) | -S_15(c18) | -S_15(c18).  [resolve(204,d,184,b)].
+205 -H_1(c11) | S_14(c11) | S_15(c11) | H_9(c11) | H_10(c11) | H_12(c11).  [resolve(171,a,163,f)].
+Derived: -H_1(c11) | S_14(c11) | S_15(c11) | H_9(c11) | H_12(c11).  [resolve(205,e,186,a)].
+206 H_3(c11) | -H_1(c11) | H_9(c11) | H_10(c11) | H_12(c11) | S_15(c11).  [resolve(171,a,168,e)].
+Derived: H_3(c11) | -H_1(c11) | H_9(c11) | H_12(c11) | S_15(c11).  [resolve(206,d,186,a)].
+207 -H_1(c10) | S_14(c10) | S_15(c10) | H_9(c10) | H_10(c10) | H_12(c10).  [resolve(172,a,163,f)].
+Derived: -H_1(c10) | S_14(c10) | S_15(c10) | H_9(c10) | H_12(c10).  [resolve(207,e,187,a)].
+208 H_3(c10) | -H_1(c10) | H_9(c10) | H_10(c10) | H_12(c10) | S_15(c10).  [resolve(172,a,168,e)].
+Derived: H_3(c10) | -H_1(c10) | H_9(c10) | H_12(c10) | S_15(c10).  [resolve(208,d,187,a)].
+209 -S_16(x) | H_3(x) | -H_1(x) | H_9(x) | H_10(x) | H_12(x) | -S_14(x).  [resolve(174,f,165,b)].
+Derived: -S_16(x) | H_3(x) | -H_1(x) | H_9(x) | H_12(x) | -S_14(x) | -S_14(x).  [resolve(209,e,183,b)].
+210 -S_16(x) | H_3(x) | -H_1(x) | H_9(x) | H_10(x) | H_12(x) | -S_15(x).  [resolve(174,f,166,b)].
+Derived: -S_16(x) | H_3(x) | -H_1(x) | H_9(x) | H_12(x) | -S_15(x) | -S_15(x).  [resolve(210,e,184,b)].
+211 -S_16(c11) | H_3(c11) | -H_1(c11) | H_9(c11) | H_10(c11) | H_12(c11).  [resolve(174,f,171,a)].
+Derived: -S_16(c11) | H_3(c11) | -H_1(c11) | H_9(c11) | H_12(c11).  [resolve(211,e,186,a)].
+212 -S_16(c10) | H_3(c10) | -H_1(c10) | H_9(c10) | H_10(c10) | H_12(c10).  [resolve(174,f,172,a)].
+Derived: -S_16(c10) | H_3(c10) | -H_1(c10) | H_9(c10) | H_12(c10).  [resolve(212,e,187,a)].
+213 H_3(c13) | -H_1(c13) | H_9(c13) | H_10(c13) | H_12(c13) | -S_14(c13).  [resolve(175,e,165,b)].
+Derived: H_3(c13) | -H_1(c13) | H_9(c13) | H_12(c13) | -S_14(c13) | -S_14(c13).  [resolve(213,d,183,b)].
+214 H_3(c13) | -H_1(c13) | H_9(c13) | H_10(c13) | H_12(c13) | -S_15(c13).  [resolve(175,e,166,b)].
+Derived: H_3(c13) | -H_1(c13) | H_9(c13) | H_12(c13) | -S_15(c13) | -S_15(c13).  [resolve(214,d,184,b)].
+
+Eliminating H_12/1
+215 -H_9(x) | -H_12(x).  [clausify(50)].
+216 H_12(c4).  [clausify(25)].
+Derived: -H_9(c4).  [resolve(215,b,216,a)].
+217 -H_12(x) | H_1(x).  [resolve(93,b,90,a)].
+Derived: H_1(c4).  [resolve(217,a,216,a)].
+218 S_16(x) | -H_12(x).  [resolve(94,a,93,b)].
+Derived: S_16(c4).  [resolve(218,b,216,a)].
+219 -H_3(x) | -H_12(x).  [resolve(102,a,93,b)].
+Derived: -H_3(c4).  [resolve(219,b,216,a)].
+220 -S_14(x) | -H_12(x).  [resolve(104,a,93,b)].
+Derived: -S_14(c4).  [resolve(220,b,216,a)].
+221 -S_15(x) | -H_12(x).  [resolve(105,a,93,b)].
+Derived: -S_15(c4).  [resolve(221,b,216,a)].
+222 -H_12(c7).  [resolve(106,a,93,b)].
+223 -H_12(c11).  [resolve(147,a,131,a)].
+224 -H_12(c10).  [resolve(147,a,139,a)].
+225 -H_12(x) | H_3(x) | -H_1(x) | S_16(x).  [resolve(147,a,142,b)].
+226 H_3(c7) | -H_1(c7) | -H_12(c7).  [resolve(151,b,147,a)].
+227 -H_12(c2).  [resolve(157,b,155,a)].
+228 -H_12(c3).  [resolve(179,b,178,a)].
+229 H_9(x) | H_12(x) | -S_16(x) | H_1(x) | H_1(x).  [resolve(191,b,180,a)].
+Derived: H_9(x) | -S_16(x) | H_1(x) | H_1(x) | H_1(x).  [resolve(229,b,217,a)].
+230 H_9(c13) | H_12(c13) | H_1(c13) | H_1(c13).  [resolve(192,b,180,a)].
+Derived: H_9(c13) | H_1(c13) | H_1(c13) | H_1(c13).  [resolve(230,b,217,a)].
+231 H_9(c13) | H_12(c13) | S_16(c13) | S_16(c13).  [resolve(193,b,181,b)].
+Derived: H_9(c13) | S_16(c13) | S_16(c13) | S_16(c13).  [resolve(231,b,218,b)].
+232 -H_1(c1) | H_9(c1) | H_12(c1) | S_16(c1) | S_16(c1).  [resolve(194,c,181,b)].
+Derived: -H_1(c1) | H_9(c1) | S_16(c1) | S_16(c1) | S_16(c1).  [resolve(232,c,218,b)].
+233 -H_1(x) | S_14(x) | S_15(x) | H_9(x) | H_12(x) | S_16(x) | S_16(x).  [resolve(195,e,181,b)].
+Derived: -H_1(x) | S_14(x) | S_15(x) | H_9(x) | S_16(x) | S_16(x) | S_16(x).  [resolve(233,e,218,b)].
+234 -H_3(x) | -H_1(x) | S_14(x) | S_15(x) | H_9(x) | H_12(x) | -H_3(x).  [resolve(196,f,182,b)].
+Derived: -H_3(x) | -H_1(x) | S_14(x) | S_15(x) | H_9(x) | -H_3(x) | -H_3(x).  [resolve(234,f,219,b)].
+235 H_3(x) | -H_1(x) | H_9(x) | H_12(x) | S_15(x) | S_16(x) | S_16(x).  [resolve(197,d,181,b)].
+Derived: H_3(x) | -H_1(x) | H_9(x) | S_15(x) | S_16(x) | S_16(x) | S_16(x).  [resolve(235,d,218,b)].
+236 H_3(x) | -H_1(x) | H_9(x) | H_12(x) | S_15(x) | -S_14(x) | -S_14(x).  [resolve(198,d,183,b)].
+Derived: H_3(x) | -H_1(x) | H_9(x) | S_15(x) | -S_14(x) | -S_14(x) | -S_14(x).  [resolve(236,d,220,b)].
+237 H_3(c7) | -H_1(c7) | H_9(c7) | H_12(c7) | S_15(c7).  [resolve(199,d,185,a)].
+Derived: H_3(c7) | -H_1(c7) | H_9(c7) | S_15(c7).  [resolve(237,d,222,a)].
+238 H_3(c1) | -H_1(c1) | H_9(c1) | H_12(c1) | -S_14(c1) | -S_14(c1).  [resolve(200,d,183,b)].
+Derived: H_3(c1) | -H_1(c1) | H_9(c1) | -S_14(c1) | -S_14(c1) | -S_14(c1).  [resolve(238,d,220,b)].
+239 H_3(c1) | -H_1(c1) | H_9(c1) | H_12(c1) | -S_15(c1) | -S_15(c1).  [resolve(201,d,184,b)].
+Derived: H_3(c1) | -H_1(c1) | H_9(c1) | -S_15(c1) | -S_15(c1) | -S_15(c1).  [resolve(239,d,221,b)].
+240 H_3(c18) | -H_1(c18) | H_9(c18) | H_12(c18) | S_16(c18) | S_16(c18).  [resolve(202,d,181,b)].
+Derived: H_3(c18) | -H_1(c18) | H_9(c18) | S_16(c18) | S_16(c18) | S_16(c18).  [resolve(240,d,218,b)].
+241 H_3(c18) | -H_1(c18) | H_9(c18) | H_12(c18) | -S_14(c18) | -S_14(c18).  [resolve(203,d,183,b)].
+Derived: H_3(c18) | -H_1(c18) | H_9(c18) | -S_14(c18) | -S_14(c18) | -S_14(c18).  [resolve(241,d,220,b)].
+242 H_3(c18) | -H_1(c18) | H_9(c18) | H_12(c18) | -S_15(c18) | -S_15(c18).  [resolve(204,d,184,b)].
+Derived: H_3(c18) | -H_1(c18) | H_9(c18) | -S_15(c18) | -S_15(c18) | -S_15(c18).  [resolve(242,d,221,b)].
+243 -H_1(c11) | S_14(c11) | S_15(c11) | H_9(c11) | H_12(c11).  [resolve(205,e,186,a)].
+Derived: -H_1(c11) | S_14(c11) | S_15(c11) | H_9(c11).  [resolve(243,e,223,a)].
+244 H_3(c11) | -H_1(c11) | H_9(c11) | H_12(c11) | S_15(c11).  [resolve(206,d,186,a)].
+Derived: H_3(c11) | -H_1(c11) | H_9(c11) | S_15(c11).  [resolve(244,d,223,a)].
+245 -H_1(c10) | S_14(c10) | S_15(c10) | H_9(c10) | H_12(c10).  [resolve(207,e,187,a)].
+Derived: -H_1(c10) | S_14(c10) | S_15(c10) | H_9(c10).  [resolve(245,e,224,a)].
+246 H_3(c10) | -H_1(c10) | H_9(c10) | H_12(c10) | S_15(c10).  [resolve(208,d,187,a)].
+Derived: H_3(c10) | -H_1(c10) | H_9(c10) | S_15(c10).  [resolve(246,d,224,a)].
+247 -S_16(x) | H_3(x) | -H_1(x) | H_9(x) | H_12(x) | -S_14(x) | -S_14(x).  [resolve(209,e,183,b)].
+Derived: -S_16(x) | H_3(x) | -H_1(x) | H_9(x) | -S_14(x) | -S_14(x) | -S_14(x).  [resolve(247,e,220,b)].
+248 -S_16(x) | H_3(x) | -H_1(x) | H_9(x) | H_12(x) | -S_15(x) | -S_15(x).  [resolve(210,e,184,b)].
+Derived: -S_16(x) | H_3(x) | -H_1(x) | H_9(x) | -S_15(x) | -S_15(x) | -S_15(x).  [resolve(248,e,221,b)].
+249 -S_16(c11) | H_3(c11) | -H_1(c11) | H_9(c11) | H_12(c11).  [resolve(211,e,186,a)].
+Derived: -S_16(c11) | H_3(c11) | -H_1(c11) | H_9(c11).  [resolve(249,e,223,a)].
+250 -S_16(c10) | H_3(c10) | -H_1(c10) | H_9(c10) | H_12(c10).  [resolve(212,e,187,a)].
+Derived: -S_16(c10) | H_3(c10) | -H_1(c10) | H_9(c10).  [resolve(250,e,224,a)].
+251 H_3(c13) | -H_1(c13) | H_9(c13) | H_12(c13) | -S_14(c13) | -S_14(c13).  [resolve(213,d,183,b)].
+Derived: H_3(c13) | -H_1(c13) | H_9(c13) | -S_14(c13) | -S_14(c13) | -S_14(c13).  [resolve(251,d,220,b)].
+252 H_3(c13) | -H_1(c13) | H_9(c13) | H_12(c13) | -S_15(c13) | -S_15(c13).  [resolve(214,d,184,b)].
+Derived: H_3(c13) | -H_1(c13) | H_9(c13) | -S_15(c13) | -S_15(c13) | -S_15(c13).  [resolve(252,d,221,b)].
+
+Eliminating H_9/1
+253 -H_9(x) | H_1(x).  [resolve(89,b,90,a)].
+254 H_9(c12).  [clausify(33)].
+Derived: H_1(c12).  [resolve(253,a,254,a)].
+255 S_16(x) | -H_9(x).  [resolve(94,a,89,b)].
+Derived: S_16(c12).  [resolve(255,b,254,a)].
+256 -H_3(x) | -H_9(x).  [resolve(102,a,89,b)].
+Derived: -H_3(c12).  [resolve(256,b,254,a)].
+257 -S_14(x) | -H_9(x).  [resolve(104,a,89,b)].
+Derived: -S_14(c12).  [resolve(257,b,254,a)].
+258 -S_15(x) | -H_9(x).  [resolve(105,a,89,b)].
+Derived: -S_15(c12).  [resolve(258,b,254,a)].
+259 -H_9(c7).  [resolve(106,a,89,b)].
+260 -H_9(c11).  [resolve(144,a,131,a)].
+261 -H_9(c10).  [resolve(144,a,139,a)].
+262 -H_9(x) | H_3(x) | -H_1(x) | S_16(x).  [resolve(144,a,142,b)].
+263 H_3(c7) | -H_1(c7) | -H_9(c7).  [resolve(151,b,144,a)].
+264 -H_9(c2).  [resolve(154,b,155,a)].
+265 -H_9(c3).  [resolve(177,b,178,a)].
+266 -H_9(c4).  [resolve(215,b,216,a)].
+267 H_9(x) | -S_16(x) | H_1(x) | H_1(x) | H_1(x).  [resolve(229,b,217,a)].
+Derived: -S_16(x) | H_1(x) | H_1(x) | H_1(x) | H_1(x).  [resolve(267,a,253,a)].
+268 H_9(c13) | H_1(c13) | H_1(c13) | H_1(c13).  [resolve(230,b,217,a)].
+Derived: H_1(c13) | H_1(c13) | H_1(c13) | H_1(c13).  [resolve(268,a,253,a)].
+269 H_9(c13) | S_16(c13) | S_16(c13) | S_16(c13).  [resolve(231,b,218,b)].
+Derived: S_16(c13) | S_16(c13) | S_16(c13) | S_16(c13).  [resolve(269,a,255,b)].
+270 -H_1(c1) | H_9(c1) | S_16(c1) | S_16(c1) | S_16(c1).  [resolve(232,c,218,b)].
+Derived: -H_1(c1) | S_16(c1) | S_16(c1) | S_16(c1) | S_16(c1).  [resolve(270,b,255,b)].
+271 -H_1(x) | S_14(x) | S_15(x) | H_9(x) | S_16(x) | S_16(x) | S_16(x).  [resolve(233,e,218,b)].
+Derived: -H_1(x) | S_14(x) | S_15(x) | S_16(x) | S_16(x) | S_16(x) | S_16(x).  [resolve(271,d,255,b)].
+272 -H_3(x) | -H_1(x) | S_14(x) | S_15(x) | H_9(x) | -H_3(x) | -H_3(x).  [resolve(234,f,219,b)].
+Derived: -H_3(x) | -H_1(x) | S_14(x) | S_15(x) | -H_3(x) | -H_3(x) | -H_3(x).  [resolve(272,e,256,b)].
+273 H_3(x) | -H_1(x) | H_9(x) | S_15(x) | S_16(x) | S_16(x) | S_16(x).  [resolve(235,d,218,b)].
+Derived: H_3(x) | -H_1(x) | S_15(x) | S_16(x) | S_16(x) | S_16(x) | S_16(x).  [resolve(273,c,255,b)].
+274 H_3(x) | -H_1(x) | H_9(x) | S_15(x) | -S_14(x) | -S_14(x) | -S_14(x).  [resolve(236,d,220,b)].
+Derived: H_3(x) | -H_1(x) | S_15(x) | -S_14(x) | -S_14(x) | -S_14(x) | -S_14(x).  [resolve(274,c,257,b)].
+275 H_3(c7) | -H_1(c7) | H_9(c7) | S_15(c7).  [resolve(237,d,222,a)].
+Derived: H_3(c7) | -H_1(c7) | S_15(c7).  [resolve(275,c,259,a)].
+276 H_3(c1) | -H_1(c1) | H_9(c1) | -S_14(c1) | -S_14(c1) | -S_14(c1).  [resolve(238,d,220,b)].
+Derived: H_3(c1) | -H_1(c1) | -S_14(c1) | -S_14(c1) | -S_14(c1) | -S_14(c1).  [resolve(276,c,257,b)].
+277 H_3(c1) | -H_1(c1) | H_9(c1) | -S_15(c1) | -S_15(c1) | -S_15(c1).  [resolve(239,d,221,b)].
+Derived: H_3(c1) | -H_1(c1) | -S_15(c1) | -S_15(c1) | -S_15(c1) | -S_15(c1).  [resolve(277,c,258,b)].
+278 H_3(c18) | -H_1(c18) | H_9(c18) | S_16(c18) | S_16(c18) | S_16(c18).  [resolve(240,d,218,b)].
+Derived: H_3(c18) | -H_1(c18) | S_16(c18) | S_16(c18) | S_16(c18) | S_16(c18).  [resolve(278,c,255,b)].
+279 H_3(c18) | -H_1(c18) | H_9(c18) | -S_14(c18) | -S_14(c18) | -S_14(c18).  [resolve(241,d,220,b)].
+Derived: H_3(c18) | -H_1(c18) | -S_14(c18) | -S_14(c18) | -S_14(c18) | -S_14(c18).  [resolve(279,c,257,b)].
+280 H_3(c18) | -H_1(c18) | H_9(c18) | -S_15(c18) | -S_15(c18) | -S_15(c18).  [resolve(242,d,221,b)].
+Derived: H_3(c18) | -H_1(c18) | -S_15(c18) | -S_15(c18) | -S_15(c18) | -S_15(c18).  [resolve(280,c,258,b)].
+281 -H_1(c11) | S_14(c11) | S_15(c11) | H_9(c11).  [resolve(243,e,223,a)].
+Derived: -H_1(c11) | S_14(c11) | S_15(c11).  [resolve(281,d,260,a)].
+282 H_3(c11) | -H_1(c11) | H_9(c11) | S_15(c11).  [resolve(244,d,223,a)].
+Derived: H_3(c11) | -H_1(c11) | S_15(c11).  [resolve(282,c,260,a)].
+283 -H_1(c10) | S_14(c10) | S_15(c10) | H_9(c10).  [resolve(245,e,224,a)].
+Derived: -H_1(c10) | S_14(c10) | S_15(c10).  [resolve(283,d,261,a)].
+284 H_3(c10) | -H_1(c10) | H_9(c10) | S_15(c10).  [resolve(246,d,224,a)].
+Derived: H_3(c10) | -H_1(c10) | S_15(c10).  [resolve(284,c,261,a)].
+285 -S_16(x) | H_3(x) | -H_1(x) | H_9(x) | -S_14(x) | -S_14(x) | -S_14(x).  [resolve(247,e,220,b)].
+Derived: -S_16(x) | H_3(x) | -H_1(x) | -S_14(x) | -S_14(x) | -S_14(x) | -S_14(x).  [resolve(285,d,257,b)].
+286 -S_16(x) | H_3(x) | -H_1(x) | H_9(x) | -S_15(x) | -S_15(x) | -S_15(x).  [resolve(248,e,221,b)].
+Derived: -S_16(x) | H_3(x) | -H_1(x) | -S_15(x) | -S_15(x) | -S_15(x) | -S_15(x).  [resolve(286,d,258,b)].
+287 -S_16(c11) | H_3(c11) | -H_1(c11) | H_9(c11).  [resolve(249,e,223,a)].
+Derived: -S_16(c11) | H_3(c11) | -H_1(c11).  [resolve(287,d,260,a)].
+288 -S_16(c10) | H_3(c10) | -H_1(c10) | H_9(c10).  [resolve(250,e,224,a)].
+Derived: -S_16(c10) | H_3(c10) | -H_1(c10).  [resolve(288,d,261,a)].
+289 H_3(c13) | -H_1(c13) | H_9(c13) | -S_14(c13) | -S_14(c13) | -S_14(c13).  [resolve(251,d,220,b)].
+Derived: H_3(c13) | -H_1(c13) | -S_14(c13) | -S_14(c13) | -S_14(c13) | -S_14(c13).  [resolve(289,c,257,b)].
+290 H_3(c13) | -H_1(c13) | H_9(c13) | -S_15(c13) | -S_15(c13) | -S_15(c13).  [resolve(252,d,221,b)].
+Derived: H_3(c13) | -H_1(c13) | -S_15(c13) | -S_15(c13) | -S_15(c13) | -S_15(c13).  [resolve(290,c,258,b)].
+
+============================== end predicate elimination =============
+
+Auto_denials:  (non-Horn, no changes).
+
+Term ordering decisions:
+Predicate symbol precedence:  predicate_order([ H_1, S_14, S_16, S_15, H_3 ]).
+Function symbol precedence:  function_order([ c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18 ]).
+After inverse_order:  (no changes).
+Unfolding symbols: (none).
+
+Auto_inference settings:
+  % set(binary_resolution).  % (non-Horn)
+
+Auto_process settings:
+  % set(factor).  % (non-Horn)
+  % set(unit_deletion).  % (non-Horn)
+
+kept:      291 -H_3(x) | S_14(x).  [clausify(18)].
+kept:      292 H_3(x) | -S_14(x).  [clausify(18)].
+kept:      293 H_1(c5).  [clausify(26)].
+kept:      294 H_3(c6).  [clausify(27)].
+kept:      295 S_15(c15).  [clausify(36)].
+kept:      296 S_14(c16).  [clausify(37)].
+kept:      297 S_16(c17).  [clausify(38)].
+kept:      298 -S_15(x) | -S_14(x).  [clausify(54)].
+kept:      299 -S_16(x) | -S_14(x).  [clausify(55)].
+kept:      300 -S_16(x) | -S_15(x).  [clausify(56)].
+kept:      301 -H_3(x) | H_1(x).  [resolve(58,b,59,a)].
+kept:      302 -H_3(c1).  [resolve(62,a,58,b)].
+kept:      303 -S_14(x) | H_1(x).  [resolve(64,a,59,a)].
+kept:      304 -S_14(c1).  [resolve(64,a,62,a)].
+kept:      305 -S_15(x) | H_1(x).  [resolve(65,a,59,a)].
+kept:      306 -S_15(c1).  [resolve(65,a,62,a)].
+kept:      307 H_1(c7).  [resolve(66,a,59,a)].
+kept:      308 S_14(c7) | S_15(c7).  [resolve(66,a,63,a)].
+kept:      309 H_3(c9).  [resolve(73,a,71,a)].
+kept:      310 S_14(c9).  [resolve(73,a,72,a)].
+kept:      311 H_3(c8).  [resolve(76,a,77,a)].
+kept:      312 S_14(c8).  [resolve(76,a,78,a)].
+           313 -S_14(x) | H_3(x) | H_3(x).  [resolve(79,a,77,a)].
+           314 -H_3(x) | S_14(x) | S_14(x).  [resolve(80,b,78,a)].
+kept:      315 S_15(c10).  [resolve(85,a,84,a)].
+kept:      316 -S_15(c18).  [resolve(88,a,82,a)].
+kept:      317 -S_16(x) | H_1(x).  [resolve(95,a,90,a)].
+kept:      318 H_1(c13).  [resolve(96,a,90,a)].
+kept:      319 S_16(c13).  [resolve(96,a,94,a)].
+kept:      320 -H_1(c1) | S_16(c1).  [resolve(99,b,94,a)].
+kept:      321 -H_1(x) | S_14(x) | S_15(x) | S_16(x).  [resolve(100,b,94,a)].
+kept:      322 -H_3(x) | -S_16(x).  [resolve(102,a,95,a)].
+kept:      323 -H_3(c13).  [resolve(102,a,96,a)].
+kept:      324 -S_14(c13).  [resolve(104,a,96,a)].
+kept:      325 -S_15(c13).  [resolve(105,a,96,a)].
+kept:      326 -S_16(c7).  [resolve(106,a,95,a)].
+           327 -H_1(c7) | S_14(c7) | S_15(c7).  [resolve(106,a,100,b)].
+kept:      328 H_1(c1).  [resolve(112,a,107,b)].
+kept:      329 H_1(c14).  [resolve(113,a,107,b)].
+           330 S_14(c1) | S_15(c1) | S_16(c1).  [resolve(114,a,112,a)].
+kept:      331 S_16(c1).  [copy(330),unit_del(a,304),unit_del(b,306)].
+kept:      332 S_14(c14) | S_15(c14) | S_16(c14).  [resolve(114,a,113,a)].
+kept:      333 H_1(c18).  [resolve(115,a,107,b)].
+           334 S_14(c18) | S_15(c18) | S_16(c18).  [resolve(115,a,114,a)].
+kept:      335 S_14(c18) | S_16(c18).  [copy(334),unit_del(b,316)].
+kept:      336 H_1(c10).  [resolve(121,a,107,b)].
+kept:      337 S_15(c11).  [resolve(131,a,130,a)].
+kept:      338 -H_3(x) | -S_15(x).  [resolve(132,a,129,a)].
+kept:      339 -H_3(c11).  [resolve(132,a,131,a)].
+kept:      340 H_1(c11).  [resolve(133,a,131,a)].
+           341 H_3(c1) | -S_15(c1).  [resolve(136,b,134,a)].
+kept:      342 H_3(c7) | S_15(c7).  [resolve(137,b,130,a)].
+kept:      343 -H_3(c10).  [resolve(139,a,132,a)].
+kept:      344 H_3(x) | -H_1(x) | S_16(x) | S_15(x).  [resolve(142,b,130,a)].
+           345 H_3(c1) | -H_1(c1) | S_16(c1).  [resolve(142,b,134,a)].
+           346 H_3(c18) | -H_1(c18) | S_16(c18).  [resolve(142,b,141,a)].
+kept:      347 H_3(c18) | S_16(c18).  [copy(346),unit_del(b,333)].
+kept:      348 -S_16(c11).  [resolve(148,a,131,a)].
+kept:      349 -S_16(c10).  [resolve(148,a,139,a)].
+           350 H_3(c13) | -H_1(c13) | S_16(c13).  [resolve(149,a,142,b)].
+           351 H_3(c7) | -H_1(c7) | -S_16(c7).  [resolve(151,b,148,a)].
+kept:      352 H_1(c2).  [resolve(158,a,155,a)].
+kept:      353 S_16(c2).  [resolve(159,b,155,a)].
+kept:      354 -H_3(c2).  [resolve(164,b,155,a)].
+kept:      355 -S_14(c2).  [resolve(165,b,155,a)].
+kept:      356 -S_15(c2).  [resolve(166,b,155,a)].
+kept:      357 H_1(c3).  [resolve(180,a,178,a)].
+kept:      358 S_16(c3).  [resolve(181,b,178,a)].
+kept:      359 -H_3(c3).  [resolve(182,b,178,a)].
+kept:      360 -S_14(c3).  [resolve(183,b,178,a)].
+kept:      361 -S_15(c3).  [resolve(184,b,178,a)].
+kept:      362 H_1(c4).  [resolve(217,a,216,a)].
+kept:      363 S_16(c4).  [resolve(218,b,216,a)].
+kept:      364 -H_3(c4).  [resolve(219,b,216,a)].
+kept:      365 -S_14(c4).  [resolve(220,b,216,a)].
+kept:      366 -S_15(c4).  [resolve(221,b,216,a)].
+kept:      367 H_1(c12).  [resolve(253,a,254,a)].
+kept:      368 S_16(c12).  [resolve(255,b,254,a)].
+kept:      369 -H_3(c12).  [resolve(256,b,254,a)].
+kept:      370 -S_14(c12).  [resolve(257,b,254,a)].
+kept:      371 -S_15(c12).  [resolve(258,b,254,a)].
+           372 -S_16(x) | H_1(x) | H_1(x) | H_1(x) | H_1(x).  [resolve(267,a,253,a)].
+           373 H_1(c13) | H_1(c13) | H_1(c13) | H_1(c13).  [resolve(268,a,253,a)].
+           374 S_16(c13) | S_16(c13) | S_16(c13) | S_16(c13).  [resolve(269,a,255,b)].
+           375 -H_1(c1) | S_16(c1) | S_16(c1) | S_16(c1) | S_16(c1).  [resolve(270,b,255,b)].
+           376 -H_1(x) | S_14(x) | S_15(x) | S_16(x) | S_16(x) | S_16(x) | S_16(x).  [resolve(271,d,255,b)].
+           377 -H_3(x) | -H_1(x) | S_14(x) | S_15(x) | -H_3(x) | -H_3(x) | -H_3(x).  [resolve(272,e,256,b)].
+           378 H_3(x) | -H_1(x) | S_15(x) | S_16(x) | S_16(x) | S_16(x) | S_16(x).  [resolve(273,c,255,b)].
+           379 H_3(x) | -H_1(x) | S_15(x) | -S_14(x) | -S_14(x) | -S_14(x) | -S_14(x).  [resolve(274,c,257,b)].
+           380 H_3(c7) | -H_1(c7) | S_15(c7).  [resolve(275,c,259,a)].
+           381 H_3(c1) | -H_1(c1) | -S_14(c1) | -S_14(c1) | -S_14(c1) | -S_14(c1).  [resolve(276,c,257,b)].
+           382 H_3(c1) | -H_1(c1) | -S_15(c1) | -S_15(c1) | -S_15(c1) | -S_15(c1).  [resolve(277,c,258,b)].
+           383 H_3(c18) | -H_1(c18) | S_16(c18) | S_16(c18) | S_16(c18) | S_16(c18).  [resolve(278,c,255,b)].
+           384 H_3(c18) | -H_1(c18) | -S_14(c18) | -S_14(c18) | -S_14(c18) | -S_14(c18).  [resolve(279,c,257,b)].
+           385 H_3(c18) | -H_1(c18) | -S_15(c18) | -S_15(c18) | -S_15(c18) | -S_15(c18).  [resolve(280,c,258,b)].
+           386 -H_1(c11) | S_14(c11) | S_15(c11).  [resolve(281,d,260,a)].
+           387 H_3(c11) | -H_1(c11) | S_15(c11).  [resolve(282,c,260,a)].
+           388 -H_1(c10) | S_14(c10) | S_15(c10).  [resolve(283,d,261,a)].
+           389 H_3(c10) | -H_1(c10) | S_15(c10).  [resolve(284,c,261,a)].
+           390 -S_16(x) | H_3(x) | -H_1(x) | -S_14(x) | -S_14(x) | -S_14(x) | -S_14(x).  [resolve(285,d,257,b)].
+           391 -S_16(x) | H_3(x) | -H_1(x) | -S_15(x) | -S_15(x) | -S_15(x) | -S_15(x).  [resolve(286,d,258,b)].
+           392 -S_16(c11) | H_3(c11) | -H_1(c11).  [resolve(287,d,260,a)].
+           393 -S_16(c10) | H_3(c10) | -H_1(c10).  [resolve(288,d,261,a)].
+           394 H_3(c13) | -H_1(c13) | -S_14(c13) | -S_14(c13) | -S_14(c13) | -S_14(c13).  [resolve(289,c,257,b)].
+           395 H_3(c13) | -H_1(c13) | -S_15(c13) | -S_15(c13) | -S_15(c13) | -S_15(c13).  [resolve(290,c,258,b)].
+
+============================== end of process initial clauses ========
+
+============================== CLAUSES FOR SEARCH ====================
+
+% Clauses after input processing:
+
+formulas(usable).
+end_of_list.
+
+formulas(sos).
+291 -H_3(x) | S_14(x).  [clausify(18)].
+292 H_3(x) | -S_14(x).  [clausify(18)].
+293 H_1(c5).  [clausify(26)].
+294 H_3(c6).  [clausify(27)].
+295 S_15(c15).  [clausify(36)].
+296 S_14(c16).  [clausify(37)].
+297 S_16(c17).  [clausify(38)].
+298 -S_15(x) | -S_14(x).  [clausify(54)].
+299 -S_16(x) | -S_14(x).  [clausify(55)].
+300 -S_16(x) | -S_15(x).  [clausify(56)].
+301 -H_3(x) | H_1(x).  [resolve(58,b,59,a)].
+302 -H_3(c1).  [resolve(62,a,58,b)].
+303 -S_14(x) | H_1(x).  [resolve(64,a,59,a)].
+304 -S_14(c1).  [resolve(64,a,62,a)].
+305 -S_15(x) | H_1(x).  [resolve(65,a,59,a)].
+306 -S_15(c1).  [resolve(65,a,62,a)].
+307 H_1(c7).  [resolve(66,a,59,a)].
+308 S_14(c7) | S_15(c7).  [resolve(66,a,63,a)].
+309 H_3(c9).  [resolve(73,a,71,a)].
+310 S_14(c9).  [resolve(73,a,72,a)].
+311 H_3(c8).  [resolve(76,a,77,a)].
+312 S_14(c8).  [resolve(76,a,78,a)].
+315 S_15(c10).  [resolve(85,a,84,a)].
+316 -S_15(c18).  [resolve(88,a,82,a)].
+317 -S_16(x) | H_1(x).  [resolve(95,a,90,a)].
+318 H_1(c13).  [resolve(96,a,90,a)].
+319 S_16(c13).  [resolve(96,a,94,a)].
+321 -H_1(x) | S_14(x) | S_15(x) | S_16(x).  [resolve(100,b,94,a)].
+322 -H_3(x) | -S_16(x).  [resolve(102,a,95,a)].
+323 -H_3(c13).  [resolve(102,a,96,a)].
+324 -S_14(c13).  [resolve(104,a,96,a)].
+325 -S_15(c13).  [resolve(105,a,96,a)].
+326 -S_16(c7).  [resolve(106,a,95,a)].
+328 H_1(c1).  [resolve(112,a,107,b)].
+329 H_1(c14).  [resolve(113,a,107,b)].
+331 S_16(c1).  [copy(330),unit_del(a,304),unit_del(b,306)].
+332 S_14(c14) | S_15(c14) | S_16(c14).  [resolve(114,a,113,a)].
+333 H_1(c18).  [resolve(115,a,107,b)].
+335 S_14(c18) | S_16(c18).  [copy(334),unit_del(b,316)].
+336 H_1(c10).  [resolve(121,a,107,b)].
+337 S_15(c11).  [resolve(131,a,130,a)].
+338 -H_3(x) | -S_15(x).  [resolve(132,a,129,a)].
+339 -H_3(c11).  [resolve(132,a,131,a)].
+340 H_1(c11).  [resolve(133,a,131,a)].
+342 H_3(c7) | S_15(c7).  [resolve(137,b,130,a)].
+343 -H_3(c10).  [resolve(139,a,132,a)].
+344 H_3(x) | -H_1(x) | S_16(x) | S_15(x).  [resolve(142,b,130,a)].
+347 H_3(c18) | S_16(c18).  [copy(346),unit_del(b,333)].
+348 -S_16(c11).  [resolve(148,a,131,a)].
+349 -S_16(c10).  [resolve(148,a,139,a)].
+352 H_1(c2).  [resolve(158,a,155,a)].
+353 S_16(c2).  [resolve(159,b,155,a)].
+354 -H_3(c2).  [resolve(164,b,155,a)].
+355 -S_14(c2).  [resolve(165,b,155,a)].
+356 -S_15(c2).  [resolve(166,b,155,a)].
+357 H_1(c3).  [resolve(180,a,178,a)].
+358 S_16(c3).  [resolve(181,b,178,a)].
+359 -H_3(c3).  [resolve(182,b,178,a)].
+360 -S_14(c3).  [resolve(183,b,178,a)].
+361 -S_15(c3).  [resolve(184,b,178,a)].
+362 H_1(c4).  [resolve(217,a,216,a)].
+363 S_16(c4).  [resolve(218,b,216,a)].
+364 -H_3(c4).  [resolve(219,b,216,a)].
+365 -S_14(c4).  [resolve(220,b,216,a)].
+366 -S_15(c4).  [resolve(221,b,216,a)].
+367 H_1(c12).  [resolve(253,a,254,a)].
+368 S_16(c12).  [resolve(255,b,254,a)].
+369 -H_3(c12).  [resolve(256,b,254,a)].
+370 -S_14(c12).  [resolve(257,b,254,a)].
+371 -S_15(c12).  [resolve(258,b,254,a)].
+end_of_list.
+
+formulas(demodulators).
+end_of_list.
+
+============================== end of clauses for search =============
+
+============================== SEARCH ================================
+
+% Starting search at 0.02 seconds.
+
+given #1 (I,wt=4): 291 -H_3(x) | S_14(x).  [clausify(18)].
+
+given #2 (I,wt=4): 292 H_3(x) | -S_14(x).  [clausify(18)].
+
+given #3 (I,wt=2): 293 H_1(c5).  [clausify(26)].
+
+given #4 (I,wt=2): 294 H_3(c6).  [clausify(27)].
+
+given #5 (I,wt=2): 295 S_15(c15).  [clausify(36)].
+
+given #6 (I,wt=2): 296 S_14(c16).  [clausify(37)].
+
+given #7 (I,wt=2): 297 S_16(c17).  [clausify(38)].
+
+given #8 (I,wt=4): 298 -S_15(x) | -S_14(x).  [clausify(54)].
+
+given #9 (I,wt=4): 299 -S_16(x) | -S_14(x).  [clausify(55)].
+
+given #10 (I,wt=4): 300 -S_16(x) | -S_15(x).  [clausify(56)].
+
+given #11 (I,wt=4): 301 -H_3(x) | H_1(x).  [resolve(58,b,59,a)].
+
+given #12 (I,wt=2): 302 -H_3(c1).  [resolve(62,a,58,b)].
+
+given #13 (I,wt=4): 303 -S_14(x) | H_1(x).  [resolve(64,a,59,a)].
+
+given #14 (I,wt=2): 304 -S_14(c1).  [resolve(64,a,62,a)].
+
+given #15 (I,wt=4): 305 -S_15(x) | H_1(x).  [resolve(65,a,59,a)].
+
+given #16 (I,wt=2): 306 -S_15(c1).  [resolve(65,a,62,a)].
+
+given #17 (I,wt=2): 307 H_1(c7).  [resolve(66,a,59,a)].
+
+given #18 (I,wt=4): 308 S_14(c7) | S_15(c7).  [resolve(66,a,63,a)].
+
+given #19 (I,wt=2): 309 H_3(c9).  [resolve(73,a,71,a)].
+
+given #20 (I,wt=2): 310 S_14(c9).  [resolve(73,a,72,a)].
+
+given #21 (I,wt=2): 311 H_3(c8).  [resolve(76,a,77,a)].
+
+given #22 (I,wt=2): 312 S_14(c8).  [resolve(76,a,78,a)].
+
+given #23 (I,wt=2): 315 S_15(c10).  [resolve(85,a,84,a)].
+
+given #24 (I,wt=2): 316 -S_15(c18).  [resolve(88,a,82,a)].
+
+given #25 (I,wt=4): 317 -S_16(x) | H_1(x).  [resolve(95,a,90,a)].
+
+given #26 (I,wt=2): 318 H_1(c13).  [resolve(96,a,90,a)].
+
+given #27 (I,wt=2): 319 S_16(c13).  [resolve(96,a,94,a)].
+
+given #28 (I,wt=8): 321 -H_1(x) | S_14(x) | S_15(x) | S_16(x).  [resolve(100,b,94,a)].
+
+given #29 (I,wt=4): 322 -H_3(x) | -S_16(x).  [resolve(102,a,95,a)].
+
+given #30 (I,wt=2): 323 -H_3(c13).  [resolve(102,a,96,a)].
+
+given #31 (I,wt=2): 324 -S_14(c13).  [resolve(104,a,96,a)].
+
+given #32 (I,wt=2): 325 -S_15(c13).  [resolve(105,a,96,a)].
+
+given #33 (I,wt=2): 326 -S_16(c7).  [resolve(106,a,95,a)].
+
+given #34 (I,wt=2): 328 H_1(c1).  [resolve(112,a,107,b)].
+
+given #35 (I,wt=2): 329 H_1(c14).  [resolve(113,a,107,b)].
+
+given #36 (I,wt=2): 331 S_16(c1).  [copy(330),unit_del(a,304),unit_del(b,306)].
+
+given #37 (I,wt=6): 332 S_14(c14) | S_15(c14) | S_16(c14).  [resolve(114,a,113,a)].
+
+given #38 (I,wt=2): 333 H_1(c18).  [resolve(115,a,107,b)].
+
+given #39 (I,wt=4): 335 S_14(c18) | S_16(c18).  [copy(334),unit_del(b,316)].
+
+given #40 (I,wt=2): 336 H_1(c10).  [resolve(121,a,107,b)].
+
+given #41 (I,wt=2): 337 S_15(c11).  [resolve(131,a,130,a)].
+
+given #42 (I,wt=4): 338 -H_3(x) | -S_15(x).  [resolve(132,a,129,a)].
+
+given #43 (I,wt=2): 339 -H_3(c11).  [resolve(132,a,131,a)].
+
+given #44 (I,wt=2): 340 H_1(c11).  [resolve(133,a,131,a)].
+
+given #45 (I,wt=4): 342 H_3(c7) | S_15(c7).  [resolve(137,b,130,a)].
+
+given #46 (I,wt=2): 343 -H_3(c10).  [resolve(139,a,132,a)].
+
+given #47 (I,wt=8): 344 H_3(x) | -H_1(x) | S_16(x) | S_15(x).  [resolve(142,b,130,a)].
+
+given #48 (I,wt=4): 347 H_3(c18) | S_16(c18).  [copy(346),unit_del(b,333)].
+
+given #49 (I,wt=2): 348 -S_16(c11).  [resolve(148,a,131,a)].
+
+given #50 (I,wt=2): 349 -S_16(c10).  [resolve(148,a,139,a)].
+
+given #51 (I,wt=2): 352 H_1(c2).  [resolve(158,a,155,a)].
+
+given #52 (I,wt=2): 353 S_16(c2).  [resolve(159,b,155,a)].
+
+given #53 (I,wt=2): 354 -H_3(c2).  [resolve(164,b,155,a)].
+
+given #54 (I,wt=2): 355 -S_14(c2).  [resolve(165,b,155,a)].
+
+given #55 (I,wt=2): 356 -S_15(c2).  [resolve(166,b,155,a)].
+
+given #56 (I,wt=2): 357 H_1(c3).  [resolve(180,a,178,a)].
+
+given #57 (I,wt=2): 358 S_16(c3).  [resolve(181,b,178,a)].
+
+given #58 (I,wt=2): 359 -H_3(c3).  [resolve(182,b,178,a)].
+
+given #59 (I,wt=2): 360 -S_14(c3).  [resolve(183,b,178,a)].
+
+given #60 (I,wt=2): 361 -S_15(c3).  [resolve(184,b,178,a)].
+
+given #61 (I,wt=2): 362 H_1(c4).  [resolve(217,a,216,a)].
+
+given #62 (I,wt=2): 363 S_16(c4).  [resolve(218,b,216,a)].
+
+given #63 (I,wt=2): 364 -H_3(c4).  [resolve(219,b,216,a)].
+
+given #64 (I,wt=2): 365 -S_14(c4).  [resolve(220,b,216,a)].
+
+given #65 (I,wt=2): 366 -S_15(c4).  [resolve(221,b,216,a)].
+
+given #66 (I,wt=2): 367 H_1(c12).  [resolve(253,a,254,a)].
+
+given #67 (I,wt=2): 368 S_16(c12).  [resolve(255,b,254,a)].
+
+given #68 (I,wt=2): 369 -H_3(c12).  [resolve(256,b,254,a)].
+
+given #69 (I,wt=2): 370 -S_14(c12).  [resolve(257,b,254,a)].
+
+given #70 (I,wt=2): 371 -S_15(c12).  [resolve(258,b,254,a)].
+
+given #71 (A,wt=2): 396 S_14(c6).  [resolve(294,a,291,a)].
+
+given #72 (F,wt=2): 398 -S_14(c15).  [resolve(298,a,295,a)].
+
+given #73 (F,wt=2): 399 -S_14(c17).  [resolve(299,a,297,a)].
+
+given #74 (F,wt=2): 400 -S_16(c15).  [resolve(300,b,295,a)].
+
+given #75 (F,wt=2): 406 -S_14(c10).  [resolve(315,a,298,a)].
+
+given #76 (T,wt=2): 397 H_3(c16).  [resolve(296,a,292,b)].
+
+given #77 (T,wt=2): 401 H_1(c6).  [resolve(301,a,294,a)].
+
+given #78 (T,wt=2): 402 H_1(c16).  [resolve(303,a,296,a)].
+
+given #79 (T,wt=2): 403 H_1(c15).  [resolve(305,a,295,a)].
+
+given #80 (A,wt=2): 404 H_1(c9).  [resolve(309,a,301,a)].
+
+given #81 (F,wt=2): 409 -S_16(c8).  [resolve(322,a,311,a)].
+
+given #82 (F,wt=2): 410 -S_16(c9).  [resolve(322,a,309,a)].
+
+given #83 (F,wt=2): 411 -S_16(c6).  [resolve(322,a,294,a)].
+
+given #84 (F,wt=2): 412 -S_14(c11).  [resolve(337,a,298,a)].
+
+given #85 (T,wt=2): 405 H_1(c8).  [resolve(311,a,301,a)].
+
+given #86 (T,wt=2): 407 H_1(c17).  [resolve(317,a,297,a)].
+
+given #87 (T,wt=6): 408 S_14(c5) | S_15(c5) | S_16(c5).  [resolve(321,a,293,a)].
+
+given #88 (T,wt=6): 416 H_3(c14) | S_16(c14) | S_15(c14).  [resolve(344,b,329,a)].
+
+given #89 (A,wt=2): 413 -S_15(c8).  [resolve(338,a,311,a)].
+
+given #90 (F,wt=2): 414 -S_15(c9).  [resolve(338,a,309,a)].
+
+given #91 (F,wt=2): 415 -S_15(c6).  [resolve(338,a,294,a)].
+
+given #92 (F,wt=2): 418 -S_15(c16).  [resolve(397,a,338,a)].
+
+given #93 (F,wt=2): 419 -S_16(c16).  [resolve(397,a,322,a)].
+
+given #94 (T,wt=6): 417 H_3(c5) | S_16(c5) | S_15(c5).  [resolve(344,b,293,a)].
+
+============================== STATISTICS ============================
+
+Given=94. Generated=229. Kept=95. proofs=0.
+Usable=94. Sos=0. Demods=0. Limbo=0, Disabled=352. Hints=0.
+Kept_by_rule=0, Deleted_by_rule=0.
+Forward_subsumed=134. Back_subsumed=0.
+Sos_limit_deleted=0. Sos_displaced=0. Sos_removed=0.
+New_demodulators=0 (0 lex), Back_demodulated=0. Back_unit_deleted=1.
+Demod_attempts=0. Demod_rewrites=0.
+Res_instance_prunes=0. Para_instance_prunes=0. Basic_paramod_prunes=0.
+Nonunit_fsub_feature_tests=30. Nonunit_bsub_feature_tests=22.
+Megabytes=0.64.
+User_CPU=0.02, System_CPU=0.00, Wall_clock=0.
+
+============================== end of statistics =====================
+
+============================== end of search =========================
+
+SEARCH FAILED
+
+Exiting with failure.
+
+Process 6515 exit (sos_empty) Mon Apr 22 14:24:13 2013

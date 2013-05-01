@@ -1,0 +1,23 @@
+formulas(assumptions).
+1_B(x) -> 1_A(x).
+1_E(x) -> 1_A(x).
+2_D(x) -> 2_C(x).
+2_F(x) -> 2_C(x).
+(all x (1_A(x) <-> 2_C(x))).
+((all x (1_B(x) -> 2_D(x))) & (exists x (2_D(x) & -1_B(x)))) | ((all x (1_B(x) <-> 2_D(x)))).
+((all x (2_F(x) -> 1_E(x))) & (exists x (1_E(x) & -2_F(x)))) | ((all x (1_E(x) <-> 2_F(x)))).
+exists x 1_A(x).
+exists x 1_B(x).
+exists x 1_E(x).
+exists x 2_C(x).
+exists x 2_D(x).
+exists x 2_F(x).
+1_A(x) -> 1_B(x) | 1_E(x).
+2_C(x) -> 2_D(x) | 2_F(x).
+(all x (1_E(x) -> -1_B(x))).
+(all x (2_F(x) -> -2_D(x))).
+end_of_list.
+
+formulas(assumptions).
+((all x (2_F(x) -> 1_B(x))) & (exists x (1_B(x) & -2_F(x)))).
+end_of_list.
