@@ -1,0 +1,380 @@
+============================== Mace4 =================================
+Mace4 (64) version 2009-02A, February 2009.
+Process 6199 was started by szyu on lore,
+Mon Apr 22 14:24:12 2013
+The command was "mace4 -t 10 -N 200 -b 2000 -f output/Hackel_Small/reasonerFiles/Hackel_SmallN_C_D_noGoal.txt".
+============================== end of head ===========================
+
+============================== INPUT =================================
+
+% Reading from file output/Hackel_Small/reasonerFiles/Hackel_SmallN_C_D_noGoal.txt
+
+
+formulas(assumptions).
+H_2(x) -> H_1(x).
+H_3(x) -> H_2(x).
+H_4(x) -> H_3(x).
+H_5(x) -> H_3(x).
+H_6(x) -> H_2(x).
+H_7(x) -> H_6(x).
+H_8(x) -> H_1(x).
+H_9(x) -> H_8(x).
+H_10(x) -> H_8(x).
+H_11(x) -> H_8(x).
+H_12(x) -> H_8(x).
+S_14(x) -> S_13(x).
+S_15(x) -> S_13(x).
+S_16(x) -> S_13(x).
+(all x (H_1(x) <-> S_13(x))).
+(all x (H_2(x) -> S_13(x))) & (exists x (S_13(x) & -H_2(x))).
+H_2(x) <-> S_14(x) | S_15(x).
+(all x (H_3(x) <-> S_14(x))).
+H_4(x) | H_5(x) <-> S_14(x).
+(all x (H_6(x) <-> S_15(x))).
+(all x (H_7(x) <-> S_15(x))).
+(all x (H_8(x) <-> S_16(x))).
+(exists x H_11(x)).
+(exists x H_10(x)).
+(exists x H_12(x)).
+(exists x H_1(x)).
+(exists x H_3(x)).
+(exists x H_2(x)).
+(exists x H_5(x)).
+(exists x H_4(x)).
+(exists x H_7(x)).
+(exists x H_6(x)).
+(exists x H_9(x)).
+(exists x H_8(x)).
+(exists x S_13(x)).
+(exists x S_15(x)).
+(exists x S_14(x)).
+(exists x S_16(x)).
+H_1(x) -> H_2(x) | H_8(x).
+H_3(x) -> H_4(x) | H_5(x).
+H_2(x) -> H_3(x) | H_6(x).
+H_6(x) -> H_7(x).
+H_8(x) -> H_9(x) | H_10(x) | H_11(x) | H_12(x).
+S_13(x) -> S_14(x) | S_15(x) | S_16(x).
+(all x (H_8(x) -> -H_2(x))).
+(all x (H_5(x) -> -H_4(x))).
+(all x (H_6(x) -> -H_3(x))).
+(all x (H_9(x) -> -H_10(x))).
+(all x (H_9(x) -> -H_11(x))).
+(all x (H_9(x) -> -H_12(x))).
+(all x (H_11(x) -> -H_10(x))).
+(all x (H_12(x) -> -H_10(x))).
+(all x (H_12(x) -> -H_11(x))).
+(all x (S_15(x) -> -S_14(x))).
+(all x (S_16(x) -> -S_14(x))).
+(all x (S_16(x) -> -S_15(x))).
+end_of_list.
+
+% From the command line: assign(max_seconds, 10).
+
+% From the command line: assign(end_size, 200).
+
+% From the command line: assign(max_megs, 2000).
+
+============================== end of input ==========================
+
+============================== PROCESS NON-CLAUSAL FORMULAS ==========
+
+% Formulas that are not ordinary clauses:
+1 H_2(x) -> H_1(x) # label(non_clause).  [assumption].
+2 H_3(x) -> H_2(x) # label(non_clause).  [assumption].
+3 H_4(x) -> H_3(x) # label(non_clause).  [assumption].
+4 H_5(x) -> H_3(x) # label(non_clause).  [assumption].
+5 H_6(x) -> H_2(x) # label(non_clause).  [assumption].
+6 H_7(x) -> H_6(x) # label(non_clause).  [assumption].
+7 H_8(x) -> H_1(x) # label(non_clause).  [assumption].
+8 H_9(x) -> H_8(x) # label(non_clause).  [assumption].
+9 H_10(x) -> H_8(x) # label(non_clause).  [assumption].
+10 H_11(x) -> H_8(x) # label(non_clause).  [assumption].
+11 H_12(x) -> H_8(x) # label(non_clause).  [assumption].
+12 S_14(x) -> S_13(x) # label(non_clause).  [assumption].
+13 S_15(x) -> S_13(x) # label(non_clause).  [assumption].
+14 S_16(x) -> S_13(x) # label(non_clause).  [assumption].
+15 (all x (H_1(x) <-> S_13(x))) # label(non_clause).  [assumption].
+16 (all x (H_2(x) -> S_13(x))) & (exists x (S_13(x) & -H_2(x))) # label(non_clause).  [assumption].
+17 H_2(x) <-> S_14(x) | S_15(x) # label(non_clause).  [assumption].
+18 (all x (H_3(x) <-> S_14(x))) # label(non_clause).  [assumption].
+19 H_4(x) | H_5(x) <-> S_14(x) # label(non_clause).  [assumption].
+20 (all x (H_6(x) <-> S_15(x))) # label(non_clause).  [assumption].
+21 (all x (H_7(x) <-> S_15(x))) # label(non_clause).  [assumption].
+22 (all x (H_8(x) <-> S_16(x))) # label(non_clause).  [assumption].
+23 (exists x H_11(x)) # label(non_clause).  [assumption].
+24 (exists x H_10(x)) # label(non_clause).  [assumption].
+25 (exists x H_12(x)) # label(non_clause).  [assumption].
+26 (exists x H_1(x)) # label(non_clause).  [assumption].
+27 (exists x H_3(x)) # label(non_clause).  [assumption].
+28 (exists x H_2(x)) # label(non_clause).  [assumption].
+29 (exists x H_5(x)) # label(non_clause).  [assumption].
+30 (exists x H_4(x)) # label(non_clause).  [assumption].
+31 (exists x H_7(x)) # label(non_clause).  [assumption].
+32 (exists x H_6(x)) # label(non_clause).  [assumption].
+33 (exists x H_9(x)) # label(non_clause).  [assumption].
+34 (exists x H_8(x)) # label(non_clause).  [assumption].
+35 (exists x S_13(x)) # label(non_clause).  [assumption].
+36 (exists x S_15(x)) # label(non_clause).  [assumption].
+37 (exists x S_14(x)) # label(non_clause).  [assumption].
+38 (exists x S_16(x)) # label(non_clause).  [assumption].
+39 H_1(x) -> H_2(x) | H_8(x) # label(non_clause).  [assumption].
+40 H_3(x) -> H_4(x) | H_5(x) # label(non_clause).  [assumption].
+41 H_2(x) -> H_3(x) | H_6(x) # label(non_clause).  [assumption].
+42 H_6(x) -> H_7(x) # label(non_clause).  [assumption].
+43 H_8(x) -> H_9(x) | H_10(x) | H_11(x) | H_12(x) # label(non_clause).  [assumption].
+44 S_13(x) -> S_14(x) | S_15(x) | S_16(x) # label(non_clause).  [assumption].
+45 (all x (H_8(x) -> -H_2(x))) # label(non_clause).  [assumption].
+46 (all x (H_5(x) -> -H_4(x))) # label(non_clause).  [assumption].
+47 (all x (H_6(x) -> -H_3(x))) # label(non_clause).  [assumption].
+48 (all x (H_9(x) -> -H_10(x))) # label(non_clause).  [assumption].
+49 (all x (H_9(x) -> -H_11(x))) # label(non_clause).  [assumption].
+50 (all x (H_9(x) -> -H_12(x))) # label(non_clause).  [assumption].
+51 (all x (H_11(x) -> -H_10(x))) # label(non_clause).  [assumption].
+52 (all x (H_12(x) -> -H_10(x))) # label(non_clause).  [assumption].
+53 (all x (H_12(x) -> -H_11(x))) # label(non_clause).  [assumption].
+54 (all x (S_15(x) -> -S_14(x))) # label(non_clause).  [assumption].
+55 (all x (S_16(x) -> -S_14(x))) # label(non_clause).  [assumption].
+56 (all x (S_16(x) -> -S_15(x))) # label(non_clause).  [assumption].
+
+============================== end of process non-clausal formulas ===
+
+============================== CLAUSES FOR SEARCH ====================
+
+formulas(mace4_clauses).
+-H_2(x) | H_1(x).
+-H_3(x) | H_2(x).
+-H_4(x) | H_3(x).
+-H_5(x) | H_3(x).
+-H_6(x) | H_2(x).
+-H_7(x) | H_6(x).
+-H_8(x) | H_1(x).
+-H_9(x) | H_8(x).
+-H_10(x) | H_8(x).
+-H_11(x) | H_8(x).
+-H_12(x) | H_8(x).
+-S_14(x) | S_13(x).
+-S_15(x) | S_13(x).
+-S_16(x) | S_13(x).
+-H_1(x) | S_13(x).
+H_1(x) | -S_13(x).
+-H_2(x) | S_13(x).
+S_13(c1).
+-H_2(c1).
+-H_2(x) | S_14(x) | S_15(x).
+H_2(x) | -S_14(x).
+H_2(x) | -S_15(x).
+-H_3(x) | S_14(x).
+H_3(x) | -S_14(x).
+-H_4(x) | S_14(x).
+-H_5(x) | S_14(x).
+H_4(x) | H_5(x) | -S_14(x).
+-H_6(x) | S_15(x).
+H_6(x) | -S_15(x).
+-H_7(x) | S_15(x).
+H_7(x) | -S_15(x).
+-H_8(x) | S_16(x).
+H_8(x) | -S_16(x).
+H_11(c2).
+H_10(c3).
+H_12(c4).
+H_1(c5).
+H_3(c6).
+H_2(c7).
+H_5(c8).
+H_4(c9).
+H_7(c10).
+H_6(c11).
+H_9(c12).
+H_8(c13).
+S_13(c14).
+S_15(c15).
+S_14(c16).
+S_16(c17).
+-H_1(x) | H_2(x) | H_8(x).
+-H_3(x) | H_4(x) | H_5(x).
+-H_2(x) | H_3(x) | H_6(x).
+-H_6(x) | H_7(x).
+-H_8(x) | H_9(x) | H_10(x) | H_11(x) | H_12(x).
+-S_13(x) | S_14(x) | S_15(x) | S_16(x).
+-H_8(x) | -H_2(x).
+-H_5(x) | -H_4(x).
+-H_6(x) | -H_3(x).
+-H_9(x) | -H_10(x).
+-H_9(x) | -H_11(x).
+-H_9(x) | -H_12(x).
+-H_11(x) | -H_10(x).
+-H_12(x) | -H_10(x).
+-H_12(x) | -H_11(x).
+-S_15(x) | -S_14(x).
+-S_16(x) | -S_14(x).
+-S_16(x) | -S_15(x).
+end_of_list.
+
+============================== end of clauses for search =============
+
+% There are no natural numbers in the input.
+
+============================== DOMAIN SIZE 2 =========================
+
+============================== STATISTICS ============================
+
+For domain size 2.
+
+Current CPU time: 0.00 seconds (total CPU time: 0.01 seconds).
+Ground clauses: seen=116, kept=116.
+Selections=1, assignments=1, propagations=25, current_models=0.
+Rewrite_terms=6, rewrite_bools=66, indexes=4.
+Rules_from_neg_clauses=4, cross_offs=4.
+
+============================== end of statistics =====================
+
+============================== DOMAIN SIZE 3 =========================
+
+============================== STATISTICS ============================
+
+For domain size 3.
+
+Current CPU time: 0.00 seconds (total CPU time: 0.01 seconds).
+Ground clauses: seen=165, kept=165.
+Selections=2, assignments=3, propagations=47, current_models=0.
+Rewrite_terms=8, rewrite_bools=177, indexes=5.
+Rules_from_neg_clauses=4, cross_offs=18.
+
+============================== end of statistics =====================
+
+============================== DOMAIN SIZE 4 =========================
+
+============================== STATISTICS ============================
+
+For domain size 4.
+
+Current CPU time: 0.00 seconds (total CPU time: 0.01 seconds).
+Ground clauses: seen=214, kept=214.
+Selections=4, assignments=10, propagations=85, current_models=0.
+Rewrite_terms=18, rewrite_bools=329, indexes=9.
+Rules_from_neg_clauses=7, cross_offs=33.
+
+============================== end of statistics =====================
+
+============================== DOMAIN SIZE 5 =========================
+
+============================== STATISTICS ============================
+
+For domain size 5.
+
+Current CPU time: 0.00 seconds (total CPU time: 0.01 seconds).
+Ground clauses: seen=263, kept=263.
+Selections=6, assignments=19, propagations=141, current_models=0.
+Rewrite_terms=31, rewrite_bools=544, indexes=14.
+Rules_from_neg_clauses=11, cross_offs=55.
+
+============================== end of statistics =====================
+
+============================== DOMAIN SIZE 6 =========================
+
+============================== STATISTICS ============================
+
+For domain size 6.
+
+Current CPU time: 0.00 seconds (total CPU time: 0.01 seconds).
+Ground clauses: seen=312, kept=312.
+Selections=9, assignments=35, propagations=213, current_models=0.
+Rewrite_terms=51, rewrite_bools=838, indexes=20.
+Rules_from_neg_clauses=15, cross_offs=83.
+
+============================== end of statistics =====================
+
+============================== DOMAIN SIZE 7 =========================
+
+============================== MODEL =================================
+
+interpretation( 7, [number=1, seconds=0], [
+
+        function(c1, [ 0 ]),
+
+        function(c2, [ 0 ]),
+
+        function(c3, [ 3 ]),
+
+        function(c4, [ 4 ]),
+
+        function(c5, [ 0 ]),
+
+        function(c6, [ 1 ]),
+
+        function(c7, [ 1 ]),
+
+        function(c8, [ 1 ]),
+
+        function(c9, [ 6 ]),
+
+        function(c10, [ 2 ]),
+
+        function(c11, [ 2 ]),
+
+        function(c12, [ 5 ]),
+
+        function(c13, [ 0 ]),
+
+        function(c14, [ 0 ]),
+
+        function(c15, [ 2 ]),
+
+        function(c16, [ 1 ]),
+
+        function(c17, [ 0 ]),
+
+        relation(H_1(_), [ 1, 1, 1, 1, 1, 1, 1 ]),
+
+        relation(H_10(_), [ 0, 0, 0, 1, 0, 0, 0 ]),
+
+        relation(H_11(_), [ 1, 0, 0, 0, 0, 0, 0 ]),
+
+        relation(H_12(_), [ 0, 0, 0, 0, 1, 0, 0 ]),
+
+        relation(H_2(_), [ 0, 1, 1, 0, 0, 0, 1 ]),
+
+        relation(H_3(_), [ 0, 1, 0, 0, 0, 0, 1 ]),
+
+        relation(H_4(_), [ 0, 0, 0, 0, 0, 0, 1 ]),
+
+        relation(H_5(_), [ 0, 1, 0, 0, 0, 0, 0 ]),
+
+        relation(H_6(_), [ 0, 0, 1, 0, 0, 0, 0 ]),
+
+        relation(H_7(_), [ 0, 0, 1, 0, 0, 0, 0 ]),
+
+        relation(H_8(_), [ 1, 0, 0, 1, 1, 1, 0 ]),
+
+        relation(H_9(_), [ 0, 0, 0, 0, 0, 1, 0 ]),
+
+        relation(S_13(_), [ 1, 1, 1, 1, 1, 1, 1 ]),
+
+        relation(S_14(_), [ 0, 1, 0, 0, 0, 0, 1 ]),
+
+        relation(S_15(_), [ 0, 0, 1, 0, 0, 0, 0 ]),
+
+        relation(S_16(_), [ 1, 0, 0, 1, 1, 1, 0 ])
+]).
+
+============================== end of model ==========================
+
+============================== STATISTICS ============================
+
+For domain size 7.
+
+Current CPU time: 0.00 seconds (total CPU time: 0.01 seconds).
+Ground clauses: seen=361, kept=361.
+Selections=14, assignments=32, propagations=115, current_models=1.
+Rewrite_terms=36, rewrite_bools=540, indexes=10.
+Rules_from_neg_clauses=3, cross_offs=55.
+
+============================== end of statistics =====================
+
+User_CPU=0.01, System_CPU=0.00, Wall_clock=0.
+
+Exiting with 1 model.
+
+Process 6199 exit (max_models) Mon Apr 22 14:24:12 2013
+The process finished Mon Apr 22 14:24:12 2013

@@ -1,0 +1,26 @@
+taxonomy 1 T1
+(1 2 3 4)
+(2 5 6 7)
+(3 8 9 10)
+(4 11 12 13)
+
+taxonomy 2 T2
+(1 2 3 4)
+(2 5 6 7)
+(3 8 9 10)
+(4 11 12 13)
+
+articulation ar foo
+[1.1 is_included_in 2.1]
+[1.2 is_included_in 2.2]
+[1.3 is_included_in 2.3]
+[1.4 is_included_in 2.4]
+[1.5 is_included_in 2.5]
+[1.6 is_included_in 2.6]
+[1.7 is_included_in 2.7]
+[1.8 is_included_in 2.8]
+[1.9 is_included_in 2.9]
+[1.10 is_included_in 2.10]
+[1.11 is_included_in 2.11]
+[1.12 is_included_in 2.12]
+[1.13 is_included_in 2.13]

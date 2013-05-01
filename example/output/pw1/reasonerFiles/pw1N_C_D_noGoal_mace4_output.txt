@@ -1,0 +1,155 @@
+============================== Mace4 =================================
+Mace4 (64) version 2009-02A, February 2009.
+Process 6120 was started by szyu on lore,
+Mon Apr 22 14:24:05 2013
+The command was "mace4 -t 10 -N 200 -b 2000 -f output/pw1/reasonerFiles/pw1N_C_D_noGoal.txt".
+============================== end of head ===========================
+
+============================== INPUT =================================
+
+% Reading from file output/pw1/reasonerFiles/pw1N_C_D_noGoal.txt
+
+
+formulas(assumptions).
+1_B(x) -> 1_A(x).
+1_E(x) -> 1_A(x).
+2_D(x) -> 2_C(x).
+2_F(x) -> 2_C(x).
+(all x (1_A(x) <-> 2_C(x))).
+(all x (1_B(x) -> 2_D(x))) & (exists x (2_D(x) & -1_B(x))) | (all x (1_B(x) <-> 2_D(x))).
+(all x (2_F(x) -> 1_E(x))) & (exists x (1_E(x) & -2_F(x))) | (all x (1_E(x) <-> 2_F(x))).
+(exists x 1_A(x)).
+(exists x 1_B(x)).
+(exists x 1_E(x)).
+(exists x 2_C(x)).
+(exists x 2_D(x)).
+(exists x 2_F(x)).
+1_A(x) -> 1_B(x) | 1_E(x).
+2_C(x) -> 2_D(x) | 2_F(x).
+(all x (1_E(x) -> -1_B(x))).
+(all x (2_F(x) -> -2_D(x))).
+end_of_list.
+
+% From the command line: assign(max_seconds, 10).
+
+% From the command line: assign(end_size, 200).
+
+% From the command line: assign(max_megs, 2000).
+
+============================== end of input ==========================
+
+============================== PROCESS NON-CLAUSAL FORMULAS ==========
+
+% Formulas that are not ordinary clauses:
+1 1_B(x) -> 1_A(x) # label(non_clause).  [assumption].
+2 1_E(x) -> 1_A(x) # label(non_clause).  [assumption].
+3 2_D(x) -> 2_C(x) # label(non_clause).  [assumption].
+4 2_F(x) -> 2_C(x) # label(non_clause).  [assumption].
+5 (all x (1_A(x) <-> 2_C(x))) # label(non_clause).  [assumption].
+6 (all x (1_B(x) -> 2_D(x))) & (exists x (2_D(x) & -1_B(x))) | (all x (1_B(x) <-> 2_D(x))) # label(non_clause).  [assumption].
+7 (all x (2_F(x) -> 1_E(x))) & (exists x (1_E(x) & -2_F(x))) | (all x (1_E(x) <-> 2_F(x))) # label(non_clause).  [assumption].
+8 (exists x 1_A(x)) # label(non_clause).  [assumption].
+9 (exists x 1_B(x)) # label(non_clause).  [assumption].
+10 (exists x 1_E(x)) # label(non_clause).  [assumption].
+11 (exists x 2_C(x)) # label(non_clause).  [assumption].
+12 (exists x 2_D(x)) # label(non_clause).  [assumption].
+13 (exists x 2_F(x)) # label(non_clause).  [assumption].
+14 1_A(x) -> 1_B(x) | 1_E(x) # label(non_clause).  [assumption].
+15 2_C(x) -> 2_D(x) | 2_F(x) # label(non_clause).  [assumption].
+16 (all x (1_E(x) -> -1_B(x))) # label(non_clause).  [assumption].
+17 (all x (2_F(x) -> -2_D(x))) # label(non_clause).  [assumption].
+
+============================== end of process non-clausal formulas ===
+
+============================== CLAUSES FOR SEARCH ====================
+
+formulas(mace4_clauses).
+-1_B(x) | 1_A(x).
+-1_E(x) | 1_A(x).
+-2_D(x) | 2_C(x).
+-2_F(x) | 2_C(x).
+-1_A(x) | 2_C(x).
+1_A(x) | -2_C(x).
+-1_B(x) | 2_D(x) | -1_B(y) | 2_D(y).
+-1_B(x) | 2_D(x) | 1_B(y) | -2_D(y).
+2_D(c1) | -1_B(x) | 2_D(x).
+2_D(c1) | 1_B(x) | -2_D(x).
+-1_B(c1) | -1_B(x) | 2_D(x).
+-1_B(c1) | 1_B(x) | -2_D(x).
+-2_F(x) | 1_E(x) | -1_E(y) | 2_F(y).
+-2_F(x) | 1_E(x) | 1_E(y) | -2_F(y).
+1_E(c2) | -1_E(x) | 2_F(x).
+1_E(c2) | 1_E(x) | -2_F(x).
+-2_F(c2) | -1_E(x) | 2_F(x).
+-2_F(c2) | 1_E(x) | -2_F(x).
+1_A(c3).
+1_B(c4).
+1_E(c5).
+2_C(c6).
+2_D(c7).
+2_F(c8).
+-1_A(x) | 1_B(x) | 1_E(x).
+-2_C(x) | 2_D(x) | 2_F(x).
+-1_E(x) | -1_B(x).
+-2_F(x) | -2_D(x).
+end_of_list.
+
+============================== end of clauses for search =============
+
+% There are no natural numbers in the input.
+
+============================== DOMAIN SIZE 2 =========================
+
+============================== MODEL =================================
+
+interpretation( 2, [number=1, seconds=0], [
+
+        function(c1, [ 0 ]),
+
+        function(c2, [ 0 ]),
+
+        function(c3, [ 0 ]),
+
+        function(c4, [ 0 ]),
+
+        function(c5, [ 1 ]),
+
+        function(c6, [ 0 ]),
+
+        function(c7, [ 0 ]),
+
+        function(c8, [ 1 ]),
+
+        relation(1_A(_), [ 1, 1 ]),
+
+        relation(1_B(_), [ 1, 0 ]),
+
+        relation(1_E(_), [ 0, 1 ]),
+
+        relation(2_C(_), [ 1, 1 ]),
+
+        relation(2_D(_), [ 1, 0 ]),
+
+        relation(2_F(_), [ 0, 1 ])
+]).
+
+============================== end of model ==========================
+
+============================== STATISTICS ============================
+
+For domain size 2.
+
+Current CPU time: 0.00 seconds (total CPU time: 0.01 seconds).
+Ground clauses: seen=58, kept=58.
+Selections=5, assignments=5, propagations=15, current_models=1.
+Rewrite_terms=22, rewrite_bools=87, indexes=19.
+Rules_from_neg_clauses=3, cross_offs=3.
+
+============================== end of statistics =====================
+
+User_CPU=0.01, System_CPU=0.00, Wall_clock=0.
+
+Exiting with 1 model.
+
+Process 6120 exit (max_models) Mon Apr 22 14:24:05 2013
+The process finished Mon Apr 22 14:24:05 2013
