@@ -36,6 +36,8 @@ class EulerParser:
                                     help="disable coverage")
             inst.add_option("--countmir", action="store_true", dest="countOn", default=False,\
                                   help="count # of occurance for each of rcc5")
+            inst.add_option("--pwcluster", action="store_true", dest="cluster", default=False,\
+                                  help="output the distance between pairwise possible world")
             inst.add_option("-N", action="store_false", dest="output", default=True,\
                                   help="no output")
             inst.add_option("-n", dest="nary", type="int", default=0, help="N-nary, used with -g")

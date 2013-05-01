@@ -40,6 +40,9 @@ class TaxonomyMapping:
         self.pwswitch = os.path.join(self.dlvdir, "pw.dlv")
         self.ixswitch = os.path.join(self.dlvdir, "ix.dlv")
         self.mirfile = os.path.join(options.outputdir, self.name+"_mir.csv")
+        self.clfile = os.path.join(options.outputdir, self.name+"_cl.csv")
+        self.cldot = os.path.join(options.outputdir, self.name+"_cl.dot")
+        self.clpdf = os.path.join(options.outputdir, self.name+"_cl.pdf")
         self.iefile = os.path.join(options.outputdir, self.name+"_ie.dot")
         self.iepdf = os.path.join(options.outputdir, self.name+"_ie.pdf")
 
@@ -221,7 +224,10 @@ class TaxonomyMapping:
         raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
         pws = raw.split("\n")
         self.npw = len(pws)
+        # mirs for each pw
+        if self.options.cluster: pwmirs = []
         for i in range(len(pws)):
+            if self.options.cluster: pwmirs.append({})
             outputstr = "Possible world "+i.__str__()+": {"
             items = pws[i].split(";")
             for j in range(len(items)):
@@ -231,6 +237,7 @@ class TaxonomyMapping:
                 if j != 0: outputstr += ", "
                 outputstr += dotc1+rel[2]+dotc2
                 pair = dotc1+","+dotc2
+                if self.options.cluster: pwmirs[i][pair] = rcc5[rel[2]]
                 if i == 0:
                     self.mir[pair] = rcc5[rel[2]]
                     self.mirc[pair] = []
@@ -242,6 +249,26 @@ class TaxonomyMapping:
             if self.options.output and pwflag:
                 print outputstr + "}"
         self.genMir()
+        if self.options.cluster: self.genPwCluster(pwmirs)
+
+    def genPwCluster(self, pwmirs):
+        fcl = open(self.clfile, 'w')
+        fcldot = open(self.cldot, 'w')
+        fcldot.write("graph "+self.name+"_cluster {\n\n")
+        for i in range(self.npw):
+            for j in range(i+1):
+                if i == j : fcl.write("0 "); continue
+                d = 0
+                for key in pwmirs[i].keys():
+                     if pwmirs[i][key] != pwmirs[j][key]: d += 1
+                fcl.write(d.__str__()+" ")
+                if i != j : fcldot.write("\"pw"+i.__str__()+"\" -- \"pw"+j.__str__()+\
+                            "\" [label="+d.__str__()+",labeldistance="+d.__str__()+"]\n")
+            fcl.write("\n")
+        fcldot.write("}")
+        fcl.close()
+        fcldot.close()
+        commands.getoutput("dot -Tpdf "+self.cldot+" -o "+self.clpdf)
 
     def genOB(self):
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
