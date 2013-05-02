@@ -1,0 +1,9 @@
+taxonomy R RAB1968
+(31 32)
+
+taxonomy G GodfreyWooten1979
+(33 34 35 38)
+(35 36 37)
+
+articulation abs abstract
+[R.31 equals G.33]

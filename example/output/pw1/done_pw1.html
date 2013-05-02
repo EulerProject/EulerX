@@ -1,0 +1,73 @@
+<html><head><title>CleanTAX run pw1</title>
+    <script type="text/javascript">
+
+    function callDot(url) {                     
+      document.theForm.theURL = url;
+      http_request = false;
+      if (window.XMLHttpRequest) { // Mozilla, Safari,...
+        http_request = new XMLHttpRequest();
+        if (http_request.overrideMimeType) {    
+            http_request.overrideMimeType('text/xml');
+        }
+      } else if (window.ActiveXObject) { // IE
+         try {
+            http_request = new ActiveXObject("Msxml2.XMLHTTP");
+        } catch (e) {
+           try {
+              http_request = new ActiveXObject("Microsoft.XMLHTTP");
+           } catch (e) {}
+         }
+      }
+      if (!http_request) {
+         alert('Cannot create XMLHTTP instance');
+         return false;
+      }
+      http_request.onreadystatechange = alertContents;
+      http_request.open('GET', url, true);
+      http_request.send(null);
+    }
+
+    function alertContents() {
+          if (http_request.readyState == 4) {
+             if (http_request.status == 200) {
+
+                var doc = http_request.responseText;
+                document.theForm.content.value = doc;
+                document.theForm.submit();
+                
+
+             } else {
+                alert('There was a problem with the request.');
+             }
+          }
+       }
+    </script>
+    </head>
+    <body>
+    <form name="theForm" method="POST" action="/cgi-bin/runDot.pl">
+    <input type="hidden" name="format" value="pdf">
+    <input type="hidden" name="content">
+    <input type="hidden" name="theURL">
+    </form>
+    <table border="1">
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>implied</td><td>mir</td><td>A</td><td>C</td><td>{equals}</td><td>TRUE</td><tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>implied</td><td>mir</td><td>A</td><td>D</td><td>{includes}</td><td>TRUE</td><tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>implied</td><td>mir</td><td>A</td><td>F</td><td>{includes}</td><td>TRUE</td><tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>B</td><td>C</td><td>includes</td><td>false</td><td><a href="../output/reasonerFiles/pw1N_C_D_includes_1.B_2.C_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_includes_1.B_2.C_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>B</td><td>C</td><td>equals</td><td>false</td><td><a href="../output/reasonerFiles/pw1N_C_D_equals_1.B_2.C_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_equals_1.B_2.C_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>B</td><td>C</td><td>disjoint</td><td>false</td><td><a href="../output/reasonerFiles/pw1N_C_D_disjoint_1.B_2.C_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_disjoint_1.B_2.C_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>B</td><td>C</td><td>overlaps</td><td>false</td><td><a href="../output/reasonerFiles/pw1N_C_D_overlaps_1.B_2.C_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_overlaps_1.B_2.C_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>B</td><td>C</td><td>is_included_in</td><td><a href="#" onClick="callDot('../output/reasonerFiles/pw1N_C_D_is_included_in_1.B_2.C_possible_Prover_prover9_output.txt.dot'); return false;">true</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_is_included_in_1.B_2.C_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_is_included_in_1.B_2.C_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>implied</td><td>mir</td><td>B</td><td>D</td><td>{is_included_in,equals}</td><td>TRUE</td><tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>B</td><td>F</td><td>includes</td><td>false</td><td><a href="../output/reasonerFiles/pw1N_C_D_includes_1.B_2.F_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_includes_1.B_2.F_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>B</td><td>F</td><td>equals</td><td>false</td><td><a href="../output/reasonerFiles/pw1N_C_D_equals_1.B_2.F_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_equals_1.B_2.F_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>B</td><td>F</td><td>disjoint</td><td><a href="#" onClick="callDot('../output/reasonerFiles/pw1N_C_D_disjoint_1.B_2.F_possible_Prover_prover9_output.txt.dot'); return false;">true</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_disjoint_1.B_2.F_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_disjoint_1.B_2.F_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>B</td><td>F</td><td>overlaps</td><td>false</td><td><a href="../output/reasonerFiles/pw1N_C_D_overlaps_1.B_2.F_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_overlaps_1.B_2.F_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>B</td><td>F</td><td>is_included_in</td><td>false</td><td><a href="../output/reasonerFiles/pw1N_C_D_is_included_in_1.B_2.F_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_is_included_in_1.B_2.F_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>E</td><td>C</td><td>includes</td><td>false</td><td><a href="../output/reasonerFiles/pw1N_C_D_includes_1.E_2.C_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_includes_1.E_2.C_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>E</td><td>C</td><td>equals</td><td>false</td><td><a href="../output/reasonerFiles/pw1N_C_D_equals_1.E_2.C_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_equals_1.E_2.C_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>E</td><td>C</td><td>disjoint</td><td>false</td><td><a href="../output/reasonerFiles/pw1N_C_D_disjoint_1.E_2.C_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_disjoint_1.E_2.C_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>E</td><td>C</td><td>overlaps</td><td>false</td><td><a href="../output/reasonerFiles/pw1N_C_D_overlaps_1.E_2.C_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_overlaps_1.E_2.C_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>E</td><td>C</td><td>is_included_in</td><td><a href="#" onClick="callDot('../output/reasonerFiles/pw1N_C_D_is_included_in_1.E_2.C_possible_Prover_prover9_output.txt.dot'); return false;">true</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_is_included_in_1.E_2.C_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_is_included_in_1.E_2.C_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>E</td><td>D</td><td>includes</td><td>false</td><td><a href="../output/reasonerFiles/pw1N_C_D_includes_1.E_2.D_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_includes_1.E_2.D_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>E</td><td>D</td><td>equals</td><td>false</td><td><a href="../output/reasonerFiles/pw1N_C_D_equals_1.E_2.D_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_equals_1.E_2.D_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>E</td><td>D</td><td>disjoint</td><td><a href="#" onClick="callDot('../output/reasonerFiles/pw1N_C_D_disjoint_1.E_2.D_possible_Prover_prover9_output.txt.dot'); return false;">true</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_disjoint_1.E_2.D_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_disjoint_1.E_2.D_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>E</td><td>D</td><td>overlaps</td><td><a href="#" onClick="callDot('../output/reasonerFiles/pw1N_C_D_overlaps_1.E_2.D_possible_Prover_prover9_output.txt.dot'); return false;">true</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_overlaps_1.E_2.D_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_overlaps_1.E_2.D_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>possible</td><td>inferred</td><td>E</td><td>D</td><td>is_included_in</td><td>false</td><td><a href="../output/reasonerFiles/pw1N_C_D_is_included_in_1.E_2.D_possible_Prover.txt">prover9 input file</a></td><td><a href="../output/reasonerFiles/pw1N_C_D_is_included_in_1.E_2.D_possible_Prover_prover9_output.txt">prover9 output file</a></td></tr>
+<tr><td>pw1</td><td>1</td><td>2</td><td>NonEmptiness Coverage DisjointChildren </td><td>implied</td><td>mir</td><td>E</td><td>F</td><td>{includes,equals}</td><td>TRUE</td></table></body></html>
