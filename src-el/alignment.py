@@ -282,21 +282,22 @@ class TaxonomyMapping:
         if self.options.simpCluster:
             for i in range(self.npw):
                 for j in range(i):
+                    reduced = False
                     for k in range(self.npw):
                         if i == k or j == k: continue
-                        if j < k and k < i and dmatrix[i][j] > 0 and dmatrix[i][k] > 0 and dmatrix[k][j] > 0:
+                        if j < k and k < i:
                             if dmatrix[i][j] == dmatrix[i][k] + dmatrix[k][j]:
-                                dmatrix[i][j] = None
+                                reduced = True
                                 break
-                        elif i < k and dmatrix[i][j] > 0 and dmatrix[k][i] > 0 and dmatrix[k][j] > 0:
+                        elif i < k:
                             if dmatrix[i][j] == dmatrix[k][i] + dmatrix[k][j]:
-                                dmatrix[i][j] = None
+                                reduced = True
                                 break
-                        elif k < j and dmatrix[i][j] > 0 and dmatrix[i][k] > 0 and dmatrix[j][k] > 0:
+                        elif k < j:
                             if dmatrix[i][j] == dmatrix[i][k] + dmatrix[j][k]:
-                                dmatrix[i][j] = None
+                                reduced = True
                                 break
-                    if dmatrix[i][j] > 0:
+                    if not reduced:
                         fcldot.write("\"pw"+i.__str__()+"\" -- \"pw"+j.__str__()+\
                             "\" [label="+dmatrix[i][j].__str__()+",len="+dmatrix[i][j].__str__()+"]\n")
         fcldot.write("}")
