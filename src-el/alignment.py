@@ -1,5 +1,6 @@
 import os
 import time
+import sets
 import inspect
 import threading
 import StringIO
@@ -256,9 +257,9 @@ class TaxonomyMapping:
             fpw.write(outputstr)
             fpw.close()
         self.genMir()
-        if self.options.cluster: self.genPwCluster(pwmirs)
+        if self.options.cluster: self.genPwCluster(pwmirs, False)
 
-    def genPwCluster(self, pwmirs):
+    def genPwCluster(self, pws, obs):
         fcl = open(self.clfile, 'w')
         fcldot = open(self.cldot, 'w')
         fcldot.write("graph "+self.name+"_cluster {\n"+\
@@ -271,8 +272,14 @@ class TaxonomyMapping:
                     dmatrix[i].append(0)
                     fcl.write("0 "); continue
                 d = 0
-                for key in pwmirs[i].keys():
-                    if pwmirs[i][key] != pwmirs[j][key]: d += 1
+                if obs:
+                    for ob in pws[i]:
+                        if ob not in pws[j]: d += 1
+                    for ob in pws[j]:
+                        if ob not in pws[i]: d += 1
+                else:
+                    for key in pwmirs[i].keys():
+                        if pws[i][key] != pws[j][key]: d += 1
                 fcl.write(d.__str__()+" ")
                 dmatrix[i].append(d)
                 if i != j and not self.options.simpCluster:
@@ -313,6 +320,7 @@ class TaxonomyMapping:
         pws = raw.split("\n")
         self.npw = len(pws)
         outputstr = ""
+        if self.options.cluster: pwobs = []
         for i in range(len(pws)):
             outputstr += "Possible world "+i.__str__()+": {"
             items = pws[i].split(";")
@@ -343,9 +351,11 @@ class TaxonomyMapping:
                 s = keys[j].find("@")
                 if s != -1:
                     outputstr += keys[j][s:]
+            if self.options.cluster: pwobs.append(sets.Set(keys))
             outputstr += "}\n"
         if self.options.output:
             print outputstr
+        if self.options.cluster: self.genPwCluster(pwobs, True)
             
 
     def genVE(self):
