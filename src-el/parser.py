@@ -47,6 +47,8 @@ class EulerParser:
             inst.add_option("-d", dest="depth", type="int", default=2, help="depth, used with -g")
             inst.add_option("-t", dest="relation", type="string", default="<",\
                                   help="artifitial articulaiton rel, used with -g")
+            inst.add_option("--reasoner", dest="reasoner", type="string", default="dlv",\
+                                  help="choose a reasoner")
             inst.add_option("-i", dest="inputfile", help="input file")
             inst.add_option("-r", dest="inputdir", default="",\
                                   help="input directory, by default ./")
