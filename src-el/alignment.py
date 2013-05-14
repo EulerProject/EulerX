@@ -41,6 +41,7 @@ class TaxonomyMapping:
         self.pwswitch = os.path.join(self.dlvdir, "pw.dlv")
         self.ixswitch = os.path.join(self.dlvdir, "ix.dlv")
         self.pwout = os.path.join(options.outputdir, self.name+"_pw.txt")
+        self.obout = os.path.join(options.outputdir, self.name+"_ob.txt")
         self.mirfile = os.path.join(options.outputdir, self.name+"_mir.csv")
         self.clfile = os.path.join(options.outputdir, self.name+"_cl.csv")
         self.cldot = os.path.join(options.outputdir, self.name+"_cl.dot")
@@ -221,6 +222,10 @@ class TaxonomyMapping:
             commands.getoutput("dot -Tpdf "+self.iefile+" -o "+self.iepdf)
 
     def genPW(self, pwflag):
+        if reasoner[self.options.reasoner] == reasoner["gringo"]:
+            com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0"
+            print commands.getoutput(com)
+            return None
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
         self.pw = commands.getoutput(com)
@@ -278,7 +283,7 @@ class TaxonomyMapping:
                     for ob in pws[j]:
                         if ob not in pws[i]: d += 1
                 else:
-                    for key in pwmirs[i].keys():
+                    for key in pws[i].keys():
                         if pws[i][key] != pws[j][key]: d += 1
                 fcl.write(d.__str__()+" ")
                 dmatrix[i].append(d)
@@ -355,6 +360,9 @@ class TaxonomyMapping:
             outputstr += "}\n"
         if self.options.output:
             print outputstr
+        fob = open(self.obout, 'w')
+        fob.write(outputstr)
+        fob.close()
         if self.options.cluster: self.genPwCluster(pwobs, True)
             
 
@@ -397,10 +405,11 @@ class TaxonomyMapping:
         for key in self.taxonomies.keys():
             cou = 0
             con += "tax(" + self.taxonomies[key].dlvName() + "," + n.__str__() + ").\n"
+            con += "concept2(A, B) :- concept(A,B,_).\n"
             for taxon in self.taxonomies[key].taxa.keys():
                 t = self.taxonomies[key].taxa[taxon]
                 if (self.enc & encode["dl"] or self.enc & encode["mn"]) and t.hasChildren():
-                    con += "concept(" + t.dlvName() + "," + n.__str__() + ",i).\n"
+                    con += "concept2(" + t.dlvName() + "," + n.__str__() + ").\n"
                 else:
                     fl = num + cou
                     if self.enc & encode["mn"]:
@@ -444,20 +453,30 @@ class TaxonomyMapping:
 
         elif self.enc & encode["mn"]:
             maxint = prod
-	    self.baseDlv = "#maxint=" + maxint.__str__() + ".\n\n"
-	    self.baseDlv += con
-	    self.baseDlv += "%%% regions\n"
-	    self.baseDlv += "r(M):- #int(M),M>=1,M<=#maxint.\n\n"
+            if reasoner[self.options.reasoner] == reasoner["dlv"]:
+	        self.baseDlv = "#maxint=" + maxint.__str__() + ".\n\n"
+	        self.baseDlv += con
+	        self.baseDlv += "%%% regions\n"
+	        self.baseDlv += "r(M):- #int(M),M>=1,M<=#maxint.\n\n"
 
-	    self.baseDlv += "%%% bit\n"
-            for i in range(len(couArray)):
-	        self.baseDlv += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n"
+	        self.baseDlv += "%%% bit\n"
+                for i in range(len(couArray)):
+	            self.baseDlv += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n"
+
+            elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+	        self.baseDlv = con
+	        self.baseDlv += "%%% regions\n"
+	        self.baseDlv += "r(1.."+maxint.__str__()+").\n\n"
+
+	        self.baseDlv += "%%% bit\n"
+                for i in range(len(couArray)):
+	            self.baseDlv += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", V = M1 #mod " + couArray[i].__str__() + ".\n"
 
 	    self.baseDlv += "\n\n%%% Meaning of regions\n"
 	    self.baseDlv += "in(X, M) :- r(M),concept(X,T,N),N1=N+1,bit(M,T,N1).\n"
 	    self.baseDlv += "out(X, M) :- r(M),concept(X,T,N),N1=N+1,not bit(M,T,N1).\n"
-	    self.baseDlv += "in(X, M) :- r(M),concept(X,_,_),not out(X, M).\n"
-	    self.baseDlv += "ir(M, fi) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n\n"
+	    self.baseDlv += "in(X, M) :- r(M),concept2(X,_),not out(X, M).\n"
+	    self.baseDlv += "ir(M, fi) :- in(X, M), out(X, M), r(M), concept2(X,_).\n\n"
 
 	    self.baseDlv += "%%% Constraints of regions.\n"
 	    self.baseDlv += "irs(X) :- ir(X, _).\n"
@@ -621,7 +640,10 @@ class TaxonomyMapping:
 			    #self.baseDlv += "in(" + t1.dlvName() + ", X) v out(" + t1.dlvName() + ", X) :- in(" + t.dlvName() + ", X).\n"
 			    #self.baseDlv += "in(" + t.dlvName() + ", X) v out(" + t.dlvName() + ", X) :- out(" + t1.dlvName() + ", X).\n"
 			    self.baseDlv += "ir(X, r" + ruleNum.__str__() +") :- in(" + t1.dlvName() + ", X), out(" + t.dlvName() + ", X).\n"
-			    self.baseDlv += ":- #count{X: vrs(X), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0, pw.\n"
+                            if reasoner[self.options.reasoner] == reasoner["dlv"]:
+			        self.baseDlv += ":- #count{X: vrs(X), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0, pw.\n"
+                            elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+			        self.baseDlv += "1[vrs(X): in(" + t1.dlvName() + ", X): in(" + t.dlvName() + ", X)] :- pw.\n"
 			    self.baseDlv += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n"
 			    self.baseDlv += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n\n"
 			    coverage += ",out(" + t1.dlvName() + ", X)"
@@ -653,8 +675,12 @@ class TaxonomyMapping:
 			        #self.baseDlv += "in(" + name1 + ", X) v out(" + name1 + ", X) :- out(" + name2 + ", X).\n"
 			        #self.baseDlv += "in(" + name2 + ", X) v out(" + name2 + ", X) :- out(" + name1 + ", X).\n"
 				self.baseDlv += "ir(X, r" + ruleNum.__str__() + ") :- in(" + name1 + ", X), in(" + name2+ ", X).\n"
-				self.baseDlv += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2+ ", X)} = 0, pw.\n"
-				self.baseDlv += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2+ ", X)} = 0, pw.\n"
+                                if reasoner[self.options.reasoner] == reasoner["dlv"]:
+				    self.baseDlv += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2+ ", X)} = 0, pw.\n"
+				    self.baseDlv += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2+ ", X)} = 0, pw.\n"
+                                elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+				    self.baseDlv += "1[vrs(X): in(" + name1 + ", X): out(" + name2+ ", X)] :- pw.\n"
+				    self.baseDlv += "1[vrs(X): out(" + name1 + ", X): in(" + name2+ ", X)] :- pw.\n"
 			        self.baseDlv += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
 			        self.baseDlv += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
 			        self.baseDlv += "pie(r" + ruleNum.__str__() + ", A, 2) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
@@ -707,25 +733,25 @@ class TaxonomyMapping:
             ruleNum = len(self.rules)
             self.articulations[i].ruleNum = ruleNum
             self.rules["r" + ruleNum.__str__()] = self.articulations[i].string
-            self.baseDlv += self.articulations[i].toDlv(self.options.encode)+ "\n"
+            self.baseDlv += self.articulations[i].toASP(self.options.encode, self.options.reasoner)+ "\n"
 
     def genDlvDc(self):
         self.baseDlv += "%%% Decoding now\n"
-        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \"<\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
-        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \">\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
-        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \"><\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
-        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
-        self.baseDlv += ":- rel(X, Y, \"<\"), rel(X, Y, \">\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
-        self.baseDlv += ":- rel(X, Y, \"<\"), rel(X, Y, \"><\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
-        self.baseDlv += ":- rel(X, Y, \"<\"), rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
-        self.baseDlv += ":- rel(X, Y, \">\"), rel(X, Y, \"><\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
-        self.baseDlv += ":- rel(X, Y, \">\"), rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
-        self.baseDlv += ":- rel(X, Y, \"><\"), rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _), pw.\n"
-        self.baseDlv += ":- not rel(X, Y, \"=\"), not rel(X, Y, \"<\"), not rel(X, Y, \">\"), not rel(X, Y, \"><\"), not rel(X, Y, \"!\"), concept(X, N1, _), concept(Y, N2, _), N1 < N2, pw.\n\n"
+        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \"<\"), concept2(X, N1), concept2(Y, N2), pw.\n"
+        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \">\"), concept2(X, N1), concept2(Y, N2), pw.\n"
+        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \"><\"), concept2(X, N1), concept2(Y, N2), pw.\n"
+        self.baseDlv += ":- rel(X, Y, \"=\"), rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), pw.\n"
+        self.baseDlv += ":- rel(X, Y, \"<\"), rel(X, Y, \">\"), concept2(X, N1), concept2(Y, N2), pw.\n"
+        self.baseDlv += ":- rel(X, Y, \"<\"), rel(X, Y, \"><\"), concept2(X, N1), concept2(Y, N2), pw.\n"
+        self.baseDlv += ":- rel(X, Y, \"<\"), rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), pw.\n"
+        self.baseDlv += ":- rel(X, Y, \">\"), rel(X, Y, \"><\"), concept2(X, N1), concept2(Y, N2), pw.\n"
+        self.baseDlv += ":- rel(X, Y, \">\"), rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), pw.\n"
+        self.baseDlv += ":- rel(X, Y, \"><\"), rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), pw.\n"
+        self.baseDlv += ":- not rel(X, Y, \"=\"), not rel(X, Y, \"<\"), not rel(X, Y, \">\"), not rel(X, Y, \"><\"), not rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), N1 < N2, pw.\n\n"
 
-        self.baseDlv += "hint(X, Y, 0) :- concept(X, N1, _), concept(Y, N2, _), N1 < N2, vr(R, _), in(X, R), out(Y, R), pw.\n"
-        self.baseDlv += "hint(X, Y, 1) :- concept(X, N1, _), concept(Y, N2, _), N1 < N2, vr(R, _), in(X, R), in(Y, R), pw.\n"
-        self.baseDlv += "hint(X, Y, 2) :- concept(X, N1, _), concept(Y, N2, _), N1 < N2, vr(R, _), out(X, R), in(Y, R), pw.\n\n"
+        self.baseDlv += "hint(X, Y, 0) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), out(Y, R), pw.\n"
+        self.baseDlv += "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), in(Y, R), pw.\n"
+        self.baseDlv += "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), out(X, R), in(Y, R), pw.\n\n"
 
         self.baseDlv += "rel(X, Y, \"=\") :- not hint(X, Y, 0), hint(X, Y, 1), not hint(X, Y, 2), pw.\n"
         self.baseDlv += "rel(X, Y, \"<\") :- not hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2), pw.\n"

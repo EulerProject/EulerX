@@ -61,6 +61,10 @@ relstr[2] = "is_included_in"
 relstr[3] = "disjoint"
 relstr[4] = "overlaps"
 
+reasoner={}
+reasoner["dlv"] = 1 << 0
+reasoner["gringo"] = 1 << 1
+
 encode = {}
 encode["dr"] = 1
 encode["direct"] = encode["dr"]
