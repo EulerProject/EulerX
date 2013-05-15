@@ -22,7 +22,6 @@ def main():
         if not reasoner.has_key(options.reasoner):
           print "unknown reasoner "+options.reasoner#+", please choose one reasoner from "+reasoner.keys().toString()
           return None
-        print options.reasoner
         elRunner = EulerRunner.instance()
         elRunner.run(options)
       else:

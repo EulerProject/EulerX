@@ -34,12 +34,12 @@ class TaxonomyMapping:
             options.outputdir = options.inputdir
         if not os.path.exists(options.outputdir):
             os.mkdir(options.outputdir)
-        self.dlvdir = os.path.join(options.outputdir, "dlv")
-        if not os.path.exists(self.dlvdir):
-            os.mkdir(self.dlvdir)
-        self.pwfile = os.path.join(self.dlvdir, self.name+"_pw.dlv")
-        self.pwswitch = os.path.join(self.dlvdir, "pw.dlv")
-        self.ixswitch = os.path.join(self.dlvdir, "ix.dlv")
+        self.aspdir = os.path.join(options.outputdir, "asp")
+        if not os.path.exists(self.aspdir):
+            os.mkdir(self.aspdir)
+        self.pwfile = os.path.join(self.aspdir, self.name+"_pw.asp")
+        self.pwswitch = os.path.join(self.aspdir, "pw.asp")
+        self.ixswitch = os.path.join(self.aspdir, "ix.asp")
         self.pwout = os.path.join(options.outputdir, self.name+"_pw.txt")
         self.obout = os.path.join(options.outputdir, self.name+"_ob.txt")
         self.mirfile = os.path.join(options.outputdir, self.name+"_mir.csv")
@@ -82,7 +82,7 @@ class TaxonomyMapping:
         return taxa
 
     def run(self):
-        self.genDlv()
+        self.genASP()
         if not self.testConsistency():
             print "Input is inconsistent!!"
             self.inconsistencyExplanation()
@@ -124,7 +124,7 @@ class TaxonomyMapping:
         dn2 = pair[1].dotName()
         vn1 = pair[0].dlvName()
         vn2 = pair[1].dlvName()
-        rsnrfile = os.path.join(self.dlvdir, dn1 +"_"+ dn2 + "_" + rel + ".dlv")
+        rsnrfile = os.path.join(self.aspdir, dn1 +"_"+ dn2 + "_" + rel + ".dlv")
         frsnr = open(rsnrfile, "w")
         frsnr.write("\n%%% Assumption" + vn1 + "_" + vn2 + "_" + rel + "\n")
         if rel == "equals":
@@ -372,7 +372,7 @@ class TaxonomyMapping:
         if self.options.output:
             print self.ve
 
-    def genDlv(self):
+    def genASP(self):
         if self.baseDlv != "":
             return  None
         self.genDlvConcept()
@@ -386,10 +386,13 @@ class TaxonomyMapping:
         fdlv.write(self.baseDlv)
         fdlv.close()
         pdlv = open(self.pwswitch, 'w')
-        pdlv.write("pw.")
-        pdlv.close()
         idlv = open(self.ixswitch, 'w')
+        pdlv.write("pw.")
         idlv.write("ix.")
+        if reasoner[self.options.reasoner] == reasoner["gringo"]:
+            pdlv.write("\n#hide.\n#show rel/3.")
+            idlv.write("\n#hide.\n#show ie/3.")
+        pdlv.close()
         idlv.close()
 
     def genDlvConcept(self):
