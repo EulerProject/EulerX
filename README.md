@@ -30,6 +30,7 @@ CleanTax++ dependencies:
 
 EulerDLV dependencies:
 * DLV:            http://www.dlvsystem.com/
+* GraphViz:       http://www.graphviz.org/
 
 # Examples of Running CleanTax++
 
@@ -51,9 +52,9 @@ Still under example/ directory (assuming src-el/ is in your PATH env),
 1. "euler -i example/abstract4.txt -e vr", you will get all the mir relations in the generated output file using binary encoding.
 2. "euler -i example/abstract4.txt -e vrpw", you will get all the possible worlds in the console using binary encoding.
 3. "euler -i example/abstract4.txt -e vrve", you will get all the valid euler regions in the console using binary encoding.
-4. "euler -i example/abstract4.txt -e pl", you will get all the mir relations in the generated output file using polynomial encoding.
-5. "euler -i example/abstract4.txt -e plpw", you will get all the possible worlds in the console using polynomial encoding.
-6. "euler -i example/abstract4.txt -e plve", you will get all the valid euler regions in the console using polynomial encoding.
+4. "euler -i example/abstract4.txt -e mn", you will get all the mir relations in the generated output file using polynomial encoding.
+5. "euler -i example/abstract4.txt -e mnpw", you will get all the possible worlds in the console using polynomial encoding.
+6. "euler -i example/abstract4.txt -e mnve", you will get all the valid euler regions in the console using polynomial encoding.
 
 # Contact
 
