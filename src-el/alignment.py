@@ -647,7 +647,7 @@ class TaxonomyMapping:
                             if reasoner[self.options.reasoner] == reasoner["dlv"]:
 			        self.baseDlv += ":- #count{X: vrs(X), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0, pw.\n"
                             elif reasoner[self.options.reasoner] == reasoner["gringo"]:
-			        self.baseDlv += "1[vrs(X): in(" + t1.dlvName() + ", X): in(" + t.dlvName() + ", X)] :- pw.\n"
+			        self.baseDlv += ":- [vrs(X): in(" + t1.dlvName() + ", X): in(" + t.dlvName() + ", X)]0, pw.\n"
 			    self.baseDlv += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n"
 			    self.baseDlv += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n\n"
 			    coverage += ",out(" + t1.dlvName() + ", X)"
