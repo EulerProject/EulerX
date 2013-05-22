@@ -224,7 +224,8 @@ class TaxonomyMapping:
     def genPW(self, pwflag):
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0"
-            print commands.getoutput(com)
+            outputstr = commands.getoutput(com)
+            if self.options.output: print outputstr
             return None
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
