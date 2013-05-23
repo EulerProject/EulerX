@@ -175,6 +175,8 @@ class TaxonomyMapping:
 ## NF ends
 
     def testConsistency(self):
+        # TODO comment out for now
+        return True
         com = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+self.pwswitch
         if commands.getoutput(com) == "":
             return False
@@ -223,7 +225,7 @@ class TaxonomyMapping:
 
     def genPW(self, pwflag):
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
-            com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0"
+            com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
             outputstr = commands.getoutput(com)
             if self.options.output: print outputstr
             return None
@@ -321,44 +323,40 @@ class TaxonomyMapping:
 
     def genOB(self):
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-        com = "dlv -silent -filter=pinout "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
-        raw = commands.getoutput(com).replace("{","").replace("}","").replace(" ","").replace("),",");")
+        if reasoner[self.options.reasoner] == reasoner["dlv"]:
+            com = "dlv -silent -filter=pp "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
+            raw = commands.getoutput(com).replace("{","").replace("}","").replace(" ","").replace("),",");")
+        elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+            com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=no"
+            raw = commands.getoutput(com)
         pws = raw.split("\n")
-        self.npw = len(pws)
+        self.npw = 0
         outputstr = ""
+        lastpw = ""
         if self.options.cluster: pwobs = []
         for i in range(len(pws)):
-            outputstr += "Possible world "+i.__str__()+": {"
-            items = pws[i].split(";")
-            pmapping = {}
+            if pws[i].find("pp(") == -1: continue
+            if reasoner[self.options.reasoner] == reasoner["dlv"]:
+                items = pws[i].split(";")
+            elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+                items = pws[i].split(" ")
+            pw = ""
             for j in range(len(items)):
-                inout = items[j].replace("pinout(","").replace(")","").split(",")
-                dotConcept = self.dlvName2dot(inout[0])
-                key = ""
-                for k in range(2,self.obslen+1):
-                    if key != "": key += "@"
-                    key += inout[k]
-                if inout[1] == "in":
-                    if pmapping.has_key(key):
-                        pmapping[key].append("*"+dotConcept)
-                    else:
-                        pmapping[key]=[dotConcept]
-                #else:
-                 #   if pmapping.has_key(inout[1]):
-                  #      pmapping[inout[1]].append("-"+dotConcept)
-                  #  else:
-                   #     pmapping[inout[1]]=["-"+dotConcept]
-            keys = pmapping.keys()
-            for j in range(len(keys)):
-                if j != 0: outputstr += ", "
-                values = pmapping[keys[j]]
-                for k in range(len(values)):
-                    outputstr += values[k]
-                s = keys[j].find("@")
-                if s != -1:
-                    outputstr += keys[j][s:]
-            if self.options.cluster: pwobs.append(sets.Set(keys))
-            outputstr += "}\n"
+                if items[j] == "": continue
+                if j != 0: pw += ", "
+                inout = items[j].replace("pp(","").replace(")","").split(",")
+                dotConcept1 = self.dlvName2dot(inout[0])
+                dotConcept2 = self.dlvName2dot(inout[1])
+                loct = ""
+                for k in range(2,self.obslen):
+                    loct += "@" + inout[k]
+                pw += dotConcept1+"*"+dotConcept2+loct
+            # Filter those duplicate pws
+            if pw != lastpw:
+                lastpw = pw
+                outputstr += "Possible world "+self.npw.__str__()+": {"
+                outputstr += pw + "}\n"
+                self.npw += 1
         if self.options.output:
             print outputstr
         fob = open(self.obout, 'w')
@@ -391,7 +389,10 @@ class TaxonomyMapping:
         pdlv.write("pw.")
         idlv.write("ix.")
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
-            pdlv.write("\n#hide.\n#show rel/3.")
+            if self.enc & encode["ob"]:
+                pdlv.write("\n#hide.\n#show pp/" + self.obslen.__str__() + ".")
+            elif self.enc & encode["pw"]:
+                pdlv.write("\n#hide.\n#show rel/3.")
             idlv.write("\n#hide.\n#show ie/3.")
         pdlv.close()
         idlv.close()
@@ -765,8 +766,14 @@ class TaxonomyMapping:
 
     def genDlvObs(self):
         self.baseDlv += "%% Observation Information\n\n"
+        if reasoner[self.options.reasoner] == reasoner["dlv"]:
+            self.seperator = "v"
+            self.connector = ", "
+        elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+            self.seperator = "|"
+            self.connector = ": "
         if self.location == []:
-            self.baseDlv += "present(X) v absent(X) :- r(X).\n"
+            self.baseDlv += "present(X) " + self.seperator + " absent(X) :- r(X).\n"
             self.baseDlv += ":- present(X), absent(X).\n"
             self.baseDlv += "absent(X) :- irs(X).\n"
         else:
@@ -781,7 +788,7 @@ class TaxonomyMapping:
                 for i in range(len(self.location)):
                     self.baseDlv += "l(" + self.location[i] + ").\n"
             if self.temporal == []:
-                self.baseDlv += "present(X, L) v absent(X, L) :- r(X), l(L).\n"
+                self.baseDlv += "present(X, L) " + self.seperator + " absent(X, L) :- r(X), l(L).\n"
                 self.baseDlv += ":- present(X, L), absent(X, L).\n"
                 self.baseDlv += "absent(X, L) :- irs(X), l(L).\n"
                 self.baseDlv += "present(X, L) :- present(X, L1), subl(L1, L).\n"
@@ -797,7 +804,7 @@ class TaxonomyMapping:
                 else:
                     for i in range(len(self.temporal)):
                         self.baseDlv += "t(" + self.temporal[i] + ").\n"
-                self.baseDlv += "present(X, L, T) v absent(X, L, T) :- r(X), l(L), t(T).\n"
+                self.baseDlv += "present(X, L, T) " + self.seperator + " absent(X, L, T) :- r(X), l(L), t(T).\n"
                 self.baseDlv += ":- present(X, L, T), absent(X, L, T).\n"
                 self.baseDlv += "absent(X, L, T) :- irs(X), l(L), t(T).\n"
                 self.baseDlv += "present(X, L, T) :- present(X, L1, T), subl(L1, L), t(T).\n"
@@ -807,10 +814,13 @@ class TaxonomyMapping:
                 
         if self.obslen == 2:
             appendd = ""
+	    self.baseDlv += "pp(X, Y) :- pinout(X, in, R), pinout(Y, in, R), X < Y.\n"
         elif self.obslen == 3:
             appendd = ", Y"
+	    self.baseDlv += "pp(X, Y, Z) :- pinout(X, in, R, Z), pinout(Y, in, R, Z), X < Y.\n"
         elif self.obslen == 4:
             appendd = ", Y, Z"
+	    self.baseDlv += "pp(X, Y, Z, T) :- pinout(X, in, R, Z, T), pinout(Y, in, R, Z, T), X < Y.\n"
         else:
             print "Syntax error in observation portion of input file!!"
         for i in range(len(self.obs)):
@@ -820,7 +830,7 @@ class TaxonomyMapping:
                   pre = "in"
                 else:
                   pre = "out"
-                if tmp != "": tmp += ", "
+                if tmp != "": tmp += self.connector
                 cpt = self.obs[i][0][j][0]
                 tmp += pre + "(" + cpt + ", X)"
             pair = ""
@@ -831,9 +841,12 @@ class TaxonomyMapping:
             if self.obs[i][1] == "N":
                 self.baseDlv += ":- present(X" + pair + ")," + tmp + ".\n" 
             else:
-                self.baseDlv += ":- #count{X: present(X" + pair + "), " + tmp + "} = 0.\n"
-	self.baseDlv += "pinout(C, in, X" + appendd + ") :- present(X" + appendd + "), concept(C, _, N), #int(N), in(C, X).\n"
-	self.baseDlv += "pinout(C, out, X" + appendd + ") :- present(X" + appendd + "), concept(C, _, N), #int(N), out(C, X).\n"
+                if reasoner[self.options.reasoner] == reasoner["dlv"]:
+                    self.baseDlv += ":- #count{X: present(X" + pair + "), " + tmp + "} = 0.\n"
+                elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+                    self.baseDlv += ":- [present(X" + pair + "): " + tmp + "]0.\n"
+	self.baseDlv += "pinout(C, in, X" + appendd + ") :- present(X" + appendd + "), concept(C, _, N), in(C, X).\n"
+	self.baseDlv += "pinout(C, out, X" + appendd + ") :- present(X" + appendd + "), concept(C, _, N), out(C, X).\n"
             
 
     def readFile(self):
