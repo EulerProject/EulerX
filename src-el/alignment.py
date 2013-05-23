@@ -683,8 +683,8 @@ class TaxonomyMapping:
 				    self.baseDlv += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2+ ", X)} = 0, pw.\n"
 				    self.baseDlv += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2+ ", X)} = 0, pw.\n"
                                 elif reasoner[self.options.reasoner] == reasoner["gringo"]:
-				    self.baseDlv += "1[vrs(X): in(" + name1 + ", X): out(" + name2+ ", X)] :- pw.\n"
-				    self.baseDlv += "1[vrs(X): out(" + name1 + ", X): in(" + name2+ ", X)] :- pw.\n"
+				    self.baseDlv += ":- [vrs(X): in(" + name1 + ", X): out(" + name2+ ", X)]0, pw.\n"
+				    self.baseDlv += ":- [vrs(X): out(" + name1 + ", X): in(" + name2+ ", X)]0, pw.\n"
 			        self.baseDlv += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
 			        self.baseDlv += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
 			        self.baseDlv += "pie(r" + ruleNum.__str__() + ", A, 2) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
