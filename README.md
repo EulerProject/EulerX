@@ -2,16 +2,16 @@
 
 # Introduction
 
-Euler is an open source toolkit (mostly written in Python) for merging taxonomies and visualizing the results. (see https://sites.google.com/site/eulerdi/ for more info).
+Euler is an open source toolkit (mostly written in Python) for merging taxonomies (taxonomical organized datasets) and visualizing the results. (see https://sites.google.com/site/eulerdi/ for more info).
 
-We have all the CleanTax++ source code, EulerDLV source code, and a bunch of use cases in this toolkit. CleanTax++ is a modified version of CleanTax which was firstly developed by Dave Thau. CleanTax/CleanTax++ are built upon Prover9/Mace4 reasoning software. EulerDLV is a brand new taxonomy reasoning tool that Mingmin built from scratch. EulerDLV is built based on DLV.
+We have all the CleanTax++ source code, EulerASP source code, and a bunch of use cases in this toolkit. CleanTax++ is a modified version of CleanTax which was firstly developed by Dave Thau. CleanTax/CleanTax++ are built upon Prover9/Mace4 reasoning software. EulerASP is a brand new taxonomy reasoning tool that Mingmin built from scratch. EulerASP is built based on popular ASP reasoners DLV and clingo/gringo.
 
 # Structure of this toolkit
 src-ct/             # directory of CleanTax++ source code
 src-ct/main.py      # main entry of CleanTax++ source code
 
-src-el/             # directory of EulerDLV source code
-src-el/euler        # main entry of EulerDLV source code
+src-el/             # directory of EulerASP source code
+src-el/euler        # main entry of EulerASP source code
 
 example/            # directory of all the use cases
 example/runct.sh    # shell script to run CleanTax++, see the example section for more information
@@ -28,8 +28,11 @@ CleanTax++ dependencies:
 * Prover9/Mace4:  http://www.cs.unm.edu/~mccune/mace4/
 * GraphViz:       http://www.graphviz.org/
 
-EulerDLV dependencies:
+EulerASP dependencies:
 * DLV:            http://www.dlvsystem.com/
+* Potassco:       http://potassco.sourceforge.net/
+  - gringo-3.0.3
+  - claspD-1.1.4
 * GraphViz:       http://www.graphviz.org/
 
 # Examples of Running CleanTax++
@@ -44,7 +47,7 @@ Here are examples under example/ directory,
 6. "./runct.sh abstract3b", you will find the output files in output/abstract3b/, it is the "Bertram" mode for abstract3.
 7. "./runct.sh abstract2c", you will find the output files in output/abstract2c/, it is the test case with articulation confidence for abstract2.
 
-# Examples of Running EulerDLV
+# Examples of Running EulerASP
 
 Still under example/ directory (assuming src-el/ is in your PATH env),
 
