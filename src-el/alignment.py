@@ -232,6 +232,10 @@ class TaxonomyMapping:
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
         self.pw = commands.getoutput(com)
+        if self.pw == "":
+            print "Input is inconsistent"
+            self.inconsistencyExplanation()
+            return None
         raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
         pws = raw.split("\n")
         self.npw = len(pws)
