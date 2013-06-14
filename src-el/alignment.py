@@ -194,6 +194,7 @@ class TaxonomyMapping:
             ies = (re.match("\{(.*)\}", ie)).group(1).split(", ")
             tmpmap = {}
             for i in range(len(ies)):
+               print ies[i]
                item = re.match("ie\(s\((.*),(.*),(.*)\)\)", ies[i])
                key = item.group(1)+","+item.group(3)
                if key in tmpmap.keys():
@@ -490,8 +491,8 @@ class TaxonomyMapping:
 	    self.baseDlv += "%%% Constraints of regions.\n"
 	    self.baseDlv += "irs(X) :- ir(X, _).\n"
 	    self.baseDlv += "vrs(X) :- vr(X, _).\n"
-	    self.baseDlv += "vr(X, X) :- not irs(X), r(X).\n"
-	    self.baseDlv += "ir(X, X) :- not vrs(X), r(X).\n"
+	    self.baseDlv += "vr(X, X) :- not irs(X), r(X), pw.\n"
+	    self.baseDlv += "ir(X, X) :- not vrs(X), r(X), pw.\n"
 	    self.baseDlv += "ie(prod(A,B)) :- vr(X, A), ir(X, B), ix.\n"
 	    self.baseDlv += ":- vrs(X), irs(X), pw.\n\n"
 
