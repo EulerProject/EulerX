@@ -183,7 +183,7 @@ class TaxonomyMapping:
         return True
 
     def inconsistencyExplanation(self):
-        com = "dlv -silent -filter=ie "+self.pwfile+" "+self.ixswitch
+        com = "dlv -silent -filter=ie -n=1 "+self.pwfile+" "+self.ixswitch
         ie = commands.getoutput(com)
         self.postProcessIE(ie);
 
@@ -194,15 +194,18 @@ class TaxonomyMapping:
             ies = (re.match("\{(.*)\}", ie)).group(1).split(", ")
             tmpmap = {}
             for i in range(len(ies)):
-               print ies[i]
-               item = re.match("ie\(s\((.*),(.*),(.*)\)\)", ies[i])
-               key = item.group(1)+","+item.group(3)
-               if key in tmpmap.keys():
-                   value = tmpmap[key]
-                   value.append(item.group(2))
-                   tmpmap[key] = value
-               else:
-                   tmpmap[key] = [item.group(1), item.group(2)]
+              if ies[i].find("prod(") != -1:
+                item = re.match("ie\(prod\((.*),(.*)\)\)", ies[i])
+                key = item.group(1)
+              else:
+                item = re.match("ie\(s\((.*),(.*),(.*)\)\)", ies[i])
+                key = item.group(1)+","+item.group(3)
+                if key in tmpmap.keys():
+                  value = tmpmap[key]
+                  value.append(item.group(2))
+                  tmpmap[key] = value
+                else:
+                  tmpmap[key] = [item.group(1), item.group(2)]
             fie = open(self.iefile, 'w')
             fie.write("strict digraph "+self.name+"_ie {\n\nrankdir = LR\n\n")
             #fie.write("subgraph rules {\n")
@@ -341,6 +344,8 @@ class TaxonomyMapping:
         if self.options.cluster: pwobs = []
         for i in range(len(pws)):
             if pws[i].find("pp(") == -1: continue
+	    result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), #count{Y: vr(Y, _), in(" + name2 + ",Y), out(" + name1 + ",Y)} > 0, ix.\n"
+	    result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), #count{Y: vr(Y, _), in(" + name2 + ",Y), out(" + name1 + ",Y)} > 0, ix.\n\n"
             if reasoner[self.options.reasoner] == reasoner["dlv"]:
                 items = pws[i].split(";")
             elif reasoner[self.options.reasoner] == reasoner["gringo"]:
