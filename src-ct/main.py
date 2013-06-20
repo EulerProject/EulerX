@@ -247,7 +247,8 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
     fMir.close()
     
     # Generating RCG
-    taxMap.generateDot(outputDir, taxMap.name, taxMap)
+    # testing purpose
+    #taxMap.generateDot(outputDir, taxMap.name, taxMap)
 
     # Generating all possible worlds
     if pw:

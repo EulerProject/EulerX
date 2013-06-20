@@ -400,7 +400,8 @@ class TaxonomyMapping:
 	for pair in self.mir.keys():
 	    fPW.write(pair + "," + self.mir[pair] + "\n")
 	fPW.close()
-        self.generateDot(outputDir,fileName, taxaMap)
+        # For testing purpose, disable provenance
+        #self.generateDot(outputDir,fileName, taxaMap)
 
     def generateDot(self, outputDir, fileName, taxaMap):
         fDot = open(outputDir+fileName+".dot", 'w')

@@ -45,9 +45,8 @@ class RedWindow():
 	self.vbox.pack_start(entry, gtk.TRUE, gtk.TRUE, 1)
         
 	for i in range(5):
-            print i, mir
 	    if mir & (1 << i):
-                button = gtk.CheckButton(findkey(rcc5, 1 << i))
+                button = gtk.CheckButton(relstr[i])
 		button.connect("toggled", self.toggle_handler, i)
 	        button.set_active(True)
 	        self.vbox.pack_start(button)
