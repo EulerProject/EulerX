@@ -5,6 +5,7 @@ import inspect
 import threading
 import StringIO
 from taxonomy import * 
+from redWind import *
 from helper import *
 
 class TaxonomyMapping:
@@ -260,20 +261,38 @@ class TaxonomyMapping:
                 if self.options.cluster: pwmirs[i][pair] = rcc5[rel[2]]
                 if i == 0:
                     self.mir[pair] = rcc5[rel[2]]
-                    self.mirc[pair] = []
-                    for k in range(5):
-                        self.mirc[pair].append(0)
+#                    self.mirc[pair] = []
+#                    for k in range(5):
+#                        self.mirc[pair].append(0)
                 else:
                     self.mir[pair] |= rcc5[rel[2]]
-                self.mirc[pair][logmap[rcc5[rel[2]]]] += 1
+#                self.mirc[pair][logmap[rcc5[rel[2]]]] += 1
+            self.adjustMirc(pair)
             outputstr += "}\n"
         if pwflag:
             if self.options.output: print outputstr
             fpw = open(self.pwout, 'w')
             fpw.write(outputstr)
             fpw.close()
+        if self.options.reduction: self.uncReduction()
         self.genMir()
         if self.options.cluster: self.genPwCluster(pwmirs, False)
+
+    def uncReduction(self):
+        for pair in self.mir.keys():
+            if self.mir[pair] not in rcc5.values():
+                userAns = RedWindow(pair, self.mir[pair])
+                self.mir[pair] = userAns.main()
+                self.adjustMirc(pair)
+
+    def adjustMirc(self, pair):
+        self.mirc[pair] = []
+        for k in range(5):
+            self.mirc[pair].append(0)
+        for k in range(5):
+            if self.mir[pair] & (1 << k):
+                self.mirc[pair][k] += 1
+
 
     def genPwCluster(self, pws, obs):
         fcl = open(self.clfile, 'w')
