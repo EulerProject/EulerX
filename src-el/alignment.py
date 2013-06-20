@@ -267,11 +267,11 @@ class TaxonomyMapping:
 #                        self.mirc[pair].append(0)
                 else:
                     self.mir[pair] |= rcc5[rel[2]]
-                pairrel = pair+","+rel[2].__str__()
+                pairrel = pair+","+rcc5[rel[2]].__str__()
                 if pairrel in self.mirp.keys():
-                    self.mirp[pairrel] = [i]
-                else:
                     self.mirp[pairrel].append(i)
+                else:
+                    self.mirp[pairrel] = [i]
 #                self.mirc[pair][logmap[rcc5[rel[2]]]] += 1
             self.adjustMirc(pair)
             outputstr += "}\n"
@@ -291,14 +291,21 @@ class TaxonomyMapping:
                 userAns = RedWindow(pair, self.mir[pair])
                 self.mir[pair] = userAns.main()
                 self.adjustMirc(pair)
-        ppw = []
+        ppw = sets.Set()
+        print self.mirp
         for pair in self.mir.keys():
+          tmpppw = sets.Set()
           for i in range(5):
             rel = 1 << i
-            if self.mir[pair] & rel:
-              for pw in self.mirp[pair+","+rel.__str__()]
-                if pw not in ppw:
-                  ppw.append(pw)
+            if self.mir[pair] & rel and pair+","+rel.__str__() in self.mirp.keys():
+              for pw in self.mirp[pair+","+rel.__str__()]:
+                  tmpppw.add(pw)
+          if len(tmpppw) != 0:
+            if len(ppw) == 0:
+              ppw = tmpppw
+            else:
+              ppw = ppw.intersection(tmpppw)
+        outputstr = ""
         for i in ppw:
             if self.options.cluster: pwmirs.append({})
             outputstr += "Possible world "+i.__str__()+": {"
@@ -310,6 +317,7 @@ class TaxonomyMapping:
                 if j != 0: outputstr += ", "
                 outputstr += dotc1+rel[2]+dotc2
             outputstr += "}\n"
+        return outputstr
 
     def adjustMirc(self, pair):
         self.mirc[pair] = []
