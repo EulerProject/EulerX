@@ -13,6 +13,7 @@ class TaxonomyMapping:
     def __init__(self, options):
         self.mir = {}                          # MIR
         self.mirc = {}                         # MIRC
+        self.mirp = {}                         # MIR Provenance
         self.obs = []                          # OBS
         self.obslen = 0                        # OBS time / location?
         self.location = []                     # location set
@@ -266,24 +267,49 @@ class TaxonomyMapping:
 #                        self.mirc[pair].append(0)
                 else:
                     self.mir[pair] |= rcc5[rel[2]]
+                pairrel = pair+","+rel[2].__str__()
+                if pairrel in self.mirp.keys():
+                    self.mirp[pairrel] = [i]
+                else:
+                    self.mirp[pairrel].append(i)
 #                self.mirc[pair][logmap[rcc5[rel[2]]]] += 1
             self.adjustMirc(pair)
             outputstr += "}\n"
+        if self.options.reduction:
+            outputstr = self.uncReduction(pws)
         if pwflag:
             if self.options.output: print outputstr
             fpw = open(self.pwout, 'w')
             fpw.write(outputstr)
             fpw.close()
-        if self.options.reduction: self.uncReduction()
         self.genMir()
         if self.options.cluster: self.genPwCluster(pwmirs, False)
 
-    def uncReduction(self):
+    def uncReduction(self, pws):
         for pair in self.mir.keys():
             if self.mir[pair] not in rcc5.values():
                 userAns = RedWindow(pair, self.mir[pair])
                 self.mir[pair] = userAns.main()
                 self.adjustMirc(pair)
+        ppw = []
+        for pair in self.mir.keys():
+          for i in range(5):
+            rel = 1 << i
+            if self.mir[pair] & rel:
+              for pw in self.mirp[pair+","+rel.__str__()]
+                if pw not in ppw:
+                  ppw.append(pw)
+        for i in ppw:
+            if self.options.cluster: pwmirs.append({})
+            outputstr += "Possible world "+i.__str__()+": {"
+            items = pws[i].split(";")
+            for j in range(len(items)):
+                rel = items[j].replace("rel(","").replace(")","").split(",")
+                dotc1 = self.dlvName2dot(rel[0])
+                dotc2 = self.dlvName2dot(rel[1])
+                if j != 0: outputstr += ", "
+                outputstr += dotc1+rel[2]+dotc2
+            outputstr += "}\n"
 
     def adjustMirc(self, pair):
         self.mirc[pair] = []
