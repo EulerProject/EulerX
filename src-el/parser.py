@@ -49,6 +49,8 @@ class EulerParser:
                                   help="artifitial articulaiton rel, used with -g")
             inst.add_option("--reasoner", dest="reasoner", type="string", default="dlv",\
                                   help="choose a reasoner")
+            inst.add_option("--ur", action="store_true", dest="reduction", default=False,\
+                                  help="turn on uncertainty reduction")
             inst.add_option("-i", dest="inputfile", help="input file")
             inst.add_option("-r", dest="inputdir", default="",\
                                   help="input directory, by default ./")
