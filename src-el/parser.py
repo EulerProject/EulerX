@@ -34,9 +34,9 @@ class EulerParser:
                                   help="artifitial example generator")
             inst.add_option("--cc", action="store_true", dest="consCheck", default=False,\
                                     help="consistency check only")
-            inst.add_option("--dc", action="store_true", dest="enableCov", default=False,\
+            inst.add_option("--dc", action="store_false", dest="enableCov", default=True,\
                                     help="disable coverage")
-            inst.add_option("--ie", action="store_false", dest="ie", default=True,\
+            inst.add_option("--ie", action="store_true", dest="ie", default=False,\
                                     help="inconsistency explanation")
             inst.add_option("--countmir", action="store_true", dest="countOn", default=False,\
                                   help="count # of occurance for each of rcc5")
