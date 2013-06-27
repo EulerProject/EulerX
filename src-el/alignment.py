@@ -184,11 +184,14 @@ class TaxonomyMapping:
 ## NF ends
 
     def testConsistency(self):
-        # TODO comment out for now
-        #return True
-        com = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+self.pwswitch
-        if commands.getoutput(com) == "":
-            return False
+        if reasoner[self.options.reasoner] == reasoner["gringo"]:
+            com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 1"
+            if commands.getoutput(com).count("\n") < 5:
+                return False
+        else:
+            com = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+self.pwswitch
+            if commands.getoutput(com) == "":
+                return False
         return True
 
     def inconsistencyExplanation(self):
