@@ -85,10 +85,17 @@ class TaxonomyMapping:
 
     def run(self):
         self.genASP()
-        if not self.testConsistency():
-            print "Input is inconsistent!!"
-            self.inconsistencyExplanation()
+        if self.options.consCheck:
+            if not self.testConsistency():
+                print "Input is inconsistent o_O"
+            else:
+                print "Input is consistent ^_^"
             return
+        if self.options.ie:
+            if not self.testConsistency():
+                print "Input is inconsistent!!"
+                self.inconsistencyExplanation()
+                return
         if self.enc & encode["pw"]:
             self.genPW(True)
         elif self.enc & encode["ve"]:
@@ -178,8 +185,9 @@ class TaxonomyMapping:
 
     def testConsistency(self):
         # TODO comment out for now
-        return True
+        #return True
         com = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+self.pwswitch
+        print commands.getoutput(com)
         if commands.getoutput(com) == "":
             return False
         return True
@@ -238,6 +246,7 @@ class TaxonomyMapping:
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
         self.pw = commands.getoutput(com)
+        print self.pw
         if self.pw == "":
             print "Input is inconsistent"
             self.inconsistencyExplanation()
