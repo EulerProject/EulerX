@@ -4,7 +4,7 @@
 
 Euler is an open source toolkit (mostly written in Python) for merging taxonomies (taxonomical organized datasets) and visualizing the results. (see https://sites.google.com/site/eulerdi/ for more info).
 
-We have all the CleanTax++ source code, EulerASP source code, and a bunch of use cases in this toolkit. CleanTax++ is a modified version of CleanTax which was firstly developed by Dave Thau. CleanTax/CleanTax++ are built upon Prover9/Mace4 reasoning software. EulerASP is a brand new taxonomy reasoning tool that Mingmin built from scratch. EulerASP is built based on popular ASP reasoners DLV and clingo/gringo.
+We have all the CleanTax++ source code, EulerASP source code, and a bunch of use cases in this toolkit. CleanTax++ (EulerFO) is a modified version of CleanTax which was firstly developed by Dave Thau. CleanTax/CleanTax++ are built upon Prover9/Mace4 reasoning software. EulerASP is a brand new taxonomy reasoning tool that Mingmin built from scratch. EulerASP is built based on popular ASP reasoners DLV and clingo/gringo.
 
 # Structure of this toolkit
 src-ct/             # directory of CleanTax++ source code
@@ -22,22 +22,26 @@ example/..          # other examples
 
 
 # Software Dependencies
-Assuming you have Python 2.X or later installed in your computer, you also need the following dependent software to run this toolkit.
+The whole toolkit is written in Python, so you need have Python 2.X or later installed in your computer. You also need the following dependent software to run this toolkit.
 
 CleanTax++ dependencies:
-* Prover9/Mace4:  http://www.cs.unm.edu/~mccune/mace4/
-* GraphViz:       http://www.graphviz.org/
+1. Prover9/Mace4:  http://www.cs.unm.edu/~mccune/mace4/
+2. GraphViz:       http://www.graphviz.org/
 
 EulerASP dependencies:
-* DLV:            http://www.dlvsystem.com/
-* Potassco:       http://potassco.sourceforge.net/
+1. DLV:            http://www.dlvsystem.com/
+2. Potassco:       http://potassco.sourceforge.net/
   - gringo-3.0.3
   - claspD-1.1.4
-* GraphViz:       http://www.graphviz.org/
+3. GraphViz:       http://www.graphviz.org/
+
+####################### IMPORTANT #########################
+Please run checkdep.sh and make sure the dependency check passes before running this toolkit.
+###########################################################
 
 # Examples of Running CleanTax++
 
-Here are examples under example/ directory, 
+Here are examples under example/ directory,
 
 1. cd to example/ directory
 2. run test.sh by "./test.sh", you will find the output files in output/test/
@@ -49,7 +53,7 @@ Here are examples under example/ directory,
 
 # Examples of Running EulerASP
 
-Still under example/ directory (assuming src-el/ is in your PATH env),
+Still under example/ directory (assuming src-el/ is in your PATH env, and gringo, claspD, dlv in your PATH env),
 
 0. "euler --help" wil give you the options that you have
 1. "euler -i example/abstract4.txt -e vr", you will get all the mir relations in the generated output file using binary encoding.
