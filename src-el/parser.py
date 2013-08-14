@@ -40,6 +40,10 @@ class EulerParser:
                                     help="inconsistency explanation")
             inst.add_option("--countmir", action="store_true", dest="countOn", default=False,\
                                   help="count # of occurance for each of rcc5")
+            inst.add_option("--rcg", action="store_true", dest="rcg", default=False,\
+                                  help="Reduced containment graphs")
+            inst.add_option("--rcgo", action="store_true", dest="rcgo", default=False,\
+                                  help="Reduced containment graphs with overlaps")
             inst.add_option("--pwcluster", action="store_true", dest="cluster", default=False,\
                                   help="output the distance between pairwise possible world")
             inst.add_option("--simpcluster", action="store_true", dest="simpCluster", default=False,\
