@@ -36,6 +36,7 @@ class TaxonomyMapping:
             options.outputdir = options.inputdir
         if not os.path.exists(options.outputdir):
             os.mkdir(options.outputdir)
+        self.outputdir = options.outputdir
         self.aspdir = os.path.join(options.outputdir, "asp")
         if not os.path.exists(self.aspdir):
             os.mkdir(self.aspdir)
@@ -252,6 +253,10 @@ class TaxonomyMapping:
             print "Input is inconsistent"
             self.inconsistencyExplanation()
             return None
+        if self.pw.find("error") != -1:
+            print self.pw
+            print "\nEncoding error, please contact Mingmin at michen@ucdavis.edu"
+            return None
         raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
         pws = raw.split("\n")
         self.npw = len(pws)
@@ -260,6 +265,11 @@ class TaxonomyMapping:
         if self.options.cluster: pwmirs = []
         for i in range(len(pws)):
             if self.options.cluster: pwmirs.append({})
+
+            # pwTm is the possible world taxonomy mapping, used for RCG
+            if self.options.rcg or self.options.rcgo:
+                pwTm = copy.deepcopy(self)
+
             outputstr += "Possible world "+i.__str__()+": {"
             items = pws[i].split(";")
             for j in range(len(items)):
@@ -270,11 +280,16 @@ class TaxonomyMapping:
                 outputstr += dotc1+rel[2]+dotc2
                 pair = dotc1+","+dotc2
                 if self.options.cluster: pwmirs[i][pair] = rcc5[rel[2]]
+                if self.options.rcg or self.options.rcgo:
+                    pwTm.mir[pair] = rcc5[rel[2]]
+                    if rcc5[rel[2]] == rcc5["is_included_in"]:
+                        pwTm.tr.append([dotc1, dotc2, 1])
+                    elif rcc5[rel[2]] == rcc5["includes"]:
+                        pwTm.tr.append([dotc2, dotc1, 1])
+                    elif rcc5[rel[2]] == rcc5["equals"]:
+                        pwTm.eq.append([dotc1, dotc2])
                 if i == 0:
                     self.mir[pair] = rcc5[rel[2]]
-#                    self.mirc[pair] = []
-#                    for k in range(5):
-#                        self.mirc[pair].append(0)
                 else:
                     self.mir[pair] |= rcc5[rel[2]]
                 pairrel = pair+","+rcc5[rel[2]].__str__()
@@ -282,9 +297,10 @@ class TaxonomyMapping:
                     self.mirp[pairrel].append(i)
                 else:
                     self.mirp[pairrel] = [i]
-#                self.mirc[pair][logmap[rcc5[rel[2]]]] += 1
             self.adjustMirc(pair)
             outputstr += "}\n"
+            if self.options.rcg or self.options.rcgo:
+                pwTm.genPwRcg(self.name + "_" + i.__str__())
         if self.options.reduction:
             outputstr = self.uncReduction(pws)
         if pwflag:
@@ -294,6 +310,70 @@ class TaxonomyMapping:
             fpw.close()
         self.genMir()
         if self.options.cluster: self.genPwCluster(pwmirs, False)
+
+    def genPwRcg(self, fileName):
+        fDot = open(self.outputdir+fileName+".dot", 'w')
+	fDot.write("digraph {\n\nrankdir = RL\n\n")
+
+	# Equalities
+        for [T1, T2] in self.eq:
+            T1s = T1.split(".")
+            T2s = T2.split(".")
+	    if(T1s[1] == T2s[1]):
+		tmpStr = T1s[1]
+		fDot.write("\"" + tmpStr +"\" [color=blue];\n")
+	    else:
+		tmpStr = T1+","+T2
+            tmpTr = list(self.tr)
+            for [T3, T4, P] in tmpTr:
+		if(T1 == T3 or T2 == T3):
+		    self.tr.remove([T3, T4, P])
+		    self.tr.append([tmpStr, T4, 0])
+		elif(T1 == T4 or T2 == T4):
+		    self.tr.remove([T3, T4, P])
+		    self.tr.append([T3, tmpStr, 0])
+
+	# Duplicates
+	tmpTr = list(self.tr)
+        for [T1, T2, P] in tmpTr:
+	    if(self.tr.count([T1, T2, P]) > 1):
+		self.tr.remove([T1, T2, P])
+	tmpTr = list(self.tr)
+        for [T1, T2, P] in tmpTr:
+	    if(P == 0):
+	        if(self.tr.count([T1, T2, 1]) > 0):
+		    self.tr.remove([T1, T2, 1])
+
+	# Reductions
+	tmpTr = list(self.tr)
+        for [T1, T2, P1] in tmpTr:
+            for [T3, T4, P2] in tmpTr:
+		if (T2 == T3):
+		    if(self.tr.count([T1, T4, 0])>0):
+		        self.tr.remove([T1, T4, 0])
+		        self.tr.append([T1, T4, 2])
+		    if(self.tr.count([T1, T4, 1])>0):
+		        self.tr.remove([T1, T4, 1])
+		        #self.tr.append([T1, T4, 3])
+	for [T1, T2, P] in self.tr:
+	    if(P == 0):
+	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")
+	    elif(P == 1):
+	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=red];\n")
+	    #elif(P == 2):
+	    	#fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
+        if self.options.rcgo:
+	    fDot.write("  subgraph ig {\nedge [dir=none, style=dashed, color=grey]\n\n")
+            for key in self.mir.keys():
+                if self.mir[key] == rcc5["overlaps"]:
+                    item = re.match("(.*),(.*)", key)
+	    	    fDot.write("\"" + item.group(1) + "\" -> \"" + item.group(2) + "\"\n")
+	    fDot.write("  }\n")
+	fDot.write("}\n")
+            
+        fDot.close()
+        commands.getoutput("dot -Tpdf "+self.outputdir+fileName+".dot -o "+self.outputdir+fileName+".pdf")
+
 
     def uncReduction(self, pws):
         for pair in self.mir.keys():
