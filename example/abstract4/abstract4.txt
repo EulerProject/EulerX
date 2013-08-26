@@ -10,4 +10,3 @@ articulation abs abstract
 [1.c {is_included_in overlaps} 2.f]
 [1.d equals 2.d]
 [1.e {equals overlaps} 2.g]
-

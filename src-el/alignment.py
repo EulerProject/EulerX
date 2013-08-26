@@ -36,7 +36,6 @@ class TaxonomyMapping:
             options.outputdir = options.inputdir
         if not os.path.exists(options.outputdir):
             os.mkdir(options.outputdir)
-        self.outputdir = options.outputdir
         self.aspdir = os.path.join(options.outputdir, "asp")
         if not os.path.exists(self.aspdir):
             os.mkdir(self.aspdir)
@@ -312,7 +311,7 @@ class TaxonomyMapping:
         if self.options.cluster: self.genPwCluster(pwmirs, False)
 
     def genPwRcg(self, fileName):
-        fDot = open(self.outputdir+fileName+".dot", 'w')
+        fDot = open(self.options.outputdir+fileName+".dot", 'w')
 	fDot.write("digraph {\n\nrankdir = RL\n\n")
 
 	# Equalities
@@ -372,7 +371,7 @@ class TaxonomyMapping:
 	fDot.write("}\n")
             
         fDot.close()
-        commands.getoutput("dot -Tpdf "+self.outputdir+fileName+".dot -o "+self.outputdir+fileName+".pdf")
+        commands.getoutput("dot -Tpdf "+self.options.outputdir+fileName+".dot -o "+self.options.outputdir+fileName+".pdf")
 
 
     def uncReduction(self, pws):

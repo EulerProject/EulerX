@@ -265,7 +265,7 @@ class Articulation:
         return relString
     
     def __str__(self):
-        result = ""
+        result = self.taxon1.stringOf() + " "
         if len(self.relations) == 1:
             result += self.relations[0].name
         else:
@@ -275,7 +275,6 @@ class Articulation:
                     result += " "
                 result += relation.name
             result += "}"
-        result += " " + self.taxon1.stringOf()
         result += " " + self.taxon2.stringOf()
 	if self.numTaxon == 3:
             result += " " + self.taxon3.stringOf()
@@ -827,6 +826,7 @@ class TaxonomyMapping:
 	        if(self.testConsistency(outputDir)):
 	            self.removeMir(a.__str__())
                     fIE = open(outputDir + "../" + self.name + "_ie.txt", 'w')
+		    print "Input is inconsistent!!"
 		    print "Remedial measure: remove [" + a.toString() + "]"
 		    fIE.write("Remedial measure: remove [" + a.toString() + "]\n")
                     self.traceOut1(outputDir, a, fIE)
