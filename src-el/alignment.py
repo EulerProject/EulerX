@@ -245,13 +245,12 @@ class TaxonomyMapping:
             outputstr = commands.getoutput(com)
             if self.options.output: print outputstr
             return None
+        # DLV, from here on
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-        com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
-        self.pw = commands.getoutput(com)
+        self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
+        self.pw = commands.getoutput(self.com)
         if self.pw == "":
-            print "Input is inconsistent"
-            self.inconsistencyExplanation()
-            return None
+            self.simpleRemedy()
         if self.pw.find("error") != -1:
             print self.pw
             print "\nEncoding error, please contact Mingmin at michen@ucdavis.edu"
@@ -266,10 +265,9 @@ class TaxonomyMapping:
             if self.options.cluster: pwmirs.append({})
 
             # pwTm is the possible world taxonomy mapping, used for RCG
-            if self.options.rcg or self.options.rcgo:
-                pwTm = copy.deepcopy(self)
+            pwTm = copy.deepcopy(self)
 
-            outputstr += "Possible world "+i.__str__()+": {"
+            outputstr += "\nPossible world "+i.__str__()+":\n{"
             items = pws[i].split(";")
             for j in range(len(items)):
                 rel = items[j].replace("rel(","").replace(")","").split(",")
@@ -279,17 +277,20 @@ class TaxonomyMapping:
                 outputstr += dotc1+rel[2]+dotc2
                 pair = dotc1+","+dotc2
                 if self.options.cluster: pwmirs[i][pair] = rcc5[rel[2]]
-                if self.options.rcg or self.options.rcgo:
-                    pwTm.mir[pair] = rcc5[rel[2]]
-                    if rcc5[rel[2]] == rcc5["is_included_in"]:
-                        pwTm.tr.append([dotc1, dotc2, 1])
-                    elif rcc5[rel[2]] == rcc5["includes"]:
-                        pwTm.tr.append([dotc2, dotc1, 1])
-                    elif rcc5[rel[2]] == rcc5["equals"]:
-                        pwTm.eq.append([dotc1, dotc2])
+                # RCG
+                pwTm.mir[pair] = rcc5[rel[2]]
+                if rcc5[rel[2]] == rcc5["is_included_in"]:
+                    pwTm.tr.append([dotc1, dotc2, 1])
+                elif rcc5[rel[2]] == rcc5["includes"]:
+                    pwTm.tr.append([dotc2, dotc1, 1])
+                elif rcc5[rel[2]] == rcc5["equals"]:
+                    pwTm.eq.append([dotc1, dotc2])
                 if i == 0:
-                    self.mir[pair] = rcc5[rel[2]]
+                    if not self.mir.has_key(pair) or not self.mir[pair] & rcc5[rel[2]]:
+                        self.mir[pair] = rcc5[rel[2]] | relation["infer"]
                 else:
+                    if not self.mir[pair] & rcc5[rel[2]]:
+                        self.mir[pair] |= relation["infer"]
                     self.mir[pair] |= rcc5[rel[2]]
                 pairrel = pair+","+rcc5[rel[2]].__str__()
                 if pairrel in self.mirp.keys():
@@ -298,8 +299,8 @@ class TaxonomyMapping:
                     self.mirp[pairrel] = [i]
             self.adjustMirc(pair)
             outputstr += "}\n"
-            if self.options.rcg or self.options.rcgo:
-                pwTm.genPwRcg(self.name + "_" + i.__str__())
+            # RCG
+            pwTm.genPwRcg(self.name + "_" + i.__str__())
         if self.options.reduction:
             outputstr = self.uncReduction(pws)
         if pwflag:
@@ -359,10 +360,10 @@ class TaxonomyMapping:
 	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")
 	    elif(P == 1):
 	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=red];\n")
-	    #elif(P == 2):
-	    	#fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
+	    elif(P == 2):
+	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
         if self.options.rcgo:
-	    fDot.write("  subgraph ig {\nedge [dir=none, style=dashed, color=grey]\n\n")
+	    fDot.write("  subgraph ig {\nedge [dir=none, style=dashed, color=blue]\n\n")
             for key in self.mir.keys():
                 if self.mir[key] == rcc5["overlaps"]:
                     item = re.match("(.*),(.*)", key)
@@ -371,29 +372,65 @@ class TaxonomyMapping:
 	fDot.write("}\n")
             
         fDot.close()
-        commands.getoutput("dot -Tpdf "+self.options.outputdir+fileName+".dot -o "+self.options.outputdir+fileName+".pdf")
+        commands.getoutput("dot -Tpng "+self.options.outputdir+fileName+".dot -o "+self.options.outputdir+fileName+".png")
 
+
+
+    def simpleRemedy(self):
+        print "************************************"
+        print "Input is inconsistent"
+        if self.options.ie:
+            self.inconsistencyExplanation()
+        s = len(self.articulations)
+        for i in range(s):
+            a = self.articulations.pop(i)    
+            # Now refresh the input file
+            self.genASP()
+    	    # Run the reasoner again
+            self.pw = commands.getoutput(self.com)
+            if self.pw != "":
+                # Remove mir is not needed because it will be reset anyways
+                self.removeMir(a.string)
+                print "Repairing: remove [" + a.string + "]"
+                print "************************************"
+                return True
+            self.articulations.insert(i, a)
+        print "Don't know how to repair"
+        print "************************************"
+        return False
 
     def uncReduction(self, pws):
+        ppw = sets.Set()
         for pair in self.mir.keys():
-            if self.mir[pair] not in rcc5.values():
+            if self.mir[pair] & ~relation["infer"] not in rcc5.values():
                 userAns = RedWindow(pair, self.mir[pair])
                 self.mir[pair] = userAns.main()
                 self.adjustMirc(pair)
-        ppw = sets.Set()
-        print self.mirp
-        for pair in self.mir.keys():
-          tmpppw = sets.Set()
-          for i in range(5):
-            rel = 1 << i
-            if self.mir[pair] & rel and pair+","+rel.__str__() in self.mirp.keys():
-              for pw in self.mirp[pair+","+rel.__str__()]:
-                  tmpppw.add(pw)
-          if len(tmpppw) != 0:
-            if len(ppw) == 0:
-              ppw = tmpppw
-            else:
-              ppw = ppw.intersection(tmpppw)
+                # Reduce pws
+                tmpppw = sets.Set()
+                for i in range(5):
+                  rel = 1 << i
+                  if self.mir[pair] & rel and pair+","+rel.__str__() in self.mirp.keys():
+                    for pw in self.mirp[pair+","+rel.__str__()]:
+                        tmpppw.add(pw)
+                        # Adjust mir
+                        for tmppair in self.mir.keys():
+                          for j in range(5):
+                            relj = 1 << j
+                            if tmppair+","+relj.__str__() in self.mirp.keys() and\
+                               pw in self.mirp[tmppair+","+relj.__str__()]:
+                              if len(tmpppw) ==1:
+                                self.mir[tmppair] = relj
+                              else:
+                                self.mir[tmppair] |= relj
+                if len(tmpppw) != 0:
+                  if len(ppw) == 0:
+                    ppw = tmpppw
+                  else:
+                    ppw = ppw.intersection(tmpppw)
+                else:
+                  print "Inconsistent again !!"
+                  ppw = tmpppw
         outputstr = ""
         for i in ppw:
             if self.options.cluster: pwmirs.append({})
@@ -524,8 +561,7 @@ class TaxonomyMapping:
             print self.ve
 
     def genASP(self):
-        if self.baseDlv != "":
-            return  None
+        self.baseDlv == ""
         self.genDlvConcept()
         self.genDlvPC()
         self.genDlvAr()
@@ -1118,6 +1154,7 @@ class TaxonomyMapping:
     #class Observation:
      #   def __init__(self, , flag):
 
+
     def dotName2dlv(self, dotName):
         elems = re.match("(.*)\.(.*)", dotName)
         return "c" + elems.group(1) + "_" + elems.group(2)
@@ -1224,22 +1261,44 @@ class TaxonomyMapping:
             if self.options.verbose:
 		print pairkey
             if self.mir.has_key(pairkey) and self.mir[pairkey] != 0:
+              if self.mir[pairkey] & relation["infer"]:
+                hint = ",inferred,"
+              else:
+                hint = ",input,"
               if self.options.countOn:
                 for i in range(5):
                   if self.mirc[pairkey][i] != 0:
-                    fmir.write(pairkey+",opt," + findkey(relation, 1 << i)+","\
+                    fmir.write(pairkey+hint + findkey(relation, 1 << i)+","\
                                +self.mirc[pairkey][i].__str__()+","+self.npw.__str__()+"\n")
               else:
-                fmir.write(pairkey+",opt," + findkey(relation, self.mir[pairkey])+"\n")
+                fmir.write(pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"])+"\n")
                 if self.options.verbose:
-                    print pairkey+",opt," + findkey(relation, self.mir[pairkey])+"\n"
+                    print pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"])+"\n"
             else:
                 self.mir[pairkey] = self.getPairMir(pair)
                 rl = findkey(relation, self.mir[pairkey])
-                fmir.write(pairkey + ",dlv," + rl +"\n")
+                fmir.write(pairkey + ",inferred," + rl +"\n")
                 if self.options.verbose:
-                    print pairkey + ",dlv," + rl +"\n"
+                    print pairkey + ",inferred," + rl +"\n"
         fmir.close()
+
+    def removeMir(self, string):
+        r = string.split(" ")
+	self.mir[r[0] + "," + r[len(r)-1]] = 0
+	if(self.tr.count([r[0], r[len(r)-1], 0]) > 0):
+	    self.tr.remove([r[0], r[len(r)-1], 0])
+	elif(self.tr.count([r[len(r)-1], r[0], 0]) > 0):
+	    self.tr.remove([r[len(r)-1], r[0], 0])
+	if len(r) > 3:
+	    if r[len(r)-2] == "+=":
+	        self.mir[r[1] + "," + r[3]] = 0
+		if(self.tr.count([r[1], r[3], 0]) > 0):
+	    	    self.tr.remove([r[1], r[3], 0])
+	    elif r[1] == "=+":
+	        self.mir[r[0] + "," + r[2]] = 0
+		if(self.tr.count([r[2], r[0], 0]) > 0):
+	    	    self.tr.remove([r[2], r[0], 0])
+
  
     def getPairMir(self, pair):
         result = 0
