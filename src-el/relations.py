@@ -23,8 +23,10 @@ relation["="] = 1 << 0
 relation[">"] = 1 << 1
 relation["<"] = 1 << 2
 relation["!"] = 1 << 3
-relation["<>"] = 1 << 3
+#relation["<>"] = 1 << 3
 relation["><"] = 1 << 4
+# Imfer bit
+relation["infer"] = 1 << 5
 relation["{=, >}"] = 1 << 0 | 1 << 1
 relation["{=, <}"] = 1 << 0 | 1 << 2
 relation["{=, !}"] = 1 << 0 | 1 << 3

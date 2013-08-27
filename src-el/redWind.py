@@ -39,6 +39,7 @@ class RedWindow():
         self.win = gtk.Window(gtk.WINDOW_TOPLEVEL)
 	self.win.set_title("Euler/X")
 	self.win.set_default_size(250, 200)
+        self.win.set_keep_above(True)
 	self.vbox = gtk.VBox(gtk.TRUE,3)
         taxa = re.match("(.*),(.*)", pair)
 	entry = gtk.Label("What is the relation between "+taxa.group(1)+" and "+taxa.group(2)+"?\n(Check those relations that are possible)?")
