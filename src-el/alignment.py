@@ -100,6 +100,8 @@ class TaxonomyMapping:
             self.genPW(True)
         elif self.enc & encode["ve"]:
             self.genVE()
+        elif self.enc & encode["cb"]:
+            self.genCB()
         elif self.enc & encode["ob"]:
             self.genOB()
         elif self.enc & encode["ct"]:
@@ -361,6 +363,7 @@ class TaxonomyMapping:
 	    elif(P == 1):
 	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=red];\n")
 	    elif(P == 2):
+              if False:
 	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
         if self.options.rcgo:
 	    fDot.write("  subgraph ig {\nedge [dir=none, style=dashed, color=blue]\n\n")
@@ -369,6 +372,13 @@ class TaxonomyMapping:
                     item = re.match("(.*),(.*)", key)
 	    	    fDot.write("\"" + item.group(1) + "\" -> \"" + item.group(2) + "\"\n")
 	    fDot.write("  }\n")
+        fDot.write("  subgraph cluster_lg {\n")
+        fDot.write("    rankdir = LR\n")
+        fDot.write("    label = \"Legend\";\n")
+        fDot.write("    A1 -> B1 [label=\"is included in (given)\" style=filled, color=black]\n")
+        fDot.write("    A2 -> B2 [label=\"is included in (inferred)\" style=filled, color=red]\n")
+        fDot.write("    A3 -> B3 [label=\"overlaps\" dir=none, style=dashed, color=blue]\n")
+        fDot.write("  }\n")
 	fDot.write("}\n")
             
         fDot.close()
@@ -413,16 +423,16 @@ class TaxonomyMapping:
                   if self.mir[pair] & rel and pair+","+rel.__str__() in self.mirp.keys():
                     for pw in self.mirp[pair+","+rel.__str__()]:
                         tmpppw.add(pw)
-                        # Adjust mir
-                        for tmppair in self.mir.keys():
-                          for j in range(5):
-                            relj = 1 << j
-                            if tmppair+","+relj.__str__() in self.mirp.keys() and\
-                               pw in self.mirp[tmppair+","+relj.__str__()]:
-                              if len(tmpppw) ==1:
-                                self.mir[tmppair] = relj
-                              else:
-                                self.mir[tmppair] |= relj
+                # Adjust mir
+                for tmppair in self.mir.keys():
+                  for j in range(5):
+                    relj = 1 << j
+                    if tmppair+","+relj.__str__() in self.mirp.keys() and\
+                       pw in self.mirp[tmppair+","+relj.__str__()]:
+                      if len(tmpppw) ==1:
+                        self.mir[tmppair] = relj
+                      else:
+                        self.mir[tmppair] |= relj
                 if len(tmpppw) != 0:
                   if len(ppw) == 0:
                     ppw = tmpppw
@@ -560,6 +570,12 @@ class TaxonomyMapping:
         if self.options.output:
             print self.ve
 
+    def genCB(self):
+        com = "dlv -silent -filter=relout "+self.pwfile+" "+self.pwswitch
+        self.cb = commands.getoutput(com)
+        if self.options.output:
+            print self.cb
+ 
     def genASP(self):
         self.baseDlv == ""
         self.genDlvConcept()
@@ -595,6 +611,7 @@ class TaxonomyMapping:
         pro = 1    # product of num
         couArray = []
         proArray = []
+        taxaArray = []
         for key in self.taxonomies.keys():
             cou = 0
             con += "tax(" + self.taxonomies[key].dlvName() + "," + n.__str__() + ").\n"
@@ -647,14 +664,62 @@ class TaxonomyMapping:
         elif self.enc & encode["mn"]:
             maxint = prod
             if reasoner[self.options.reasoner] == reasoner["dlv"]:
-	        self.baseDlv = "#maxint=" + maxint.__str__() + ".\n\n"
+                if self.enc & encode["cb"]:
+	            self.baseDlv = "#maxint=" + (2**maxint-1).__str__() + ".\n\n"
+	            self.baseDlv += "#const m=" + maxint.__str__() + ".\n\n"
+	            self.baseDlv += "%%% regions\n"
+	            self.baseDlv += "r(M):- #int(M),M>=1,M<=m.\n\n"
+                else:
+	            self.baseDlv = "#maxint=" + maxint.__str__() + ".\n\n"
+	            self.baseDlv += "%%% regions\n"
+	            self.baseDlv += "r(M):- #int(M),M>=1,M<=#maxint.\n\n"
+
 	        self.baseDlv += con
-	        self.baseDlv += "%%% regions\n"
-	        self.baseDlv += "r(M):- #int(M),M>=1,M<=#maxint.\n\n"
 
 	        self.baseDlv += "%%% bit\n"
                 for i in range(len(couArray)):
 	            self.baseDlv += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n"
+                if self.enc & encode["cb"]:
+                    self.baseDlv += "\n%%% combined concept\n"
+        	    for key1 in self.taxonomies.keys():
+        	        for key2 in self.taxonomies.keys():
+                            if key1 == key2: continue
+                            for taxon1 in self.taxonomies[key1].taxa.keys():
+                                t1 = self.taxonomies[key1].taxa[taxon1]
+                                for taxon2 in self.taxonomies[key2].taxa.keys():
+                                    t2 = self.taxonomies[key2].taxa[taxon2]
+				    self.baseDlv += "newcon(" + t1.dlvName() + "__" + t2.dlvName() + ", "\
+						+ t1.dlvName() + ", " + t2.dlvName()  + ").\n"
+						#+ "concept2(" + t1.dlvName() + ", _), "\
+						#+ "concept2(" + t2.dlvName() + ", _).\n"
+	            self.baseDlv += "cb(M):- #int(M),M>=1,M<=#maxint.\n\n"
+
+	            self.baseDlv += "\n%%% power\n"
+        	    self.baseDlv += "p(1,1).\n"
+        	    self.baseDlv += "p(N,M) :- #int(N),N>0,#succ(N1,N),p(N1,M1),M=M1*2.\n\n"
+        
+        	    self.baseDlv += "%%% bit2\n"
+        	    self.baseDlv += "bit2(M, N, 0):-cb(M),r(N),p(N,P),M1=M/P,#mod(M1,2,0).\n"
+        	    self.baseDlv += "bit2(M, N, 1):-cb(M),r(N),not bit2(M,N,0).\n\n"
+
+        	    self.baseDlv += "%%% concept to combined concept\n"
+		    self.baseDlv += "cnotcc(C,CC) :- concept2(C,_), cb(CC), in(C, M), bit2(CC, M, 0), vrs(M).\n"
+		    self.baseDlv += "cnotcc(C,CC) :- concept2(C,_), cb(CC), out(C, M), bit2(CC, M, 1), vrs(M).\n"
+		    self.baseDlv += "cnotcc(C,CC) :- concept2(C,_), cb(CC), bit2(CC,M,1),irs(M).\n"
+		    self.baseDlv += "ctocc(C, CC) :- concept2(C,_), cb(CC), not cnotcc(C, CC).\n"
+		    self.baseDlv += "ctocc(C, CC) :- newcon(C, X, Y), ctocc(X, XC), ctocc(Y, YC), and(XC, YC, CC).\n"
+
+        	    self.baseDlv += "\n%%% and op\n"
+		    self.baseDlv += "nand(X, Y, Z) :- cb(X), cb(Y), cb(Z), r(M), bit2(X, M, 0), bit2(Y, M, _), bit2(Z, M, 1).\n"
+		    self.baseDlv += "nand(X, Y, Z) :- cb(X), cb(Y), cb(Z), r(M), bit2(X, M, _), bit2(Y, M, 0), bit2(Z, M, 1).\n"
+		    self.baseDlv += "nand(X, Y, Z) :- cb(X), cb(Y), cb(Z), r(M), bit2(X, M, 1), bit2(Y, M, 1), bit2(Z, M, 0).\n"
+		    self.baseDlv += "and(X, Y, Z) :- cb(X), cb(Y), cb(Z), not nand(X, Y, Z).\n"
+
+        	    self.baseDlv += "\n%%% minus op\n"
+		    self.baseDlv += "nminus(X, Y, Z) :- cb(X), cb(Y), cb(Z), r(M), bit2(X, M, 0), bit2(Y, M, _), bit2(Z, M, 1).\n"
+		    self.baseDlv += "nminus(X, Y, Z) :- cb(X), cb(Y), cb(Z), r(M), bit2(X, M, 1), bit2(Y, M, 0), bit2(Z, M, 0).\n"
+		    self.baseDlv += "nminus(X, Y, Z) :- cb(X), cb(Y), cb(Z), r(M), bit2(X, M, 1), bit2(Y, M, 1), bit2(Z, M, 1).\n"
+		    self.baseDlv += "minus(X, Y, Z) :- cb(X), cb(Y), cb(Z), not nminus(X, Y, Z).\n"
 
             elif reasoner[self.options.reasoner] == reasoner["gringo"]:
 	        self.baseDlv = con
@@ -942,15 +1007,58 @@ class TaxonomyMapping:
         self.baseDlv += ":- rel(X, Y, \"><\"), rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), pw.\n"
         self.baseDlv += ":- not rel(X, Y, \"=\"), not rel(X, Y, \"<\"), not rel(X, Y, \">\"), not rel(X, Y, \"><\"), not rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), N1 < N2, pw.\n\n"
 
-        self.baseDlv += "hint(X, Y, 0) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), out(Y, R), pw.\n"
-        self.baseDlv += "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), in(Y, R), pw.\n"
-        self.baseDlv += "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), out(X, R), in(Y, R), pw.\n\n"
+        if self.enc & encode["cb"]:
+            self.baseDlv += "hint(X, Y, 0) :- concept2(X, N1), concept2(Y, N2), vrs(R), in(X, R), out(Y, R), pw.\n"
+            self.baseDlv += "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), vrs(R), in(X, R), in(Y, R), pw.\n"
+            self.baseDlv += "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), vrs(R), out(X, R), in(Y, R), pw.\n\n"
+        else:
+            self.baseDlv += "hint(X, Y, 0) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), out(Y, R), pw.\n"
+            self.baseDlv += "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), in(Y, R), pw.\n"
+            self.baseDlv += "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), out(X, R), in(Y, R), pw.\n\n"
 
         self.baseDlv += "rel(X, Y, \"=\") :- not hint(X, Y, 0), hint(X, Y, 1), not hint(X, Y, 2), pw.\n"
         self.baseDlv += "rel(X, Y, \"<\") :- not hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2), pw.\n"
         self.baseDlv += "rel(X, Y, \">\") :- hint(X, Y, 0), hint(X, Y, 1), not hint(X, Y, 2), pw.\n"
         self.baseDlv += "rel(X, Y, \"><\") :- hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2), pw.\n"
         self.baseDlv += "rel(X, Y, \"!\") :- hint(X, Y, 0), not hint(X, Y, 1), hint(X, Y, 2), pw.\n\n\n"
+
+        if self.enc & encode["cb"]:
+            self.baseDlv += "%%% Combined concept decoding\n"
+	    self.baseDlv += "combined(XC,1) :- rel(X,Y,\">\"), ctocc(X, XC).\n"
+	    self.baseDlv += "combined(XC,1) :- rel(X,Y,\"<\"), ctocc(X, XC).\n"
+	    self.baseDlv += "combined(XC,1) :- rel(X,Y,\"=\"), ctocc(X, XC).\n"
+	    self.baseDlv += "combined(XC,1) :- rel(X,Y,\"!\"), ctocc(X, XC).\n"
+	    self.baseDlv += "combined(YC,1) :- rel(X,Y,\">\"), ctocc(Y, YC).\n"
+	    self.baseDlv += "combined(YC,1) :- rel(X,Y,\"<\"), ctocc(Y, YC).\n"
+	    self.baseDlv += "combined(YC,1) :- rel(X,Y,\"=\"), ctocc(Y, YC).\n"
+	    self.baseDlv += "combined(YC,1) :- rel(X,Y,\"!\"), ctocc(Y, YC).\n"
+	    self.baseDlv += "combined(Z,1) :- rel(X,Y,\"><\"), ctocc(X, XC), ctocc(Y, YC), and(XC, YC, Z).\n"
+	    self.baseDlv += "combined(XC,0) :- rel(X,Y,\"><\"), ctocc(X, XC).\n"
+	    self.baseDlv += "combined(YC,0) :- rel(X,Y,\"><\"), ctocc(Y, YC).\n"
+	    self.baseDlv += "combined(X,0) :- not combined(X,1), cb(X).\n"
+	    self.baseDlv += "combined(X,2) :- combined(X,1), not combined(X,0), cb(X).\n"
+	    self.baseDlv += "combined(X,1) :- relcc(X,Y,\"<\").\n"
+	    self.baseDlv += "combined(X,1) :- relcc(X,Y,\">\").\n"
+	    self.baseDlv += "combined(X,1) :- relcc(X,Y,\"=\").\n"
+	    self.baseDlv += "combined(X,1) :- relcc(X,Y,\"!\").\n"
+	    self.baseDlv += "combined(Y,1) :- relcc(X,Y,\"<\").\n"
+	    self.baseDlv += "combined(Y,1) :- relcc(X,Y,\">\").\n"
+	    self.baseDlv += "combined(Y,1) :- relcc(X,Y,\"=\").\n"
+	    self.baseDlv += "combined(Y,1) :- relcc(X,Y,\"!\").\n"
+	    self.baseDlv += "hant(X, Y, 0) :- combined(X,1), combined(Y,1), not X=Y, vrs(R), bit2(X, R, 1), bit2(Y, R, 0).\n"
+	    self.baseDlv += "hant(X, Y, 1) :- combined(X,1), combined(Y,1), not X=Y, vrs(R), bit2(X, R, 1), bit2(Y, R, 1).\n"
+	    self.baseDlv += "hant(X, Y, 2) :- combined(X,1), combined(Y,1), not X=Y, vrs(R), bit2(X, R, 0), bit2(Y, R, 1).\n"
+	    self.baseDlv += "relcc(X, Y, \"=\") :- X<Y, not hant(X, Y, 0), hant(X, Y, 1), not hant(X, Y, 2), pw.\n"
+	    self.baseDlv += "relcc(X, Y, \"<\") :- X<Y, not hant(X, Y, 0), hant(X, Y, 1), hant(X, Y, 2), pw.\n"
+	    self.baseDlv += "relcc(X, Y, \">\") :- X<Y, hant(X, Y, 0), hant(X, Y, 1), not hant(X, Y, 2), pw.\n"
+	    self.baseDlv += "relcc(X, Y, \"><\") :- X<Y, hant(X, Y, 0), hant(X, Y, 1), hant(X, Y, 2), pw.\n"
+	    self.baseDlv += "relcc(X, Y, \"!\") :- X<Y, hant(X, Y, 0), not hant(X, Y, 1), hant(X, Y, 2), pw.\n"
+	    self.baseDlv += "combined(X,0) :- relcc(X,Y,\"><\").\n"
+	    self.baseDlv += "combined(Y,0) :- relcc(X,Y,\"><\").\n"
+	    self.baseDlv += "combined(Z,1) :- relcc(X,Y,\"><\"), and(X, Y, Z).\n"
+	    self.baseDlv += "combined(Z,1) :- relcc(X,Y,\"><\"), minus(X, Y, Z).\n"
+	    self.baseDlv += "combined(Z,1) :- relcc(X,Y,\"><\"), minus(Y, X, Z).\n"
+	    self.baseDlv += "relout(X, Y, Z) :- ctocc(X, XC), ctocc(Y, YC), relcc(XC, YC, Z), combined(XC, 2), combined(YC, 2).\n"
 
     def genDlvObs(self):
         self.baseDlv += "%% Observation Information\n\n"
