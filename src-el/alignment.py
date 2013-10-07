@@ -297,7 +297,9 @@ class TaxonomyMapping:
                     if not self.mir.has_key(pair) or not self.mir[pair] & rcc5[rel[2]]:
                         self.mir[pair] = rcc5[rel[2]] | relation["infer"]
                 else:
-                    if not self.mir[pair] & rcc5[rel[2]]:
+                    if not self.mir.has_key(pair):
+                        self.mir[pair] = rcc5[rel[2]] | relation["infer"]
+                    elif not self.mir[pair] & rcc5[rel[2]]:
                         self.mir[pair] |= relation["infer"]
                     self.mir[pair] |= rcc5[rel[2]]
                 pairrel = pair+","+rcc5[rel[2]].__str__()
