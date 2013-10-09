@@ -406,6 +406,7 @@ class TaxonomyMapping:
         for i in range(s):
             a = self.articulations.pop(i)    
             # Now refresh the input file
+            self.rules = {}
             self.genASP()
     	    # Run the reasoner again
             self.pw = commands.getoutput(self.com)
@@ -920,7 +921,10 @@ class TaxonomyMapping:
 			self.baseAsp += "%% ISA\n"
 			coverage = ":- in(" + t.dlvName() + ", X)"
 			coverin = ""
-			coverout = "out(" + t.dlvName() + ", X) :- "
+                        if self.options.enableCov:
+			    coverout = "out(" + t.dlvName() + ", X) :- "
+                        else:
+			    coverout = "in(" + t.dlvName() + ",X) v out(" + t.dlvName() + ", X) :- "
 			for t1 in t.children:
                             queue.append(t1)
 			    self.baseAsp += "% " + t1.dlvName() + " isa " + t.dlvName() + "\n"
@@ -944,13 +948,12 @@ class TaxonomyMapping:
                             coverin += "in(" + t1.dlvName() + ", X)"
                             coverout += "out(" + t1.dlvName() + ", X)"
 			# C
-                        if self.options.enableCov:
-			    self.baseAsp += "%% coverage\n"
-                            ruleNum = len(self.rules)
-		            self.rules["r" + ruleNum.__str__()] = t.dotName() + " coverage"
-			    #self.baseAsp += coverin + " :- in(" + t.dlvName() + ", X).\n"
-			    self.baseAsp += coverout + ".\n"
-			    #self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") " +coverage + ".\n\n"
+			self.baseAsp += "%% coverage\n"
+                        ruleNum = len(self.rules)
+		        self.rules["r" + ruleNum.__str__()] = t.dotName() + " coverage"
+			#self.baseAsp += coverin + " :- in(" + t.dlvName() + ", X).\n"
+			self.baseAsp += coverout + ".\n"
+			#self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") " +coverage + ".\n\n"
 
 			# D
 			self.baseAsp += "%% sibling disjointness\n"
