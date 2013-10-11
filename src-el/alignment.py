@@ -105,7 +105,7 @@ class TaxonomyMapping:
         elif self.enc & encode["ve"]:
             self.genVE()
         elif self.enc & encode["cb"]:
-            self.genPW(True)
+            self.genPW(False)
             self.genCbConcept()
             fcb = open(self.cbfile, 'w')
             fcb.write(self.baseCb)
@@ -316,7 +316,6 @@ class TaxonomyMapping:
                     self.mirp[pairrel].append(i)
                 else:
                     self.mirp[pairrel] = [i]
-            print self.mirp
             self.adjustMirc(pair)
             outputstr += "}\n"
             # RCG
@@ -602,7 +601,7 @@ class TaxonomyMapping:
         raw = self.cb.replace("{","").replace("}","").replace(" ","").replace("),",");")
         pws = raw.split("\n")
         self.npw = len(pws)
-        self.outPW(pws, False, "relout")
+        self.outPW(pws, True, "relout")
  
     def genASP(self):
         self.baseAsp == ""
