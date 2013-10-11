@@ -42,6 +42,7 @@ class TaxonomyMapping:
         if not os.path.exists(self.aspdir):
             os.mkdir(self.aspdir)
         self.pwfile = os.path.join(self.aspdir, self.name+"_pw.asp")
+        self.cbfile = os.path.join(self.aspdir, self.name+"_cb.asp")
         self.pwswitch = os.path.join(self.aspdir, "pw.asp")
         self.ixswitch = os.path.join(self.aspdir, "ix.asp")
         self.pwout = os.path.join(options.outputdir, self.name+"_pw.txt")
@@ -104,6 +105,11 @@ class TaxonomyMapping:
         elif self.enc & encode["ve"]:
             self.genVE()
         elif self.enc & encode["cb"]:
+            self.genPW(True)
+            self.genCbConcept()
+            fcb = open(self.cbfile, 'w')
+            fcb.write(self.baseCb)
+            fcb.close()
             self.genCB()
         elif self.enc & encode["ob"]:
             self.genOB()
@@ -310,6 +316,7 @@ class TaxonomyMapping:
                     self.mirp[pairrel].append(i)
                 else:
                     self.mirp[pairrel] = [i]
+            print self.mirp
             self.adjustMirc(pair)
             outputstr += "}\n"
             # RCG
@@ -584,7 +591,7 @@ class TaxonomyMapping:
 
     def genCB(self):
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-        self.com = "dlv -silent -filter=relout "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
+        self.com = "dlv -silent -filter=relout "+self.cbfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
         self.cb = commands.getoutput(self.com)
         if self.cb == "":
             self.simpleRemedy()
@@ -622,6 +629,71 @@ class TaxonomyMapping:
         pdlv.close()
         idlv.close()
 
+    def genCbConcept(self):
+        self.baseCb += "\n%%% combined concept\n"
+        for key1 in self.taxonomies.keys():
+            for key2 in self.taxonomies.keys():
+                if key1 >= key2: continue
+                for taxon1 in self.taxonomies[key1].taxa.keys():
+                    t1 = self.taxonomies[key1].taxa[taxon1]
+                    for taxon2 in self.taxonomies[key2].taxa.keys():
+                        t2 = self.taxonomies[key2].taxa[taxon2]
+                        if self.mirp.has_key(t1.dotName()+","+t2.dotName()+","+rcc5["overlaps"].__str__()) or\
+                           self.mirp.has_key(t2.dotName()+","+t1.dotName()+","+rcc5["overlaps"].__str__()):
+                            continue
+	                self.baseCb += "newcon(" + t1.dlvName() + "_not_" + t2.dlvName() + ", "\
+	           	            + t1.dlvName() + ", " + t2.dlvName()  + ", 0).\n"
+	                self.baseCb += "newcon(" + t1.dlvName() + "__" + t2.dlvName() + ", "\
+	           		    + t1.dlvName() + ", " + t2.dlvName()  + ", 1).\n"
+	                self.baseCb += "newcon(not_" + t1.dlvName() + "__" + t2.dlvName() + ", "\
+	           		    + t1.dlvName() + ", " + t2.dlvName()  + ", 2).\n"
+	           		    #+ "concept2(" + t1.dlvName() + ", _), "\
+	           		    #+ "concept2(" + t2.dlvName() + ", _).\n"
+        self.baseCb += "cb(X) :- newcon(X, _, _, _).\n"
+        self.baseCb += "cp(X) :- concept2(X, _).\n"
+        self.baseCb += "con(X) :- cb(X).\n"
+        self.baseCb += "con(X) :- cp(X).\n"
+        self.baseCb += "in(X, M) :- newcon(X, Y, Z, 0), in(Y, M), out(Z, M).\n"
+        self.baseCb += "out(X, M) :- newcon(X, Y, Z, 0), out(Y, M).\n"
+        self.baseCb += "out(X, M) :- newcon(X, Y, Z, 0), in(Z, M).\n"
+        self.baseCb += "in(X, M) :- newcon(X, Y, Z, 1), in(Y, M), in(Z, M).\n"
+        self.baseCb += "out(X, M) :- newcon(X, Y, Z, 1), out(Y, M).\n"
+        self.baseCb += "out(X, M) :- newcon(X, Y, Z, 1), out(Z, M).\n"
+        self.baseCb += "in(X, M) :- newcon(X, Y, Z, 2), out(Y, M), in(Z, M).\n"
+        self.baseCb += "out(X, M) :- newcon(X, Y, Z, 2), in(Y, M).\n"
+        self.baseCb += "out(X, M) :- newcon(X, Y, Z, 2), out(Z, M).\n"
+	#self.baseCb += "cb(M):- #int(M),M>=1,M<=#maxint.\n\n"
+
+	#self.baseCb += "\n%%% power\n"
+        #self.baseCb += "p(1,1).\n"
+        #self.baseCb += "p(N,M) :- #int(N),N>0,#succ(N1,N),p(N1,M1),M=M1*2.\n\n"
+        
+        #self.baseCb += "%%% bit2\n"
+        #self.baseCb += "bit2(M, N, 0):-cb(M),r(N),p(N,P),M1=M/P,#mod(M1,2,0).\n"
+        #self.baseCb += "bit2(M, N, 1):-cb(M),r(N),not bit2(M,N,0).\n\n"
+
+        self.baseCb += "%%% concept to combined concept\n"
+	self.baseCb += "cnotcc(C,CC) :- concept2(C,_), cb(CC), in(C, M), out(CC, M), vrs(M).\n"
+	self.baseCb += "cnotcc(C,CC) :- concept2(C,_), cb(CC), out(C, M), in(CC, M), vrs(M).\n"
+	self.baseCb += "cnotcc(C,CC) :- concept2(C,_), cb(CC), in(CC, M), irs(M).\n"
+	self.baseCb += "ctocc(C, CC) :- concept2(C,_), cb(CC), not cnotcc(C, CC).\n"
+	self.baseCb += "ctocc(C, CC) :- newcon(C, X, Y, 0), ctocc(X, XC), ctocc(Y, YC), minus(XC, YC, CC).\n"
+	self.baseCb += "ctocc(C, CC) :- newcon(C, X, Y, 1), ctocc(X, XC), ctocc(Y, YC), and(XC, YC, CC).\n"
+	self.baseCb += "ctocc(C, CC) :- newcon(C, X, Y, 2), ctocc(X, XC), ctocc(Y, YC), minus(YC, XC, CC).\n"
+
+        self.baseCb += "\n%%% and op\n"
+	self.baseCb += "nand(X, Y, Z) :- con(X), con(Y), con(Z), r(M), out(X, M), in(Z, M).\n"
+	self.baseCb += "nand(X, Y, Z) :- con(X), con(Y), con(Z), r(M), out(Y, M), in(Z, M).\n"
+	self.baseCb += "nand(X, Y, Z) :- con(X), con(Y), con(Z), r(M), in(X, M), in(Y, M), out(Z, M).\n"
+	self.baseCb += "and(X, Y, Z) :- con(X), con(Y), con(Z), not nand(X, Y, Z).\n"
+
+        self.baseCb += "\n%%% minus op\n"
+	self.baseCb += "nminus(X, Y, Z) :- con(X), con(Y), con(Z), r(M), out(X, M), in(Z, M).\n"
+	self.baseCb += "nminus(X, Y, Z) :- con(X), con(Y), con(Z), r(M), in(X, M), out(Y, M), out(Z, M).\n"
+	self.baseCb += "nminus(X, Y, Z) :- con(X), con(Y), con(Z), r(M), in(X, M), in(Y, M), in(Z, M).\n"
+	self.baseCb += "minus(X, Y, Z) :- con(X), con(Y), con(Z), not nminus(X, Y, Z).\n"
+
+
     def genDlvConcept(self):
         con = "%%% Concepts\n"
 
@@ -639,7 +711,8 @@ class TaxonomyMapping:
             con += "concept2(A, B) :- concept(A,B,_).\n"
             for taxon in self.taxonomies[key].taxa.keys():
                 t = self.taxonomies[key].taxa[taxon]
-                if (self.enc & encode["dl"] or self.enc & encode["mn"]) and t.hasChildren():
+                if (self.enc & encode["dl"] or self.enc & encode["mn"]) and\
+                    t.hasChildren(): #and self.options.enableCov:
                     con += "concept2(" + t.dlvName() + "," + n.__str__() + ").\n"
                 else:
                     fl = num + cou
@@ -694,67 +767,6 @@ class TaxonomyMapping:
 	        self.baseAsp += "%%% bit\n"
                 for i in range(len(couArray)):
 	            self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n"
-                if self.enc & encode["cb"]:
-                    self.baseAsp += "\n%%% combined concept\n"
-        	    for key1 in self.taxonomies.keys():
-        	        for key2 in self.taxonomies.keys():
-                            if key1 >= key2: continue
-                            for taxon1 in self.taxonomies[key1].taxa.keys():
-                                t1 = self.taxonomies[key1].taxa[taxon1]
-                                for taxon2 in self.taxonomies[key2].taxa.keys():
-                                    t2 = self.taxonomies[key2].taxa[taxon2]
-				    self.baseAsp += "newcon(" + t1.dlvName() + "_not_" + t2.dlvName() + ", "\
-						+ t1.dlvName() + ", " + t2.dlvName()  + ", 0).\n"
-				    self.baseAsp += "newcon(" + t1.dlvName() + "__" + t2.dlvName() + ", "\
-						+ t1.dlvName() + ", " + t2.dlvName()  + ", 1).\n"
-				    self.baseAsp += "newcon(not_" + t1.dlvName() + "__" + t2.dlvName() + ", "\
-						+ t1.dlvName() + ", " + t2.dlvName()  + ", 2).\n"
-						#+ "concept2(" + t1.dlvName() + ", _), "\
-						#+ "concept2(" + t2.dlvName() + ", _).\n"
-                    self.baseAsp += "cb(X) :- newcon(X, _, _, _).\n"
-                    self.baseAsp += "cp(X) :- concept2(X, _).\n"
-                    self.baseAsp += "con(X) :- cb(X).\n"
-                    self.baseAsp += "con(X) :- cp(X).\n"
-                    self.baseAsp += "in(X, M) :- newcon(X, Y, Z, 0), in(Y, M), out(Z, M).\n"
-                    self.baseAsp += "out(X, M) :- newcon(X, Y, Z, 0), out(Y, M).\n"
-                    self.baseAsp += "out(X, M) :- newcon(X, Y, Z, 0), in(Z, M).\n"
-                    self.baseAsp += "in(X, M) :- newcon(X, Y, Z, 1), in(Y, M), in(Z, M).\n"
-                    self.baseAsp += "out(X, M) :- newcon(X, Y, Z, 1), out(Y, M).\n"
-                    self.baseAsp += "out(X, M) :- newcon(X, Y, Z, 1), out(Z, M).\n"
-                    self.baseAsp += "in(X, M) :- newcon(X, Y, Z, 2), out(Y, M), in(Z, M).\n"
-                    self.baseAsp += "out(X, M) :- newcon(X, Y, Z, 2), in(Y, M).\n"
-                    self.baseAsp += "out(X, M) :- newcon(X, Y, Z, 2), out(Z, M).\n"
-	            #self.baseAsp += "cb(M):- #int(M),M>=1,M<=#maxint.\n\n"
-
-	            #self.baseAsp += "\n%%% power\n"
-        	    #self.baseAsp += "p(1,1).\n"
-        	    #self.baseAsp += "p(N,M) :- #int(N),N>0,#succ(N1,N),p(N1,M1),M=M1*2.\n\n"
-        
-        	    #self.baseAsp += "%%% bit2\n"
-        	    #self.baseAsp += "bit2(M, N, 0):-cb(M),r(N),p(N,P),M1=M/P,#mod(M1,2,0).\n"
-        	    #self.baseAsp += "bit2(M, N, 1):-cb(M),r(N),not bit2(M,N,0).\n\n"
-
-        	    self.baseAsp += "%%% concept to combined concept\n"
-		    self.baseAsp += "cnotcc(C,CC) :- concept2(C,_), cb(CC), in(C, M), out(CC, M), vrs(M).\n"
-		    self.baseAsp += "cnotcc(C,CC) :- concept2(C,_), cb(CC), out(C, M), in(CC, M), vrs(M).\n"
-		    self.baseAsp += "cnotcc(C,CC) :- concept2(C,_), cb(CC), in(CC, M), irs(M).\n"
-		    self.baseAsp += "ctocc(C, CC) :- concept2(C,_), cb(CC), not cnotcc(C, CC).\n"
-		    self.baseAsp += "ctocc(C, CC) :- newcon(C, X, Y, 0), ctocc(X, XC), ctocc(Y, YC), minus(XC, YC, CC).\n"
-		    self.baseAsp += "ctocc(C, CC) :- newcon(C, X, Y, 1), ctocc(X, XC), ctocc(Y, YC), and(XC, YC, CC).\n"
-		    self.baseAsp += "ctocc(C, CC) :- newcon(C, X, Y, 2), ctocc(X, XC), ctocc(Y, YC), minus(YC, XC, CC).\n"
-
-        	    self.baseAsp += "\n%%% and op\n"
-		    self.baseAsp += "nand(X, Y, Z) :- con(X), con(Y), con(Z), r(M), out(X, M), in(Z, M).\n"
-		    self.baseAsp += "nand(X, Y, Z) :- con(X), con(Y), con(Z), r(M), out(Y, M), in(Z, M).\n"
-		    self.baseAsp += "nand(X, Y, Z) :- con(X), con(Y), con(Z), r(M), in(X, M), in(Y, M), out(Z, M).\n"
-		    self.baseAsp += "and(X, Y, Z) :- con(X), con(Y), con(Z), not nand(X, Y, Z).\n"
-
-        	    self.baseAsp += "\n%%% minus op\n"
-		    self.baseAsp += "nminus(X, Y, Z) :- con(X), con(Y), con(Z), r(M), out(X, M), in(Z, M).\n"
-		    self.baseAsp += "nminus(X, Y, Z) :- con(X), con(Y), con(Z), r(M), in(X, M), out(Y, M), out(Z, M).\n"
-		    self.baseAsp += "nminus(X, Y, Z) :- con(X), con(Y), con(Z), r(M), in(X, M), in(Y, M), in(Z, M).\n"
-		    self.baseAsp += "minus(X, Y, Z) :- con(X), con(Y), con(Z), not nminus(X, Y, Z).\n"
-
             elif reasoner[self.options.reasoner] == reasoner["gringo"]:
 	        self.baseAsp = con
 	        self.baseAsp += "%%% regions\n"
@@ -1030,6 +1042,7 @@ class TaxonomyMapping:
             self.baseAsp += self.articulations[i].toASP(self.options.encode, self.options.reasoner)+ "\n"
 
     def genDlvDc(self):
+        self.baseCb  += self.baseAsp
         self.baseAsp += template.getDlvPwDc()
         self.baseCb  += template.getDlvCbDc()
 
