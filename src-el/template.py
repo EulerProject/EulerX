@@ -1,8 +1,52 @@
 from helper import *
 
 class template:
-    global dlvPwDc
-    global dlvCbDc
+    global dlvCbCon              # Base cb new concept encoding
+    global dlvPwDc               # Base pw decoding
+    global dlvCbDc               # Base cb decoding
+
+    dlvCbCon = "cb(X) :- newcon(X, _, _, _).\n"\
+             + "cp(X) :- concept2(X, _).\n"\
+             + "con(X) :- cb(X).\n"\
+             + "con(X) :- cp(X).\n"\
+             + "in(X, M) :- newcon(X, Y, Z, 0), in(Y, M), out(Z, M).\n"\
+             + "out(X, M) :- newcon(X, Y, Z, 0), out(Y, M).\n"\
+             + "out(X, M) :- newcon(X, Y, Z, 0), in(Z, M).\n"\
+             + "in(X, M) :- newcon(X, Y, Z, 1), in(Y, M), in(Z, M).\n"\
+             + "out(X, M) :- newcon(X, Y, Z, 1), out(Y, M).\n"\
+             + "out(X, M) :- newcon(X, Y, Z, 1), out(Z, M).\n"\
+             + "in(X, M) :- newcon(X, Y, Z, 2), out(Y, M), in(Z, M).\n"\
+             + "out(X, M) :- newcon(X, Y, Z, 2), in(Y, M).\n"\
+             + "out(X, M) :- newcon(X, Y, Z, 2), out(Z, M).\n"\
+
+             + "%%% concept to combined concept\n"\
+	     + "cnotcc(C,CC) :- concept2(C,_), cb(CC), in(C, M), out(CC, M), vrs(M).\n"\
+	     + "cnotcc(C,CC) :- concept2(C,_), cb(CC), out(C, M), in(CC, M), vrs(M).\n"\
+	     + "cnotcc(C,CC) :- concept2(C,_), cb(CC), in(CC, M), irs(M).\n"\
+	     + "ctocc(C, CC) :- concept2(C,_), cb(CC), not cnotcc(C, CC).\n"\
+	     + "ctocc(C, CC) :- newcon(C, X, Y, 0), ctocc(X, XC), ctocc(Y, YC), minus(XC, YC, CC).\n"\
+	     + "ctocc(C, CC) :- newcon(C, X, Y, 1), ctocc(X, XC), ctocc(Y, YC), and(XC, YC, CC).\n"\
+	     + "ctocc(C, CC) :- newcon(C, X, Y, 2), ctocc(X, XC), ctocc(Y, YC), minus(YC, XC, CC).\n"\
+
+             + "\n%%% and op\n"\
+	     + "nand(X, Y, Z) :- con(X), con(Y), con(Z), r(M), out(X, M), in(Z, M).\n"\
+	     + "nand(X, Y, Z) :- con(X), con(Y), con(Z), r(M), out(Y, M), in(Z, M).\n"\
+	     + "nand(X, Y, Z) :- con(X), con(Y), con(Z), r(M), in(X, M), in(Y, M), out(Z, M).\n"\
+	     + "and(X, Y, Z) :- con(X), con(Y), con(Z), not nand(X, Y, Z).\n"\
+
+             + "\n%%% minus op\n"\
+	     + "nminus(X, Y, Z) :- con(X), con(Y), con(Z), r(M), out(X, M), in(Z, M).\n"\
+	     + "nminus(X, Y, Z) :- con(X), con(Y), con(Z), r(M), in(X, M), out(Y, M), out(Z, M).\n"\
+	     + "nminus(X, Y, Z) :- con(X), con(Y), con(Z), r(M), in(X, M), in(Y, M), in(Z, M).\n"\
+	     + "minus(X, Y, Z) :- con(X), con(Y), con(Z), not nminus(X, Y, Z).\n"
+
+   #self.baseCb += "\n%%% power\n"
+   #self.baseCb += "p(1,1).\n"
+   #self.baseCb += "p(N,M) :- #int(N),N>0,#succ(N1,N),p(N1,M1),M=M1*2.\n\n"
+   
+   #self.baseCb += "%%% bit2\n"
+   #self.baseCb += "bit2(M, N, 0):-cb(M),r(N),p(N,P),M1=M/P,#mod(M1,2,0).\n"
+   #self.baseCb += "bit2(M, N, 1):-cb(M),r(N),not bit2(M,N,0).\n\n"
 
     dlvPwDc = "%%% Decoding now\n"\
           + ":- rel(X, Y, \"=\"), rel(X, Y, \"<\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
@@ -75,6 +119,10 @@ class template:
     #    dlvDc += "hint(X, Y, 0) :- concept2(X, N1), concept2(Y, N2), vrs(R), in(X, R), out(Y, R), pw.\n"
     #    dlvDc += "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), vrs(R), in(X, R), in(Y, R), pw.\n"
     #    dlvDc += "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), vrs(R), out(X, R), in(Y, R), pw.\n\n"
+
+    def getDlvCbCon():
+        global dlvCbCon
+        return dlvCbCon
 
     def getDlvPwDc():
         global dlvPwDc
