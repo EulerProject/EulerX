@@ -605,13 +605,13 @@ class TaxonomyMapping:
  
     def genASP(self):
         self.baseAsp == ""
-        self.genDlvConcept()
-        self.genDlvPC()
-        self.genDlvAr()
+        self.genAspConcept()
+        self.genAspPC()
+        self.genAspAr()
         if self.enc & encode["vr"] or self.enc & encode["dl"] or self.enc & encode["pl"] or self.enc & encode["mn"]:
-            self.genDlvDc()
+            self.genAspDc()
         if self.obs != [] and self.enc & encode["ob"]:
-            self.genDlvObs()
+            self.genAspObs()
         fdlv = open(self.pwfile, 'w')
         fdlv.write(self.baseAsp)
         fdlv.close()
@@ -649,9 +649,9 @@ class TaxonomyMapping:
 	           		    #+ "concept2(" + t1.dlvName() + ", _), "\
 	           		    #+ "concept2(" + t2.dlvName() + ", _).\n"
         # add more template rules to the input file
-        self.baseCb += template.getDlvCbCon()
+        self.baseCb += template.getAspCbCon()
 
-    def genDlvConcept(self):
+    def genAspConcept(self):
         con = "%%% Concepts\n"
 
         # numbering concepts
@@ -732,24 +732,7 @@ class TaxonomyMapping:
 	        self.baseAsp += "%%% bit\n"
                 for i in range(len(couArray)):
 	            self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", V = M1 #mod " + couArray[i].__str__() + ".\n"
-
-	    self.baseAsp += "\n\n%%% Meaning of regions\n"
-	    self.baseAsp += "in(X, M) :- r(M),concept(X,T,N),N1=N+1,bit(M,T,N1).\n"
-	    self.baseAsp += "out(X, M) :- r(M),concept(X,T,N),N1=N+1,not bit(M,T,N1).\n"
-	    self.baseAsp += "in(X, M) :- r(M),concept2(X,_),not out(X, M).\n"
-	    self.baseAsp += "ir(M, fi) :- in(X, M), out(X, M), r(M), concept2(X,_).\n\n"
-
-	    self.baseAsp += "%%% Constraints of regions.\n"
-	    self.baseAsp += "irs(X) :- ir(X, _).\n"
-	    self.baseAsp += "vrs(X) :- vr(X, _).\n"
-	    self.baseAsp += "vr(X, X) :- not irs(X), r(X), pw.\n"
-	    self.baseAsp += "ir(X, X) :- not vrs(X), r(X), pw.\n"
-	    self.baseAsp += "ie(prod(A,B)) :- vr(X, A), ir(X, B), ix.\n"
-	    self.baseAsp += ":- vrs(X), irs(X), pw.\n\n"
-
-	    self.baseAsp += "%%% Inconsistency Explanation.\n"
-	    self.baseAsp += "ie(s(R, A, Y)) :- pie(R, A, Y), not cc(R, Y), ix.\n"
-	    self.baseAsp += "cc(R, Y) :- c(R, _, Y), ix.\n"
+            self.baseAsp += template.getAspMnCon()
 
         elif self.enc & encode["vr"]:
 	    self.baseAsp = "#maxint=" + int(2**num).__str__() + ".\n\n"
@@ -874,7 +857,7 @@ class TaxonomyMapping:
         else:
             print "EXCEPTION: encode ",self.options.encode," not defined!!"
 
-    def genDlvPC(self):
+    def genAspPC(self):
         self.baseAsp += "%%% PC relations\n"
         for key in self.taxonomies.keys():
             queue = copy.deepcopy(self.taxonomies[key].roots)
@@ -989,7 +972,7 @@ class TaxonomyMapping:
 				self.baseAsp += "label(" + name1 + ", " + name2+ ", ds).\n"
 
 
-    def genDlvAr(self):
+    def genAspAr(self):
         self.baseAsp += "\n%%% Articulations\n"
         for i in range(len(self.articulations)):
             self.baseAsp += "% " + self.articulations[i].string + "\n"
@@ -998,12 +981,12 @@ class TaxonomyMapping:
             self.rules["r" + ruleNum.__str__()] = self.articulations[i].string
             self.baseAsp += self.articulations[i].toASP(self.options.encode, self.options.reasoner)+ "\n"
 
-    def genDlvDc(self):
+    def genAspDc(self):
         self.baseCb  += self.baseAsp
-        self.baseAsp += template.getDlvPwDc()
-        self.baseCb  += template.getDlvCbDc()
+        self.baseAsp += template.getAspPwDc()
+        self.baseCb  += template.getAspCbDc()
 
-    def genDlvObs(self):
+    def genAspObs(self):
         self.baseAsp += "%% Observation Information\n\n"
         if reasoner[self.options.reasoner] == reasoner["dlv"]:
             self.seperator = "v"
