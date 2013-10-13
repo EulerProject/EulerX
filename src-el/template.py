@@ -1,11 +1,28 @@
 from helper import *
 
 class template:
-    global dlvCbCon              # Base cb new concept encoding
-    global dlvPwDc               # Base pw decoding
-    global dlvCbDc               # Base cb decoding
+    global aspMnCon              # Base mn concept encoding
+    global aspCbCon              # Base cb new concept encoding
+    global aspPwDc               # Base pw decoding
+    global aspCbDc               # Base cb decoding
 
-    dlvCbCon = "cb(X) :- newcon(X, _, _, _).\n"\
+    aspMnCon = "\n\n%%% Meaning of regions\n"\
+             + "in(X, M) :- r(M),concept(X,T,N),N1=N+1,bit(M,T,N1).\n"\
+             + "out(X, M) :- r(M),concept(X,T,N),N1=N+1,not bit(M,T,N1).\n"\
+             + "in(X, M) :- r(M),concept2(X,_),not out(X, M).\n"\
+             + "ir(M, fi) :- in(X, M), out(X, M), r(M), concept2(X,_).\n\n"\
+             + "%%% Constraints of regions.\n"\
+             + "irs(X) :- ir(X, _).\n"\
+             + "vrs(X) :- vr(X, _).\n"\
+             + "vr(X, X) :- not irs(X), r(X), pw.\n"\
+             + "ir(X, X) :- not vrs(X), r(X), pw.\n"\
+             + "ie(prod(A,B)) :- vr(X, A), ir(X, B), ix.\n"\
+             + ":- vrs(X), irs(X), pw.\n\n"\
+             + "%%% Inconsistency Explanation.\n"\
+             + "ie(s(R, A, Y)) :- pie(R, A, Y), not cc(R, Y), ix.\n"\
+             + "cc(R, Y) :- c(R, _, Y), ix.\n"
+
+    aspCbCon = "cb(X) :- newcon(X, _, _, _).\n"\
              + "cp(X) :- concept2(X, _).\n"\
              + "con(X) :- cb(X).\n"\
              + "con(X) :- cp(X).\n"\
@@ -18,7 +35,6 @@ class template:
              + "in(X, M) :- newcon(X, Y, Z, 2), out(Y, M), in(Z, M).\n"\
              + "out(X, M) :- newcon(X, Y, Z, 2), in(Y, M).\n"\
              + "out(X, M) :- newcon(X, Y, Z, 2), out(Z, M).\n"\
-
              + "%%% concept to combined concept\n"\
 	     + "cnotcc(C,CC) :- concept2(C,_), cb(CC), in(C, M), out(CC, M), vrs(M).\n"\
 	     + "cnotcc(C,CC) :- concept2(C,_), cb(CC), out(C, M), in(CC, M), vrs(M).\n"\
@@ -27,13 +43,11 @@ class template:
 	     + "ctocc(C, CC) :- newcon(C, X, Y, 0), ctocc(X, XC), ctocc(Y, YC), minus(XC, YC, CC).\n"\
 	     + "ctocc(C, CC) :- newcon(C, X, Y, 1), ctocc(X, XC), ctocc(Y, YC), and(XC, YC, CC).\n"\
 	     + "ctocc(C, CC) :- newcon(C, X, Y, 2), ctocc(X, XC), ctocc(Y, YC), minus(YC, XC, CC).\n"\
-
              + "\n%%% and op\n"\
 	     + "nand(X, Y, Z) :- con(X), con(Y), con(Z), r(M), out(X, M), in(Z, M).\n"\
 	     + "nand(X, Y, Z) :- con(X), con(Y), con(Z), r(M), out(Y, M), in(Z, M).\n"\
 	     + "nand(X, Y, Z) :- con(X), con(Y), con(Z), r(M), in(X, M), in(Y, M), out(Z, M).\n"\
 	     + "and(X, Y, Z) :- con(X), con(Y), con(Z), not nand(X, Y, Z).\n"\
-
              + "\n%%% minus op\n"\
 	     + "nminus(X, Y, Z) :- con(X), con(Y), con(Z), r(M), out(X, M), in(Z, M).\n"\
 	     + "nminus(X, Y, Z) :- con(X), con(Y), con(Z), r(M), in(X, M), out(Y, M), out(Z, M).\n"\
@@ -48,30 +62,30 @@ class template:
    #self.baseCb += "bit2(M, N, 0):-cb(M),r(N),p(N,P),M1=M/P,#mod(M1,2,0).\n"
    #self.baseCb += "bit2(M, N, 1):-cb(M),r(N),not bit2(M,N,0).\n\n"
 
-    dlvPwDc = "%%% Decoding now\n"\
-          + ":- rel(X, Y, \"=\"), rel(X, Y, \"<\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
-          + ":- rel(X, Y, \"=\"), rel(X, Y, \">\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
-          + ":- rel(X, Y, \"=\"), rel(X, Y, \"><\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
-          + ":- rel(X, Y, \"=\"), rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
-          + ":- rel(X, Y, \"<\"), rel(X, Y, \">\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
-          + ":- rel(X, Y, \"<\"), rel(X, Y, \"><\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
-          + ":- rel(X, Y, \"<\"), rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
-          + ":- rel(X, Y, \">\"), rel(X, Y, \"><\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
-          + ":- rel(X, Y, \">\"), rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
-          + ":- rel(X, Y, \"><\"), rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
-          + ":- not rel(X, Y, \"=\"), not rel(X, Y, \"<\"), not rel(X, Y, \">\"), not rel(X, Y, \"><\"), not rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), N1 < N2, pw.\n\n"\
-          + "rel(X, Y, \"=\") :- not hint(X, Y, 0), hint(X, Y, 1), not hint(X, Y, 2), pw.\n"\
-          + "rel(X, Y, \"<\") :- not hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2), pw.\n"\
-          + "rel(X, Y, \">\") :- hint(X, Y, 0), hint(X, Y, 1), not hint(X, Y, 2), pw.\n"\
-          + "rel(X, Y, \"><\") :- hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2), pw.\n"\
-          + "rel(X, Y, \"!\") :- hint(X, Y, 0), not hint(X, Y, 1), hint(X, Y, 2), pw.\n\n\n"\
-          + "hint(X, Y, 0) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), out(Y, R), pw.\n"\
-          + "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), in(Y, R), pw.\n"\
-          + "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), out(X, R), in(Y, R), pw.\n\n"
+    aspPwDc = "%%% Decoding now\n"\
+            + ":- rel(X, Y, \"=\"), rel(X, Y, \"<\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
+            + ":- rel(X, Y, \"=\"), rel(X, Y, \">\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
+            + ":- rel(X, Y, \"=\"), rel(X, Y, \"><\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
+            + ":- rel(X, Y, \"=\"), rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
+            + ":- rel(X, Y, \"<\"), rel(X, Y, \">\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
+            + ":- rel(X, Y, \"<\"), rel(X, Y, \"><\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
+            + ":- rel(X, Y, \"<\"), rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
+            + ":- rel(X, Y, \">\"), rel(X, Y, \"><\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
+            + ":- rel(X, Y, \">\"), rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
+            + ":- rel(X, Y, \"><\"), rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
+            + ":- not rel(X, Y, \"=\"), not rel(X, Y, \"<\"), not rel(X, Y, \">\"), not rel(X, Y, \"><\"), not rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), N1 < N2, pw.\n\n"\
+            + "rel(X, Y, \"=\") :- not hint(X, Y, 0), hint(X, Y, 1), not hint(X, Y, 2), pw.\n"\
+            + "rel(X, Y, \"<\") :- not hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2), pw.\n"\
+            + "rel(X, Y, \">\") :- hint(X, Y, 0), hint(X, Y, 1), not hint(X, Y, 2), pw.\n"\
+            + "rel(X, Y, \"><\") :- hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2), pw.\n"\
+            + "rel(X, Y, \"!\") :- hint(X, Y, 0), not hint(X, Y, 1), hint(X, Y, 2), pw.\n\n\n"\
+            + "hint(X, Y, 0) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), out(Y, R), pw.\n"\
+            + "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), in(Y, R), pw.\n"\
+            + "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), out(X, R), in(Y, R), pw.\n\n"
 
 
-    dlvCbDc  = dlvPwDc
-    dlvCbDc += "%%% Combined concept decoding\n"\
+    aspCbDc  = aspPwDc
+    aspCbDc += "%%% Combined concept decoding\n"\
             +  "combined(XC,0) :- ctocc(X, XC).\n"\
             +  "combined(X,1) :- rel(X,Y,\">\").\n"\
             +  "combined(X,1) :- rel(X,Y,\"<\").\n"\
@@ -120,17 +134,23 @@ class template:
     #    dlvDc += "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), vrs(R), in(X, R), in(Y, R), pw.\n"
     #    dlvDc += "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), vrs(R), out(X, R), in(Y, R), pw.\n\n"
 
-    def getDlvCbCon():
-        global dlvCbCon
-        return dlvCbCon
+    def getAspMnCon():
+        global aspMnCon
+        return aspMnCon
 
-    def getDlvPwDc():
-        global dlvPwDc
-        return dlvPwDc
+    def getAspCbCon():
+        global aspCbCon
+        return aspCbCon
 
-    def getDlvCbDc():
-        global dlvCbDc
-        return dlvCbDc
+    def getAspPwDc():
+        global aspPwDc
+        return aspPwDc
 
-    getDlvPwDc = Callable(getDlvPwDc)
-    getDlvCbDc = Callable(getDlvCbDc)
+    def getAspCbDc():
+        global aspCbDc
+        return aspCbDc
+
+    getAspMnCon = Callable(getAspMnCon)
+    getAspCbCon = Callable(getAspCbCon)
+    getAspPwDc  = Callable(getAspPwDc)
+    getAspCbDc  = Callable(getAspCbDc)
