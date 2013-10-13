@@ -648,50 +648,8 @@ class TaxonomyMapping:
 	           		    + t1.dlvName() + ", " + t2.dlvName()  + ", 2).\n"
 	           		    #+ "concept2(" + t1.dlvName() + ", _), "\
 	           		    #+ "concept2(" + t2.dlvName() + ", _).\n"
-        self.baseCb += "cb(X) :- newcon(X, _, _, _).\n"
-        self.baseCb += "cp(X) :- concept2(X, _).\n"
-        self.baseCb += "con(X) :- cb(X).\n"
-        self.baseCb += "con(X) :- cp(X).\n"
-        self.baseCb += "in(X, M) :- newcon(X, Y, Z, 0), in(Y, M), out(Z, M).\n"
-        self.baseCb += "out(X, M) :- newcon(X, Y, Z, 0), out(Y, M).\n"
-        self.baseCb += "out(X, M) :- newcon(X, Y, Z, 0), in(Z, M).\n"
-        self.baseCb += "in(X, M) :- newcon(X, Y, Z, 1), in(Y, M), in(Z, M).\n"
-        self.baseCb += "out(X, M) :- newcon(X, Y, Z, 1), out(Y, M).\n"
-        self.baseCb += "out(X, M) :- newcon(X, Y, Z, 1), out(Z, M).\n"
-        self.baseCb += "in(X, M) :- newcon(X, Y, Z, 2), out(Y, M), in(Z, M).\n"
-        self.baseCb += "out(X, M) :- newcon(X, Y, Z, 2), in(Y, M).\n"
-        self.baseCb += "out(X, M) :- newcon(X, Y, Z, 2), out(Z, M).\n"
-	#self.baseCb += "cb(M):- #int(M),M>=1,M<=#maxint.\n\n"
-
-	#self.baseCb += "\n%%% power\n"
-        #self.baseCb += "p(1,1).\n"
-        #self.baseCb += "p(N,M) :- #int(N),N>0,#succ(N1,N),p(N1,M1),M=M1*2.\n\n"
-        
-        #self.baseCb += "%%% bit2\n"
-        #self.baseCb += "bit2(M, N, 0):-cb(M),r(N),p(N,P),M1=M/P,#mod(M1,2,0).\n"
-        #self.baseCb += "bit2(M, N, 1):-cb(M),r(N),not bit2(M,N,0).\n\n"
-
-        self.baseCb += "%%% concept to combined concept\n"
-	self.baseCb += "cnotcc(C,CC) :- concept2(C,_), cb(CC), in(C, M), out(CC, M), vrs(M).\n"
-	self.baseCb += "cnotcc(C,CC) :- concept2(C,_), cb(CC), out(C, M), in(CC, M), vrs(M).\n"
-	self.baseCb += "cnotcc(C,CC) :- concept2(C,_), cb(CC), in(CC, M), irs(M).\n"
-	self.baseCb += "ctocc(C, CC) :- concept2(C,_), cb(CC), not cnotcc(C, CC).\n"
-	self.baseCb += "ctocc(C, CC) :- newcon(C, X, Y, 0), ctocc(X, XC), ctocc(Y, YC), minus(XC, YC, CC).\n"
-	self.baseCb += "ctocc(C, CC) :- newcon(C, X, Y, 1), ctocc(X, XC), ctocc(Y, YC), and(XC, YC, CC).\n"
-	self.baseCb += "ctocc(C, CC) :- newcon(C, X, Y, 2), ctocc(X, XC), ctocc(Y, YC), minus(YC, XC, CC).\n"
-
-        self.baseCb += "\n%%% and op\n"
-	self.baseCb += "nand(X, Y, Z) :- con(X), con(Y), con(Z), r(M), out(X, M), in(Z, M).\n"
-	self.baseCb += "nand(X, Y, Z) :- con(X), con(Y), con(Z), r(M), out(Y, M), in(Z, M).\n"
-	self.baseCb += "nand(X, Y, Z) :- con(X), con(Y), con(Z), r(M), in(X, M), in(Y, M), out(Z, M).\n"
-	self.baseCb += "and(X, Y, Z) :- con(X), con(Y), con(Z), not nand(X, Y, Z).\n"
-
-        self.baseCb += "\n%%% minus op\n"
-	self.baseCb += "nminus(X, Y, Z) :- con(X), con(Y), con(Z), r(M), out(X, M), in(Z, M).\n"
-	self.baseCb += "nminus(X, Y, Z) :- con(X), con(Y), con(Z), r(M), in(X, M), out(Y, M), out(Z, M).\n"
-	self.baseCb += "nminus(X, Y, Z) :- con(X), con(Y), con(Z), r(M), in(X, M), in(Y, M), in(Z, M).\n"
-	self.baseCb += "minus(X, Y, Z) :- con(X), con(Y), con(Z), not nminus(X, Y, Z).\n"
-
+        # add more template rules to the input file
+        self.baseCb += template.getDlvCbCon()
 
     def genDlvConcept(self):
         con = "%%% Concepts\n"
