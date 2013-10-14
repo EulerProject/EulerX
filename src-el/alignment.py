@@ -11,6 +11,7 @@ from helper import *
 
 class TaxonomyMapping:
 
+    # Constructor
     def __init__(self, options):
         self.mir = {}                          # MIR
         self.mirc = {}                         # MIRC
@@ -19,20 +20,20 @@ class TaxonomyMapping:
         self.obslen = 0                        # OBS time / location?
         self.location = []                     # location set
         self.temporal = []                     # temporal set
-        self.exploc = False
-        self.exptmp = False
-        self.tr = []                           # transitive reduction
+        self.exploc = False                    # exploring location info
+        self.exptmp = False                    # exploring temporal info
+        self.tr = []                           # transitive reduction, ie, < relation
         self.eq = []                           # euqlities
         self.rules = {}
-        self.taxonomies = {}
-        self.articulations = []
-        self.map = {}
-        self.baseAsp = ""
-        self.baseCb = ""
+        self.taxonomies = {}                   # set of taxonomies
+        self.articulations = []                # set of articulations
+        self.map = {}                          # mapping between the concept name and its numbering
+        self.baseAsp = ""                      # tmp string for the ASP input file
+        self.baseCb = ""                       # tmp string for the combined concept ASP input file
         self.pw = ""
         self.npw = 0                           # # of pws
         self.options = options
-        self.enc = encode[options.encode]
+        self.enc = encode[options.encode]      # encoding
         self.name = os.path.splitext(os.path.basename(options.inputfile))[0]
         if options.outputdir is None:
             options.outputdir = options.inputdir

@@ -38,6 +38,8 @@ class Articulation:
             self.taxon3 = Taxon()
             self.taxon4 = Taxon()
 	    return None
+
+        # Parsing begins here
 	if (initInput.find("confidence=") != -1):
 	    elements = re.match("(.*) confidence=(.*)", initInput)
             initInput = elements.group(1)
@@ -89,7 +91,6 @@ class Articulation:
             relString = elements.group(3)
             taxon2taxonomy = elements.group(4)
             taxon2taxon = elements.group(5)
-          
           
             if (relString.find(" ") != -1):
                 if (relation.has_key(relString)):
