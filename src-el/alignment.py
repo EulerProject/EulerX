@@ -590,6 +590,11 @@ class TaxonomyMapping:
             print self.ve
 
     def genCB(self):
+        if reasoner[self.options.reasoner] == reasoner["gringo"]:
+            com = "gringo "+self.cbfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
+            outputstr = commands.getoutput(com)
+            if self.options.output: print outputstr
+            return None
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         self.com = "dlv -silent -filter=relout "+self.cbfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
         self.cb = commands.getoutput(self.com)
@@ -625,6 +630,8 @@ class TaxonomyMapping:
                 pdlv.write("\n#hide.\n#show pp/" + self.obslen.__str__() + ".")
             elif self.enc & encode["pw"]:
                 pdlv.write("\n#hide.\n#show rel/3.")
+            elif self.enc & encode["cb"]:
+                pdlv.write("\n#hide.\n#show relout/3.")
             idlv.write("\n#hide.\n#show ie/3.")
         pdlv.close()
         idlv.close()
