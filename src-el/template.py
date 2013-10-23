@@ -1,6 +1,9 @@
 from helper import *
 
 class template:
+    global encErrMsg
+    encErrMsg = "\nEncoding error, please contact Mingmin at michen@ucdavis.edu"
+
     global aspMnCon              # Base mn concept encoding
     global aspCbCon              # Base cb new concept encoding
     global aspPwDc               # Base pw decoding
