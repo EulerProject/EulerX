@@ -5,6 +5,7 @@ import inspect
 import threading
 import StringIO
 from taxonomy import * 
+from alignment import * 
 from redWind import *
 from template import *
 from helper import *
