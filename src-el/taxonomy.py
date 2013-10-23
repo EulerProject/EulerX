@@ -268,7 +268,7 @@ class Articulation:
 	            result += "c(r" + self.ruleNum.__str__() + ", A, 2) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                 elif reasoner[rnr] == reasoner["gringo"]:
 		    result  = "vr(X, r" + self.ruleNum.__str__() + ") | ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
-		    result += "1[vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)] :- pw.\n" 
+		    result += "1[vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)] :- pw.\n" 
 		    result += "1[vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)] :- pw.\n" 
 		#result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
 		#result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
