@@ -252,11 +252,26 @@ class TaxonomyMapping:
             fie.close()
             commands.getoutput("dot -Tpdf "+self.iefile+" -o "+self.iepdf)
 
+    def outGringoPW(self):
+        raw = self.pw.split("\n")
+        pws = []
+        ## Filter out those trash in the gringo output
+        for i in range(2, len(raw) - 2, 2):
+            pws.append(raw[i])
+        self.npw = len(pws)
+        outputstr = ""
+        for i in range(len(pws)):
+            outputstr += "\nPossible world "+i.__str__()+":\n{"
+            outputstr += pws[i]
+            outputstr += "}\n"
+        print outputstr
+
     def genPW(self, pwflag):
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
-            outputstr = commands.getoutput(com)
-            if self.options.output: print outputstr
+            self.pw = commands.getoutput(com)
+            if self.options.output and pwflag:
+                self.outGringoPW()
             return None
         # DLV, from here on
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -266,7 +281,7 @@ class TaxonomyMapping:
             self.simpleRemedy()
         if self.pw.find("error") != -1:
             print self.pw
-            print "\nEncoding error, please contact Mingmin at michen@ucdavis.edu"
+            print template.encErrMsg
             return None
         raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
         pws = raw.split("\n")
@@ -593,8 +608,9 @@ class TaxonomyMapping:
     def genCB(self):
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             com = "gringo "+self.cbfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
-            outputstr = commands.getoutput(com)
-            if self.options.output: print outputstr
+            self.pw = commands.getoutput(com)
+            if self.options.output:
+                self.outGringoPW()
             return None
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         self.com = "dlv -silent -filter=relout "+self.cbfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
@@ -603,7 +619,7 @@ class TaxonomyMapping:
             self.simpleRemedy()
         if self.cb.find("error") != -1:
             print self.cb
-            print "\nEncoding error, please contact Mingmin at michen@ucdavis.edu"
+            print template.encErrMsg
             return None
         raw = self.cb.replace("{","").replace("}","").replace(" ","").replace("),",");")
         pws = raw.split("\n")
