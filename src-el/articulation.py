@@ -344,6 +344,6 @@ class Articulation:
             elif self.relations == relation["=+"]:
                 result = "sum(" + name1 + "," + name2 + "," + self.taxon3.dlvName() + ").\n"
         else:
-            print "EXCEPTION: encoding:", enc, " is not supported !!"
+            raise Exception("Encoding:", enc, " is not supported !!")
 	return result
 

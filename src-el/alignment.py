@@ -260,31 +260,48 @@ class TaxonomyMapping:
             pws.append(raw[i])
         self.npw = len(pws)
         outputstr = ""
+        # mirs for each pw
+        if self.options.cluster: pwmirs = []
         for i in range(len(pws)):
+            if self.options.cluster: pwmirs.append({})
+
+            # pwTm is the possible world taxonomy mapping, used for RCG
+            pwTm = copy.deepcopy(self)
+            pwTm.mir = {}
+            pwTm.tr = []
+
             outputstr += "\nPossible world "+i.__str__()+":\n{"
+            items = pws[i].split(" ")
             outputstr += pws[i]
             outputstr += "}\n"
         print outputstr
 
     def genPW(self, pwflag):
+        pws = []
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
             self.pw = commands.getoutput(com)
-            if self.options.output and pwflag:
-                self.outGringoPW()
-            return None
+            if pwflag:
+                raw = self.pw.split("\n")
+                ## Filter out those trash in the gringo output
+                for i in range(2, len(raw) - 2, 2):
+                    pws.append(raw[i].strip().replace(") ",");"))
+                self.outPW(pws, pwflag, "rel")
         # DLV, from here on
-        path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-        self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
-        self.pw = commands.getoutput(self.com)
-        if self.pw == "":
-            self.simpleRemedy()
-        if self.pw.find("error") != -1:
-            print self.pw
-            print template.encErrMsg
-            return None
-        raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
-        pws = raw.split("\n")
+        elif reasoner[self.options.reasoner] == reasoner["dlv"]:
+            path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+            self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
+            self.pw = commands.getoutput(self.com)
+            if self.pw == "":
+                self.simpleRemedy()
+            if self.pw.find("error") != -1:
+                print self.pw
+                print template.encErrMsg
+                return None
+            raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
+            pws = raw.split("\n")
+        else:
+            raise Exception("Reasoner:", self.options.reasoner, " is not supported !!")
         self.npw = len(pws)
         self.outPW(pws, pwflag, "rel")
 
@@ -301,9 +318,12 @@ class TaxonomyMapping:
             pwTm.tr = []
 
             outputstr += "\nPossible world "+i.__str__()+":\n{"
+            if self.options.verbose: print pws[i]+"#"
             items = pws[i].split(";")
+            if self.options.verbose: print len(items),items
             for j in range(len(items)):
                 rel = items[j].replace(ss+"(","").replace(")","").split(",")
+                if self.options.verbose: print items[j],rel[0],rel[1]
                 dotc1 = self.dlvName2dot(rel[0])
                 dotc2 = self.dlvName2dot(rel[1])
                 if self.options.verbose: print dotc1,rel[2],dotc2
@@ -606,25 +626,30 @@ class TaxonomyMapping:
             print self.ve
 
     def genCB(self):
+        pws = []
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             com = "gringo "+self.cbfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
             self.pw = commands.getoutput(com)
-            if self.options.output:
-                self.outGringoPW()
-            return None
-        path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-        self.com = "dlv -silent -filter=relout "+self.cbfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
-        self.cb = commands.getoutput(self.com)
-        if self.cb == "":
-            self.simpleRemedy()
-        if self.cb.find("error") != -1:
-            print self.cb
-            print template.encErrMsg
-            return None
-        raw = self.cb.replace("{","").replace("}","").replace(" ","").replace("),",");")
-        pws = raw.split("\n")
+            raw = self.pw.split("\n")
+            ## Filter out those trash in the gringo output
+            for i in range(2, len(raw) - 2, 2):
+                pws.append(raw[i].strip().replace(") ",");"))
+        elif reasoner[self.options.reasoner] == reasoner["dlv"]:
+            path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+            self.com = "dlv -silent -filter=relout "+self.cbfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
+            self.cb = commands.getoutput(self.com)
+            if self.cb == "":
+                self.simpleRemedy()
+            if self.cb.find("error") != -1:
+                print self.cb
+                print template.encErrMsg
+                return None
+            raw = self.cb.replace("{","").replace("}","").replace(" ","").replace("),",");")
+            pws = raw.split("\n")
+        else:
+            raise Exception("Reasoner:", self.options.reasoner, " is not supported !!")
         self.npw = len(pws)
-        self.outPW(pws, True, "relout")
+        self.outPW(pws, self.options.output, "relout")
  
     def genASP(self):
         self.baseAsp == ""
