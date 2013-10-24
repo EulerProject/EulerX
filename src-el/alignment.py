@@ -642,7 +642,7 @@ class TaxonomyMapping:
                 self.simpleRemedy()
             if self.cb.find("error") != -1:
                 print self.cb
-                print template.encErrMsg
+                raise Exception(template.encErrMsg)
                 return None
             raw = self.cb.replace("{","").replace("}","").replace(" ","").replace("),",");")
             pws = raw.split("\n")
