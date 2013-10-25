@@ -163,7 +163,12 @@ class template:
         global aspCbDc
         return aspCbDc
 
+    def getEncErrMsg():
+        global encErrMsg
+        return encErrMsg
+
     getAspMnCon = Callable(getAspMnCon)
     getAspCbCon = Callable(getAspCbCon)
     getAspPwDc  = Callable(getAspPwDc)
     getAspCbDc  = Callable(getAspCbDc)
+    getEncErrMsg= Callable(getEncErrMsg)
