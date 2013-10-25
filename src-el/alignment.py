@@ -281,6 +281,9 @@ class TaxonomyMapping:
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
             self.pw = commands.getoutput(com)
+            if self.pw.find("ERROR") != -1:
+                print self.pw
+                raise Exception(template.encErrMsg)
             if pwflag:
                 raw = self.pw.split("\n")
                 ## Filter out those trash in the gringo output
@@ -296,7 +299,7 @@ class TaxonomyMapping:
                 self.simpleRemedy()
             if self.pw.find("error") != -1:
                 print self.pw
-                print template.encErrMsg
+                raise Exception(template.encErrMsg)
                 return None
             raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
             pws = raw.split("\n")
@@ -323,7 +326,7 @@ class TaxonomyMapping:
             if self.options.verbose: print len(items),items
             for j in range(len(items)):
                 rel = items[j].replace(ss+"(","").replace(")","").split(",")
-                if self.options.verbose: print items[j],rel[0],rel[1]
+                if self.options.verbose: print items[j],rel
                 dotc1 = self.dlvName2dot(rel[0])
                 dotc2 = self.dlvName2dot(rel[1])
                 if self.options.verbose: print dotc1,rel[2],dotc2
@@ -630,10 +633,15 @@ class TaxonomyMapping:
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             com = "gringo "+self.cbfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
             self.pw = commands.getoutput(com)
+            if self.pw.find("ERROR") != -1:
+                print self.pw
+                raise Exception(template.encErrMsg)
             raw = self.pw.split("\n")
+            if self.options.verbose: print raw
             ## Filter out those trash in the gringo output
             for i in range(2, len(raw) - 2, 2):
                 pws.append(raw[i].strip().replace(") ",");"))
+                if self.options.verbose: print pws
         elif reasoner[self.options.reasoner] == reasoner["dlv"]:
             path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
             self.com = "dlv -silent -filter=relout "+self.cbfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
