@@ -283,7 +283,7 @@ class TaxonomyMapping:
             self.pw = commands.getoutput(com)
             if self.pw.find("ERROR") != -1:
                 print self.pw
-                raise Exception(template.encErrMsg)
+                raise Exception(template.getEncErrMsg())
             if pwflag:
                 raw = self.pw.split("\n")
                 ## Filter out those trash in the gringo output
@@ -299,7 +299,7 @@ class TaxonomyMapping:
                 self.simpleRemedy()
             if self.pw.find("error") != -1:
                 print self.pw
-                raise Exception(template.encErrMsg)
+                raise Exception(template.getEncErrMsg())
                 return None
             raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
             pws = raw.split("\n")
@@ -635,7 +635,7 @@ class TaxonomyMapping:
             self.pw = commands.getoutput(com)
             if self.pw.find("ERROR") != -1:
                 print self.pw
-                raise Exception(template.encErrMsg)
+                raise Exception(template.getEncErrMsg())
             raw = self.pw.split("\n")
             if self.options.verbose: print raw
             ## Filter out those trash in the gringo output
@@ -650,7 +650,7 @@ class TaxonomyMapping:
                 self.simpleRemedy()
             if self.cb.find("error") != -1:
                 print self.cb
-                raise Exception(template.encErrMsg)
+                raise Exception(template.getEncErrMsg())
                 return None
             raw = self.cb.replace("{","").replace("}","").replace(" ","").replace("),",");")
             pws = raw.split("\n")
