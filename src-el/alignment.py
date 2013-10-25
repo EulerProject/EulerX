@@ -1284,32 +1284,71 @@ class TaxonomyMapping:
 	elif (r[1] == "equals"):
 	    self.addEMir(r[0], r[2])
             self.eq.append([r[0], r[2]])
-	elif (r[2] == "lsum"):
-	    self.addIMir(r[3], r[0], provenance)
-	    self.addIMir(r[3], r[1], provenance)
-	    self.mir[r[0] + "," + r[3]] = rcc5["is_included_in"]
-	    self.mir[r[1] + "," + r[3]] = rcc5["is_included_in"]
-	    self.tr.append([r[0],r[3], provenance])
-	    self.tr.append([r[1],r[3], provenance])
-	    return None
-	elif (r[1] == "rsum"):
-	    self.addIMir(r[0], r[2], provenance)
-	    self.addIMir(r[0], r[3], provenance)
-	    self.mir[r[0] + "," + r[2]] = rcc5["includes"]
-	    self.mir[r[0] + "," + r[3]] = rcc5["includes"]
-	    self.tr.append([r[2], r[0], provenance])
-	    self.tr.append([r[3], r[0], provenance])
-	    return None
-	elif (r[2] == "ldiff"):
-	    self.addIMir(r[0], r[3], provenance)
-	    self.mir[r[0] + "," + r[3]] = rcc5["includes"]
-	    self.tr.append([r[3], r[0], provenance])
-	    return None
-	elif (r[1] == "rdiff"):
-	    self.addIMir(r[3], r[0], provenance)
-	    self.mir[r[3] + "," + r[0]] = rcc5["is_included_in"]
-	    self.tr.append([r[3], r[0], provenance])
-	    return None
+	elif (len(r) == 4):
+            if (r[2] == "lsum"):
+                self.addIMir(r[3], r[0], provenance)
+                self.addIMir(r[3], r[1], provenance)
+                self.mir[r[0] + "," + r[3]] = rcc5["is_included_in"]
+                self.mir[r[1] + "," + r[3]] = rcc5["is_included_in"]
+                self.tr.append([r[0],r[3], provenance])
+                self.tr.append([r[1],r[3], provenance])
+                return None
+            elif (r[1] == "rsum"):
+                self.addIMir(r[0], r[2], provenance)
+                self.addIMir(r[0], r[3], provenance)
+                self.mir[r[0] + "," + r[2]] = rcc5["includes"]
+                self.mir[r[0] + "," + r[3]] = rcc5["includes"]
+                self.tr.append([r[2], r[0], provenance])
+                self.tr.append([r[3], r[0], provenance])
+                return None
+            elif (r[2] == "ldiff"):
+                self.addIMir(r[0], r[3], provenance)
+                self.mir[r[0] + "," + r[3]] = rcc5["includes"]
+                self.tr.append([r[3], r[0], provenance])
+                return None
+            elif (r[1] == "rdiff"):
+                self.addIMir(r[3], r[0], provenance)
+                self.mir[r[3] + "," + r[0]] = rcc5["is_included_in"]
+                self.tr.append([r[3], r[0], provenance])
+                return None
+        elif (len(r) == 5):
+            if (r[3] == "l3sum"):
+                self.addIMir(r[4], r[0], provenance)
+                self.addIMir(r[4], r[1], provenance)
+                self.addIMir(r[4], r[2], provenance)
+                self.mir[r[0] + "," + r[4]] = rcc5["is_included_in"]
+                self.mir[r[1] + "," + r[4]] = rcc5["is_included_in"]
+                self.mir[r[2] + "," + r[4]] = rcc5["is_included_in"]
+                self.tr.append([r[0],r[4], provenance])
+                self.tr.append([r[1],r[4], provenance])
+                self.tr.append([r[2],r[4], provenance])
+                return None
+            elif (r[1] == "r3sum"):
+                self.addIMir(r[0], r[2], provenance)
+                self.addIMir(r[0], r[3], provenance)
+                self.addIMir(r[0], r[4], provenance)
+                self.mir[r[0] + "," + r[2]] = rcc5["includes"]
+                self.mir[r[0] + "," + r[3]] = rcc5["includes"]
+                self.mir[r[0] + "," + r[4]] = rcc5["includes"]
+                self.tr.append([r[2], r[0], provenance])
+                self.tr.append([r[3], r[0], provenance])
+                self.tr.append([r[4], r[0], provenance])
+                return None
+        elif (len(r) == 6):   
+            if (r[4] == "l4sum"):
+                self.addIMir(r[5], r[0], provenance)
+                self.addIMir(r[5], r[1], provenance)
+                self.addIMir(r[5], r[2], provenance)
+                self.addIMir(r[5], r[3], provenance)
+                self.mir[r[0] + "," + r[5]] = rcc5["is_included_in"]
+                self.mir[r[1] + "," + r[5]] = rcc5["is_included_in"]
+                self.mir[r[2] + "," + r[5]] = rcc5["is_included_in"]
+                self.mir[r[3] + "," + r[5]] = rcc5["is_included_in"]
+                self.tr.append([r[0],r[5], provenance])
+                self.tr.append([r[1],r[5], provenance])
+                self.tr.append([r[2],r[5], provenance])
+                self.tr.append([r[3],r[5], provenance])
+                return None 
         if rcc5.has_key(r[1]):
 	    self.mir[r[0] + "," + r[2]] = rcc5[r[1]]
  

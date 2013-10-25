@@ -16,6 +16,7 @@ class Articulation:
             self.taxon2 = Taxon()
             self.taxon3 = Taxon()
             self.taxon4 = Taxon()
+            self.taxon5 = Taxon()
 	    return None
 
         # Parsing begins here
@@ -27,9 +28,18 @@ class Articulation:
 	    if (initInput.find("lsum") != -1):
 	        self.relations = relation["+="]
 	        elements = re.match("(.*)\.(.*) (.*)\.(.*) lsum (.*)\.(.*)", initInput)
+            elif (initInput.find("l3sum") != -1):
+	        self.relations = relation["+3="]
+	        elements = re.match("(.*)\.(.*) (.*)\.(.*) (.*)\.(.*) l3sum (.*)\.(.*)", initInput)
+	    elif (initInput.find("l4sum") != -1):
+	        self.relations = relation["+4="]
+	        elements = re.match("(.*)\.(.*) (.*)\.(.*) (.*)\.(.*) (.*)\.(.*) l4sum (.*)\.(.*)", initInput)
 	    elif (initInput.find("rsum") != -1):
 	        self.relations = relation["=+"]
 	        elements = re.match("(.*)\.(.*) rsum (.*)\.(.*) (.*)\.(.*)", initInput)
+	    elif (initInput.find("r3sum") != -1):
+	        self.relations = relation["=3+"]
+	        elements = re.match("(.*)\.(.*) r3sum (.*)\.(.*) (.*)\.(.*) (.*)\.(.*)", initInput)
 	    elif (initInput.find("ldiff") != -1):
 	        self.relations = 0 #[relationDict["-="]]
 	        elements = re.match("(.*)\.(.*) (.*)\.(.*) ldiff (.*)\.(.*)", initInput)
@@ -52,11 +62,19 @@ class Articulation:
             self.taxon2 = mapping.getTaxon(taxon2taxonomy, taxon2taxon)
             self.taxon3 = mapping.getTaxon(taxon3taxonomy, taxon3taxon)
 	    self.numTaxon = 3
-            if(initInput.find("4sum") != -1):
+            if(initInput.find("e4sum") != -1 or initInput.find("i4sum") != -1 or initInput.find("l3sum") != -1 or initInput.find("r3sum") != -1):
                 taxon4taxonomy = elements.group(7)
                 taxon4taxon = elements.group(8)
                 self.taxon4 = mapping.getTaxon(taxon4taxonomy, taxon4taxon)
 	        self.numTaxon = 4
+            if(initInput.find("l4sum") != -1):
+                taxon4taxonomy = elements.group(7)
+                taxon4taxon = elements.group(8)
+                self.taxon4 = mapping.getTaxon(taxon4taxonomy, taxon4taxon)
+                taxon5taxonomy = elements.group(9)
+                taxon5taxon = elements.group(10)
+                self.taxon5 = mapping.getTaxon(taxon5taxonomy, taxon5taxon)
+	        self.numTaxon = 5
         else:
             ## initInput is of form b48.a equals k04.a
             self.relation = 0
@@ -282,6 +300,52 @@ class Articulation:
 		#result += "out(" + name2 + ",X) :- out(" + name3 + ",X).\n" 
 		#result += "in(" + name1 + ",X) v in(" + name2 + ",X) :- in(" + name3 + ",X).\n" 
 		#result += "out(" +name3 + ",X) :- out(" + name1 + ",X), out(" + name2 + ",X).\n" 
+            elif self.relations == relation["+3="]:
+                name3 = self.taxon3.dlvName()
+                name4 = self.taxon4.dlvName()
+                if reasoner[rnr] == reasoner["dlv"]:
+		    result  = ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name4 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name4 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), out(" + name2 + ",X), in(" + name4 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), in(" + name2 + ",X), in(" + name4 + ",X)} = 0.\n"
+		    result += ":- #count{X: vrs(X), out(" + name3 + ",X), in(" + name4 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), in(" + name3 + ",X), in(" + name4 + ",X)} = 0.\n" 
+                elif reasoner[rnr] == reasoner["gringo"]:
+		    result  = ":- [vrs(X): out(" + name1 + ",X): in(" + name4 + ",X)]0.\n" 
+		    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name4 + ",X)]0.\n" 
+		    result += ":- [vrs(X): out(" + name2 + ",X): in(" + name4 + ",X)]0.\n" 
+		    result += ":- [vrs(X): in(" + name2 + ",X): in(" + name4 + ",X)]0.\n"
+		    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name4 + ",X)]0.\n" 
+		    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name4 + ",X)]0.\n"
+		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name4 + ",X).\n" 
+		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name4 + ",X).\n"
+		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name4 + ",X).\n"
+            elif self.relations == relation["+4="]:
+                name3 = self.taxon3.dlvName()
+                name4 = self.taxon4.dlvName()
+                name5 = self.taxon5.dlvName()
+                if reasoner[rnr] == reasoner["dlv"]:
+		    result  = ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name5 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name5 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), out(" + name2 + ",X), in(" + name5 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), in(" + name2 + ",X), in(" + name5 + ",X)} = 0.\n"
+		    result += ":- #count{X: vrs(X), out(" + name3 + ",X), in(" + name5 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), in(" + name3 + ",X), in(" + name5 + ",X)} = 0.\n"
+		    result += ":- #count{X: vrs(X), out(" + name4 + ",X), in(" + name5 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), in(" + name4 + ",X), in(" + name5 + ",X)} = 0.\n"
+                elif reasoner[rnr] == reasoner["gringo"]:
+		    result  = ":- [vrs(X): out(" + name1 + ",X): in(" + name5 + ",X)]0.\n" 
+		    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name5 + ",X)]0.\n" 
+		    result += ":- [vrs(X): out(" + name2 + ",X): in(" + name5 + ",X)]0.\n" 
+		    result += ":- [vrs(X): in(" + name2 + ",X): in(" + name5 + ",X)]0.\n"
+		    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name5 + ",X)]0.\n" 
+		    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name5 + ",X)]0.\n"
+		    result += ":- [vrs(X): out(" + name4 + ",X): in(" + name5 + ",X)]0.\n" 
+		    result += ":- [vrs(X): in(" + name4 + ",X): in(" + name5 + ",X)]0.\n"
+		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name5 + ",X).\n" 
+		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name5 + ",X).\n"
+		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name5 + ",X).\n"
+		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name4 + ",X), out(" + name5 + ",X).\n" 
             elif self.relations == relation["=+"]:
                 name3 = self.taxon3.dlvName()
                 if reasoner[rnr] == reasoner["dlv"]:
@@ -295,7 +359,27 @@ class Articulation:
                     result += ":- [vrs(X): out(" + name3 + ",X): in(" + name1 + ",X)]0.\n"            
                     result += ":- [vrs(X): in(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
 		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name1 + ",X).\n" 
-		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name1 + ",X).\n" 
+		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name1 + ",X).\n"
+            elif self.relations == relation["=3+"]:
+                name3 = self.taxon3.dlvName()
+                name4 = self.taxon4.dlvName()
+                if reasoner[rnr] == reasoner["dlv"]:
+		    result  = ":- #count{X: vrs(X), out(" + name2 + ",X), in(" + name1 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), in(" + name2 + ",X), in(" + name1 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), out(" + name3 + ",X), in(" + name1 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), in(" + name3 + ",X), in(" + name1 + ",X)} = 0.\n"
+		    result += ":- #count{X: vrs(X), out(" + name4 + ",X), in(" + name1 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), in(" + name4 + ",X), in(" + name1 + ",X)} = 0.\n" 
+                elif reasoner[rnr] == reasoner["gringo"]:
+                    result  = ":- [vrs(X): out(" + name2 + ",X): in(" + name1 + ",X)]0.\n"            
+                    result += ":- [vrs(X): in(" + name2 + ",X): in(" + name1 + ",X)]0.\n"            
+                    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name1 + ",X)]0.\n"            
+                    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
+                    result += ":- [vrs(X): out(" + name4 + ",X): in(" + name1 + ",X)]0.\n"            
+                    result += ":- [vrs(X): in(" + name4 + ",X): in(" + name1 + ",X)]0.\n"
+		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name1 + ",X).\n" 
+		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name1 + ",X).\n"
+	    	result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name4 + ",X), out(" + name1 + ",X).\n"
 		#result += "in(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
 		#result += "in(" + name1 + ",X) :- in(" + name3 + ",X).\n" 
 		#result += "out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 

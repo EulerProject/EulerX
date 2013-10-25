@@ -53,8 +53,11 @@ relation["{=, >, !, ><}"] = 1 << 0 | 1 << 1 | 1 << 3 | 1 << 4
 relation["{=, <, !, ><}"] = 1 << 0 | 1 << 2 | 1 << 3 | 1 << 4
 relation["{>, <, !, ><}"] = 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4
 relation["{=, >, <, !, ><}"] = 1 << 0 | 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4
-relation["+="] = 1 << 5
-relation["=+"] = (1 << 5) + 1
+relation["+="] = 1 << 5 #lsum
+relation["=+"] = (1 << 5) + 1 #rsum
+relation["+3="] = 1 << 6 #l3sum
+relation["=3+"] = (1 << 6) + 1 #r3sum
+relation["+4="] = 1 << 7 #l4sum
 
 relstr={}
 relstr[0] = "equals"
