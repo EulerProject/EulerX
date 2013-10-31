@@ -1309,15 +1309,21 @@ class TaxonomyMapping:
                 self.tr.append([r[2], r[0], provenance])
                 self.tr.append([r[3], r[0], provenance])
                 return None
-            elif (r[2] == "ldiff"):
+            elif (r[2] == "ldiff"): #similar as "rsum", but r[0]=r[1]+r[3]
+                self.addIMir(r[0], r[1], provenance)
                 self.addIMir(r[0], r[3], provenance)
+                self.mir[r[0] + "," + r[1]] = rcc5["includes"]
                 self.mir[r[0] + "," + r[3]] = rcc5["includes"]
+                self.tr.append([r[1], r[0], provenance])
                 self.tr.append([r[3], r[0], provenance])
                 return None
-            elif (r[1] == "rdiff"):
-                self.addIMir(r[3], r[0], provenance)
-                self.mir[r[3] + "," + r[0]] = rcc5["is_included_in"]
-                self.tr.append([r[3], r[0], provenance])
+            elif (r[1] == "rdiff"): #similar as "lsum", but r[0]+r[3]=r[2]
+                self.addIMir(r[2], r[0], provenance)
+                self.addIMir(r[2], r[3], provenance)
+                self.mir[r[0] + "," + r[2]] = rcc5["is_included_in"]
+                self.mir[r[3] + "," + r[2]] = rcc5["is_included_in"]
+                self.tr.append([r[0], r[2], provenance])
+                self.tr.append([r[3], r[2], provenance])
                 return None
         elif (len(r) == 5):
             if (r[3] == "l3sum"):
