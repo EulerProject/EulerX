@@ -317,8 +317,9 @@ class TaxonomyMapping:
 
             # pwTm is the possible world taxonomy mapping, used for RCG
             pwTm = copy.deepcopy(self)
-            pwTm.mir = {}
-            pwTm.tr = []
+            # Temporarily comment out because some inner-taxonomy mirs may miss.
+            # pwTm.mir = {}
+            # pwTm.tr = []
 
             outputstr += "\nPossible world "+i.__str__()+":\n{"
             if self.options.verbose: print pws[i]+"#"
@@ -373,6 +374,9 @@ class TaxonomyMapping:
     def genPwRcg(self, fileName):
         fDot = open(self.options.outputdir+fileName+".dot", 'w')
 	fDot.write("digraph {\n\nrankdir = RL\n\n")
+        tmpCom = ""    # cache of combined taxa
+        taxa1 = ""     # cache of taxa in the first taxonomy
+        taxa2 = ""     # cache of taxa in the second taxonomy
 
 	# Equalities
         for [T1, T2] in self.eq:
@@ -383,6 +387,8 @@ class TaxonomyMapping:
 		fDot.write("\"" + tmpStr +"\" [color=blue];\n")
 	    else:
 		tmpStr = T1+","+T2
+            # This assumes that eq is with arity two, eg, we don't have A=B=C
+            tmpCom += "  \""+tmpStr+"\"\n"
             tmpTr = list(self.tr)
             for [T3, T4, P] in tmpTr:
 		if(T1 == T3 or T2 == T3):
@@ -414,20 +420,41 @@ class TaxonomyMapping:
 		    if(self.tr.count([T1, T4, 1])>0):
 		        self.tr.remove([T1, T4, 1])
 		        #self.tr.append([T1, T4, 3])
+
+        # Node Coloring
+        tmpTax = ""   # First taxonomy name
+	for [T1, T2, P] in self.tr:
+            if(T1.find(",") == -1 and T1.find(".") != -1):
+                T1s = T1.split(".")
+                if tmpTax == "": tmpTax = T1s[1]
+                if tmpTax == T1s[1]: taxa1 += "  "+T1+"\n"
+                else: taxa2 += "  "+T1+"\n"
+            if(T2.find(",") == -1 and T2.find(".") != -1):
+                T2s = T2.split(".")
+                if tmpTax == "": tmpTax = T2s[1]
+                if tmpTax == T2s[1]: taxa1 += "  "+T2+"\n"
+                else: taxa2 += "  "+T2+"\n"
+        fDot.write("  node [shape=box style=\"filled, rounded\" fillcolor=\"#CCFFCC\"]\n")
+        fDot.write(taxa1)
+        fDot.write("  node [shape=box style=\"filled, rounded\" fillcolor=\"#FFFFCC\"]\n")
+        fDot.write(taxa2)
+        fDot.write("  node [shape=box style=\"filled, rounded\" fillcolor=\"#EEEEEE\"]\n")
+        fDot.write(tmpCom)
+
 	for [T1, T2, P] in self.tr:
 	    if(P == 0):
-	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")
+	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")
 	    elif(P == 1):
-	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=red];\n")
+	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=red];\n")
 	    elif(P == 2):
               if False:
-	    	fDot.write("\"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
+	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
         if self.options.rcgo:
-	    fDot.write("  subgraph ig {\nedge [dir=none, style=dashed, color=blue]\n\n")
+	    fDot.write("  subgraph ig {\nedge [dir=none, style=dashed, color=blue, constraint=false]\n\n")
             for key in self.mir.keys():
                 if self.mir[key] == rcc5["overlaps"]:
                     item = re.match("(.*),(.*)", key)
-	    	    fDot.write("\"" + item.group(1) + "\" -> \"" + item.group(2) + "\"\n")
+	    	    fDot.write("     \"" + item.group(1) + "\" -> \"" + item.group(2) + "\"\n")
 	    fDot.write("  }\n")
         fDot.write("  subgraph cluster_lg {\n")
         fDot.write("    rankdir = LR\n")
