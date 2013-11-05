@@ -1,0 +1,39 @@
+digraph foo {
+
+rankdir = TD
+
+node [color = purple, style = solid, shape = circle, fixedsize = true]
+"1,2_A";
+"1,2_E";
+"1,2_G";
+"1,2_H";
+
+node [color = red, style = solid, shape = circle, fixedsize = true]
+edge [dir = back, concentrate = true]
+"1,2_A" -> {"1_B" "1_F" }
+{rank = same; "1_B" "1_F" }
+"1_B" -> {"1_C" "1_D" "1,2_E" }
+{rank = same; "1_C" "1_D" "1,2_E" }
+"1_F" -> {"1,2_G" "1,2_H" }
+{rank = same; "1,2_G" "1,2_H" }
+
+node [color = blue, style = solid, shape = circle, fixedsize = true]
+"1,2_A" -> {"2_B" "2_F" }
+{rank = same; "2_B" "2_F" }
+"2_B" -> {"2_C" "1,2_H" "1,2_E" }
+{rank = same; "2_C" "1,2_H" "1,2_E" }
+"2_F" -> {"1,2_G" "2_I" }
+{rank = same; "1,2_G" "2_I" }
+
+{rank = same; "1_B" "2_B" }
+{rank = same; "1_F" "2_F" }
+
+"1_C" -> "2_C" [dir = forward, color = darkorange, label = "<", fontcolor = darkgreen]
+"1_D" -> "2_C" [dir = forward, color = darkorange, label = "<", fontcolor = darkgreen]
+"1_F" -> "2_B" [dir = none, color = navy, label = overlaps, fontcolor = navy, style = invis]
+"1_B" -> "2_B" [dir = forward, color = darkorange, label = "<", fontcolor = darkgreen]
+"2_F" -> "1_F" [dir = forward, color = darkorange, label = "<", fontcolor = darkgreen]
+"1_C" -> "2_C" [dir = forward, color = darkorange, label = "<", fontcolor = darkgreen]
+"1_D" -> "2_C" [dir = forward, color = darkorange, label = "<", fontcolor = darkgreen]
+graph [label = "\nred: taxonomy 1\nblue: taxonomy 2\n"]
+}
