@@ -41,10 +41,10 @@ class Articulation:
 	        self.relations = relation["=3+"]
 	        elements = re.match("(.*)\.(.*) r3sum (.*)\.(.*) (.*)\.(.*) (.*)\.(.*)", initInput)
 	    elif (initInput.find("ldiff") != -1):
-	        self.relations = 0 #[relationDict["-="]]
+	        self.relations = relation["-="]
 	        elements = re.match("(.*)\.(.*) (.*)\.(.*) ldiff (.*)\.(.*)", initInput)
 	    elif (initInput.find("rdiff") != -1):
-	        self.relations = 0 #[relationDict["=-"]]
+	        self.relations = relation["=-"]
 	        elements = re.match("(.*)\.(.*) rdiff (.*)\.(.*) (.*)\.(.*)", initInput)
 	    elif (initInput.find("e4sum") != -1):
 	        self.relations = 0 #[relationDict["+=+"]]
@@ -280,7 +280,7 @@ class Articulation:
 		    result  = ":- [vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)]0, pw.\n"
 		    result += ":- 1[vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)], 1[vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)], pw.\n" 
 		    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
-            elif self.relations == relation["+="]:
+            elif self.relations == relation["+="]: # lsum
                 name3 = self.taxon3.dlvName()
                 if reasoner[rnr] == reasoner["dlv"]:
 		    result  = ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name3 + ",X)} = 0.\n" 
@@ -299,7 +299,21 @@ class Articulation:
 		#result += "out(" + name1 + ",X) :- out(" + name3 + ",X).\n" 
 		#result += "out(" + name2 + ",X) :- out(" + name3 + ",X).\n" 
 		#result += "in(" + name1 + ",X) v in(" + name2 + ",X) :- in(" + name3 + ",X).\n" 
-		#result += "out(" +name3 + ",X) :- out(" + name1 + ",X), out(" + name2 + ",X).\n" 
+		#result += "out(" +name3 + ",X) :- out(" + name1 + ",X), out(" + name2 + ",X).\n"
+            elif self.relations == relation["=-"]: # rdiff
+                name3 = self.taxon3.dlvName()
+                if reasoner[rnr] == reasoner["dlv"]:
+		    result  = ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), out(" + name3 + ",X), in(" + name2 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), in(" + name3 + ",X), in(" + name2 + ",X)} = 0.\n" 
+                elif reasoner[rnr] == reasoner["gringo"]:
+		    result  = ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+		    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+		    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name2 + ",X)]0.\n" 
+		    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name2 + ",X)]0.\n" 
+		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
+		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name2 + ",X).\n" 
             elif self.relations == relation["+3="]:
                 name3 = self.taxon3.dlvName()
                 name4 = self.taxon4.dlvName()
@@ -346,7 +360,7 @@ class Articulation:
 		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name5 + ",X).\n"
 		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name5 + ",X).\n"
 		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name4 + ",X), out(" + name5 + ",X).\n" 
-            elif self.relations == relation["=+"]:
+            elif self.relations == relation["=+"] or self.relations == relation["-="]: # rsum and ldiff
                 name3 = self.taxon3.dlvName()
                 if reasoner[rnr] == reasoner["dlv"]:
 		    result  = ":- #count{X: vrs(X), out(" + name2 + ",X), in(" + name1 + ",X)} = 0.\n" 
