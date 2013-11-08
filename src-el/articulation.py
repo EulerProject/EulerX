@@ -111,6 +111,8 @@ class Articulation:
 	    if self.relations == rcc5["equals"]:
 		result  = "ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
 		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
+		result += "ir(X, prod(r" + self.ruleNum.__str__() + ",R)) :- out3(" + name1 + ", X, R), in(" + name2 + ",X), ix.\n"
+		result += "ir(X, prod(r" + self.ruleNum.__str__() + ",R)) :- in(" + name1 + ",X), out3(" + name2 + ", X, R), ix.\n" 
                 if reasoner[rnr] == reasoner["dlv"]:
 		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
@@ -123,6 +125,7 @@ class Articulation:
 		#result += "out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
 	    elif self.relations == rcc5["includes"]:
 		result  = "ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
+		result += "ir(X, prod(r" + self.ruleNum.__str__() + ",R)) :- out3(" + name1 + ", X, R), in(" + name2 + ",X), ix.\n"
                 if reasoner[rnr] == reasoner["dlv"]:
 		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
 		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n" 
@@ -190,6 +193,7 @@ class Articulation:
 		#result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
 	    elif self.relations == (rcc5["equals"] | rcc5["is_included_in"]):
 		result  = "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
+		result += "ir(X, prod(r" + self.ruleNum.__str__() + ",R)) :- in(" + name1 + ",X), out3(" + name2 + ", X, R), ix.\n" 
                 if reasoner[rnr] == reasoner["dlv"]:
 		    result += "vr(X, r" + self.ruleNum.__str__() + ") v ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n" 
 		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
@@ -204,6 +208,7 @@ class Articulation:
 		#result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
 	    elif self.relations == (rcc5["equals"] | rcc5["includes"]):
 		result  = "ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
+		result += "ir(X, prod(r" + self.ruleNum.__str__() + ",R)) :- out3(" + name1 + ", X, R), in(" + name2 + ",X), ix.\n"
                 if reasoner[rnr] == reasoner["dlv"]:
 		    result += "vr(X, r" + self.ruleNum.__str__() +") v ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
 		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
