@@ -219,18 +219,22 @@ class TaxonomyMapping:
             ies = (re.match("\{(.*)\}", ie)).group(1).split(", ")
             tmpmap = {}
             for i in range(len(ies)):
-              if ies[i].find("prod(") != -1:
+              if ies[i].find("ie\(prod(") != -1:
                 item = re.match("ie\(prod\((.*),(.*)\)\)", ies[i])
                 key = item.group(1)
+                tmpmap[key] = [item.group(2)]
               else:
-                item = re.match("ie\(s\((.*),(.*),(.*)\)\)", ies[i])
+                if ies[i].find("prod(") != -1:
+                  item = re.match("ie\(s\((.*),prod(.*),(.*)\)\)", ies[i])
+                else:
+                  item = re.match("ie\(s\((.*),(.*),(.*)\)\)", ies[i])
                 key = item.group(1)+","+item.group(3)
                 if key in tmpmap.keys():
                   value = tmpmap[key]
                   value.append(item.group(2))
                   tmpmap[key] = value
                 else:
-                  tmpmap[key] = [item.group(1), item.group(2)]
+                  tmpmap[key] = [item.group(2)]
             fie = open(self.iefile, 'w')
             fie.write("strict digraph "+self.name+"_ie {\n\nrankdir = LR\n\n")
             #fie.write("subgraph rules {\n")
@@ -243,7 +247,7 @@ class TaxonomyMapping:
             #fie.write("}\n")
             for key in tmpmap.keys():
                 for value in tmpmap[key]:
-                    fie.write("\""+value+"\" -> \"inconsistency="+tmpmap[key].__str__()+"\" \n")
+                    fie.write("\""+value+"\" -> \"inconsistency="+key.__str__()+"\" \n")
             label=""
             for key in self.rules.keys():
                 label += key+" : "+self.rules[key]+"\n"
@@ -958,10 +962,7 @@ class TaxonomyMapping:
 			self.baseAsp += "%% ISA\n"
 			coverage = ":- in(" + t.dlvName() + ", X)"
 			coverin = ""
-                        if self.options.enableCov:
-			    coverout = "out(" + t.dlvName() + ", X) :- "
-                        else:
-			    coverout = "in(" + t.dlvName() + ",X) v out(" + t.dlvName() + ", X) :- "
+                        coverout = ""
 			for t1 in t.children:
                             queue.append(t1)
 			    self.baseAsp += "% " + t1.dlvName() + " isa " + t.dlvName() + "\n"
@@ -972,6 +973,7 @@ class TaxonomyMapping:
 			    #self.baseAsp += "in(" + t1.dlvName() + ", X) v out(" + t1.dlvName() + ", X) :- in(" + t.dlvName() + ", X).\n"
 			    #self.baseAsp += "in(" + t.dlvName() + ", X) v out(" + t.dlvName() + ", X) :- out(" + t1.dlvName() + ", X).\n"
 			    self.baseAsp += "ir(X, r" + ruleNum.__str__() +") :- in(" + t1.dlvName() + ", X), out(" + t.dlvName() + ", X).\n"
+		            self.baseAsp += "ir(X, prod(r" + ruleNum.__str__() + ",R)) :- in(" + t1.dlvName() + ",X), out3(" + t.dlvName() + ", X, R), ix.\n" 
                             if reasoner[self.options.reasoner] == reasoner["dlv"]:
 			        self.baseAsp += ":- #count{X: vrs(X), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0, pw.\n"
                             elif reasoner[self.options.reasoner] == reasoner["gringo"]:
@@ -989,7 +991,13 @@ class TaxonomyMapping:
                         ruleNum = len(self.rules)
 		        self.rules["r" + ruleNum.__str__()] = t.dotName() + " coverage"
 			#self.baseAsp += coverin + " :- in(" + t.dlvName() + ", X).\n"
-			self.baseAsp += coverout + ".\n"
+                        if self.options.enableCov:
+			    coverout3 = "out3(" + t.dlvName() + ", X, r" + ruleNum.__str__() + ") :- " + coverout
+			    coverout = "out(" + t.dlvName() + ", X) :- " + coverout
+			    self.baseAsp += coverout3 + ", ix.\n"
+                        else:
+			    coverout = "in(" + t.dlvName() + ",X) v out(" + t.dlvName() + ", X) :- " + coverout
+			self.baseAsp += coverout + ", pw.\n"
 			#self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") " +coverage + ".\n\n"
 
 			# D

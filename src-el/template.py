@@ -17,7 +17,7 @@ class template:
              + "%%% Constraints of regions.\n"\
              + "irs(X) :- ir(X, _).\n"\
              + "vrs(X) :- vr(X, _).\n"\
-             + "vr(X, X) :- not irs(X), r(X), pw.\n"\
+             + "vr(X, X) :- not irs(X), r(X).\n"\
              + "ir(X, X) :- not vrs(X), r(X), pw.\n"\
              + "ie(prod(A,B)) :- vr(X, A), ir(X, B), ix.\n"\
              + ":- vrs(X), irs(X), pw.\n\n"\
