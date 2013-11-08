@@ -1,0 +1,39 @@
+taxonomy 1 Taxonomy1
+(39 40 48)
+(40 41 44 47)
+(41 42 43)
+(44 45 46)
+(48 49 50 51 52)
+
+taxonomy 2 Taxonomy2
+(53 54 57 60 61 64)
+(54 55 56)
+(57 58 59)
+(61 62 63)
+
+articulation tw1 tw1
+[1.39 equals 2.53]
+[1.40 includes 2.54]
+[1.40 includes 2.57]
+[1.40 rsum 2.54 2.57]
+[1.41 equals 2.54]
+[1.42 equals 2.55]
+[1.43 equals 2.56]
+[1.44 is_included_in 2.57]
+[1.47 is_included_in 2.57]
+[1.44 1.47 lsum 2.57]
+[1.45 is_included_in 2.58]
+[1.46 is_included_in 2.58]
+[1.45 1.46 lsum 2.58]
+[1.47 equals 2.59]
+[1.48 includes 2.60]
+[1.48 includes 2.61]
+[1.48 includes 2.64]
+[1.48 r3sum 2.60 2.61 2.64]
+[1.49 equals 2.60]
+[1.50 is_included_in 2.61]
+[1.50 equals 2.62]
+[1.51 is_included_in 2.61]
+[1.51 equals 2.63]
+[1.51 1.52 lsum 2.61]
+[1.52 equals 2.64]
