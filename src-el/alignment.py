@@ -430,13 +430,13 @@ class TaxonomyMapping:
 	for [T1, T2, P] in self.tr:
             if(T1.find(",") == -1 and T1.find(".") != -1):
                 T1s = T1.split(".")
-                if tmpTax == "": tmpTax = T1s[1]
-                if tmpTax == T1s[1]: taxa1 += "  \""+T1+"\"\n"
+                if tmpTax == "": tmpTax = T1s[0]
+                if tmpTax == T1s[0]: taxa1 += "  \""+T1+"\"\n"
                 else: taxa2 += "  \""+T1+"\"\n"
             if(T2.find(",") == -1 and T2.find(".") != -1):
                 T2s = T2.split(".")
-                if tmpTax == "": tmpTax = T2s[1]
-                if tmpTax == T2s[1]: taxa1 += "  \""+T2+"\"\n"
+                if tmpTax == "": tmpTax = T2s[0]
+                if tmpTax == T2s[0]: taxa1 += "  \""+T2+"\"\n"
                 else: taxa2 += "  \""+T2+"\"\n"
         fDot.write("  node [shape=box style=\"filled, rounded\" fillcolor=\"#CCFFCC\"]\n")
         fDot.write(taxa1)
