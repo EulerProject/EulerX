@@ -247,7 +247,7 @@ class TaxonomyMapping:
             #fie.write("}\n")
             for key in tmpmap.keys():
                 for value in tmpmap[key]:
-                    fie.write("\""+value+"\" -> \"inconsistency="+key.__str__()+"\" \n")
+                    fie.write("\""+value+"\" -> \"inconsistency="+key.__str__()+":"+tmpmap[key].__str__()+"\" \n")
             label=""
             for key in self.rules.keys():
                 label += key+" : "+self.rules[key]+"\n"
@@ -293,7 +293,6 @@ class TaxonomyMapping:
                 ## Filter out those trash in the gringo output
                 for i in range(2, len(raw) - 2, 2):
                     pws.append(raw[i].strip().replace(") ",");"))
-                self.outPW(pws, pwflag, "rel")
         # DLV, from here on
         elif reasoner[self.options.reasoner] == reasoner["dlv"]:
             path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -321,9 +320,9 @@ class TaxonomyMapping:
 
             # pwTm is the possible world taxonomy mapping, used for RCG
             pwTm = copy.deepcopy(self)
-            # Temporarily comment out because some inner-taxonomy mirs may miss.
-            # pwTm.mir = {}
-            # pwTm.tr = []
+            if self.enc & encode["cb"]:
+                pwTm.mir = {}
+                pwTm.tr = []
 
             outputstr += "\nPossible world "+i.__str__()+":\n{"
             if self.options.verbose: print pws[i]+"#"
@@ -364,7 +363,11 @@ class TaxonomyMapping:
             self.adjustMirc(pair)
             outputstr += "}\n"
             # RCG
-            pwTm.genPwRcg(self.name + "_" + i.__str__())
+            # Only generate the RCG when necessary
+            # for example, if mncb, genPW() is called for intermediate usage
+            if self.enc & encode["pw"] and ss == "rel" or\
+               self.enc & encode["cb"] and ss == "relout":
+                pwTm.genPwRcg(self.name + "_" + i.__str__())
         if self.options.reduction:
             outputstr = self.uncReduction(pws)
         if pwflag:
@@ -382,9 +385,13 @@ class TaxonomyMapping:
         taxa1 = ""     # cache of taxa in the first taxonomy
         taxa2 = ""     # cache of taxa in the second taxonomy
 
+        tmpTax = ""   # First taxonomy name, actually it really doesn't
+                      # matter which one is the first one
 	# Equalities
         for [T1, T2] in self.eq:
             T1s = T1.split(".")
+            # First taxonomy name
+            if tmpTax == "": tmpTax = T1s[0]
             T2s = T2.split(".")
 	    if(T1s[1] == T2s[1]):
 		tmpStr = T1s[1]
@@ -425,19 +432,23 @@ class TaxonomyMapping:
 		        self.tr.remove([T1, T4, 1])
 		        #self.tr.append([T1, T4, 3])
 
+        if self.options.verbose:
+            print "Transitive reduction:"
+            print self.tr
         # Node Coloring
-        tmpTax = ""   # First taxonomy name
 	for [T1, T2, P] in self.tr:
-            if(T1.find(",") == -1 and T1.find(".") != -1):
+            if(T1.find("*") == -1 and T1.find(",") == -1 and T1.find(".") != -1):
                 T1s = T1.split(".")
-                if tmpTax == "": tmpTax = T1s[0]
                 if tmpTax == T1s[0]: taxa1 += "  \""+T1+"\"\n"
                 else: taxa2 += "  \""+T1+"\"\n"
-            if(T2.find(",") == -1 and T2.find(".") != -1):
+            else:
+                tmpCom += "  \""+T1+"\"\n"
+            if(T2.find("*") == -1 and T2.find(",") == -1 and T2.find(".") != -1):
                 T2s = T2.split(".")
-                if tmpTax == "": tmpTax = T2s[0]
                 if tmpTax == T2s[0]: taxa1 += "  \""+T2+"\"\n"
                 else: taxa2 += "  \""+T2+"\"\n"
+            else:
+                tmpCom += "  \""+T2+"\"\n"
         fDot.write("  node [shape=box style=\"filled, rounded\" fillcolor=\"#CCFFCC\"]\n")
         fDot.write(taxa1)
         fDot.write("  node [shape=box style=\"filled, rounded\" fillcolor=\"#FFFFCC\"]\n")
@@ -728,15 +739,14 @@ class TaxonomyMapping:
                         t2 = self.taxonomies[key2].taxa[taxon2]
                         if self.mirp.has_key(t1.dotName()+","+t2.dotName()+","+rcc5["overlaps"].__str__()) or\
                            self.mirp.has_key(t2.dotName()+","+t1.dotName()+","+rcc5["overlaps"].__str__()):
-                            continue
-	                self.baseCb += "newcon(" + t1.dlvName() + "_not_" + t2.dlvName() + ", "\
-	           	            + t1.dlvName() + ", " + t2.dlvName()  + ", 0).\n"
-	                self.baseCb += "newcon(" + t1.dlvName() + "__" + t2.dlvName() + ", "\
-	           		    + t1.dlvName() + ", " + t2.dlvName()  + ", 1).\n"
-	                self.baseCb += "newcon(not_" + t1.dlvName() + "__" + t2.dlvName() + ", "\
-	           		    + t1.dlvName() + ", " + t2.dlvName()  + ", 2).\n"
-	           		    #+ "concept2(" + t1.dlvName() + ", _), "\
-	           		    #+ "concept2(" + t2.dlvName() + ", _).\n"
+	                    self.baseCb += "newcon(" + t1.dlvName() + "_not_" + t2.dlvName() + ", "\
+	           	                + t1.dlvName() + ", " + t2.dlvName()  + ", 0).\n"
+	                    self.baseCb += "newcon(" + t1.dlvName() + "__" + t2.dlvName() + ", "\
+	           	                + t1.dlvName() + ", " + t2.dlvName()  + ", 1).\n"
+	                    self.baseCb += "newcon(not_" + t1.dlvName() + "__" + t2.dlvName() + ", "\
+	           	                + t1.dlvName() + ", " + t2.dlvName()  + ", 2).\n"
+	           		        #+ "concept2(" + t1.dlvName() + ", _), "\
+	           		        #+ "concept2(" + t2.dlvName() + ", _).\n"
         # add more template rules to the input file
         self.baseCb += template.getAspCbCon()
 

@@ -13,6 +13,8 @@ class template:
              + "in(X, M) :- r(M),concept(X,T,N),N1=N+1,bit(M,T,N1).\n"\
              + "out(X, M) :- r(M),concept(X,T,N),N1=N+1,not bit(M,T,N1).\n"\
              + "in(X, M) :- r(M),concept2(X,_),not out(X, M).\n"\
+             + "outs(X, M) :- out3(X, M, _), ix.\n"\
+             + "in(X, M) :- r(M),concept2(X,_),not outs(X, M), ix.\n"\
              + "ir(M, fi) :- in(X, M), out(X, M), r(M), concept2(X,_).\n\n"\
              + "%%% Constraints of regions.\n"\
              + "irs(X) :- ir(X, _).\n"\
@@ -48,13 +50,13 @@ class template:
              + "irs(M) :- newcon(X, Y, Z, 2), in(X, M), in(Y, M).\n"\
              + "irs(M) :- newcon(X, Y, Z, 2), in(X, M), out(Z, M).\n"\
              + "%%% concept to combined concept\n"\
-	     + "cnotcc(C,CC) :- concept2(C,_), cb(CC), in(C, M), out(CC, M), vrs(M).\n"\
-	     + "cnotcc(C,CC) :- concept2(C,_), cb(CC), out(C, M), in(CC, M), vrs(M).\n"\
-	     + "cnotcc(C,CC) :- concept2(C,_), cb(CC), in(CC, M), irs(M).\n"\
-	     + "ctocc(C, CC) :- concept2(C,_), cb(CC), not cnotcc(C, CC).\n"\
-	     + "ctocc(C, CC) :- newcon(C, X, Y, 0), ctocc(X, XC), ctocc(Y, YC), minus(XC, YC, CC).\n"\
-	     + "ctocc(C, CC) :- newcon(C, X, Y, 1), ctocc(X, XC), ctocc(Y, YC), and(XC, YC, CC).\n"\
-	     + "ctocc(C, CC) :- newcon(C, X, Y, 2), ctocc(X, XC), ctocc(Y, YC), minus(YC, XC, CC).\n"\
+	     + "cnotcc(C,CC, T) :- concept2(C, T), cb(CC), in(C, M), out(CC, M), vrs(M).\n"\
+	     + "cnotcc(C,CC, T) :- concept2(C, T), cb(CC), out(C, M), in(CC, M), vrs(M).\n"\
+	     + "cnotcc(C,CC, T) :- concept2(C, T), cb(CC), in(CC, M), irs(M).\n"\
+	     + "ctocc(C, CC, T) :- concept2(C, T), cb(CC), not cnotcc(C, CC, T).\n"\
+	     + "ctocc(C, CC, 2) :- newcon(C, X, Y, 0), ctocc(X, XC, _), ctocc(Y, YC, _), minus(XC, YC, CC).\n"\
+	     + "ctocc(C, CC, 2) :- newcon(C, X, Y, 1), ctocc(X, XC, _), ctocc(Y, YC, _), and(XC, YC, CC).\n"\
+	     + "ctocc(C, CC, 2) :- newcon(C, X, Y, 2), ctocc(X, XC, _), ctocc(Y, YC, _), minus(YC, XC, CC).\n"\
              + "\n%%% and op\n"\
 	     + "nand(X, Y, Z) :- con(X), con(Y), con(Z), r(M), out(X, M), in(Z, M).\n"\
 	     + "nand(X, Y, Z) :- con(X), con(Y), con(Z), r(M), out(Y, M), in(Z, M).\n"\
@@ -98,49 +100,55 @@ class template:
 
     aspCbDc  = aspPwDc
     aspCbDc += "%%% Combined concept decoding\n"\
-            +  "combined(XC,0) :- ctocc(X, XC).\n"\
-            +  "combined(X,1) :- rel(X,Y,\">\").\n"\
-            +  "combined(X,1) :- rel(X,Y,\"<\").\n"\
-            +  "combined(X,1) :- rel(X,Y,\"=\").\n"\
-            +  "combined(X,1) :- rel(X,Y,\"!\").\n"\
-            +  "combined(Y,1) :- rel(X,Y,\">\").\n"\
-            +  "combined(Y,1) :- rel(X,Y,\"<\").\n"\
-            +  "combined(Y,1) :- rel(X,Y,\"=\").\n"\
-            +  "combined(Y,1) :- rel(X,Y,\"!\").\n"\
-            +  "combined(Z,1) :- rel(X,Y,\"><\"), newcon(Z, X, Y, _).\n"\
-            +  "combined(Y,0) :- relcc(X,Y,\"=\"), newcon(X, _, _, 1), newcon(Y, _, _, 0).\n"\
-            +  "combined(Y,0) :- relcc(X,Y,\"=\"), newcon(X, _, _, 1), newcon(Y, _, _, 2).\n"\
-            +  "combined(Y,0) :- relcc(Y,X,\"=\"), newcon(X, _, _, 1), newcon(Y, _, _, 0).\n"\
-            +  "combined(Y,0) :- relcc(Y,X,\"=\"), newcon(X, _, _, 1), newcon(Y, _, _, 2).\n"\
-            +  "combined(XC,0) :- rel(X,Y,\"><\"), ctocc(X, XC).\n"\
-            +  "combined(YC,0) :- rel(X,Y,\"><\"), ctocc(Y, YC).\n"\
-            +  "combined(X,0) :- rel(X,Y,\"><\").\n"\
-            +  "combined(Y,0) :- rel(X,Y,\"><\").\n"\
-            +  "combined(X,0) :- not combined(X,1), con(X).\n"\
-            +  "combined(X,2) :- combined(X,1), not combined(X,0), con(X).\n"\
-            +  "combined(X,1) :- relcc(X,Y,\"<\").\n"\
-            +  "combined(X,1) :- relcc(X,Y,\">\").\n"\
-            +  "combined(X,1) :- relcc(X,Y,\"=\").\n"\
-            +  "combined(X,1) :- relcc(X,Y,\"!\").\n"\
-            +  "combined(Y,1) :- relcc(X,Y,\"<\").\n"\
-            +  "combined(Y,1) :- relcc(X,Y,\">\").\n"\
-            +  "combined(Y,1) :- relcc(X,Y,\"=\").\n"\
-            +  "combined(Y,1) :- relcc(X,Y,\"!\").\n"\
-            +  "hant(X, X, 3) :- combined(X,1).\n"\
-            +  "hant(X, Y, 0) :- combined(X,1), combined(Y,1), not hant(X, Y, 3), vrs(R), in(X, R), out(Y, R).\n"\
-            +  "hant(X, Y, 1) :- combined(X,1), combined(Y,1), not hant(X, Y, 3), vrs(R), in(X, R),  in(Y, R).\n"\
-            +  "hant(X, Y, 2) :- combined(X,1), combined(Y,1), not hant(X, Y, 3), vrs(R), out(X, R), in(Y, R).\n"\
+            +  "combined(XC,0,3) :- ctocc(X, XC, _), combined(X,2,_).\n"\
+            +  "combined(X,1,0) :- rel(X,Y,\">\").\n"\
+            +  "combined(X,1,0) :- rel(X,Y,\"<\").\n"\
+            +  "combined(X,1,0) :- rel(X,Y,\"=\").\n"\
+            +  "combined(X,1,0) :- rel(X,Y,\"!\").\n"\
+            +  "combined(Y,1,1) :- rel(X,Y,\">\").\n"\
+            +  "combined(Y,1,1) :- rel(X,Y,\"<\").\n"\
+            +  "combined(Y,1,1) :- rel(X,Y,\"=\").\n"\
+            +  "combined(Y,1,1) :- rel(X,Y,\"!\").\n"\
+            +  "combined(Z,1,2) :- rel(X,Y,\"><\"), newcon(Z, X, Y, _).\n"\
+            +  "combined(Y,0,2) :- relcc(X,Y,\"=\"), newcon(X, _, _, 1), newcon(Y, _, _, 0).\n"\
+            +  "combined(Y,0,2) :- relcc(X,Y,\"=\"), newcon(X, _, _, 1), newcon(Y, _, _, 2).\n"\
+            +  "combined(Y,0,2) :- relcc(Y,X,\"=\"), newcon(X, _, _, 1), newcon(Y, _, _, 0).\n"\
+            +  "combined(Y,0,2) :- relcc(Y,X,\"=\"), newcon(X, _, _, 1), newcon(Y, _, _, 2).\n"\
+            +  "combined(XC,0,2) :- rel(X,Y,\"><\"), ctocc(X, XC, _).\n"\
+            +  "combined(YC,0,2) :- rel(X,Y,\"><\"), ctocc(Y, YC, _).\n"\
+            +  "combined(X,0,0) :- rel(X,Y,\"><\").\n"\
+            +  "combined(Y,0,0) :- rel(X,Y,\"><\").\n"\
+            +  "combined2(X,Y) :- combined(X,Y,Z).\n"\
+            +  "combined2(X,0) :- not combined2(X,1), con(X).\n"\
+            +  "combined(X,2,Y) :- combined(X,1,Y), not combined2(X,0), con(X).\n"\
+            +  "combined2(X,1) :- relcc(X,Y,\"<\").\n"\
+            +  "combined2(X,1) :- relcc(X,Y,\">\").\n"\
+            +  "combined2(X,1) :- relcc(X,Y,\"=\").\n"\
+            +  "combined2(X,1) :- relcc(X,Y,\"!\").\n"\
+            +  "combined2(Y,1) :- relcc(X,Y,\"<\").\n"\
+            +  "combined2(Y,1) :- relcc(X,Y,\">\").\n"\
+            +  "combined2(Y,1) :- relcc(X,Y,\"=\"),cp(Y).\n"\
+            +  "combined2(Y,0) :- relcc(X,Y,\"=\"),cb(Y).\n"\
+            +  "combined2(Y,1) :- relcc(X,Y,\"!\").\n"\
+            +  "hant(X, X, 3) :- combined2(X,1).\n"\
+            +  "hant(X, Y, 0) :- combined(X,1,Z), combined(Y,1,W), Z<W, not hant(X, Y, 3), vrs(R), in(X, R), out(Y, R).\n"\
+            +  "hant(X, Y, 0) :- combined(X,1,2), combined(Y,1,2), not hant(X, Y, 3), vrs(R), in(X, R), out(Y, R).\n"\
+            +  "hant(X, Y, 1) :- combined(X,1,Z), combined(Y,1,W), Z<W, not hant(X, Y, 3), vrs(R), in(X, R),  in(Y, R).\n"\
+            +  "hant(X, Y, 1) :- combined(X,1,2), combined(Y,1,2), not hant(X, Y, 3), vrs(R), in(X, R),  in(Y, R).\n"\
+            +  "hant(X, Y, 2) :- combined(X,1,Z), combined(Y,1,W), Z<W, not hant(X, Y, 3), vrs(R), out(X, R), in(Y, R).\n"\
+            +  "hant(X, Y, 2) :- combined(X,1,2), combined(Y,1,2), not hant(X, Y, 3), vrs(R), out(X, R), in(Y, R).\n"\
             +  "relcc(X, Y, \"=\") :- X<Y, not hant(X, Y, 0), hant(X, Y, 1), not hant(X, Y, 2), pw.\n"\
             +  "relcc(X, Y, \"<\") :- X<Y, not hant(X, Y, 0), hant(X, Y, 1), hant(X, Y, 2), pw.\n"\
             +  "relcc(X, Y, \">\") :- X<Y, hant(X, Y, 0), hant(X, Y, 1), not hant(X, Y, 2), pw.\n"\
             +  "relcc(X, Y, \"><\") :- X<Y, hant(X, Y, 0), hant(X, Y, 1), hant(X, Y, 2), pw.\n"\
             +  "relcc(X, Y, \"!\") :- X<Y, hant(X, Y, 0), not hant(X, Y, 1), hant(X, Y, 2), pw.\n"\
-            +  "combined(X,0) :- relcc(X,Y,\"><\").\n"\
-            +  "combined(Y,0) :- relcc(X,Y,\"><\").\n"\
-            +  "combined(Z,1) :- relcc(X,Y,\"><\"), and(X, Y, Z).\n"\
-            +  "combined(Z,1) :- relcc(X,Y,\"><\"), minus(X, Y, Z).\n"\
-            +  "combined(Z,1) :- relcc(X,Y,\"><\"), minus(Y, X, Z).\n"\
-            +  "relout(X, Y, Z) :- relcc(X, Y, Z), combined(X, 2), combined(Y, 2).\n"
+            +  "combined2(X,0) :- relcc(X,Y,\"><\").\n"\
+            +  "combined2(Y,0) :- relcc(X,Y,\"><\").\n"\
+            +  "combined2(Z,1) :- relcc(X,Y,\"><\"), and(X, Y, Z).\n"\
+            +  "combined2(Z,1) :- relcc(X,Y,\"><\"), minus(X, Y, Z).\n"\
+            +  "combined2(Z,1) :- relcc(X,Y,\"><\"), minus(Y, X, Z).\n"\
+            +  "relout(X, Y, Z) :- relcc(X, Y, Z), combined(X, 2, T), combined(Y, 2, S), T<S.\n"\
+            +  "relout(X, Y, Z) :- relcc(X, Y, Z), combined(X, 2, 2), combined(Y, 2, 2).\n"
 
     #if self.enc & encode["cb"]:
     #    dlvDc += "hint(X, Y, 0) :- concept2(X, N1), concept2(Y, N2), vrs(R), in(X, R), out(Y, R), pw.\n"
