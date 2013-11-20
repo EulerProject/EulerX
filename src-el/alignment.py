@@ -6,7 +6,7 @@ import threading
 import StringIO
 from taxonomy import * 
 from alignment import * 
-from redWind import *
+#from redWind import *
 from template import *
 from helper import *
 
@@ -23,8 +23,10 @@ class TaxonomyMapping:
         self.temporal = []                     # temporal set
         self.exploc = False                    # exploring location info
         self.exptmp = False                    # exploring temporal info
+        self.basemir = {}                      # base MIR
+        self.basetr = []                       # transitive reduction, only input taxonomies
         self.tr = []                           # transitive reduction, ie, < relation
-        self.eq = []                           # euqlities
+        self.eq = {}                           # euqlities
         self.rules = {}
         self.taxonomies = {}                   # set of taxonomies
         self.articulations = []                # set of articulations
@@ -271,8 +273,8 @@ class TaxonomyMapping:
 
             # pwTm is the possible world taxonomy mapping, used for RCG
             pwTm = copy.deepcopy(self)
-            pwTm.mir = {}
-            pwTm.tr = []
+            pwTm.mir = [] #pwTm.basemir
+            pwTm.tr = [] #pwTm.basetr
 
             outputstr += "\nPossible world "+i.__str__()+":\n{"
             items = pws[i].split(" ")
@@ -321,8 +323,8 @@ class TaxonomyMapping:
             # pwTm is the possible world taxonomy mapping, used for RCG
             pwTm = copy.deepcopy(self)
             if self.enc & encode["cb"]:
-                pwTm.mir = {}
-                pwTm.tr = []
+                pwTm.mir = pwTm.basemir
+                pwTm.tr = []#pwTm.basetr
 
             outputstr += "\nPossible world "+i.__str__()+":\n{"
             if self.options.verbose: print pws[i]+"#"
@@ -345,7 +347,7 @@ class TaxonomyMapping:
                 elif rcc5[rel[2]] == rcc5["includes"]:
                     pwTm.tr.append([dotc2, dotc1, 1])
                 elif rcc5[rel[2]] == rcc5["equals"]:
-                    pwTm.eq.append([dotc1, dotc2])
+                    pwTm.addEqMap(dotc1, dotc2)
                 if i == 0:
                     if not self.mir.has_key(pair) or not self.mir[pair] & rcc5[rel[2]]:
                         self.mir[pair] = rcc5[rel[2]] | relation["infer"]
@@ -387,27 +389,42 @@ class TaxonomyMapping:
 
         tmpTax = ""   # First taxonomy name, actually it really doesn't
                       # matter which one is the first one
+        alias = {}
+        
 	# Equalities
-        for [T1, T2] in self.eq:
+        for T1 in self.eq.keys():
+            # self.eq is dynamically changed, so we need this check
+            if not self.eq.has_key(T1):
+                continue
+            tmpStr = ""
+            blueNode = False
             T1s = T1.split(".")
             # First taxonomy name
             if tmpTax == "": tmpTax = T1s[0]
-            T2s = T2.split(".")
-	    if(T1s[1] == T2s[1]):
-		tmpStr = T1s[1]
-		fDot.write("\"" + tmpStr +"\" [color=blue];\n")
-	    else:
-		tmpStr = T1+","+T2
-            # This assumes that eq is with arity two, eg, we don't have A=B=C
+            for T2 in self.eq[T1]:
+                T2s = T2.split(".")
+	        if(T1s[1] == T2s[1]):
+                    blueNode = True
+	        else:
+                    if tmpStr != "": tmpStr = "," + tmpStr
+	            tmpStr = T2 + tmpStr
+            if tmpStr != "": tmpStr = "," + tmpStr
+            if blueNode:
+	        tmpStr = T1s[1] + tmpStr
+	        fDot.write("\"" + tmpStr +"\" [color=blue];\n")
+            else:
+	        tmpStr = T1 + tmpStr
             tmpCom += "  \""+tmpStr+"\"\n"
-            tmpTr = list(self.tr)
-            for [T3, T4, P] in tmpTr:
-		if(T1 == T3 or T2 == T3):
-		    self.tr.remove([T3, T4, P])
-		    self.tr.append([tmpStr, T4, 0])
-		elif(T1 == T4 or T2 == T4):
-		    self.tr.remove([T3, T4, P])
-		    self.tr.append([T3, tmpStr, 0])
+            for T2 in self.eq[T1]:
+                del self.eq[T2]
+                tmpTr = list(self.tr)
+                for [T3, T4, P] in tmpTr:
+	            if(T1 == T3 or T2 == T3):
+	                self.tr.remove([T3, T4, P])
+	                self.tr.append([tmpStr, T4, 0])
+	            elif(T1 == T4 or T2 == T4):
+	                self.tr.remove([T3, T4, P])
+	                self.tr.append([T3, tmpStr, 0])
 
 	# Duplicates
 	tmpTr = list(self.tr)
@@ -510,50 +527,50 @@ class TaxonomyMapping:
         return False
 
     def uncReduction(self, pws):
-        ppw = sets.Set()
-        for pair in self.mir.keys():
-            if self.mir[pair] & ~relation["infer"] not in rcc5.values():
-                userAns = RedWindow(pair, self.mir[pair])
-                self.mir[pair] = userAns.main()
-                self.adjustMirc(pair)
-                # Reduce pws
-                tmpppw = sets.Set()
-                for i in range(5):
-                  rel = 1 << i
-                  if self.mir[pair] & rel and pair+","+rel.__str__() in self.mirp.keys():
-                    for pw in self.mirp[pair+","+rel.__str__()]:
-                        tmpppw.add(pw)
-                # Adjust mir
-                for tmppair in self.mir.keys():
-                  for j in range(5):
-                    relj = 1 << j
-                    if tmppair+","+relj.__str__() in self.mirp.keys() and\
-                       pw in self.mirp[tmppair+","+relj.__str__()]:
-                      if len(tmpppw) ==1:
-                        self.mir[tmppair] = relj
-                      else:
-                        self.mir[tmppair] |= relj
-                if len(tmpppw) != 0:
-                  if len(ppw) == 0:
-                    ppw = tmpppw
-                  else:
-                    ppw = ppw.intersection(tmpppw)
-                else:
-                  print "Inconsistent again !!"
-                  ppw = tmpppw
+        #ppw = sets.Set()
+        #for pair in self.mir.keys():
+        #    if self.mir[pair] & ~relation["infer"] not in rcc5.values():
+        #        userAns = RedWindow(pair, self.mir[pair])
+        #        self.mir[pair] = userAns.main()
+        #        self.adjustMirc(pair)
+        #        # Reduce pws
+        #        tmpppw = sets.Set()
+        #        for i in range(5):
+        #          rel = 1 << i
+        #          if self.mir[pair] & rel and pair+","+rel.__str__() in self.mirp.keys():
+        #            for pw in self.mirp[pair+","+rel.__str__()]:
+        #                tmpppw.add(pw)
+        #        # Adjust mir
+        #        for tmppair in self.mir.keys():
+        #          for j in range(5):
+        #            relj = 1 << j
+        #            if tmppair+","+relj.__str__() in self.mirp.keys() and\
+        #               pw in self.mirp[tmppair+","+relj.__str__()]:
+        #              if len(tmpppw) ==1:
+        #                self.mir[tmppair] = relj
+        #              else:
+        #                self.mir[tmppair] |= relj
+        #        if len(tmpppw) != 0:
+        #          if len(ppw) == 0:
+        #            ppw = tmpppw
+        #          else:
+        #            ppw = ppw.intersection(tmpppw)
+        #        else:
+        #          print "Inconsistent again !!"
+        #          ppw = tmpppw
         outputstr = ""
-        for i in ppw:
-            if self.options.cluster: pwmirs.append({})
-            outputstr += "Possible world "+i.__str__()+": {"
-            items = pws[i].split(";")
-            for j in range(len(items)):
-                rel = items[j].replace("rel(","").replace(")","").split(",")
-                dotc1 = self.dlvName2dot(rel[0])
-                dotc2 = self.dlvName2dot(rel[1])
-                if j != 0: outputstr += ", "
-                outputstr += dotc1+rel[2]+dotc2
-            outputstr += "}\n"
-        return outputstr
+        #for i in ppw:
+        #    if self.options.cluster: pwmirs.append({})
+        #    outputstr += "Possible world "+i.__str__()+": {"
+        #    items = pws[i].split(";")
+        #    for j in range(len(items)):
+        #        rel = items[j].replace("rel(","").replace(")","").split(",")
+        #        dotc1 = self.dlvName2dot(rel[0])
+        #        dotc2 = self.dlvName2dot(rel[1])
+        #        if j != 0: outputstr += ", "
+        #        outputstr += dotc1+rel[2]+dotc2
+        #    outputstr += "}\n"
+        #return outputstr
 
     def adjustMirc(self, pair):
         self.mirc[pair] = []
@@ -686,7 +703,7 @@ class TaxonomyMapping:
                 if self.options.verbose: print pws
         elif reasoner[self.options.reasoner] == reasoner["dlv"]:
             path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-            self.com = "dlv -silent -filter=relout "+self.cbfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
+            self.com = "dlv -silent -filter=relout "+self.cbfile+" "+ self.pwswitch + " | "+path+"/muniq -u"
             self.cb = commands.getoutput(self.com)
             if self.cb == "":
                 self.simpleRemedy()
@@ -1211,7 +1228,8 @@ class TaxonomyMapping:
                     None
 
             elif (re.match("articulation", line)):
-                None
+                self.basetr = self.tr
+                self.basemir = self.mir
               
             elif (re.match("\[.*?\]", line)):
                 inside = re.match("\[(.*)\]", line).group(1)
@@ -1324,6 +1342,14 @@ class TaxonomyMapping:
 	self.tr.append([tName + "." + child, tName + "." + parent, 0])
 	self.addIMir(tName + "." + parent, tName + "." + child, 0)
 
+    def addEqMap(self, T1, T2):
+        if not self.eq.has_key(T1):
+            self.eq[T1] = sets.Set()
+        self.eq[T1].add(T2)
+        if not self.eq.has_key(T2):
+            self.eq[T2] = sets.Set()
+        self.eq[T2].add(T1)
+
     def addAMir(self, astring, provenance):
     	r = astring.split(" ")
         if(self.options.verbose):
@@ -1336,7 +1362,7 @@ class TaxonomyMapping:
 	    self.tr.append([r[0], r[2], provenance])
 	elif (r[1] == "equals"):
 	    self.addEMir(r[0], r[2])
-            self.eq.append([r[0], r[2]])
+            self.addEqMap(r[0], r[2])
 	elif (len(r) == 4):
             if (r[2] == "lsum"):
                 self.addIMir(r[3], r[0], provenance)
