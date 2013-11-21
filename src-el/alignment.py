@@ -733,6 +733,8 @@ class TaxonomyMapping:
         pdlv = open(self.pwswitch, 'w')
         idlv = open(self.ixswitch, 'w')
         pdlv.write("pw.")
+        if self.options.hideOverlaps:
+            pdlv.write("hide.")
         idlv.write("ix.")
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             if self.enc & encode["ob"]:

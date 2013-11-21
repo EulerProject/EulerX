@@ -43,6 +43,8 @@ class EulerParser:
                                     help="disable coverage")
             inst.add_option("--ur", action="store_true", dest="reduction", default=False,\
                                   help="turn on uncertainty reduction")
+            inst.add_option("--ho", action="store_true", dest="hideOverlaps", default=False,\
+                                  help="hide the concepts that are involved in overlapping, used with cb encoding")
             inst.add_option("--ie", action="store_true", dest="ie", default=False,\
                                     help="inconsistency explanation")
             inst.add_option("--countmir", action="store_true", dest="countOn", default=False,\
