@@ -97,3 +97,4 @@ encode["mncb"] = encode["mn"] | encode["cb"]
 encode["mnvr"] = encode["mn"] | encode["vr"]
 encode["mnob"] = encode["mn"] | encode["ob"]
 encode["mnct"] = encode["mn"] | encode["ct"]
+encode[0] = 0
