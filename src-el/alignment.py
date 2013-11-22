@@ -99,8 +99,10 @@ class TaxonomyMapping:
         if self.options.inputViz:
             inputVisualizer = InputVisual.instance()
             inputVisualizer.run(self.options.inputdir, self.options.inputfile, self.ivout)
-            commands.getoutput("dot -Tpng "+self.ivout+" -o "+self.ivpng)           
-        self.genASP()
+            commands.getoutput("dot -Tpng "+self.ivout+" -o "+self.ivpng)
+	    if not self.enc:
+		return
+	self.genASP()
         if self.options.consCheck:
             if not self.testConsistency():
                 print "Input is inconsistent o_O"
