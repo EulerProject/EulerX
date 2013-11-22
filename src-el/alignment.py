@@ -9,6 +9,7 @@ from alignment import *
 #from redWind import *
 from template import *
 from helper import *
+from input_viz import *
 
 class TaxonomyMapping:
 
@@ -49,6 +50,7 @@ class TaxonomyMapping:
         self.cbfile = os.path.join(self.aspdir, self.name+"_cb.asp")
         self.pwswitch = os.path.join(self.aspdir, "pw.asp")
         self.ixswitch = os.path.join(self.aspdir, "ix.asp")
+        self.ivout = os.path.join(options.outputdir, self.name+"_iv.dot")
         self.pwout = os.path.join(options.outputdir, self.name+"_pw.txt")
         self.cbout = os.path.join(options.outputdir, self.name+"_cb.txt")
         self.obout = os.path.join(options.outputdir, self.name+"_ob.txt")
@@ -59,6 +61,8 @@ class TaxonomyMapping:
         self.clneatopdf = os.path.join(options.outputdir, self.name+"_cl_neato.pdf")
         self.iefile = os.path.join(options.outputdir, self.name+"_ie.dot")
         self.iepdf = os.path.join(options.outputdir, self.name+"_ie.pdf")
+        self.ivpng = os.path.join(options.outputdir, self.name+"_iv.png")
+
 
     def getTaxon(self, taxonomyName="", taxonName=""):
         if(self.options.verbose):
@@ -92,6 +96,10 @@ class TaxonomyMapping:
         return taxa
 
     def run(self):
+        if self.options.inputViz:
+            inputVisualizer = InputVisual.instance()
+            inputVisualizer.run(self.options.inputdir, self.options.inputfile, self.ivout)
+            commands.getoutput("dot -Tpng "+self.ivout+" -o "+self.ivpng)           
         self.genASP()
         if self.options.consCheck:
             if not self.testConsistency():

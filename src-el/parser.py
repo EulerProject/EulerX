@@ -64,6 +64,8 @@ class EulerParser:
             inst.add_option("-d", dest="depth", type="int", default=2, help="depth, used with -g")
             inst.add_option("-t", dest="relation", type="string", default="<",\
                                   help="artifitial articulaiton rel, used with -g")
+            inst.add_option("--iv", action="store_true", dest="inputViz", default=False,\
+                                    help="input visualization")
 	return inst
 
     instance = Callable(instance)
