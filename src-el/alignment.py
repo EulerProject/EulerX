@@ -293,13 +293,26 @@ class TaxonomyMapping:
             outputstr += "}\n"
         print outputstr
 
+    def isPwNone(self):
+        if reasoner[self.options.reasoner] == reasoner["gringo"]:
+            return self.pw.find("Models     : 0 ") != -1
+        elif reasoner[self.options.reasoner] == reasoner["dlv"]:
+            return self.pw.strip() == ""
+        else:
+            raise Exception("Reasoner:", self.options.reasoner, " is not supported !!")
+
     def genPW(self, pwflag):
         pws = []
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
-            com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
-            self.pw = commands.getoutput(com)
+            self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
+            self.pw = commands.getoutput(self.com)
+            if self.isPwNone():
+                print "************************************"
+                print "Input is inconsistent"
+                if self.options.ie:
+                    self.inconsistencyExplanation()
+                self.remedy()
             if self.pw.find("ERROR") != -1:
-                print self.pw
                 raise Exception(template.getEncErrMsg())
             if pwflag:
                 raw = self.pw.split("\n")
@@ -311,7 +324,7 @@ class TaxonomyMapping:
             path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
             self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
             self.pw = commands.getoutput(self.com)
-            if self.pw == "":
+            if self.isPwNone():
                 print "************************************"
                 print "Input is inconsistent"
                 if self.options.ie:
@@ -535,7 +548,7 @@ class TaxonomyMapping:
                 self.genASP()
     	        # Run the reasoner again
                 self.pw = commands.getoutput(self.com)
-                if self.pw != "":
+                if self.isPwNone():
                     fixed = True
                     if first:
                         first = False
