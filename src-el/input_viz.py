@@ -7,6 +7,7 @@
 #=============================================================================================
 import sys
 import os
+import random
 from helper import *
 
 class InputVisual:
@@ -42,6 +43,7 @@ class InputVisual:
         pc_list1 = []
         pc_list2 = []
         art_list = []
+        sum_list = []
     
         # read each line of the file and update list
         while not_EOF:
@@ -84,14 +86,32 @@ class InputVisual:
             line = f_in.readline()
             while len(line) != 0:
                 art_type = ""
-                line = line[1:-2].replace("{","").replace("}","")
+                if line[-1] == "\n":
+                    line = line[1:-2].replace("{","").replace("}","")
+                else:
+                    line = line[1:-1].replace("{","").replace("}","")
                 temp_list = line.split(" ")
                 if len(temp_list) > 1:
-                    for i in range(1,len(temp_list)-1):
-                        art_type = art_type + temp_list[i] + " "
-                    art_tuple = (temp_list[0], temp_list[len(temp_list)-1], art_type[:-2])
-                    art_list.append(art_tuple)
-                 
+                    if "lsum" in temp_list:
+                        sum_list.append((temp_list[3], temp_list[0], temp_list[1]))
+                    elif "l3sum" in temp_list:
+                        sum_list.append((temp_list[4], temp_list[0], temp_list[1], temp_list[2]))
+                    elif "l4sum" in temp_list:
+                        sum_list.append((temp_list[5], temp_list[0], temp_list[1], temp_list[2], temp_list[3]))
+                    elif "rsum" in temp_list:
+                        sum_list.append((temp_list[0], temp_list[2], temp_list[3]))
+                    elif "r3sum" in temp_list:
+                        sum_list.append((temp_list[0], temp_list[2], temp_list[3], temp_list[4]))
+                    elif "ldiff" in temp_list:
+                        sum_list.append((temp_list[0], temp_list[1], temp_list[3]))
+                    elif "rdiff" in temp_list:
+                        sum_list.append((temp_list[2], temp_list[0], temp_list[3]))
+                    else:
+                        for i in range(1,len(temp_list)-1):
+                            art_type = art_type + temp_list[i] + " "
+                        art_tuple = (temp_list[0], temp_list[len(temp_list)-1], art_type[:-1])
+                        art_list.append(art_tuple)
+                     
                 line = f_in.readline()
                   
             # stop if it reaches the end of the file
@@ -132,6 +152,11 @@ class InputVisual:
             
         for e in art_list:
             f_out.write("\"" + e[0] + "\" -> \"" + e[1] + "\" [color=grey, style=dashed, label=\"" + e[2] + "\"];\n")
+        for e in sum_list:
+            r = lambda: random.randint(0,255)
+            color = "#" + hex(r())[2:] + hex(r())[2:] + hex(r())[2:]
+            for i in range(1,len(e)):
+                f_out.write("\"" + e[0] + "\" -> \"" + e[i] + "\" [color=\"" + color + "\", arrowhead=tee, style=dashed];\n")
         
         f_out.write("}")
         f_in.close()
