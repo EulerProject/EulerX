@@ -1,0 +1,46 @@
+taxonomy m Taxonomy2
+(348 349 352)
+(349 350 351)
+(352 353 354)
+(354 355 356)
+(356 357 358)
+(358 359 360)
+(360 361 362)
+(362 363 364)
+(364 365 366)
+(366 367 368)
+(368 369 370)
+(370 371 372)
+
+taxonomy c Taxonomy1
+(1 2 3 4 5 9 10 11 12 16 17)
+(5 6 7 8)
+(12 13 14 15)
+
+articulation crow crowmamo
+[m.348 equals c.1]
+[m.350 equals c.4]
+[m.351 equals c.16]
+[m.353 overlaps c.10]
+[m.355 equals c.9]
+[m.357 is_included_in c.10]
+[m.360 equals c.12]
+[m.361 is_included_in c.13]
+[m.362 overlaps c.13]
+[m.363 is_included_in c.13]
+[m.364 overlaps c.13]
+[m.365 is_included_in c.13]
+[m.366 overlaps c.13]
+[m.367 is_included_in c.13]
+[m.368 overlaps c.13]
+[m.369 is_included_in c.13]
+[m.370 overlaps c.13]
+[m.371 overlaps c.13]
+[m.371 includes c.14]
+[m.371 includes c.15]
+[m.372 is_included_in c.13]
+[m.353 includes c.2]
+[m.353 includes c.3]
+[m.353 includes c.17]
+[m.349 rsum c.4 c.16]
+[m.359 rsum c.5 c.11]
