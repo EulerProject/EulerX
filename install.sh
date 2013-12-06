@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-echo "Start check dependencies:"
+echo "Start checking dependencies:"
 echo ""
 if ! which python > /dev/null; then
 echo "Python check failed o_O"
@@ -44,4 +44,4 @@ exit
 fi
 echo "GraphViz check passed  #############"
 export PATH=src-el:$PATH
-
+echo "Please exit and restart your terminal since PATH has changed"

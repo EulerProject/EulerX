@@ -73,6 +73,7 @@ reasoner["dlv"] = 1 << 0
 reasoner["gringo"] = 1 << 1
 
 encode = {}
+encode[0] = 0
 encode["dr"] = 1
 encode["direct"] = encode["dr"]
 encode["vr"] = 1 << 1
@@ -97,4 +98,3 @@ encode["mncb"] = encode["mn"] | encode["cb"]
 encode["mnvr"] = encode["mn"] | encode["vr"]
 encode["mnob"] = encode["mn"] | encode["ob"]
 encode["mnct"] = encode["mn"] | encode["ct"]
-encode[0] = 0

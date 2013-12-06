@@ -37,6 +37,8 @@ class EulerParser:
             inst.add_option("-b", dest="dl", default=2, help="dl encoding spare parameter")
             inst.add_option("--reasoner", dest="reasoner", type="string", default="dlv",\
                                   help="choose a reasoner")
+            inst.add_option("--repair", dest="repair", type="string", default="topdown",\
+                                  help="choose a repairing approach in case of inconsistency")
             inst.add_option("--cc", action="store_true", dest="consCheck", default=False,\
                                     help="consistency check only")
             inst.add_option("--dc", action="store_false", dest="enableCov", default=True,\

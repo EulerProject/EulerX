@@ -2,6 +2,7 @@ import os
 import time
 import sets
 import inspect
+import itertools
 import threading
 import StringIO
 from taxonomy import * 
@@ -311,7 +312,11 @@ class TaxonomyMapping:
             self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
             self.pw = commands.getoutput(self.com)
             if self.pw == "":
-                self.simpleRemedy()
+                print "************************************"
+                print "Input is inconsistent"
+                if self.options.ie:
+                    self.inconsistencyExplanation()
+                self.remedy()
             if self.pw.find("error") != -1:
                 print self.pw
                 raise Exception(template.getEncErrMsg())
@@ -500,10 +505,10 @@ class TaxonomyMapping:
 	    fDot.write("  }\n")
         fDot.write("  subgraph cluster_lg {\n")
         fDot.write("    rankdir = LR\n")
-        fDot.write("    label = \"Legend\";\n")
-        fDot.write("    A1 -> B1 [label=\"is included in (given)\" style=filled, color=black]\n")
-        fDot.write("    A2 -> B2 [label=\"is included in (inferred)\" style=filled, color=red]\n")
-        fDot.write("    A3 -> B3 [label=\"overlaps\" dir=none, style=dashed, color=blue]\n")
+        #fDot.write("    label = \"Legend\";\n")
+        #fDot.write("    A1 -> B1 [label=\"is included in (given)\" style=filled, color=black]\n")
+        #fDot.write("    A2 -> B2 [label=\"is included in (inferred)\" style=filled, color=red]\n")
+        #fDot.write("    A3 -> B3 [label=\"overlaps\" dir=none, style=dashed, color=blue]\n")
         fDot.write("  }\n")
 	fDot.write("}\n")
             
@@ -511,24 +516,123 @@ class TaxonomyMapping:
         commands.getoutput("dot -Tpng "+self.options.outputdir+fileName+".dot -o "+self.options.outputdir+fileName+".png")
 
 
+    def bottomupRemedy(self):
+        first = True
+        fixedOpt = []
+        fixedCnt = 0
+        # local copy of articulations
+        tmpart = copy.deepcopy(self.articulations)
+        s = len(self.articulations)
+        for i in range(s-1, 0, -1):
+            fixed = False
+            first = True
+            tmpl = list(itertools.combinations(range(s), i))
+            for k in range(len(tmpl)):
+                a = []
+                for j in range(i):
+                    a.append(self.articulations.pop(tmpl[k][j] - j))
+                # Now refresh the input file
+                self.genASP()
+    	        # Run the reasoner again
+                self.pw = commands.getoutput(self.com)
+                if self.pw != "":
+                    fixed = True
+                    if first:
+                        first = False
+                        fixedCnt = 1
+                        fixedOpt = []
+                        fixedOpt.append(a)
+                    else:
+                        fixedCnt += 1
+                        fixedOpt.append(a)
+                else:
+                    if k == len(tmpl)-1 and not fixed:
+                        for l in range(fixedCnt):                   
+                            print "************************************"
+                            print "Repair option ",l,": remove problematic articulation [",
+                            a = fixedOpt[l]
+                            for j in range(i):
+                                # Remove mir is not needed because it will be reset anyways
+                                # if l == 0: self.removeMir(a[j].string)
+                                if j != 0: print ",",
+                                print a[j].string,
+                            print "]"
+                            print "************************************"
+                            fixed = True
+                self.articulations = copy.deepcopy(tmpart)
+            if not fixed: return True
+        for l in range(fixedCnt):                   
+            print "************************************"
+            print "Repair option ",l,": remove problematic articulation [",
+            a = fixedOpt[l]
+            for j in range(i):
+                # Remove mir is not needed because it will be reset anyways
+                # if l == 0: self.removeMir(a[j].string)
+                if j != 0: print ",",
+                print a[j].string,
+            print "]"
+            print "************************************"
+        return True
+
+
+    def topdownRemedy(self):
+        fixed = False
+        fixedCnt = 0
+        # local copy of articulations
+        tmpart = copy.deepcopy(self.articulations)
+        s = len(self.articulations)
+        for i in range(1, s):
+            tmpl = list(itertools.combinations(range(s), i))
+            print tmpl
+            for k in range(len(tmpl)):
+                a = []
+                for j in range(i):
+                    a.append(self.articulations.pop(tmpl[k][j] - j))
+                # Now refresh the input file
+                self.genASP()
+    	        # Run the reasoner again
+                self.pw = commands.getoutput(self.com)
+                if self.pw != "":
+                    print "************************************"
+                    print "Repair option ",fixedCnt,": remove problematic articulation [",
+                    for j in range(i):
+                        # Remove mir is not needed because it will be reset anyways
+                        # if fixedCnt == 0: self.removeMir(a[j].string)
+                        if j != 0: print ",",
+                        print a[j].string,
+                    print "]"
+                    print "************************************"
+                    fixed = True
+                self.articulations = copy.deepcopy(tmpart)
+            if fixed : return True
+        print "Don't know how to repair"
+        print "************************************"
+        return False
+
+
+    def remedy(self):
+        # Begin repairing
+        if self.options.repair == "simple":
+            self.simpleRemedy()
+        elif self.options.repair == "bottomup":
+            self.bottomupRemedy()
+        # By default, we use top down remedy to repair
+        else:
+            self.topdownRemedy()
 
     def simpleRemedy(self):
-        print "************************************"
-        print "Input is inconsistent"
-        if self.options.ie:
-            self.inconsistencyExplanation()
         s = len(self.articulations)
         for i in range(s):
             a = self.articulations.pop(i)    
             # Now refresh the input file
-            self.rules = {}
             self.genASP()
     	    # Run the reasoner again
             self.pw = commands.getoutput(self.com)
             if self.pw != "":
                 # Remove mir is not needed because it will be reset anyways
                 self.removeMir(a.string)
-                print "Repairing: remove [" + a.string + "]"
+                print "************************************"
+                print "Repairing: remove problematic articulation [" + a.string + "]"
                 print "************************************"
                 return True
             self.articulations.insert(i, a)
@@ -716,7 +820,7 @@ class TaxonomyMapping:
             self.com = "dlv -silent -filter=relout "+self.cbfile+" "+ self.pwswitch + " | "+path+"/muniq -u"
             self.cb = commands.getoutput(self.com)
             if self.cb == "":
-                self.simpleRemedy()
+                self.remedy()
             if self.cb.find("error") != -1:
                 print self.cb
                 raise Exception(template.getEncErrMsg())
