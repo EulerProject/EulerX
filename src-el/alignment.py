@@ -63,6 +63,19 @@ class TaxonomyMapping:
         self.iefile = os.path.join(options.outputdir, self.name+"_ie.dot")
         self.iepdf = os.path.join(options.outputdir, self.name+"_ie.pdf")
         self.ivpng = os.path.join(options.outputdir, self.name+"_iv.png")
+        if reasoner[self.options.reasoner] == reasoner["gringo"]:
+            # possible world command
+            self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD --eq=0"
+            # consistency command
+            self.con = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD --eq=1"
+        elif reasoner[self.options.reasoner] == reasoner["dlv"]:
+            path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+            # possible world command
+            self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
+            # consistency command
+            self.con = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+ self.pwswitch
+        else:
+            raise Exception("Reasoner:", self.options.reasoner, " is not supported !!")
 
 
     def getTaxon(self, taxonomyName="", taxonName=""):
@@ -303,42 +316,28 @@ class TaxonomyMapping:
 
     def genPW(self, pwflag):
         pws = []
+        self.pw = commands.getoutput(self.com)
+        if self.isPwNone():
+            print "************************************"
+            print "Input is inconsistent"
+            if self.options.ie:
+                self.inconsistencyExplanation()
+            self.remedy()
+        if self.pw.lower().find("error") != -1:
+            raise Exception(template.getEncErrMsg())
+        if not pwflag: return None
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
-            self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
-            self.pw = commands.getoutput(self.com)
-            if self.isPwNone():
-                print "************************************"
-                print "Input is inconsistent"
-                if self.options.ie:
-                    self.inconsistencyExplanation()
-                self.remedy()
-            if self.pw.find("ERROR") != -1:
-                raise Exception(template.getEncErrMsg())
-            if pwflag:
-                raw = self.pw.split("\n")
-                ## Filter out those trash in the gringo output
-                for i in range(2, len(raw) - 2, 2):
-                    pws.append(raw[i].strip().replace(") ",");"))
-        # DLV, from here on
+            raw = self.pw.split("\n")
+            ## Filter out those trash in the gringo output
+            for i in range(2, len(raw) - 2, 2):
+                pws.append(raw[i].strip().replace(") ",");"))
         elif reasoner[self.options.reasoner] == reasoner["dlv"]:
-            path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-            self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
-            self.pw = commands.getoutput(self.com)
-            if self.isPwNone():
-                print "************************************"
-                print "Input is inconsistent"
-                if self.options.ie:
-                    self.inconsistencyExplanation()
-                self.remedy()
-            if self.pw.find("error") != -1:
-                print self.pw
-                raise Exception(template.getEncErrMsg())
-                return None
             raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
             pws = raw.split("\n")
         else:
             raise Exception("Reasoner:", self.options.reasoner, " is not supported !!")
         self.npw = len(pws)
+        print pws
         self.outPW(pws, pwflag, "rel")
 
     def outPW(self, pws, pwflag, ss):
@@ -547,8 +546,8 @@ class TaxonomyMapping:
                 # Now refresh the input file
                 self.genASP()
     	        # Run the reasoner again
-                self.pw = commands.getoutput(self.com)
-                if self.isPwNone():
+                self.pw = commands.getoutput(self.con)
+                if not self.isPwNone():
                     fixed = True
                     if first:
                         first = False
@@ -561,6 +560,7 @@ class TaxonomyMapping:
                 else:
                     if k == len(tmpl)-1 and not fixed:
                         for l in range(fixedCnt):                   
+                            print "**", self.pw, "**"
                             print "************************************"
                             print "Repair option ",l,": remove problematic articulation [",
                             a = fixedOpt[l]
@@ -573,7 +573,7 @@ class TaxonomyMapping:
                             print "************************************"
                             fixed = True
                 self.articulations = copy.deepcopy(tmpart)
-            if not fixed: return True
+        if not fixed: return True
         for l in range(fixedCnt):                   
             print "************************************"
             print "Repair option ",l,": remove problematic articulation [",
@@ -596,7 +596,6 @@ class TaxonomyMapping:
         s = len(self.articulations)
         for i in range(1, s):
             tmpl = list(itertools.combinations(range(s), i))
-            print tmpl
             for k in range(len(tmpl)):
                 a = []
                 for j in range(i):
@@ -604,10 +603,11 @@ class TaxonomyMapping:
                 # Now refresh the input file
                 self.genASP()
     	        # Run the reasoner again
-                self.pw = commands.getoutput(self.com)
-                if self.pw != "":
+                self.pw = commands.getoutput(self.con)
+                if not self.isPwNone():
                     print "************************************"
                     print "Repair option ",fixedCnt,": remove problematic articulation [",
+                    fixedCnt += 1
                     for j in range(i):
                         # Remove mir is not needed because it will be reset anyways
                         # if fixedCnt == 0: self.removeMir(a[j].string)
@@ -615,6 +615,7 @@ class TaxonomyMapping:
                         print a[j].string,
                     print "]"
                     print "************************************"
+                    return True
                     fixed = True
                 self.articulations = copy.deepcopy(tmpart)
             if fixed : return True
@@ -640,7 +641,7 @@ class TaxonomyMapping:
             # Now refresh the input file
             self.genASP()
     	    # Run the reasoner again
-            self.pw = commands.getoutput(self.com)
+            self.pw = commands.getoutput(self.con)
             if self.pw != "":
                 # Remove mir is not needed because it will be reset anyways
                 self.removeMir(a.string)
@@ -713,6 +714,7 @@ class TaxonomyMapping:
         fcldot = open(self.cldot, 'w')
         fcldot.write("graph "+self.name+"_cluster {\n"+\
                      "overlap=false\nsplines=true\n")
+        fcldot.write("  node [shape=box style=\"filled, rounded\" fillcolor=\"#FFFFCC\"]\n")
         dmatrix = []
         for i in range(self.npw):
             dmatrix.append([])
@@ -817,8 +819,8 @@ class TaxonomyMapping:
     def genCB(self):
         pws = []
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
-            com = "gringo "+self.cbfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
-            self.pw = commands.getoutput(com)
+            self.com = "gringo "+self.cbfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
+            self.pw = commands.getoutput(self.com)
             if self.pw.find("ERROR") != -1:
                 print self.pw
                 raise Exception(template.getEncErrMsg())
