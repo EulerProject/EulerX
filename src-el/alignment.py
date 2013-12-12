@@ -615,7 +615,6 @@ class TaxonomyMapping:
                         print a[j].string,
                     print "]"
                     print "************************************"
-                    return True
                     fixed = True
                 self.articulations = copy.deepcopy(tmpart)
             if fixed : return True
@@ -642,7 +641,7 @@ class TaxonomyMapping:
             self.genASP()
     	    # Run the reasoner again
             self.pw = commands.getoutput(self.con)
-            if self.pw != "":
+            if not self.isPwNone():
                 # Remove mir is not needed because it will be reset anyways
                 self.removeMir(a.string)
                 print "************************************"
