@@ -243,15 +243,16 @@ class TaxonomyMapping:
         print ie
         if ie.find("{}") == -1 and ie != "":
             ies = (re.match("\{(.*)\}", ie)).group(1).split(", ")
+            print ies
             tmpmap = {}
             for i in range(len(ies)):
-              if ies[i].find("ie\(prod(") != -1:
+              if ies[i].find("ie(prod(") != -1:
                 item = re.match("ie\(prod\((.*),(.*)\)\)", ies[i])
                 key = item.group(1)
                 tmpmap[key] = [item.group(2)]
               else:
                 if ies[i].find("prod(") != -1:
-                  item = re.match("ie\(s\((.*),prod(.*),(.*)\)\)", ies[i])
+                  item = re.match("ie\(s\((.*),prod\((.*)\),(.*)\)\)", ies[i])
                 else:
                   item = re.match("ie\(s\((.*),(.*),(.*)\)\)", ies[i])
                 key = item.group(1)+","+item.group(3)
