@@ -240,10 +240,8 @@ class TaxonomyMapping:
 
     def postProcessIE(self, ie):
         print "Please see "+self.name+"_ie.pdf for the inconsistency relations between all the rules."
-        print ie
         if ie.find("{}") == -1 and ie != "":
             ies = (re.match("\{(.*)\}", ie)).group(1).split(", ")
-            print ies
             tmpmap = {}
             for i in range(len(ies)):
               if ies[i].find("ie(prod(") != -1:
