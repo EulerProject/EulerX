@@ -242,7 +242,7 @@ class TaxonomyMapping:
         print "Please see "+self.name+"_ie.pdf for the inconsistency relations between all the rules."
         if ie.find("{}") == -1 and ie != "":
             ies = (re.match("\{(.*)\}", ie)).group(1).split(", ")
-            print ies
+            # print ies
             tmpmap = {}
             for i in range(len(ies)):
               if ies[i].find("ie(prod") != -1:
@@ -343,7 +343,6 @@ class TaxonomyMapping:
         else:
             raise Exception("Reasoner:", self.options.reasoner, " is not supported !!")
         self.npw = len(pws)
-        print pws
         self.outPW(pws, pwflag, "rel")
 
     def outPW(self, pws, pwflag, ss):
