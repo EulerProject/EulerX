@@ -242,14 +242,15 @@ class TaxonomyMapping:
         print "Please see "+self.name+"_ie.pdf for the inconsistency relations between all the rules."
         if ie.find("{}") == -1 and ie != "":
             ies = (re.match("\{(.*)\}", ie)).group(1).split(", ")
+            # print ies
             tmpmap = {}
             for i in range(len(ies)):
-              if ies[i].find("ie(prod(") != -1:
+              if ies[i].find("ie(prod") != -1:
                 item = re.match("ie\(prod\((.*),(.*)\)\)", ies[i])
                 key = item.group(1)
                 tmpmap[key] = [item.group(2)]
               else:
-                if ies[i].find("prod(") != -1:
+                if ies[i].find("prod") != -1:
                   item = re.match("ie\(s\((.*),prod\((.*)\),(.*)\)\)", ies[i])
                 else:
                   item = re.match("ie\(s\((.*),(.*),(.*)\)\)", ies[i])
@@ -306,10 +307,16 @@ class TaxonomyMapping:
         print outputstr
 
     def isPwNone(self):
+        return self.isNone(self.pw)
+
+    def isCbNone(self):
+        return self.isNone(self.cb)
+
+    def isNone(self, output):
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
-            return self.pw.find("Models     : 0 ") != -1
+            return output.find("Models     : 0 ") != -1
         elif reasoner[self.options.reasoner] == reasoner["dlv"]:
-            return self.pw.strip() == ""
+            return output.strip() == ""
         else:
             raise Exception("Reasoner:", self.options.reasoner, " is not supported !!")
 
@@ -336,7 +343,6 @@ class TaxonomyMapping:
         else:
             raise Exception("Reasoner:", self.options.reasoner, " is not supported !!")
         self.npw = len(pws)
-        print pws
         self.outPW(pws, pwflag, "rel")
 
     def outPW(self, pws, pwflag, ss):
@@ -492,11 +498,11 @@ class TaxonomyMapping:
                 else: taxa2 += "  \""+T2+"\"\n"
             else:
                 tmpCom += "  \""+T2+"\"\n"
-        fDot.write("  node [shape=box style=\"filled, rounded\" fillcolor=\"#CCFFCC\"]\n")
+        fDot.write("  node [shape=diamond style=\"filled\" fillcolor=\"#CCFFCC\"]\n")
         fDot.write(taxa1)
-        fDot.write("  node [shape=box style=\"filled, rounded\" fillcolor=\"#FFFFCC\"]\n")
+        fDot.write("  node [shape=octagon style=\"filled\" fillcolor=\"#FFFFCC\"]\n")
         fDot.write(taxa2)
-        fDot.write("  node [shape=box style=\"filled, rounded\" fillcolor=\"#EEEEEE\"]\n")
+        fDot.write("  node [shape=box style=\"filled\" fillcolor=\"#EEEEEE\"]\n")
         fDot.write(tmpCom)
 
 	for [T1, T2, P] in self.tr:
@@ -818,11 +824,13 @@ class TaxonomyMapping:
         pws = []
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             self.com = "gringo "+self.cbfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
-            self.pw = commands.getoutput(self.com)
-            if self.pw.find("ERROR") != -1:
-                print self.pw
+            self.cb = commands.getoutput(self.com)
+            if self.isCbNone():
+                self.remedy()
+            if self.cb.find("ERROR") != -1:
+                print self.cb
                 raise Exception(template.getEncErrMsg())
-            raw = self.pw.split("\n")
+            raw = self.cb.split("\n")
             if self.options.verbose: print raw
             ## Filter out those trash in the gringo output
             for i in range(2, len(raw) - 2, 2):
@@ -832,7 +840,7 @@ class TaxonomyMapping:
             path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
             self.com = "dlv -silent -filter=relout "+self.cbfile+" "+ self.pwswitch + " | "+path+"/muniq -u"
             self.cb = commands.getoutput(self.com)
-            if self.cb == "":
+            if self.isCbNone():
                 self.remedy()
             if self.cb.find("error") != -1:
                 print self.cb
@@ -1001,7 +1009,8 @@ class TaxonomyMapping:
             self.baseAsp += "out(X, M) :- not in(X, M), r(M),concept(X,_,N),count(N).\n"
 	    self.baseAsp += "in(X, M) :- r(M),concept(X,_,N),bit(M,N,1).\n"
 	    self.baseAsp += "out(X, M) :- r(M),concept(X,_,N),bit(M,N,0).\n\n"
-	    self.baseAsp += "ir(M, fi) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n"
+	    #self.baseAsp += "ir(M, fi) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n"
+	    self.baseAsp += "irs(M) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n"
 
 	    self.baseAsp += "%%% Constraints of regions.\n"
 	    self.baseAsp += "irs(X) :- ir(X, _).\n"
