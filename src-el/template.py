@@ -15,7 +15,7 @@ class template:
              + "in(X, M) :- r(M),concept2(X,_),not out(X, M).\n"\
              + "outs(X, M) :- out3(X, M, _), ix.\n"\
              + "in(X, M) :- r(M),concept2(X,_),not outs(X, M), ix.\n"\
-             + "ir(M, fi) :- in(X, M), out(X, M), r(M), concept2(X,_).\n\n"\
+             + "irs(M) :- in(X, M), out(X, M), r(M), concept2(X,_).\n\n"\
              + "%%% Constraints of regions.\n"\
              + "irs(X) :- ir(X, _).\n"\
              + "vrs(X) :- vr(X, _).\n"\
@@ -26,6 +26,7 @@ class template:
              + "%%% Inconsistency Explanation.\n"\
              + "ie(s(R, A, Y)) :- pie(R, A, Y), not cc(R, Y), ix.\n"\
              + "cc(R, Y) :- c(R, _, Y), ix.\n"
+             #+ "ir(M, fi) :- in(X, M), out(X, M), r(M), concept2(X,_).\n\n"\
 
     aspCbCon = "cb(X) :- newcon(X, _, _, _).\n"\
              + "cp(X) :- concept2(X, _).\n"\
