@@ -25,10 +25,12 @@ example/..          # other examples
 The whole toolkit is written in Python, so you need have Python 2.X or later installed in your computer. You also need the following dependent software to run this toolkit.
 
 CleanTax++ dependencies:
+
 1. Prover9/Mace4:  http://www.cs.unm.edu/~mccune/mace4/
 2. GraphViz:       http://www.graphviz.org/
 
 EulerASP dependencies:
+
 1. DLV:            http://www.dlvsystem.com/
 2. Potassco:       http://potassco.sourceforge.net/
   - gringo-3.0.3
