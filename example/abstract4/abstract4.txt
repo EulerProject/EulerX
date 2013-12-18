@@ -1,0 +1,12 @@
+taxonomy 1 Taxonomy1
+(A B C D E)
+
+taxonomy 2 Taxonomy2
+(A B D F G)
+
+articulation abs abstract
+[1.A {is_included_in equals} 2.A]
+[1.B equals 2.B]
+[1.C {is_included_in overlaps} 2.F]
+[1.D equals 2.D]
+[1.E {equals overlaps} 2.G]
