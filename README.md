@@ -9,13 +9,13 @@ On this page:
 * [Structure of This Toolkit](https://bitbucket.org/eulerx/euler-project/overview#markdown-header-structure-of-this-toolkit)
 * [Installation Steps](https://bitbucket.org/eulerx/euler-project/overview#markdown-header-installation-steps)
 * [Software Dependencies](https://bitbucket.org/eulerx/euler-project/overview#markdown-header-software-dependencies)
-* [Examples of Running CleanTax++](https://bitbucket.org/eulerx/euler-project/overview#markdown-header-examples-of-running-cleantax++)
+* [Examples of Running EulerFO](https://bitbucket.org/eulerx/euler-project/overview#markdown-header-examples-of-running-eulerfo)
 * [Examples of Running EulerASP](https://bitbucket.org/eulerx/euler-project/overview#markdown-header-examples-of-running-eulerasp)
 * [Contact](https://bitbucket.org/eulerx/euler-project/overview#markdown-header-Contact)
 
 # Introduction
 
-Euler is an open source toolkit (mostly written in Python) for merging taxonomies (taxonomical organized datasets) and visualizing the results. (see http://euler.cs.ucdavis.edu/ for more info).
+Euler is an open source toolkit (mostly written in Python) for merging taxonomies (taxonomical organized datasets) and visualizing the results. (See our [website][euler] for more info).
 
 We have all the EulerFO source code, EulerASP source code, and a bunch of use cases in this toolkit. EulerFO is a modified version of CleanTax which was firstly developed by Dave Thau. CleanTax/EulerFO are built upon Prover9/Mace4 reasoning software. EulerASP is a brand new taxonomy reasoning tool that Mingmin built from scratch. EulerASP is built based on popular ASP reasoners DLV and Potassco.
 
@@ -53,7 +53,7 @@ Please run `installCheck.sh` and make sure the dependency check passes before ru
 
 The whole toolkit is written in **Python**, so you need have Python 2.X or later installed in your computer. You also need the following dependent software to run this toolkit.
 
-CleanTax++ dependencies:
+EulerFO dependencies:
 
 1. [Prover9/Mace4][p9m4]
 2. [GraphViz][graphviz]
@@ -66,7 +66,7 @@ EulerASP dependencies:
 	- claspD-1.1.4
 3. [GraphViz][graphviz]
 
-# Examples of Running CleanTax++
+# Examples of Running EulerFO
 
 Here are examples under `example/` directory,
 
@@ -94,6 +94,7 @@ Still under `example/` directory (assuming `src-el/` is in your PATH env, and gr
 
 If you have any question or comments, please contact Mingmin Chen at michen@ucdavis.edu.
 
+[euler]: http://euler.cs.ucdavis.edu/
 [mercury]: http://mercurial.selenic.com/
 [p9m4]: http://www.cs.unm.edu/~mccune/mace4/
 [graphviz]: http://www.graphviz.org/
