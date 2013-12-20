@@ -6,20 +6,22 @@ Euler is an open source toolkit (mostly written in Python) for merging taxonomie
 
 We have all the CleanTax++ source code, EulerASP source code, and a bunch of use cases in this toolkit. CleanTax++ (EulerFO) is a modified version of CleanTax which was firstly developed by Dave Thau. CleanTax/CleanTax++ are built upon Prover9/Mace4 reasoning software. EulerASP is a brand new taxonomy reasoning tool that Mingmin built from scratch. EulerASP is built based on popular ASP reasoners DLV and clingo/gringo.
 
-# Structure of this toolkit
+# Structure of This Toolkit
 DIRECTORIES:
-- .hg/			% internal Mercurial folder (e.g. use 'branch' file to switch branches
-- example/		% subfolders with all Euler use cases
-- regress/		% for Regression testing   
-- src-ct/		% CleanTaxI++ Source Code
-- src-el/		% EulerASP Source Code
 
-FILES: 
-- README.md		% File used on bitbucket homepage
-- installCheck.sh	% installation requirements check
-- src-ct/main.py	% main entry of CleanTax++ source code
-- src-el/euler		% main entry of EulerASP source code
-- example/runct.sh	% shell script to run CleanTax++, see the example section for more information
+- .hg/                  % internal Mercurial folder (e.g. use 'branch' file to switch branches
+- example/              % subfolders with all Euler use cases
+- regress/              % for Regression testing
+- src-ct/               % CleanTaxI++ Source Code
+- src-el/               % EulerASP Source Code
+
+FILES:
+
+- README.md             % File used on bitbucket homepage
+- installCheck.sh       % installation requirements check
+- src-ct/main.py        % main entry of CleanTax++ source code
+- src-el/euler          % main entry of EulerASP source code
+- example/runct.sh      % shell script to run CleanTax++, see the example section for more information
 
 # Installation Steps
 1. If you are using hg/mercury first, please download and install from http://mercurial.selenic.com/
