@@ -35,7 +35,7 @@ We have all the EulerFO source code, EulerASP source code, and a bunch of use ca
  `installCheck.sh`  |  installation requirements check
  `src-ct/main.py`   |  main entry of CleanTax++ source code
  `src-el/euler`     |  main entry of EulerASP source code
- `README.md`        |  shell script to run CleanTax++
+ `example/runct.sh` |  shell script to run EulerFO
 
 # Installation Steps
 
