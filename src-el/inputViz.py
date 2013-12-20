@@ -15,7 +15,7 @@ class InputVisual:
     inst = None
     
     def __init__(self):
-        return None
+        self.artSymbol = ""
     
     def instance():
         return InputVisual()
@@ -32,6 +32,18 @@ class InputVisual:
                     del li[i]
                 else:
                     last = li[i]
+                    
+    def artName2Symbol(self, name):
+        if name == "equals":
+            self.artSymbol = "=="
+        elif name == "is_included_in":
+            self.artSymbol = "<"
+        elif name == "includes":
+            self.artSymbol = ">"
+        elif name == "overlaps":
+            self.artSymbol = "><"
+        else:
+            self.artSymbol = "!"
     
     def run(self, inputdir, inputfile, ivout):
         # open the file
@@ -44,6 +56,8 @@ class InputVisual:
         pc_list2 = []
         art_list = []
         sum_list = []
+        sc1_list = []
+        sc2_list = []
     
         # read each line of the file and update list
         while not_EOF:
@@ -53,6 +67,10 @@ class InputVisual:
         
             # read (concept in taxonomy1)
             line = f_in.readline()
+            if line.find(" ") == -1:
+                sc1_list.append(name1 + "." + line[1:-2])
+            else:
+                pass
             while len(line) != 1:
                 temp_list = line[1:-2].split(" ")
                 parent = name1 + "." + temp_list[0]
@@ -69,6 +87,10 @@ class InputVisual:
         
             # read (concept in taxonomy2)
             line = f_in.readline()
+            if line.find(" ") == -1:
+                sc2_list.append(name2 + "." + line[1:-2])
+            else:
+                pass
             while len(line) != 1:
                 temp_list = line[1:-2].split(" ")
                 parent = name2 + "." + temp_list[0]
@@ -107,9 +129,15 @@ class InputVisual:
                     elif "rdiff" in temp_list:
                         sum_list.append((temp_list[2], temp_list[0], temp_list[3]))
                     else:
-                        for i in range(1,len(temp_list)-1):
-                            art_type = art_type + temp_list[i] + " "
-                        art_tuple = (temp_list[0], temp_list[len(temp_list)-1], art_type[:-1])
+                        if len(temp_list) == 3:
+                            self.artName2Symbol(temp_list[1])
+                            art_type = self.artSymbol
+                            art_tuple = (temp_list[0], temp_list[len(temp_list)-1], art_type)
+                        else:
+                            for i in range(1,len(temp_list)-1):
+                                self.artName2Symbol(temp_list[i])
+                                art_type = art_type + self.artSymbol + " OR "
+                                art_tuple = (temp_list[0], temp_list[len(temp_list)-1], art_type[:-4])
                         art_list.append(art_tuple)
                      
                 line = f_in.readline()
@@ -126,6 +154,8 @@ class InputVisual:
         f_out.write("style=invis;\n")
         f_out.write("node [shape=box style=\"filled\" fillcolor=\"#CCFFCC\"];\n")
         node_list = []
+        for e in sc1_list:
+            node_list.append(e)
         for e in pc_list1:
             node_list.append(e[0])
             node_list.append(e[1])
@@ -133,13 +163,15 @@ class InputVisual:
         for e in node_list:
             f_out.write("\"" + e + "\";\n")
         for e in pc_list1:
-            f_out.write("\"" + e[1] + "\" -> \"" + e[0] + "\" [color=black];\n")
+            f_out.write("\"" + e[1] + "\" -> \"" + e[0] + "\" [label=isa, color=black];\n")
         f_out.write("}\n")
     
         f_out.write("subgraph cluster_t2 {\n")
         f_out.write("style=invis;\n")
         f_out.write("node [shape=octagon style=\"filled\" fillcolor=\"#FFFFCC\"];\n")
         node_list = []
+        for e in sc2_list:
+            node_list.append(e)
         for e in pc_list2:
             node_list.append(e[0])
             node_list.append(e[1])
@@ -147,7 +179,7 @@ class InputVisual:
         for e in node_list:
             f_out.write("\"" + e + "\";\n")
         for e in pc_list2:
-            f_out.write("\"" + e[1] + "\" -> \"" + e[0] + "\" [color=black];\n")
+            f_out.write("\"" + e[1] + "\" -> \"" + e[0] + "\" [label=isa, color=black];\n")
         f_out.write("}\n")
             
         for e in art_list:
