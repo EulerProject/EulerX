@@ -9,7 +9,7 @@ We have all the CleanTax++ source code, EulerASP source code, and a bunch of use
 # Structure of This Toolkit
 DIRECTORIES:
 
-- .hg/                  % internal Mercurial folder (e.g. use 'branch' file to switch branches
+- .hg/                  % internal Mercurial folder (e.g. use 'branch' file to switch branches)
 - example/              % subfolders with all Euler use cases
 - regress/              % for Regression testing
 - src-ct/               % CleanTaxI++ Source Code
@@ -24,7 +24,7 @@ FILES:
 - example/runct.sh      % shell script to run CleanTax++, see the example section for more information
 
 # Installation Steps
-1. If you are using hg/mercury first, please download and install from http://mercurial.selenic.com/
+1. If you are using hg/mercury first, please download and install from http://mercurial.selenic.com/.
 2. Click the button called "Clone" on top right of the page, copy the line "hg clone https://bitbucket.org/eulerx/euler-project" in tab HTTPS. (if you have logged-in to bitbucket, you will see something like "hg clone https://YOUR_USER_NAME@bitbucket.org/eulerx/euler-project")
 3. Open your shell, go to a folder which you want to install Euler, paste this line and click "Enter". It will download the Euler repository (in folder "euler-project") under this folder.
 4. The default branch is the released version. If you want to use the latest version with more functions support, please update to "main" branch. By doing this, open the file called "branch" under folder "euler-project/.hg/", you will see the contents as "default", change it to be "main", save and close this file.
