@@ -498,11 +498,11 @@ class TaxonomyMapping:
                 else: taxa2 += "  \""+T2+"\"\n"
             else:
                 tmpCom += "  \""+T2+"\"\n"
-        fDot.write("  node [shape=diamond style=\"filled\" fillcolor=\"#CCFFCC\"]\n")
+        fDot.write("  node [shape=box style=\"filled\" fillcolor=\"#CCFFCC\"]\n")
         fDot.write(taxa1)
         fDot.write("  node [shape=octagon style=\"filled\" fillcolor=\"#FFFFCC\"]\n")
         fDot.write(taxa2)
-        fDot.write("  node [shape=box style=\"filled\" fillcolor=\"#EEEEEE\"]\n")
+        fDot.write("  node [shape=Msquare style=\"filled\" fillcolor=\"#EEEEEE\"]\n")
         fDot.write(tmpCom)
 
 	for [T1, T2, P] in self.tr:
