@@ -10,7 +10,7 @@ from alignment import *
 #from redWind import *
 from template import *
 from helper import *
-from input_viz import *
+from inputViz import *
 
 class TaxonomyMapping:
 

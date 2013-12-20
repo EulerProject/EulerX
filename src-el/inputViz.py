@@ -124,7 +124,7 @@ class InputVisual:
         
         f_out.write("subgraph cluster_t1 {\n")
         f_out.write("style=invis;\n")
-        f_out.write("node [shape=box style=\"filled, rounded\" fillcolor=\"#CCFFCC\"];\n")
+        f_out.write("node [shape=box style=\"filled\" fillcolor=\"#CCFFCC\"];\n")
         node_list = []
         for e in pc_list1:
             node_list.append(e[0])
@@ -138,7 +138,7 @@ class InputVisual:
     
         f_out.write("subgraph cluster_t2 {\n")
         f_out.write("style=invis;\n")
-        f_out.write("node [shape=octagon style=\"filled, rounded\" fillcolor=\"#FFFFCC\"];\n")
+        f_out.write("node [shape=octagon style=\"filled\" fillcolor=\"#FFFFCC\"];\n")
         node_list = []
         for e in pc_list2:
             node_list.append(e[0])
