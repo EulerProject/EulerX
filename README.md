@@ -17,25 +17,25 @@ On this page:
 
 Euler is an open source toolkit (mostly written in Python) for merging taxonomies (taxonomical organized datasets) and visualizing the results. (see http://euler.cs.ucdavis.edu/ for more info).
 
-We have all the CleanTax++ source code, EulerASP source code, and a bunch of use cases in this toolkit. CleanTax++ (EulerFO) is a modified version of CleanTax which was firstly developed by Dave Thau. CleanTax/CleanTax++ are built upon Prover9/Mace4 reasoning software. EulerASP is a brand new taxonomy reasoning tool that Mingmin built from scratch. EulerASP is built based on popular ASP reasoners DLV and clingo/gringo.
+We have all the EulerFO source code, EulerASP source code, and a bunch of use cases in this toolkit. EulerFO is a modified version of CleanTax which was firstly developed by Dave Thau. CleanTax/EulerFO are built upon Prover9/Mace4 reasoning software. EulerASP is a brand new taxonomy reasoning tool that Mingmin built from scratch. EulerASP is built based on popular ASP reasoners DLV and Potassco.
 
 # Structure of This Toolkit
 
-|  DIRECTORIES       |  Description                                                           |
-| ------------------ | ---------------------------------------------------------------------- |
-| `.hg/`             |  internal Mercurial folder (e.g. use `branch` file to switch branches) |
-| `example/`         |  subfolders with all Euler use cases                                   |
-| `regress/`         |  for Regression testing                                                |
-| `src-ct/ `         |  CleanTax++ source code                                                |
-| `src-el/`          |  EulerASP source code                                                  |
+  DIRECTORIES       |  Description                                                          
+ :----------------- | :---------------------------------------------------------------------
+ `.hg/`             |  internal Mercurial folder (e.g. use `branch` file to switch branches)
+ `example/`         |  subfolders with all Euler use cases
+ `regress/`         |  for Regression testing
+ `src-ct/ `         |  EulerFO source code
+ `src-el/`          |  EulerASP source code
 
-| FILES              |  Description                           |
-| ------------------ | -------------------------------------- |
-| `README.md`        |  file used on Bitbucket homepage       |
-| `installCheck.sh`  |  installation requirements check       |
-| `src-ct/main.py`   |  main entry of CleanTax++ source code  |
-| `src-el/euler`     |  main entry of EulerASP source code    |
-| `README.md`        |  shell script to run CleanTax++        |
+  FILES             |  Description                                    
+ :----------------- | :---------------------------------------------------------------------
+ `README.md`        |  file used on Bitbucket homepage
+ `installCheck.sh`  |  installation requirements check
+ `src-ct/main.py`   |  main entry of CleanTax++ source code
+ `src-el/euler`     |  main entry of EulerASP source code
+ `README.md`        |  shell script to run CleanTax++
 
 # Installation Steps
 
@@ -62,8 +62,8 @@ EulerASP dependencies:
 
 1. [DLV][dlv] (version: static, no ODBC support)
 2. [Potassco][potassco]
-  - gringo-3.0.3
-  - claspD-1.1.4
+	- gringo-3.0.3
+	- claspD-1.1.4
 3. [GraphViz][graphviz]
 
 # Examples of Running CleanTax++
@@ -82,13 +82,13 @@ Here are examples under `example/` directory,
 
 Still under `example/` directory (assuming `src-el/` is in your PATH env, and gringo, claspD, dlv in your PATH env),
 
-0. `euler --help" wil give you the options that you have
+0. `euler --help` wil give you the options that you have
 1. `euler -i example/abstract4.txt -e vr`, you will get all the mir relations in the generated output file using binary encoding.
 2. `euler -i example/abstract4.txt -e vrpw`, you will get all the possible worlds in the console using binary encoding.
 3. `euler -i example/abstract4.txt -e vrve`, you will get all the valid euler regions in the console using binary encoding.
 4. `euler -i example/abstract4.txt -e mn`, you will get all the mir relations in the generated output file using polynomial encoding.
 5. `euler -i example/abstract4.txt -e mnpw`, you will get all the possible worlds in the console using polynomial encoding.
-6. "euler -i example/abstract4.txt -e mnve", you will get all the valid euler regions in the console using polynomial encoding.
+6. `euler -i example/abstract4.txt -e mnve`, you will get all the valid euler regions in the console using polynomial encoding.
 
 # Contact
 
