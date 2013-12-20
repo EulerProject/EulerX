@@ -40,6 +40,7 @@ class TaxonomyMapping:
         self.options = options
         self.enc = encode[options.encode]      # encoding
         self.name = os.path.splitext(os.path.basename(options.inputfile))[0]
+        self.taxa1name = ""
         if options.outputdir is None:
             options.outputdir = options.inputdir
         if not os.path.exists(options.outputdir):
@@ -276,7 +277,7 @@ class TaxonomyMapping:
                     fie.write("\""+value+"\" -> \"inconsistency="+key.__str__()+":"+tmpmap[key].__str__()+"\" \n")
             label=""
             for key in self.rules.keys():
-                label += key+" : "+self.rules[key]+"\n"
+                label += key+" : "+self.rules[key]+"\t"
             fie.write("graph [label=\""+label+"\"]\n")
             fie.write("}")
             fie.close()
@@ -432,7 +433,7 @@ class TaxonomyMapping:
             blueNode = False
             T1s = T1.split(".")
             # First taxonomy name
-            if tmpTax == "": tmpTax = T1s[0]
+            if tmpTax == "": tmpTax = self.taxa1name
             for T2 in self.eq[T1]:
                 T2s = T2.split(".")
 	        if(T1s[1] == T2s[1]):
@@ -1332,6 +1333,7 @@ class TaxonomyMapping:
     def readFile(self):
         file = open(os.path.join(self.options.inputdir, self.options.inputfile), 'r')
         lines = file.readlines()
+        self.taxa1name = lines[0].split(" ")[1]
         flag = ""
         for line in lines:
 
@@ -1683,4 +1685,3 @@ class TaxonomyMapping:
                 return 0
             result = result | t.result
         return result
-                
