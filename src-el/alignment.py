@@ -37,6 +37,7 @@ class TaxonomyMapping:
         self.baseCb = ""                       # tmp string for the combined concept ASP input file
         self.pw = ""
         self.npw = 0                           # # of pws
+        self.pwflag = True                     # Whether to output pw
         self.options = options
         self.enc = encode[options.encode]      # encoding
         self.name = os.path.splitext(os.path.basename(options.inputfile))[0]
@@ -52,7 +53,6 @@ class TaxonomyMapping:
         self.pwswitch = os.path.join(self.aspdir, "pw.asp")
         self.ixswitch = os.path.join(self.aspdir, "ix.asp")
         self.ivout = os.path.join(options.outputdir, self.name+"_iv.dot")
-        self.pwout = os.path.join(options.outputdir, self.name+"_pw.txt")
         self.cbout = os.path.join(options.outputdir, self.name+"_cb.txt")
         self.obout = os.path.join(options.outputdir, self.name+"_ob.txt")
         self.mirfile = os.path.join(options.outputdir, self.name+"_mir.csv")
@@ -129,11 +129,12 @@ class TaxonomyMapping:
                 self.inconsistencyExplanation()
                 return
         if self.enc & encode["pw"]:
-            self.genPW(True)
+            self.genPW()
         elif self.enc & encode["ve"]:
             self.genVE()
         elif self.enc & encode["cb"]:
-            self.genPW(False)
+            self.pwflag = False
+            self.genPW()
             self.genCbConcept()
             fcb = open(self.cbfile, 'w')
             fcb.write(self.baseCb)
@@ -144,7 +145,8 @@ class TaxonomyMapping:
         elif self.enc & encode["ct"]:
             self.genMir()
         else:
-            self.genPW(False)
+            self.pwflag = False
+            self.genPW()
 
     def decodeDlv(self):
         lines = StringIO.StringIO(self.pw).readlines()
@@ -320,8 +322,7 @@ class TaxonomyMapping:
         else:
             raise Exception("Reasoner:", self.options.reasoner, " is not supported !!")
 
-    def genPW(self, pwflag):
-        pws = []
+    def genPW(self):
         self.pw = commands.getoutput(self.com)
         if self.isPwNone():
             print "************************************"
@@ -329,9 +330,17 @@ class TaxonomyMapping:
             if self.options.ie:
                 self.inconsistencyExplanation()
             self.remedy()
+            return
         if self.pw.lower().find("error") != -1:
             raise Exception(template.getEncErrMsg())
-        if not pwflag: return None
+        if not self.pwflag: return None
+        self.intOutPw(self.name, self.pwflag)
+
+    #
+    # Internal routine with several callers
+    #
+    def intOutPw(self, name, pwflag):
+        pws = []
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             raw = self.pw.split("\n")
             ## Filter out those trash in the gringo output
@@ -343,9 +352,9 @@ class TaxonomyMapping:
         else:
             raise Exception("Reasoner:", self.options.reasoner, " is not supported !!")
         self.npw = len(pws)
-        self.outPW(pws, pwflag, "rel")
+        self.outPW(name, pws, pwflag, "rel")
 
-    def outPW(self, pws, pwflag, ss):
+    def outPW(self, name, pws, pwflag, ss):
         outputstr = ""
         # mirs for each pw
         if self.options.cluster: pwmirs = []
@@ -401,14 +410,14 @@ class TaxonomyMapping:
             # for example, if mncb, genPW() is called for intermediate usage
             if self.enc & encode["pw"] and ss == "rel" or\
                self.enc & encode["cb"] and ss == "relout":
-                pwTm.genPwRcg(self.name + "_" + i.__str__())
+                pwTm.genPwRcg(name + "_" + i.__str__())
         if self.options.reduction:
             outputstr = self.uncReduction(pws)
         if pwflag:
             if self.options.output: print outputstr
-            fpw = open(self.pwout, 'w')
-            fpw.write(outputstr)
-            fpw.close()
+        fpw = open(self.options.outputdir+name+".pw", 'w')
+        fpw.write(outputstr)
+        fpw.close()
         self.genMir()
         if self.options.cluster: self.genPwCluster(pwmirs, False)
 
@@ -448,7 +457,8 @@ class TaxonomyMapping:
 	        tmpStr = T1 + tmpStr
             tmpCom += "  \""+tmpStr+"\"\n"
             for T2 in self.eq[T1]:
-                del self.eq[T2]
+                if self.eq.has_key(T2):
+                    del self.eq[T2]
                 tmpTr = list(self.tr)
                 for [T3, T4, P] in tmpTr:
 	            if(T1 == T3 or T2 == T3):
@@ -594,8 +604,8 @@ class TaxonomyMapping:
 
 
     def topdownRemedy(self):
-        fixed = False
-        fixedCnt = 0
+        fixed = False      # Whether we find a way to fix it or not
+        fixedCnt = 0       # How many ways to fix the inconsistency
         # local copy of articulations
         tmpart = copy.deepcopy(self.articulations)
         s = len(self.articulations)
@@ -612,7 +622,6 @@ class TaxonomyMapping:
                 if not self.isPwNone():
                     print "************************************"
                     print "Repair option ",fixedCnt,": remove problematic articulation [",
-                    fixedCnt += 1
                     for j in range(i):
                         # Remove mir is not needed because it will be reset anyways
                         # if fixedCnt == 0: self.removeMir(a[j].string)
@@ -621,6 +630,8 @@ class TaxonomyMapping:
                     print "]"
                     print "************************************"
                     fixed = True
+                    self.intOutPw(self.name+"_fix_"+fixedCnt.__str__(), False)
+                    fixedCnt += 1
                 self.articulations = copy.deepcopy(tmpart)
             if fixed : return True
         print "Don't know how to repair"
@@ -851,7 +862,7 @@ class TaxonomyMapping:
         else:
             raise Exception("Reasoner:", self.options.reasoner, " is not supported !!")
         self.npw = len(pws)
-        self.outPW(pws, self.options.output, "relout")
+        self.outPW(self.name, pws, self.options.output, "relout")
  
     def genASP(self):
         self.baseAsp == ""
