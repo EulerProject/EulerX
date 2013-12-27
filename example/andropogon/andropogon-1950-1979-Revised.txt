@@ -1,0 +1,21 @@
+taxonomy 1 Taxonomy1
+(24 25 26 30)
+(26 27 28 29)
+
+taxonomy 2 Taxonomy2
+(33 34 35 38)
+(35 36 37)
+
+articulation tw1 tw1
+[1.24 equals 2.33]
+[1.25 equals 2.34]
+[1.26 overlaps 2.35]
+[1.26 includes 2.36]
+[1.26 includes 2.38]
+[1.26 overlaps 2.37]
+[1.27 equals 2.36]
+[1.28 equals 2.38]
+[1.29 is_included_in 2.37]
+[1.30 is_included_in 2.37]
+[1.29 1.30 lsum 2.37]
+[1.27 1.29 1.30 l3sum 2.35]
