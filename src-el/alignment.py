@@ -432,7 +432,7 @@ class TaxonomyMapping:
         tmpTax = ""   # First taxonomy name, actually it really doesn't
                       # matter which one is the first one
         alias = {}
-        
+
 	# Equalities
         for T1 in self.eq.keys():
             # self.eq is dynamically changed, so we need this check
@@ -609,6 +609,10 @@ class TaxonomyMapping:
         fixedCnt = 0       # How many ways to fix the inconsistency
         # local copy of articulations
         tmpart = copy.deepcopy(self.articulations)
+        tmpmir = copy.deepcopy(self.mir)
+        tmptr = copy.deepcopy(self.tr)
+        tmpeq = copy.deepcopy(self.eq)
+
         s = len(self.articulations)
         for i in range(1, s):
             tmpl = list(itertools.combinations(range(s), i))
@@ -625,7 +629,7 @@ class TaxonomyMapping:
                     print "Repair option ",fixedCnt,": remove problematic articulation [",
                     for j in range(i):
                         # Remove mir is not needed because it will be reset anyways
-                        # if fixedCnt == 0: self.removeMir(a[j].string)
+                        self.removeMir(a[j].string)
                         if j != 0: print ",",
                         print a[j].string,
                     print "]"
@@ -634,6 +638,9 @@ class TaxonomyMapping:
                     self.intOutPw(self.name+"_fix_"+fixedCnt.__str__(), False)
                     fixedCnt += 1
                 self.articulations = copy.deepcopy(tmpart)
+                self.mir = copy.deepcopy(tmpmir)
+                self.tr = copy.deepcopy(tmptr)
+                self.eq = copy.deepcopy(tmpeq)
             if fixed : return True
         print "Don't know how to repair"
         print "************************************"
@@ -1661,6 +1668,10 @@ class TaxonomyMapping:
 	    self.tr.remove([r[0], r[len(r)-1], 0])
 	elif(self.tr.count([r[len(r)-1], r[0], 0]) > 0):
 	    self.tr.remove([r[len(r)-1], r[0], 0])
+	if(self.eq.has_key(r[0]) and r[len(r)-1] in self.eq[r[0]]):
+	    del self.eq[r[0]]
+	if(self.eq.has_key(r[len(r)-1]) and r[0] in self.eq[r[len(r)-1]]):
+	    del self.eq[r[len(r)-1]]
 	if len(r) > 3:
 	    if r[len(r)-2] == "+=":
 	        self.mir[r[1] + "," + r[3]] = 0
