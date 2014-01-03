@@ -460,12 +460,12 @@ class TaxonomyMapping:
             if tmpTax == "": tmpTax = self.taxa1name
             for T2 in self.eq[T1]:
                 T2s = T2.split(".")
-            if(T1s[1] == T2s[1]):
-                blueNode = True
-            else:
-                if tmpStr != "":
-                    tmpStr = "," + tmpStr
-                tmpStr = T2 + tmpStr
+                if(T1s[1] == T2s[1]):
+                    blueNode = True
+                else:
+                    if tmpStr != "":
+                        tmpStr = "," + tmpStr
+                    tmpStr = T2 + tmpStr
             if tmpStr != "":
                 if tmpStr.split(".")[0]  == tmpTax:
                     tmpStr = tmpStr + ","
