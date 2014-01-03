@@ -42,6 +42,8 @@ class TaxonomyMapping:
         self.enc = encode[options.encode]      # encoding
         self.name = os.path.splitext(os.path.basename(options.inputfile))[0]
         self.taxa1name = ""
+        self.firstRcg = False
+        self.trlist = []
         if options.outputdir is None:
             options.outputdir = options.inputdir
         if not os.path.exists(options.outputdir):
@@ -359,11 +361,16 @@ class TaxonomyMapping:
         outputstr = ""
         # mirs for each pw
         if self.options.cluster: pwmirs = []
+        fAllDot = open(self.options.outputdir+self.name+"_all.dot", 'w')
         for i in range(len(pws)):
             if self.options.cluster: pwmirs.append({})
 
             # pwTm is the possible world taxonomy mapping, used for RCG
             pwTm = copy.deepcopy(self)
+            if i == 0:
+                pwTm.firstRcg = True
+            else:
+                pwTm.firstRcg = False
             if self.enc & encode["cb"]:
                 pwTm.mir = pwTm.basemir
                 pwTm.tr = []#pwTm.basetr
@@ -412,6 +419,11 @@ class TaxonomyMapping:
             if self.enc & encode["pw"] and ss == "rel" or\
                self.enc & encode["cb"] and ss == "relout":
                 pwTm.genPwRcg(name + "_" + i.__str__())
+                for e in pwTm.tr:
+                    self.trlist.append(e)
+        self.genAllPwRcg(len(pws))
+        fAllDot.close()
+        commands.getoutput("dot -Tpng "+self.options.outputdir+self.name+"_all.dot -o "+self.options.outputdir+self.name+"_all.png")
         if self.options.reduction:
             outputstr = self.uncReduction(pws)
         if pwflag:
@@ -424,7 +436,10 @@ class TaxonomyMapping:
 
     def genPwRcg(self, fileName):
         fDot = open(self.options.outputdir+fileName+".dot", 'w')
-	fDot.write("digraph {\n\nrankdir = RL\n\n")
+        fAllDot = open(self.options.outputdir+self.name+"_all.dot", 'a')
+        fDot.write("digraph {\n\nrankdir = RL\n\n")
+        if self.firstRcg:
+            fAllDot.write("digraph {\n\nrankdir = RL\n\n")
         tmpCom = ""    # cache of combined taxa
         taxa1 = ""     # cache of taxa in the first taxonomy
         taxa2 = ""     # cache of taxa in the second taxonomy
@@ -452,10 +467,11 @@ class TaxonomyMapping:
 	            tmpStr = T2 + tmpStr
             if tmpStr != "": tmpStr = "," + tmpStr
             if blueNode:
-	        tmpStr = T1s[1] + tmpStr
-	        # fDot.write("\"" + tmpStr +"\" [color=blue];\n")
+                tmpStr = T1s[1] + tmpStr
+                # fDot.write("\"" + tmpStr +"\" [color=blue];\n")
+                # fAllDot.write("\"" + tmpStr +"\" [color=blue];\n")
             else:
-	        tmpStr = T1 + tmpStr
+                tmpStr = T1 + tmpStr
             tmpCom += "  \""+tmpStr+"\"\n"
             for T2 in self.eq[T1]:
                 if self.eq.has_key(T2):
@@ -513,8 +529,16 @@ class TaxonomyMapping:
         fDot.write(taxa1)
         fDot.write("  node [shape=octagon style=\"filled\" fillcolor=\"#FFFFCC\"]\n")
         fDot.write(taxa2)
-        fDot.write("  node [shape=circle stype=\"filled\" fillcolor=\"#EEEEEE\"]\n")
+        fDot.write("  node [shape=Msquare style=\"filled\" fillcolor=\"#EEEEEE\"]\n")
         fDot.write(tmpCom)
+        fAllDot.write("  node [shape=box style=\"filled\" fillcolor=\"#CCFFCC\"]\n")
+        fAllDot.write(taxa1)
+        fAllDot.write("  node [shape=octagon style=\"filled\" fillcolor=\"#FFFFCC\"]\n")
+        fAllDot.write(taxa2)
+        fAllDot.write("  node [shape=Msquare style=\"filled\" fillcolor=\"#EEEEEE\"]\n")
+        fAllDot.write(tmpCom)
+        fAllDot.close()
+        
 
 	for [T1, T2, P] in self.tr:
 	    if(P == 0):
@@ -538,11 +562,9 @@ class TaxonomyMapping:
         #fDot.write("    A2 -> B2 [label=\"is included in (inferred)\" style=filled, color=red]\n")
         #fDot.write("    A3 -> B3 [label=\"overlaps\" dir=none, style=dashed, color=blue]\n")
         fDot.write("  }\n")
-	fDot.write("}\n")
-            
+        fDot.write("}\n")
         fDot.close()
         commands.getoutput("dot -Tpng "+self.options.outputdir+fileName+".dot -o "+self.options.outputdir+fileName+".png")
-
 
     def bottomupRemedy(self):
         first = True
@@ -1707,3 +1729,39 @@ class TaxonomyMapping:
                 return 0
             result = result | t.result
         return result
+                    
+    def remove_duplicate_string(self,li):
+        if li:
+            li.sort()
+            last = li[-1]
+            for i in range(len(li)-2, -1, -1):
+                if last == li[i]:
+                    del li[i]
+                else:
+                    last = li[i]
+
+    def genAllPwRcg(self, numOfPws):
+        rels = []
+        for [T1, T2, P] in self.trlist:
+            cnt = 0
+            for [T3, T4, P] in self.trlist:
+                if T1 == T3 and T2 == T4:
+                    cnt = cnt + 1
+            rels.append([T1, T2, cnt,""])
+        self.remove_duplicate_string(rels)
+        pointDG = (12,169,97) #dark green
+        pointDR = (118,18,18) #dark red
+        distR = pointDR[0] - pointDG[0]
+        distG = pointDR[1] - pointDG[1]
+        distB = pointDR[2] - pointDG[2]
+        for i in range(len(rels)):
+            relra = float(rels[i][2]) / float(numOfPws)
+            newPointDec = (round(pointDG[0] + distR*relra), round(pointDG[1] + distG*relra), round(pointDG[2] + distB*relra))
+            newColor = "#" + str(hex(int(newPointDec[0])))[2:] + str(hex(int(newPointDec[1])))[2:] + str(hex(int(newPointDec[2])))[2:]
+            rels[i][3] = newColor
+        # write to dot file
+        fAllDot = open(self.options.outputdir+self.name+"_all.dot", 'a')
+        for [T1, T2, cnt, color] in rels:
+            fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",color=\"" + color + "\"];\n")
+        fAllDot.write("}\n")
+        fAllDot.close()            
