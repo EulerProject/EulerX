@@ -453,7 +453,7 @@ class TaxonomyMapping:
             if tmpStr != "": tmpStr = "," + tmpStr
             if blueNode:
 	        tmpStr = T1s[1] + tmpStr
-	        fDot.write("\"" + tmpStr +"\" [color=blue];\n")
+	        # fDot.write("\"" + tmpStr +"\" [color=blue];\n")
             else:
 	        tmpStr = T1 + tmpStr
             tmpCom += "  \""+tmpStr+"\"\n"
@@ -513,7 +513,7 @@ class TaxonomyMapping:
         fDot.write(taxa1)
         fDot.write("  node [shape=octagon style=\"filled\" fillcolor=\"#FFFFCC\"]\n")
         fDot.write(taxa2)
-        fDot.write("  node [shape=Msquare style=\"filled\" fillcolor=\"#EEEEEE\"]\n")
+        fDot.write("  node [shape=circle stype=\"filled\" fillcolor=\"#EEEEEE\"]\n")
         fDot.write(tmpCom)
 
 	for [T1, T2, P] in self.tr:
