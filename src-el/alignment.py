@@ -1762,6 +1762,6 @@ class TaxonomyMapping:
         # write to dot file
         fAllDot = open(self.options.outputdir+self.name+"_all.dot", 'a')
         for [T1, T2, cnt, color] in rels:
-            fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",color=\"" + color + "\"];\n")
+            fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",penwidth=" + str(cnt) + ",color=\"" + color + "\"];\n")
         fAllDot.write("}\n")
         fAllDot.close()            
