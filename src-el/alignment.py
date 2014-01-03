@@ -460,18 +460,26 @@ class TaxonomyMapping:
             if tmpTax == "": tmpTax = self.taxa1name
             for T2 in self.eq[T1]:
                 T2s = T2.split(".")
-	        if(T1s[1] == T2s[1]):
-                    blueNode = True
-	        else:
-                    if tmpStr != "": tmpStr = "," + tmpStr
-	            tmpStr = T2 + tmpStr
-            if tmpStr != "": tmpStr = "," + tmpStr
+            if(T1s[1] == T2s[1]):
+                blueNode = True
+            else:
+                if tmpStr != "":
+                    tmpStr = "," + tmpStr
+                tmpStr = T2 + tmpStr
+            if tmpStr != "":
+                if tmpStr.split(".")[0]  == tmpTax:
+                    tmpStr = tmpStr + ","
+                else:
+                    tmpStr = "," + tmpStr
             if blueNode:
                 tmpStr = T1s[1] + tmpStr
                 # fDot.write("\"" + tmpStr +"\" [color=blue];\n")
                 # fAllDot.write("\"" + tmpStr +"\" [color=blue];\n")
             else:
-                tmpStr = T1 + tmpStr
+                if T1s[0] == tmpTax:
+                    tmpStr = T1 + tmpStr
+                else:
+                    tmpStr = tmpStr + T1
             tmpCom += "  \""+tmpStr+"\"\n"
             for T2 in self.eq[T1]:
                 if self.eq.has_key(T2):
