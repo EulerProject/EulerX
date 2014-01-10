@@ -234,8 +234,12 @@ class Articulation:
 	    elif self.relations == (rcc5["disjoint"] | rcc5["overlaps"]):
                 if reasoner[rnr] == reasoner["dlv"]:
 		    result  = "ir(X, r" + self.ruleNum.__str__() + ") v vr(X, r" + self.ruleNum.__str__() +") :- in(" + name1 + ",X), in(" + name2 + ",X).\n"
+		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n" 
+		    result += ":- #count{X: vrs(X), in(" + name2 + ",X), out(" + name1 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
 		    result  = "ir(X, r" + self.ruleNum.__str__() + ") | vr(X, r" + self.ruleNum.__str__() +") :- in(" + name1 + ",X), in(" + name2 + ",X).\n"
+		    result += ":- [vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)]0, pw.\n" 
+		    result += ":- [vrs(X), in(" + name2 + ",X), out(" + name1 + ",X)]0, pw.\n" 
 		#result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
 		#result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
 		#result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
