@@ -634,6 +634,46 @@ class TaxonomyMapping:
         return True
 
 
+    def minInconsRemedy(self):
+        fixed = False      # Whether we find a way to fix it or not
+        fixedCnt = 0       # How many ways to fix the inconsistency
+        # local copy of articulations
+        tmpart = copy.deepcopy(self.articulations)
+        tmpmir = copy.deepcopy(self.mir)
+        tmptr = copy.deepcopy(self.tr)
+        tmpeq = copy.deepcopy(self.eq)
+
+        s = len(self.articulations)
+        for i in range(2, s):
+            tmpl = list(itertools.combinations(range(s), i))
+            for k in range(len(tmpl)):
+                self.articulations = []
+                self.mir = self.basemir
+                self.tr = self.basetr
+                self.eq = {}
+                for j in range(i):
+                    self.addArticulation(tmpart[tmpl[k][j]].string)
+                # Now refresh the input file
+                self.genASP()
+    	        # Run the reasoner again
+                self.pw = commands.getoutput(self.con)
+                if self.isPwNone():
+                    print "************************************"
+                    print "Min inconsistent subset ",fixedCnt,": [",
+                    for j in range(i):
+                        if j != 0: print ",",
+                        print self.articulations[j].string,
+                    print "]"
+                    print "************************************"
+                    fixed = True
+                    # self.intOutPw(self.name+"_fix_"+fixedCnt.__str__(), False)
+                    fixedCnt += 1
+                # self.articulations = copy.deepcopy(tmpart)
+                # self.mir = copy.deepcopy(tmpmir)
+                # self.tr = copy.deepcopy(tmptr)
+                # self.eq = copy.deepcopy(tmpeq)
+            if fixed : return True
+
     def topdownRemedy(self):
         fixed = False      # Whether we find a way to fix it or not
         fixedCnt = 0       # How many ways to fix the inconsistency
@@ -683,6 +723,8 @@ class TaxonomyMapping:
             self.simpleRemedy()
         elif self.options.repair == "bottomup":
             self.bottomupRemedy()
+        elif self.options.repair == "minIncSubset":
+            self.minInconsRemedy()
         # By default, we use top down remedy to repair
         else:
             self.topdownRemedy()
@@ -1421,12 +1463,13 @@ class TaxonomyMapping:
               
             elif (re.match("\[.*?\]", line)):
                 inside = re.match("\[(.*)\]", line).group(1)
-                self.articulations += [Articulation(inside, self)]
-		if inside.find("{") != -1:
-		    r = re.match("(.*) \{(.*)\} (.*)", inside)
-		    self.addPMir(r.group(1), r.group(3), r.group(2).replace(" ",","), 0)
-		else:
-		    self.addAMir(inside, 0)
+                self.addArticulation(inside)
+                # self.articulations += [Articulation(inside, self)]
+		# if inside.find("{") != -1:
+		#     r = re.match("(.*) \{(.*)\} (.*)", inside)
+		#     self.addPMir(r.group(1), r.group(3), r.group(2).replace(" ",","), 0)
+		# else:
+		#     self.addAMir(inside, 0)
               
             elif (re.match("\<.*\>", line)):
                 inside = re.match("\<(.*)\>", line).group(1)
@@ -1450,6 +1493,14 @@ class TaxonomyMapping:
                # self.hypothesis = hypArticulation
                    
         return True              
+
+    def addArticulation(self, artStr):
+        self.articulations += [Articulation(artStr, self)]
+	if artStr.find("{") != -1:
+	    r = re.match("(.*) \{(.*)\} (.*)", artStr)
+	    self.addPMir(r.group(1), r.group(3), r.group(2).replace(" ",","), 0)
+	else:
+	    self.addAMir(artStr, 0)
 
     def addLocation(self, line):
         self.exploc = True
