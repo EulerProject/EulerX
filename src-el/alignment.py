@@ -633,6 +633,83 @@ class TaxonomyMapping:
             print "************************************"
         return True
 
+    def allJustifications(self):
+        s = sets.Set()
+        curpath = sets.Set()
+        allpaths = sets.Set()
+        self.fixedCnt = 0
+        self.computeAllJust(sets.Set(self.articulations), s, curpath, allpaths)
+        
+    def computeAllJust(self, artSet, justSet, curpath, allpaths):
+        for path in allpaths:
+            if path.issubset(curpath):
+                return
+        if self.isConsistent(artSet):
+            allpaths.add(curpath)
+            return
+        j = sets.Set()
+        for s in justSet:
+            if len(s.intersection(curpath)) == 0:
+                j = s
+        if len(j) == 0:
+            j = self.computeOneJust(artSet)
+            if len(j) != 0:
+                lj = list(j)
+                print "************************************"
+                print "Min inconsistent subset ",self.fixedCnt,": [",
+                for i in range(len(lj)):
+                    if i != 0: print ",",
+                    print lj[i].string,
+                print "]"
+                print "************************************"
+                self.fixedCnt += 1
+        if len(j) != 0:
+            justSet.add(j)
+        for a in j:
+            tmpcur = copy.copy(curpath)
+            tmpcur.add(a)
+            tmpart = copy.copy(artSet)
+            tmpart.remove(a)
+            self.computeAllJust(tmpart, justSet, tmpcur, allpaths)
+            
+    def isConsistent(self, artSet):
+	if len(artSet) == 0:
+            return True
+        self.articulations = []
+        self.mir = self.basemir
+        self.tr = self.basetr
+        self.eq = {}
+        tmpart = copy.copy(artSet)
+        for i in range(len(artSet)):
+            self.addArticulation(tmpart.pop().string)
+        # Now refresh the input file
+        self.genASP()
+    	# Run the reasoner again
+        self.pw = commands.getoutput(self.con)
+        if not self.isPwNone():
+            return True
+        return False
+
+    def computeOneJust(self, artSet):
+        return self.computeJust(sets.Set(), artSet)
+
+    def computeJust(self, s, f):
+        if len(f) <= 1:
+            if self.isConsistent(s):
+                return s.union(f)
+            return s
+        f1 = copy.copy(f)
+        f2 = sets.Set()
+        for i in range(len(f) /2):
+            f2.add(f1.pop())
+        if not self.isConsistent(s.union(f1)):
+            return self.computeJust(s, f1)
+        if not self.isConsistent(s.union(f2)):
+            return self.computeJust(s, f2)
+        return self.computeJust(s.union(f1), f2)
+        sl = self.computeJust(s.union(f1), f2)
+        sr = self.computeJust(s.union(sl), f1)
+        return sl.union(sr)
 
     def minInconsRemedy(self):
         fixed = False      # Whether we find a way to fix it or not
@@ -725,6 +802,8 @@ class TaxonomyMapping:
             self.bottomupRemedy()
         elif self.options.repair == "minIncSubset":
             self.minInconsRemedy()
+        elif self.options.repair == "justifications":
+            self.allJustifications()
         # By default, we use top down remedy to repair
         else:
             self.topdownRemedy()
