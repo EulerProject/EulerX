@@ -802,7 +802,7 @@ class TaxonomyMapping:
             self.bottomupRemedy()
         elif self.options.repair == "minIncSubset":
             self.minInconsRemedy()
-        elif self.options.repair == "justifications":
+        elif self.options.repair == "HST":
             self.allJustifications()
         # By default, we use top down remedy to repair
         else:
