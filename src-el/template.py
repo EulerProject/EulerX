@@ -13,8 +13,7 @@ class template:
              + "in(X, M) :- r(M),concept(X,T,N),N1=N+1,bit(M,T,N1).\n"\
              + "out(X, M) :- r(M),concept(X,T,N),N1=N+1,not bit(M,T,N1).\n"\
              + "in(X, M) :- r(M),concept2(X,_),not out(X, M).\n"\
-             + "outs(X, M) :- out3(X, M, _), ix.\n"\
-             + "in(X, M) :- r(M),concept2(X,_),not outs(X, M), ix.\n"\
+             + "out(X, M) :- out3(X, M, _), ix.\n"\
              + "irs(M) :- in(X, M), out(X, M), r(M), concept2(X,_).\n\n"\
              + "%%% Constraints of regions.\n"\
              + "irs(X) :- ir(X, _).\n"\
