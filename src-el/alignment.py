@@ -243,38 +243,68 @@ class TaxonomyMapping:
         ie = commands.getoutput(com)
         self.postProcessIE(ie);
 
+    def addprod(self, value, newval):
+        if newval.find("prod") != -1:
+            item = re.match("prod\((.*),(.*)\)", newval)
+            value.append(item.group(1))
+            self.addprod(value, item.group(2))
+        elif newval.find(",") != -1:
+            item = re.match("(.*),(.*)", newval)
+            value.append(item.group(1))
+            self.addprod(value, item.group(2))
+        else:
+            value.append(newval)
+
+    def addprodSet(self, valueSet, newval):
+        if newval.find("prod") != -1:
+            item = re.match("prod\((.*),(.*)\)", newval)
+            valueSet.add(item.group(1))
+            self.addprodSet(valueSet, item.group(2))
+        elif newval.find(",") != -1:
+            item = re.match("(.*),(.*)", newval)
+            valueSet.add(item.group(1))
+            self.addprodSet(valueSet, item.group(2))
+        else:
+            valueSet.add(newval)
+
     def postProcessIE(self, ie):
         print "Please see "+self.name+"_ie.pdf for the inconsistency relations between all the rules."
         if ie.find("{}") == -1 and ie != "":
             ies = (re.match("\{(.*)\}", ie)).group(1).split(", ")
             # print ies
+            ielist = []
             tmpmap = {}
             diag = sets.Set()
             for i in range(len(ies)):
-              keylist = []
               if ies[i].find("ie(prod") != -1:
                 item = re.match("ie\(prod\((.*),(.*)\)\)", ies[i])
-                key = item.group(1)
-                keylist.append(key)
-                tmpmap[key] = [item.group(2)]
+                #key = item.group(1)
+                #keylist.append(key)
+                #tmpmap[key] = [item.group(2)]
+                #print ies[i],item.group(1),item.group(2)
+                keylist = []
+                self.addprod(keylist, item.group(1))
+                self.addprod(keylist, item.group(2))
+                #ielist.append(keylist)
+                tmpmap[keylist.__str__()] = sets.Set(keylist)
               else:
                 if ies[i].find("prod") != -1:
                   item = re.match("ie\(s\((.*),prod\((.*)\),(.*)\)\)", ies[i])
                 else:
                   item = re.match("ie\(s\((.*),(.*),(.*)\)\)", ies[i])
                 key = item.group(1)+","+item.group(3)
-                keylist.append(item.group(1))
                 if key in tmpmap.keys():
-                  value = tmpmap[key]
-                  value.append(item.group(2))
-                  tmpmap[key] = value
+                  value = sets.Set(tmpmap[key])
                 else:
-                  value = []
-                  value.append(item.group(2))
-                  tmpmap[key] = value
+                  value = sets.Set([item.group(1)])
+                self.addprodSet(value,item.group(2))
+                tmpmap[key] = value
+                print key,tmpmap[key]
+
+            for key in tmpmap.keys():
               tmpset = sets.Set()
-              keylist.extend(tmpmap[key])
-              tmpset = sets.Set(keylist)
+              tmpset = tmpmap[key]
+              
               addor  = True
               for i in range(len(diag)):
                 if tmpset.issubset(list(diag)[i]):
@@ -287,7 +317,8 @@ class TaxonomyMapping:
                   addor = False
               if addor:
                   diag.add(tmpset)
-              print key, tmpmap[key], diag
+              # print key, tmpmap[key], diag
+            print "Min inconsistent subsets: "
             print diag
                 
             fie = open(self.iefile, 'w')
@@ -678,12 +709,13 @@ class TaxonomyMapping:
         if len(j) == 0:
             j = self.computeOneJust(artSet)
             if len(j) != 0:
+                self.printArtRuleN(artSet, "a")
                 lj = list(j)
                 print "************************************"
                 print "Min inconsistent subset ",self.fixedCnt,": [",
                 for i in range(len(lj)):
                     if i != 0: print ",",
-                    print lj[i].string,
+                    print lj[i].ruleNum,":",lj[i].string,
                 print "]"
                 print "************************************"
                 self.fixedCnt += 1
@@ -697,11 +729,15 @@ class TaxonomyMapping:
             self.computeAllJust(tmpart, justSet, tmpcur, allpaths)
             
     def isConsistent(self, artSet):
+        tmpart1 = copy.copy(self.articulations)
+        tmpmir = copy.deepcopy(self.mir)
+        tmptr = copy.deepcopy(self.tr)
+        tmpeq = copy.deepcopy(self.eq)
 	if len(artSet) == 0:
             return True
         self.articulations = []
-        self.mir = self.basemir
-        self.tr = self.basetr
+        self.mir = copy.deepcopy(self.basemir)
+        self.tr = copy.deepcopy(self.basetr)
         self.eq = {}
         tmpart = copy.copy(artSet)
         for i in range(len(artSet)):
@@ -710,30 +746,60 @@ class TaxonomyMapping:
         self.genASP()
     	# Run the reasoner again
         self.pw = commands.getoutput(self.con)
+
+        self.articulations = tmpart1
+        self.mir = tmpmir
+        self.tr = tmptr
+        self.eq = tmpeq
+
         if not self.isPwNone():
             return True
         return False
 
     def computeOneJust(self, artSet):
+        print "start"
+        if self.isConsistent(artSet):
+            return sets.Set()
         return self.computeJust(sets.Set(), artSet)
 
+    # TODO move to generic header
+    def printArtRuleN(self, artSet, prefix):
+        print prefix+"= ",
+        for i in range(len(artSet)):
+          print list(artSet)[i].ruleNum,
+        print ""
+
     def computeJust(self, s, f):
+        # Assert
+        #self.printArtRuleN(s, "s")
+        #self.printArtRuleN(f, "f")
+        if not self.isConsistent(s):
+           print "ERRORRRRRR"
         if len(f) <= 1:
-            if self.isConsistent(s):
-                return s.union(f)
-            return s
+            return s.union(f)
+            #return sets.Set()
         f1 = copy.copy(f)
         f2 = sets.Set()
         for i in range(len(f) /2):
             f2.add(f1.pop())
+        #self.printArtRuleN(s)
+        #self.printArtRuleN(f1, "f1")
+        #self.printArtRuleN(f2, "f2")
         if not self.isConsistent(s.union(f1)):
+        #    print "--> 1"
             return self.computeJust(s, f1)
         if not self.isConsistent(s.union(f2)):
+        #    print "--> 2"
             return self.computeJust(s, f2)
-        return self.computeJust(s.union(f1), f2)
+        #print "--> 3"
+        # TODO this actually doesn't guarantee the minimality
+        # return self.computeJust(s.union(f1), f2)
         sl = self.computeJust(s.union(f1), f2)
-        sr = self.computeJust(s.union(sl), f1)
-        return sl.union(sr)
+        if sl.issuperset(f2):
+            return sl
+        #print "--> 4"
+        sr = self.computeJust(s, sl.difference(s))
+        return sr
 
     def minInconsRemedy(self):
         fixed = False      # Whether we find a way to fix it or not
