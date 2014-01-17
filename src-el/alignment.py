@@ -249,10 +249,13 @@ class TaxonomyMapping:
             ies = (re.match("\{(.*)\}", ie)).group(1).split(", ")
             # print ies
             tmpmap = {}
+            diag = sets.Set()
             for i in range(len(ies)):
+              keylist = []
               if ies[i].find("ie(prod") != -1:
                 item = re.match("ie\(prod\((.*),(.*)\)\)", ies[i])
                 key = item.group(1)
+                keylist.append(key)
                 tmpmap[key] = [item.group(2)]
               else:
                 if ies[i].find("prod") != -1:
@@ -260,12 +263,33 @@ class TaxonomyMapping:
                 else:
                   item = re.match("ie\(s\((.*),(.*),(.*)\)\)", ies[i])
                 key = item.group(1)+","+item.group(3)
+                keylist.append(item.group(1))
                 if key in tmpmap.keys():
                   value = tmpmap[key]
                   value.append(item.group(2))
                   tmpmap[key] = value
                 else:
-                  tmpmap[key] = [item.group(2)]
+                  value = []
+                  value.append(item.group(2))
+                  tmpmap[key] = value
+              tmpset = sets.Set()
+              keylist.extend(tmpmap[key])
+              tmpset = sets.Set(keylist)
+              addor  = True
+              for i in range(len(diag)):
+                if tmpset.issubset(list(diag)[i]):
+                  a = []
+                  a = list(diag)
+                  a.pop(i)
+                  a.insert(i,tmpset)
+                  diag = sets.Set(a)
+                elif tmpset.issuperset(list(diag)[i]):
+                  addor = False
+              if addor:
+                  diag.add(tmpset)
+              print key, tmpmap[key], diag
+            print diag
+                
             fie = open(self.iefile, 'w')
             fie.write("strict digraph "+self.name+"_ie {\n\nrankdir = LR\n\n")
             #fie.write("subgraph rules {\n")
