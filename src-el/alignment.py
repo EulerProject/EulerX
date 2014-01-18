@@ -709,7 +709,6 @@ class TaxonomyMapping:
         if len(j) == 0:
             j = self.computeOneJust(artSet)
             if len(j) != 0:
-                self.printArtRuleN(artSet, "a")
                 lj = list(j)
                 print "************************************"
                 print "Min inconsistent subset ",self.fixedCnt,": [",
@@ -757,7 +756,6 @@ class TaxonomyMapping:
         return False
 
     def computeOneJust(self, artSet):
-        print "start"
         if self.isConsistent(artSet):
             return sets.Set()
         return self.computeJust(sets.Set(), artSet)
@@ -769,37 +767,22 @@ class TaxonomyMapping:
           print list(artSet)[i].ruleNum,
         print ""
 
+    # s is consistent, f is inconsistent
     def computeJust(self, s, f):
-        # Assert
-        #self.printArtRuleN(s, "s")
-        #self.printArtRuleN(f, "f")
-        if not self.isConsistent(s):
-           print "ERRORRRRRR"
         if len(f) <= 1:
-            return s.union(f)
-            #return sets.Set()
+            return f
         f1 = copy.copy(f)
         f2 = sets.Set()
         for i in range(len(f) /2):
             f2.add(f1.pop())
-        #self.printArtRuleN(s)
-        #self.printArtRuleN(f1, "f1")
-        #self.printArtRuleN(f2, "f2")
         if not self.isConsistent(s.union(f1)):
         #    print "--> 1"
             return self.computeJust(s, f1)
         if not self.isConsistent(s.union(f2)):
-        #    print "--> 2"
             return self.computeJust(s, f2)
-        #print "--> 3"
-        # TODO this actually doesn't guarantee the minimality
-        # return self.computeJust(s.union(f1), f2)
         sl = self.computeJust(s.union(f1), f2)
-        if sl.issuperset(f2):
-            return sl
-        #print "--> 4"
-        sr = self.computeJust(s, sl.difference(s))
-        return sr
+        sr = self.computeJust(s.union(sl), f1)
+        return sl.union(sr)
 
     def minInconsRemedy(self):
         fixed = False      # Whether we find a way to fix it or not
