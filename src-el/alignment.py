@@ -244,30 +244,6 @@ class TaxonomyMapping:
         ie = commands.getoutput(com)
         self.postProcessIE(ie);
 
-    def addprod(self, value, newval):
-        if newval.find("prod") != -1:
-            item = re.match("prod\((.*),(.*)\)", newval)
-            value.append(item.group(1))
-            self.addprod(value, item.group(2))
-        elif newval.find(",") != -1:
-            item = re.match("(.*),(.*)", newval)
-            value.append(item.group(1))
-            self.addprod(value, item.group(2))
-        else:
-            value.append(newval)
-
-    def addprodSet(self, valueSet, newval):
-        if newval.find("prod") != -1:
-            item = re.match("prod\((.*),(.*)\)", newval)
-            valueSet.add(item.group(1))
-            self.addprodSet(valueSet, item.group(2))
-        elif newval.find(",") != -1:
-            item = re.match("(.*),(.*)", newval)
-            valueSet.add(item.group(1))
-            self.addprodSet(valueSet, item.group(2))
-        else:
-            valueSet.add(newval)
-
     def postProcessIE(self, ie):
         print "Please see "+self.name+"_ie.pdf for the inconsistency relations between all the rules."
         if ie.find("{}") == -1 and ie != "":
