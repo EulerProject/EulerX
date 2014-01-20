@@ -38,6 +38,7 @@ class TaxonomyMapping:
         self.pw = ""
         self.npw = 0                           # # of pws
         self.pwflag = True                     # Whether to output pw
+        self.fixedCnt = 0                      # # of fixes /repairs
         self.options = options
         self.enc = encode[options.encode]      # encoding
         self.name = os.path.splitext(os.path.basename(options.inputfile))[0]
@@ -274,73 +275,78 @@ class TaxonomyMapping:
             # print ies
             ielist = []
             tmpmap = {}
-            diag = sets.Set()
+            diagraw = sets.Set()
             for i in range(len(ies)):
               if ies[i].find("ie(prod") != -1:
-                item = re.match("ie\(prod\((.*),(.*)\)\)", ies[i])
-                #key = item.group(1)
-                #keylist.append(key)
-                #tmpmap[key] = [item.group(2)]
-                #print ies[i],item.group(1),item.group(2)
-                keylist = []
-                self.addprod(keylist, item.group(1))
-                self.addprod(keylist, item.group(2))
-                #ielist.append(keylist)
+                keylist = re.findall('[\d]+', ies[i])
                 tmpmap[keylist.__str__()] = sets.Set(keylist)
               else:
-                if ies[i].find("prod") != -1:
-                  item = re.match("ie\(s\((.*),prod\((.*)\),(.*)\)\)", ies[i])
-                else:
-                  item = re.match("ie\(s\((.*),(.*),(.*)\)\)", ies[i])
-                key = item.group(1)+","+item.group(3)
+                item = re.findall('[\d]+', ies[i])
+                key = item[0]+","+item[len(item)-1]
+                item = item[0:len(item)-1]
+                value = sets.Set()
                 if key in tmpmap.keys():
                   value = sets.Set(tmpmap[key])
-                else:
-                  value = sets.Set([item.group(1)])
-                self.addprodSet(value,item.group(2))
-                tmpmap[key] = value
-                print key,tmpmap[key]
+                tmpmap[key] = value.union(sets.Set(item))
+                #print key,tmpmap[key]
 
             for key in tmpmap.keys():
-              tmpset = sets.Set()
+              #tmpset = sets.Set()
               tmpset = tmpmap[key]
               
               addor  = True
-              for i in range(len(diag)):
-                if tmpset.issubset(list(diag)[i]):
+              for i in range(len(diagraw)):
+                if tmpset.issubset(list(diagraw)[i]):
                   a = []
-                  a = list(diag)
+                  a = list(diagraw)
                   a.pop(i)
                   a.insert(i,tmpset)
-                  diag = sets.Set(a)
-                elif tmpset.issuperset(list(diag)[i]):
+                  diagraw = sets.Set(a)
+                elif tmpset.issuperset(list(diagraw)[i]):
                   addor = False
               if addor:
-                  diag.add(tmpset)
+                  diagraw.add(tmpset)
               # print key, tmpmap[key], diag
-            print "Min inconsistent subsets: "
-            print diag
+            self.getDiag(diagraw)
+            #print "Min inconsistent subsets: "
+            #print diag
                 
-            fie = open(self.iefile, 'w')
-            fie.write("strict digraph "+self.name+"_ie {\n\nrankdir = LR\n\n")
-            #fie.write("subgraph rules {\n")
-            #for key in self.rules.keys():
-            #    fie.write(key+"\n")
-            #fie.write("}\n")
-            #fie.write("subgraph inconsistencies {\n")
-            #for key in tmpmap.keys():
-            #    fie.write("\""+key+"\"\n")
-            #fie.write("}\n")
-            for key in tmpmap.keys():
-                for value in tmpmap[key]:
-                    fie.write("\""+value+"\" -> \"inconsistency="+key.__str__()+":"+tmpmap[key].__str__()+"\" \n")
-            label=""
-            for key in self.rules.keys():
-                label += key+" : "+self.rules[key]+"\t"
-            fie.write("graph [label=\""+label+"\"]\n")
-            fie.write("}")
-            fie.close()
-            commands.getoutput("dot -Tpdf "+self.iefile+" -o "+self.iepdf)
+# Comment out the ie.pdf part tmporarily
+#            fie = open(self.iefile, 'w')
+#            fie.write("strict digraph "+self.name+"_ie {\n\nrankdir = LR\n\n")
+#            #fie.write("subgraph rules {\n")
+#            #for key in self.rules.keys():
+#            #    fie.write(key+"\n")
+#            #fie.write("}\n")
+#            #fie.write("subgraph inconsistencies {\n")
+#            #for key in tmpmap.keys():
+#            #    fie.write("\""+key+"\"\n")
+#            #fie.write("}\n")
+#            for key in tmpmap.keys():
+#                for value in tmpmap[key]:
+#                    fie.write("\""+value+"\" -> \"inconsistency="+key.__str__()+":"+tmpmap[key].__str__()+"\" \n")
+#            label=""
+#            for key in self.rules.keys():
+#                label += key+" : "+self.rules[key]+"\t"
+#            fie.write("graph [label=\""+label+"\"]\n")
+#            fie.write("}")
+#            fie.close()
+#            commands.getoutput("dot -Tpdf "+self.iefile+" -o "+self.iepdf)
+
+    def getDiag(self, raw):
+        rawl = len(raw)
+        rs = sets.Set()
+        for i in range(rawl):
+           rs = rs.union(raw.pop())
+        artSet = self.getArtSetFromN(rs)
+        self.allJustifications(artSet)
+
+    def getArtSetFromN(self, rs):
+        artSet = sets.Set()
+        for i in range(len(self.articulations)):
+            if self.articulations[i].ruleNum.__str__() in rs:
+                artSet.add(self.articulations[i])
+        return artSet
 
     def outGringoPW(self):
         raw = self.pw.split("\n")
@@ -688,12 +694,11 @@ class TaxonomyMapping:
             print "************************************"
         return True
 
-    def allJustifications(self):
+    def allJustifications(self, artSet):
         s = sets.Set()
         curpath = sets.Set()
         allpaths = sets.Set()
-        self.fixedCnt = 0
-        self.computeAllJust(sets.Set(self.articulations), s, curpath, allpaths)
+        self.computeAllJust(artSet, s, curpath, allpaths)
         
     def computeAllJust(self, artSet, justSet, curpath, allpaths):
         for path in allpaths:
@@ -776,7 +781,6 @@ class TaxonomyMapping:
         for i in range(len(f) /2):
             f2.add(f1.pop())
         if not self.isConsistent(s.union(f1)):
-        #    print "--> 1"
             return self.computeJust(s, f1)
         if not self.isConsistent(s.union(f2)):
             return self.computeJust(s, f2)
@@ -876,7 +880,7 @@ class TaxonomyMapping:
         elif self.options.repair == "minIncSubset":
             self.minInconsRemedy()
         elif self.options.repair == "HST":
-            self.allJustifications()
+            self.allJustifications(sets.Set(self.articulations))
         # By default, we use top down remedy to repair
         else:
             self.topdownRemedy()
