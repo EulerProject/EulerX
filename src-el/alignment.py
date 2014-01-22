@@ -282,7 +282,6 @@ class TaxonomyMapping:
                   addor = False
               if addor:
                   diagraw.add(tmpset)
-              # print key, tmpmap[key], diag
             self.getDiag(diagraw)
             #print "Min inconsistent subsets: "
             #print diag
@@ -314,6 +313,7 @@ class TaxonomyMapping:
         rs = sets.Set()
         for i in range(rawl):
            rs = rs.union(raw.pop())
+        print rs
         artSet = self.getArtSetFromN(rs)
         self.allJustifications(artSet)
 
