@@ -365,6 +365,8 @@ class Articulation:
 		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name4 + ",X).\n" 
 		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name4 + ",X).\n"
 		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name4 + ",X).\n"
+		result += "ir(X, r" + self.ruleNum.__str__() + ") :- out(" +name1 + ",X), out(" + name2 + ",X),\
+                           out(" + name3 + ",X), in(" + name4 + ",X).\n"
             elif self.relations == relation["+4="]:
                 name3 = self.taxon3.dlvName()
                 name4 = self.taxon4.dlvName()

@@ -25,7 +25,7 @@ class Taxon:
 
     def dlvName(self):
         return "c" + self.taxonomy.abbrev + "_" + self.abbrev
- 
+
 class Taxonomy:
     def __init__(self):
         self.roots = [] 
@@ -84,9 +84,17 @@ class Taxonomy:
         noParens = re.match("\((.*)\)", theList).group(1)
         if (noParens.find(" ") != -1):
             elements = re.split("\s", noParens)
+            # no coverage
+            nc = False
+            if elements[len(elements)-1] != "nc":
+                nchildren = len(elements)-1
+            else:
+                nchildren = len(elements)-2
+                nc = True
+                elements[len(elements)-1] += elements[0]
             self.addTaxon(elements[0])
             for index in range (1, len(elements)):
-                self.addDoubleTaxon(taxaMap, elements[0], elements[index], len(elements) == 2)
+                self.addDoubleTaxon(taxaMap, elements[0], elements[index], nchildren == 1)
         else:
             self.addTaxon(noParens)    
    
