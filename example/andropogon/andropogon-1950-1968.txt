@@ -2,7 +2,7 @@ taxonomy 1 Taxonomy1
 (24 25 26 27 28 29 30)
 
 taxonomy 2 Taxonomy2
-(31 32)
+(31 32 nc)
 
 articulation tw1 tw1
 
