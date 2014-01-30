@@ -502,13 +502,13 @@ class TaxonomyMapping:
                     blueNode = True
                 else:
                     if tmpStr != "":
-                        tmpStr = "," + tmpStr
+                        tmpStr = "\\n" + tmpStr
                     tmpStr = T2 + tmpStr
             if tmpStr != "":
                 if tmpStr.split(".")[0]  == tmpTax:
-                    tmpStr = tmpStr + ","
+                    tmpStr = tmpStr + "\\n"
                 else:
-                    tmpStr = "," + tmpStr
+                    tmpStr = "\\n" + tmpStr
             if blueNode:
                 tmpStr = T1s[1] + tmpStr
                 # fDot.write("\"" + tmpStr +"\" [color=blue];\n")
@@ -531,10 +531,10 @@ class TaxonomyMapping:
                         self.tr.remove([T3, T4, P])
                         self.tr.append([T3, tmpStr, 0])
                     for T5 in self.eqConLi:
-                        if(T5 == T3 and T5 != tmpStr and set(T5.split(",")).issubset(set(tmpStr.split(",")))):
+                        if(T5 == T3 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
                             self.tr.remove([T3,T4,P])
                             self.tr.append([tmpStr,T4,0])
-                        elif(T5 == T4 and T5 != tmpStr and set(T5.split(",")).issubset(set(tmpStr.split(",")))):
+                        elif(T5 == T4 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
                             self.tr.remove([T3,T4,P])
                             self.tr.append([T3,tmpStr,0])
         tmpeqConLi = []
@@ -542,7 +542,7 @@ class TaxonomyMapping:
             tmpeqConLi.append(T)
         for T6 in tmpeqConLi:
             for T7 in tmpeqConLi:
-                if (set(T6.split(",")).issubset(set(T7.split(","))) and T6 != T7 and T6 in self.eqConLi):
+                if (set(T6.split("\\n")).issubset(set(T7.split("\\n"))) and T6 != T7 and T6 in self.eqConLi):
                     self.eqConLi.remove(T6)
         for T in self.eqConLi:
             tmpCom += "  \""+T+"\"\n"      
@@ -576,13 +576,13 @@ class TaxonomyMapping:
             
         # Node Coloring
         for [T1, T2, P] in self.tr:
-            if(T1.find("*") == -1 and T1.find(",") == -1 and T1.find(".") != -1):
+            if(T1.find("*") == -1 and T1.find("\\n") == -1 and T1.find(".") != -1):
                 T1s = T1.split(".")
                 if tmpTax == T1s[0]: taxa1 += "  \""+T1+"\"\n"
                 else: taxa2 += "  \""+T1+"\"\n"
             else:
                 tmpCom += "  \""+T1+"\"\n"
-            if(T2.find("*") == -1 and T2.find(",") == -1 and T2.find(".") != -1):
+            if(T2.find("*") == -1 and T2.find("\\n") == -1 and T2.find(".") != -1):
                 T2s = T2.split(".")
                 if tmpTax == T2s[0]: taxa1 += "  \""+T2+"\"\n"
                 else: taxa2 += "  \""+T2+"\"\n"
