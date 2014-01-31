@@ -1,0 +1,10 @@
+taxonomy 1 Taxonomy1
+(a b e e2)
+
+taxonomy 2 Taxonomy2
+(c d f)
+
+articulation tw1 tw1
+[1.a equals 2.c]
+[1.b {is_included_in equals} 2.d]
+[1.e is_included_in 2.f]

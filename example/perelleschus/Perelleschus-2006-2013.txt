@@ -1,0 +1,40 @@
+taxonomy 1 Taxonomy1
+(28 29 30)
+(30 31 32)
+(32 33 34)
+
+taxonomy 2 Taxonomy2
+(35 36 38)
+(36 37)
+(38 39 40)
+(40 41 44)
+(41 42 43)
+(44 45 46 47)
+(47 48 51 52)
+(48 49 50)
+(52 53 54)
+
+articulation pere perell
+[1.28 is_included_in 2.35]
+[1.29 equals 2.36]
+[1.30 is_included_in 2.38]
+[1.31 equals 2.39]
+[1.32 is_included_in 2.40]
+[1.32 overlaps 2.41]
+[1.32 overlaps 2.44]
+[1.33 equals 2.49]
+[1.34 equals 2.42]
+[1.29 includes 2.37]
+[1.30 overlaps 2.40]
+[1.30 overlaps 2.41]
+[1.32 disjoint 2.43]
+[1.30 overlaps 2.44]
+[1.32 disjoint 2.45]
+[1.32 disjoint 2.46]
+[1.32 overlaps 2.47]
+[1.32 overlaps 2.48]
+[1.32 disjoint 2.50]
+[1.32 disjoint 2.51]
+[1.32 disjoint 2.52]
+[1.32 disjoint 2.53]
+[1.32 disjoint 2.54]
