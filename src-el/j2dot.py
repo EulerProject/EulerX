@@ -1,7 +1,8 @@
 import json
 import random
+from collections import defaultdict
 
-nodes = {}
+nodes = defaultdict(list)
 edges = {}
 cluster = {}
 
@@ -24,18 +25,18 @@ def parse(datafile, output):
         # seperate different node, edge, cluster, ... objects
         for item, attr in data.iteritems():
             if data[item]["type"] == "node":
-                nodes[item] = attr
+                nodes[data[item]['group']].append(data[item]["concept"])
             elif data[item]["type"] == "edge":
                 edges[item] = attr
             elif data[item]["type"] == "cluster":
                 cluster[item]= attr
-    for key, value in nodes.iteritems():
-        node = nodes[key]["group"]
-        f.write('node[shape="' +styles[node]["shape"] + '", style="' +styles[node]["style"] + '", color="' + styles[node]["color"] + '", fillcolor="' + styles[node]["fillcolor"] +'"]' +'\n')
-        if nodes[key]["group"]!= "common":
-            f.write('"'+ nodes[key]["group"] + "." + nodes[key]["concept"] + '"\n')
-        else:
-            f.write(nodes[key]["concept"] + '\n')
+    for n in nodes:
+        f.write('node[shape="' +styles[n]["shape"] + '", style="' +styles[n]["style"] + '", color="' + styles[n]["color"] + '", fillcolor="' + styles[n]["fillcolor"] +'"]' +'\n')
+        for g in nodes[n]:
+            if n!= "common":
+               f.write('"'+ n + "." + g + '"\n')
+            else:
+               f.write(g + '\n')           
     for key, value in cluster.iteritems():
        r = lambda: random.randint(0,255)
        color = "#" + hex(r())[2:] + hex(r())[2:] + hex(r())[2:]
@@ -48,7 +49,6 @@ def parse(datafile, output):
        f.write('}\n')
        f.write('edge[style="' + styles["lsum"]["style"] + '", color="' + color + '", penwidth="' + cluster[key]["w"] + '"]' +'\n')
        f.write('"' + c[1] + '" -> "' + cluster[key]['t'] + '" [label="' + cluster[key]["l"] + '"]\n')
-       
     for key, value in edges.iteritems():
         if edges[key]["l"] in styles:
             edge = edges[key]["l"]
