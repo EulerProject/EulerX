@@ -1,9 +1,10 @@
 import json
 import random
 from collections import defaultdict
+from pprint import pprint
 
 nodes = defaultdict(list)
-edges = {}
+edges = defaultdict(list)
 cluster = {}
 
 # parse the stylesheet file
@@ -27,16 +28,17 @@ def parse(datafile, output):
             if data[item]["type"] == "node":
                 nodes[data[item]['group']].append(data[item]["concept"])
             elif data[item]["type"] == "edge":
-                edges[item] = attr
+                key = attr.items()
+                edges[data[item]['l']].append(key)
             elif data[item]["type"] == "cluster":
                 cluster[item]= attr
-    for n in nodes:
-        f.write('node[shape="' +styles[n]["shape"] + '", style="' +styles[n]["style"] + '", color="' + styles[n]["color"] + '", fillcolor="' + styles[n]["fillcolor"] +'"]' +'\n')
-        for g in nodes[n]:
-            if n!= "common":
-               f.write('"'+ n + "." + g + '"\n')
+    for g in nodes:
+        f.write('node[shape="' +styles[g]["shape"] + '", style="' +styles[g]["style"] + '", color="' + styles[g]["color"] + '", fillcolor="' + styles[g]["fillcolor"] +'"]' +'\n')
+        for n in nodes[g]:
+            if g!= "common":
+               f.write('"'+ g + "." + n + '"\n')
             else:
-               f.write(g + '\n')           
+               f.write(n + '\n')           
     for key, value in cluster.iteritems():
        r = lambda: random.randint(0,255)
        color = "#" + hex(r())[2:] + hex(r())[2:] + hex(r())[2:]
@@ -49,20 +51,20 @@ def parse(datafile, output):
        f.write('}\n')
        f.write('edge[style="' + styles["lsum"]["style"] + '", color="' + color + '", penwidth="' + cluster[key]["w"] + '"]' +'\n')
        f.write('"' + c[1] + '" -> "' + cluster[key]['t'] + '" [label="' + cluster[key]["l"] + '"]\n')
-    for key, value in edges.iteritems():
-        if edges[key]["l"] in styles:
-            edge = edges[key]["l"]
+    for l in edges:
+        if l in styles:
+            f.write('edge[style="' + styles[l]["style"] + '", color="' + styles[l]["color"] + '"]\n')
         else:
-            edge = "default"
-        color = styles[edge]["color"] 
-        f.write('edge[style="' + styles[edge]["style"] + '", color="' + color + '", penwidth="' + edges[key]["w"] + '"]' +'\n')
-        f.write('"' + edges[key]["s"] + '" -> "' + edges[key]["t"] + '"')
-        if edges[key]["l"] != "isa":
-            f.write(' [label="' + edges[key]["l"] + '"]')
-        f.write('\n')
+            f.write('edge[style="' + styles["default"]["style"] + '", color="' + styles["default"]["color"] + '"]\n')
+        for e in edges[l]:
+            f.write('penwidth="' + e[3][1] + '"\n')
+            f.write('"' + e[0][1] + '" -> "' + e[2][1] + '"')
+            if l!= "isa":
+                f.write(' [label="' + l + '"]')
+            f.write('\n')
     f.write('}')            
-    f.close()         
-
+    f.close()
+    
 readStyleSheet('stylesheet.json')
 parse('data.json', 'out.dot')
 
