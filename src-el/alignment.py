@@ -45,6 +45,7 @@ class TaxonomyMapping:
         self.taxa1name = ""
         self.firstRcg = False
         self.trlist = []
+        self.eqConLi = []                      # list of concepts that are equal
         if options.outputdir is None:
             options.outputdir = options.inputdir
         if not os.path.exists(options.outputdir):
@@ -501,13 +502,13 @@ class TaxonomyMapping:
                     blueNode = True
                 else:
                     if tmpStr != "":
-                        tmpStr = "," + tmpStr
+                        tmpStr = "\\n" + tmpStr
                     tmpStr = T2 + tmpStr
             if tmpStr != "":
                 if tmpStr.split(".")[0]  == tmpTax:
-                    tmpStr = tmpStr + ","
+                    tmpStr = tmpStr + "\\n"
                 else:
-                    tmpStr = "," + tmpStr
+                    tmpStr = "\\n" + tmpStr
             if blueNode:
                 tmpStr = T1s[1] + tmpStr
                 # fDot.write("\"" + tmpStr +"\" [color=blue];\n")
@@ -517,54 +518,71 @@ class TaxonomyMapping:
                     tmpStr = T1 + tmpStr
                 else:
                     tmpStr = tmpStr + T1
-            tmpCom += "  \""+tmpStr+"\"\n"
+            self.eqConLi.append(tmpStr)
             for T2 in self.eq[T1]:
-                if self.eq.has_key(T2):
-                    del self.eq[T2]
+#                if self.eq.has_key(T2):
+#                    del self.eq[T2]
                 tmpTr = list(self.tr)
                 for [T3, T4, P] in tmpTr:
-	            if(T1 == T3 or T2 == T3):
-	                self.tr.remove([T3, T4, P])
-	                self.tr.append([tmpStr, T4, 0])
-	            elif(T1 == T4 or T2 == T4):
-	                self.tr.remove([T3, T4, P])
-	                self.tr.append([T3, tmpStr, 0])
-
-	# Duplicates
-	tmpTr = list(self.tr)
+                    if(T1 == T3 or T2 == T3):
+                        self.tr.remove([T3, T4, P])
+                        self.tr.append([tmpStr, T4, 0])
+                    elif(T1 == T4 or T2 == T4):
+                        self.tr.remove([T3, T4, P])
+                        self.tr.append([T3, tmpStr, 0])
+                    for T5 in self.eqConLi:
+                        if(T5 == T3 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
+                            self.tr.remove([T3,T4,P])
+                            self.tr.append([tmpStr,T4,0])
+                        elif(T5 == T4 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
+                            self.tr.remove([T3,T4,P])
+                            self.tr.append([T3,tmpStr,0])
+        tmpeqConLi = []
+        for T in self.eqConLi:
+            tmpeqConLi.append(T)
+        for T6 in tmpeqConLi:
+            for T7 in tmpeqConLi:
+                if (set(T6.split("\\n")).issubset(set(T7.split("\\n"))) and T6 != T7 and T6 in self.eqConLi):
+                    self.eqConLi.remove(T6)
+        for T in self.eqConLi:
+            tmpCom += "  \""+T+"\"\n"      
+            
+        # Duplicates
+    	tmpTr = list(self.tr)
         for [T1, T2, P] in tmpTr:
-	    if(self.tr.count([T1, T2, P]) > 1):
-		self.tr.remove([T1, T2, P])
-	tmpTr = list(self.tr)
+    	    if(self.tr.count([T1, T2, P]) > 1):
+                self.tr.remove([T1, T2, P])
+    	tmpTr = list(self.tr)
         for [T1, T2, P] in tmpTr:
-	    if(P == 0):
-	        if(self.tr.count([T1, T2, 1]) > 0):
-		    self.tr.remove([T1, T2, 1])
+    	    if(P == 0):
+    	        if(self.tr.count([T1, T2, 1]) > 0):
+                    self.tr.remove([T1, T2, 1])
 
-	# Reductions
-	tmpTr = list(self.tr)
+    	# Reductions
+    	tmpTr = list(self.tr)
         for [T1, T2, P1] in tmpTr:
             for [T3, T4, P2] in tmpTr:
-		if (T2 == T3):
-		    if(self.tr.count([T1, T4, 0])>0):
-		        self.tr.remove([T1, T4, 0])
-		        self.tr.append([T1, T4, 2])
-		    if(self.tr.count([T1, T4, 1])>0):
-		        self.tr.remove([T1, T4, 1])
-		        #self.tr.append([T1, T4, 3])
+            	if (T2 == T3):
+                    if(self.tr.count([T1, T4, 0])>0):
+                        self.tr.remove([T1, T4, 0])
+                        self.tr.append([T1, T4, 2])
+                    if(self.tr.count([T1, T4, 1])>0):
+                        self.tr.remove([T1, T4, 1])
+                        #self.tr.append([T1, T4, 3])
 
         if self.options.verbose:
             print "Transitive reduction:"
             print self.tr
+            
         # Node Coloring
-	for [T1, T2, P] in self.tr:
-            if(T1.find("*") == -1 and T1.find(",") == -1 and T1.find(".") != -1):
+        for [T1, T2, P] in self.tr:
+            if(T1.find("*") == -1 and T1.find("\\n") == -1 and T1.find(".") != -1):
                 T1s = T1.split(".")
                 if tmpTax == T1s[0]: taxa1 += "  \""+T1+"\"\n"
                 else: taxa2 += "  \""+T1+"\"\n"
             else:
                 tmpCom += "  \""+T1+"\"\n"
-            if(T2.find("*") == -1 and T2.find(",") == -1 and T2.find(".") != -1):
+            if(T2.find("*") == -1 and T2.find("\\n") == -1 and T2.find(".") != -1):
                 T2s = T2.split(".")
                 if tmpTax == T2s[0]: taxa1 += "  \""+T2+"\"\n"
                 else: taxa2 += "  \""+T2+"\"\n"
@@ -584,22 +602,22 @@ class TaxonomyMapping:
         fAllDot.write(tmpCom)
         fAllDot.close()
         
-
-	for [T1, T2, P] in self.tr:
-	    if(P == 0):
-	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")
-	    elif(P == 1):
-	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=red];\n")
-	    elif(P == 2):
-              if False:
-	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
+        
+        for [T1, T2, P] in self.tr:
+    	    if(P == 0):
+    	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")
+    	    elif(P == 1):
+    	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=red];\n")
+    	    elif(P == 2):
+                if False:
+                    fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
         if self.options.rcgo:
-	    fDot.write("  subgraph ig {\nedge [dir=none, style=dashed, color=blue, constraint=false]\n\n")
+            fDot.write("  subgraph ig {\nedge [dir=none, style=dashed, color=blue, constraint=false]\n\n")
             for key in self.mir.keys():
                 if self.mir[key] == rcc5["overlaps"]:
                     item = re.match("(.*),(.*)", key)
-	    	    fDot.write("     \"" + item.group(1) + "\" -> \"" + item.group(2) + "\"\n")
-	    fDot.write("  }\n")
+                    fDot.write("     \"" + item.group(1) + "\" -> \"" + item.group(2) + "\"\n")
+            fDot.write("  }\n")
         fDot.write("  subgraph cluster_lg {\n")
         fDot.write("    rankdir = LR\n")
         #fDot.write("    label = \"Legend\";\n")
