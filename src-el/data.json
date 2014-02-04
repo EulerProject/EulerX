@@ -11,6 +11,8 @@
 "2.C":{"type":"node","concept":"C","group":"2"},
 "2.F":{"type":"node","concept":"F","group":"2"},
 "2.I":{"type":"node","concept":"I","group":"2"},
+"2.D":{"type":"node","concept":"D","group":"2"},
+"+":{"type":"node","concept":"+","group":"none"},
 "1.B_A":{"type":"edge","s":"1.B","t":"A","l":"isa", "w":"2"},
 "1.F_A":{"type":"edge","s":"1.F","t":"A","l":"isa", "w":"2"},
 "1.I_A":{"type":"edge","s":"1.I","t":"A","l":"isa", "w":"2"},
@@ -20,6 +22,7 @@
 "G_1.F":{"type":"edge","s":"G","t":"1.F","l":"isa", "w":"2"},
 "H_1.F":{"type":"edge","s":"H","t":"1.F","l":"isa", "w":"2"},
 "2.B_A":{"type":"edge","s":"2.B","t":"A","l":"isa", "w":"2"},
+"2.D_A":{"type":"edge","s":"2.D","t":"A","l":"isa", "w":"2"},
 "2.F_A":{"type":"edge","s":"2.F","t":"A","l":"isa", "w":"2"},
 "2.C_2.B":{"type":"edge","s":"2.C","t":"2.B","l":"isa", "w":"2"},
 "H_2.B":{"type":"edge","s":"H","t":"2.B","l":"isa", "w":"2"},
@@ -29,5 +32,7 @@
 "1.B_2.B":{"type":"edge","s":"1.B","t":"2.B","l":"is_included_in", "w":"1"},
 "1.F_2.F":{"type":"edge","s":"1.F","t":"2.F","l":"overlaps", "w":"1"},
 "1.F_2.B":{"type":"edge","s":"1.F","t":"2.B","l":"overlaps", "w":"1"},
-"1.C_2.C":{"type":"cluster","s":"1.C,1.D","t":"2.C","l":"lsum", "w":"1"}
+"1.C_plus":{"type":"edge","s":"1.C","t":"+","l":"inplus", "w":"1"},
+"2.C_plus":{"type":"edge","s":"2.C","t":"+","l":"inplus", "w":"1"},
+"plus_2.D":{"type":"edge","s":"+","t":"2.D","l":"outplus", "w":"1"}
 }

@@ -1,9 +1,5 @@
 {
-"Graph":{"rankdir":"BT", "labelloc":"t", "fontsize":"20","labeljust":"left", "label":"Sample Graph"},
-"1":{"type":"node","shape":"box", "style": "filled,rounded", "color":"black","fillcolor":"#CCFFCC"},
-"2":{"type":"node","shape":"octagon", "style": "filled", "color":"black","fillcolor":"#FFFFCC"},
-"common":{"type":"node","shape":"Msquare", "style": "filled", "color":"black","fillcolor":"#EEEEEE"},
-"isa":{"type":"edge","style":"solid","color":"black"},
-"lsum":{"type":"edge","style":"solid","color":"red"},
-"default":{"type":"edge","style":"solid","color":"blue"}
+"graphstyle":{"graph":"rankdir=BT\n labelloc=t\n labeljust=left\n fontsize=20\n label=\"Sample Graph\"\n"},
+"nodestyle":{"1": "shape=box style=\"filled,rounded\" color=black fillcolor=\"#CCFFCC\"", "2":"shape=octagon style=filled color=black fillcolor=\"#FFFFCC\"", "common":"shape=Msquare style=filled color=black fillcolor=\"#EEEEEE\"","default":"shape=circle style=filled color=black fillcolor=white"},
+"edgestyle":{"isa": "style=solid color=black","outplus":"style=solid color=\"#105ff9\"","default":"style=solid color=black"}
 }
