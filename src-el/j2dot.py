@@ -24,6 +24,8 @@ def parse(datafile, output):
                 edges[data[key]['l']].append(value.items())
     for g in nodes:
     # if the style is not defined use the default
+        if (styles["graphstyle"]["subgraph"] == "on" and g!="none"):
+            f.write('subgraph cluster' + g + '{ label= "" style=invis\n')
         if g in styles["nodestyle"]:
             group = g
         else:
@@ -34,6 +36,8 @@ def parse(datafile, output):
                f.write('"'+ g + "." + n + '"\n')
             else:
                f.write('"'+ n + '"\n')
+        if (styles["graphstyle"]["subgraph"] == "on"and g!="none"):
+            f.write('}')
     for l in edges:
         if l in styles["edgestyle"]:
             label = l
