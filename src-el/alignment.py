@@ -389,7 +389,8 @@ class TaxonomyMapping:
                 pws.append(raw[i].strip().replace(") ",");"))
         elif reasoner[self.options.reasoner] == reasoner["dlv"]:
             raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
-            pws = raw.split("\n")
+            if raw != "":
+              pws = raw.split("\n")
         else:
             raise Exception("Reasoner:", self.options.reasoner, " is not supported !!")
         self.npw = len(pws)
@@ -505,10 +506,11 @@ class TaxonomyMapping:
                         tmpStr = "\\n" + tmpStr
                     tmpStr = T2 + tmpStr
             if tmpStr != "":
-                if tmpStr.split(".")[0]  == tmpTax:
-                    tmpStr = tmpStr + "\\n"
-                else:
-                    tmpStr = "\\n" + tmpStr
+                tmpStr = "\\n" + tmpStr + "\\n"
+                #if tmpStr.split(".")[0]  == tmpTax:
+                #    tmpStr = tmpStr + "\\n"
+                #else:
+                #    tmpStr = "\\n" + tmpStr
             if blueNode:
                 tmpStr = T1s[1] + tmpStr
                 # fDot.write("\"" + tmpStr +"\" [color=blue];\n")
@@ -1088,7 +1090,8 @@ class TaxonomyMapping:
                 raise Exception(template.getEncErrMsg())
                 return None
             raw = self.cb.replace("{","").replace("}","").replace(" ","").replace("),",");")
-            pws = raw.split("\n")
+            if raw != "":
+              pws = raw.split("\n")
         else:
             raise Exception("Reasoner:", self.options.reasoner, " is not supported !!")
         self.npw = len(pws)
@@ -1132,8 +1135,12 @@ class TaxonomyMapping:
                     t1 = self.taxonomies[key1].taxa[taxon1]
                     for taxon2 in self.taxonomies[key2].taxa.keys():
                         t2 = self.taxonomies[key2].taxa[taxon2]
-                        if self.mirp.has_key(t1.dotName()+","+t2.dotName()+","+rcc5["overlaps"].__str__()) or\
-                           self.mirp.has_key(t2.dotName()+","+t1.dotName()+","+rcc5["overlaps"].__str__()):
+                        #if self.mirp.has_key(t1.dotName()+","+t2.dotName()+","+rcc5["overlaps"].__str__()) or\
+                        #   self.mirp.has_key(t2.dotName()+","+t1.dotName()+","+rcc5["overlaps"].__str__()):
+                        p1 = t1.dotName()+","+t2.dotName()
+                        p2 = t2.dotName()+","+t1.dotName()
+                        if self.mir.has_key(p1) and self.mir[p1] == rcc5["overlaps"] or\
+                           self.mir.has_key(p2) and self.mir[p2] == rcc5["overlaps"]:
 	                    self.baseCb += "newcon(" + t1.dlvName() + "_not_" + t2.dlvName() + ", "\
 	           	                + t1.dlvName() + ", " + t2.dlvName()  + ", 0).\n"
 	                    self.baseCb += "newcon(" + t1.dlvName() + "__" + t2.dlvName() + ", "\
