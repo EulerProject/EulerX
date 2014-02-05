@@ -507,10 +507,10 @@ class TaxonomyMapping:
                     tmpStr = T2 + tmpStr
             if tmpStr != "":
                 tmpStr = "\\n" + tmpStr + "\\n"
-                #if tmpStr.split(".")[0]  == tmpTax:
-                #    tmpStr = tmpStr + "\\n"
-                #else:
-                #    tmpStr = "\\n" + tmpStr
+#                if tmpStr.split(".")[0]  == tmpTax:
+#                    tmpStr = tmpStr + "\\n"
+#                else:
+#                    tmpStr = "\\n" + tmpStr
             if blueNode:
                 tmpStr = T1s[1] + tmpStr
                 # fDot.write("\"" + tmpStr +"\" [color=blue];\n")
@@ -520,6 +520,8 @@ class TaxonomyMapping:
                     tmpStr = T1 + tmpStr
                 else:
                     tmpStr = tmpStr + T1
+            if tmpStr[0:2] == "\\n": tmpStr = tmpStr[2:]
+            if tmpStr[-2:] == "\\n": tmpStr = tmpStr[:-2]
             self.eqConLi.append(tmpStr)
             for T2 in self.eq[T1]:
 #                if self.eq.has_key(T2):
