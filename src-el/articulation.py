@@ -124,7 +124,7 @@ class Articulation:
 		#result += "out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
 		#result += "out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
 	    elif self.relations == rcc5["includes"]:
-		result  = "ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
+		result  = "ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X), pw.\n"
 		result += "ir(X, prod(r" + self.ruleNum.__str__() + ",R)) :- out3(" + name1 + ", X, R), in(" + name2 + ",X), ix.\n"
                 if reasoner[rnr] == reasoner["dlv"]:
 		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
@@ -147,7 +147,7 @@ class Articulation:
                 elif reasoner[rnr] == reasoner["gringo"]:
 		    result = ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
 		    result += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
-		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
+		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X), pw.\n" 
 	        result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
 	        result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
 	        result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
@@ -315,8 +315,8 @@ class Articulation:
 	        result += "c(r" + self.ruleNum.__str__() + ", A, 3) :- vr(X, A), out(" + name2 + ", X), in(" + name3 + ", X), ix.\n\n"
 	        result += "pie(r" + self.ruleNum.__str__() + ", A, 4) :- ir(X, A), in(" + name2 + ", X), in(" + name3 + ", X), ix.\n"
 	        result += "c(r" + self.ruleNum.__str__() + ", A, 4) :- vr(X, A), in(" + name2 + ", X), in(" + name3 + ", X), ix.\n\n"
-		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name3 + ",X).\n" 
-		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name3 + ",X).\n" 
+		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name3 + ",X), pw.\n" 
+		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name3 + ",X), pw.\n" 
 		#result += "in(" + name3 + ",X) :- in(" + name1 + ",X).\n" 
 		#result += "in(" + name3 + ",X) :- in(" + name2 + ",X).\n" 
 		#result += "out(" + name1 + ",X) :- out(" + name3 + ",X).\n" 

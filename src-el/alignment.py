@@ -312,6 +312,7 @@ class TaxonomyMapping:
     def getDiag(self, raw):
         rawl = len(raw)
         rs = sets.Set()
+        print raw
         for i in range(rawl):
            rs = rs.union(raw.pop())
         print rs
@@ -1390,7 +1391,7 @@ class TaxonomyMapping:
 			    #self.baseAsp += "out(" + t1.dlvName() + ", X) :- out(" + t.dlvName() + ", X).\n"
 			    #self.baseAsp += "in(" + t1.dlvName() + ", X) v out(" + t1.dlvName() + ", X) :- in(" + t.dlvName() + ", X).\n"
 			    #self.baseAsp += "in(" + t.dlvName() + ", X) v out(" + t.dlvName() + ", X) :- out(" + t1.dlvName() + ", X).\n"
-			    self.baseAsp += "ir(X, r" + ruleNum.__str__() +") :- in(" + t1.dlvName() + ", X), out(" + t.dlvName() + ", X).\n"
+			    self.baseAsp += "ir(X, r" + ruleNum.__str__() +") :- in(" + t1.dlvName() + ", X), out(" + t.dlvName() + ", X), pw.\n"
 		            self.baseAsp += "ir(X, prod(r" + ruleNum.__str__() + ",R)) :- in(" + t1.dlvName() + ",X), out3(" + t.dlvName() + ", X, R), ix.\n" 
                             if t1.abbrev.find("nc") == -1:
                               if reasoner[self.options.reasoner] == reasoner["dlv"]:
