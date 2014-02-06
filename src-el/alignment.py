@@ -312,6 +312,7 @@ class TaxonomyMapping:
     def getDiag(self, raw):
         rawl = len(raw)
         rs = sets.Set()
+        print raw
         for i in range(rawl):
            rs = rs.union(raw.pop())
         print rs

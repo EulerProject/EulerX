@@ -40,6 +40,7 @@ class CtiGenerator:
             nnodes = (options.nary**(options.depth+1) - 1)/(options.nary-1)
             self.mednodes = range((options.nary**options.depth - 1)/(options.nary-1) + 1,
                         (options.nary**options.depth - 1)/(options.nary-1) + options.nary + 1)
+            print "LALA"
 
 
         # Create a balanced tree

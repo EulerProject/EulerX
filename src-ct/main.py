@@ -82,8 +82,6 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
     #taxMap.prover = GQR(reasonerDir, reasonerTimeout)
     
     taxMap.name = getNameFromFile(inputFile)
-    print "calling run single on " + inputFile
-    print "calling run single on " + taxMap.name
     taxMap.readFile(inputFile)
       
     result = []
@@ -247,7 +245,8 @@ def runSingle(inputFile, ltaSets, goals, goalRelations, goalTypes, outputDir, ou
     fMir.close()
     
     # Generating RCG
-    taxMap.generateDot(outputDir, taxMap.name, taxMap)
+    # testing purpose
+    #taxMap.generateDot(outputDir, taxMap.name, taxMap)
 
     # Generating all possible worlds
     if pw:
@@ -646,7 +645,6 @@ def getConfig(opts, config):
     if (not(config.has_key("ltaList")) or ((len(config["ltaList"]) == 0))):
         config["ltaList"] = [[]]
             
-    print "OUTPUT DIR IS " + config["outputDir"]
     if (config["outputFile"] != "console"):
         config["outputFile"] = config["outputDir"] + config["outputFile"]
         
