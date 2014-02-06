@@ -14,6 +14,7 @@ class CtiGenerator:
 
     # Currently only generate N-ary Cti input files
     def run(self, options):
+        self.mednodes = []
 	if options.projectname is None:
 	    options.projectname = "foo"
 	if not os.path.exists(options.outputdir):
@@ -37,6 +38,10 @@ class CtiGenerator:
 			slfidx += 1
                 fcti.write("\n")
             nnodes = (options.nary**(options.depth+1) - 1)/(options.nary-1)
+            self.mednodes = range((options.nary**options.depth - 1)/(options.nary-1) + 1,
+                        (options.nary**options.depth - 1)/(options.nary-1) + options.nary + 1)
+            print "LALA"
+
 
         # Create a balanced tree
         elif options.nnodes != 0:
@@ -70,8 +75,12 @@ class CtiGenerator:
 	    myrel = int(random.randint(0,4))
 	else:
 	    myrel = int(math.log(relation[options.relation],2))
-	    myrelstr = relstr[myrel]
-	    for i in range(1, nnodes+1):
+        # get rel string
+	myrelstr = relstr[myrel]
+	for i in range(1, nnodes+1):
+            if options.incEx and i in self.mednodes:
+                fcti.write("\n[1."+i.__str__()+" equals 2."+i.__str__()+"]")
+            else:
                 fcti.write("\n[1."+i.__str__()+" "+myrelstr+" 2."+i.__str__()+"]")
         fcti.close()
 
@@ -85,18 +94,20 @@ class CtiGenerator:
             kids[i] = []
         noded[0] = [1]
         tmpd = 0
-        tmpnary = 1
+        options.nary = 1
         while True:
             for i in noded[tmpd]:
-                while len(kids[i]) < tmpnary:
+                while len(kids[i]) < options.nary:
                     tmpnnodes -= 1
                     kids[i].append(options.nnodes-tmpnnodes)
                     noded[tmpd+1].append(options.nnodes-tmpnnodes)
+                    if i == options.depth and tmpd == options.depth - 1:
+                        self.mednodes.append(options.nnodes-tmpnnodes)
                     if tmpnnodes == 0:
                         return None
             tmpd = (tmpd+1) % options.depth
             if tmpd == 0:
-                tmpnary += 1
+                options.nary += 1
 
     def instance():
 	global inst

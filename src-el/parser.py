@@ -32,7 +32,7 @@ class EulerParser:
                                   help="input directory, by default ./")
             inst.add_option("-o", dest="outputdir", default="./",\
                                   help="output directory, by default ./")
-            inst.add_option("-e", dest="encode", default=0,\
+            inst.add_option("-e", dest="encode", default="mnpw",\
                                   help="encoding, e.g. mnpw, drpw, dlpw, etc.")
             inst.add_option("-b", dest="dl", default=2, help="dl encoding spare parameter")
             inst.add_option("--reasoner", dest="reasoner", type="string", default="dlv",\
@@ -60,12 +60,14 @@ class EulerParser:
             inst.add_option("-N", action="store_false", dest="output", default=True,\
                                   help="no output")
             inst.add_option("-g", action="store_true", dest="generateCti", default=False,\
-                                  help="artifitial example generator")
+                                  help="artifitial example generator, cannot be used with -i option")
             inst.add_option("-n", dest="nary", type="int", default=0, help="N-nary, used with -g")
             inst.add_option("-m", dest="nnodes", type="int", default=0, help="#nodes, used with -g")
             inst.add_option("-d", dest="depth", type="int", default=2, help="depth, used with -g")
             inst.add_option("-t", dest="relation", type="string", default="<",\
                                   help="artifitial articulaiton rel, used with -g")
+            inst.add_option("-I", action="store_true", dest="incEx", default=False,\
+                                  help="generate an inconsistent example, used with -g")
             inst.add_option("--iv", action="store_true", dest="inputViz", default=False,\
                                     help="input visualization")
 	return inst
