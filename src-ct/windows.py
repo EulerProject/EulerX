@@ -34,7 +34,7 @@ class Window():
 	self.returnValue[3] = False
 	self.returnValue[4] = False
         self.win = gtk.Window(gtk.WINDOW_TOPLEVEL)
-	self.win.set_title("CleanTax 2.0")
+	self.win.set_title("Euler/X")
 	self.win.set_default_size(250, 200)
 	self.vbox = gtk.VBox(gtk.TRUE,3)
 	entry = gtk.Label("What is the relation between "+goal[0]+" and "+goal[1]+"?\n(Check those relations that are possible)?")

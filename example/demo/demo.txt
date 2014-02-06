@@ -1,16 +1,13 @@
 taxonomy 1 Taxonomy1
-(A B C D)
+(a b c d e)
 
 taxonomy 2 Taxonomy2
-(E F G H I)
-(J)
-(K)
+(a b d f g)
 
-articulation abs abstract
-[1.A includes 2.E]
-[1.B equals 2.K]
-[1.D equals 2.J]
-[1.C includes 2.F]
-[1.C includes 2.G]
-[1.C includes 2.H]
-[1.C includes 2.I]
+articulation synthetic example
+[1.a {is_included_in equals} 2.a]
+[1.b equals 2.b]
+[1.c {is_included_in overlaps} 2.f]
+[1.d equals 2.d]
+[1.e {equals overlaps} 2.g]
+[1.d includes 2.a]

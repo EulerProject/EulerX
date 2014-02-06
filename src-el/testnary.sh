@@ -1,2 +1,2 @@
-euler -g -n $1 -d $2 -t "<"
-time for (( i=0; i<10; i++ )); do euler -i foo_n$1_$2.txt -e mnpw; done;
+euler -g -$2 $3 -d $4 -t "<"
+time for (( i=0; i<$5; i++ )); do euler -i foo_$2$3_$4.txt -e $6pw -N --reasoner=$1; done;

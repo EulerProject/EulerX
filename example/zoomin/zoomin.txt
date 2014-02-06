@@ -1,0 +1,18 @@
+taxonomy 1 Taxonomy1
+(a b c)
+(b d e)
+(c f g)
+
+taxonomy 2 Taxonomy2
+(a b c)
+(b d f g)
+(c e)
+
+articulation zoomin zoomin
+[1.a equals 2.a]
+[1.b overlaps 2.b]
+[1.c disjoint 2.c]
+[1.d equals 2.d]
+[1.e equals 2.e]
+[1.f equals 2.f]
+[1.g equals 2.g]

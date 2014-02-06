@@ -19,6 +19,9 @@ def main():
         generator.run(options)
     else:
       if options.generateCti is False:
+        if not reasoner.has_key(options.reasoner):
+          print "unknown reasoner "+options.reasoner#+", please choose one reasoner from "+reasoner.keys().toString()
+          return None
         elRunner = EulerRunner.instance()
         elRunner.run(options)
       else:
