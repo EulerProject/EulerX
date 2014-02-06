@@ -67,7 +67,7 @@ class TaxonomyMapping:
         self.clneatopdf = os.path.join(options.outputdir, self.name+"_cl_neato.pdf")
         self.iefile = os.path.join(options.outputdir, self.name+"_ie.dot")
         self.iepdf = os.path.join(options.outputdir, self.name+"_ie.pdf")
-        self.ivpng = os.path.join(options.outputdir, self.name+"_iv.png")
+        self.ivpdf = os.path.join(options.outputdir, self.name+"_iv.pdf")
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             # possible world command
             self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD --eq=0"
@@ -118,7 +118,7 @@ class TaxonomyMapping:
         if self.options.inputViz:
             inputVisualizer = InputVisual.instance()
             inputVisualizer.run(self.options.inputdir, self.options.inputfile, self.ivout)
-            commands.getoutput("dot -Tpng "+self.ivout+" -o "+self.ivpng)
+            commands.getoutput("dot -Tpdf "+self.ivout+" -o "+self.ivpdf)
 	    if not self.enc:
 		return
 	self.genASP()
@@ -462,7 +462,7 @@ class TaxonomyMapping:
                     self.trlist.append(e)
         self.genAllPwRcg(len(pws))
         fAllDot.close()
-        commands.getoutput("dot -Tpng "+self.options.outputdir+self.name+"_all.dot -o "+self.options.outputdir+self.name+"_all.png")
+        commands.getoutput("dot -Tpdf "+self.options.outputdir+self.name+"_all.dot -o "+self.options.outputdir+self.name+"_all.pdf")
         if self.options.reduction:
             outputstr = self.uncReduction(pws)
         if pwflag:
@@ -631,7 +631,7 @@ class TaxonomyMapping:
         fDot.write("  }\n")
         fDot.write("}\n")
         fDot.close()
-        commands.getoutput("dot -Tpng "+self.options.outputdir+fileName+".dot -o "+self.options.outputdir+fileName+".png")
+        commands.getoutput("dot -Tpdf "+self.options.outputdir+fileName+".dot -o "+self.options.outputdir+fileName+".pdf")
 
     def bottomupRemedy(self):
         first = True
