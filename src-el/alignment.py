@@ -539,17 +539,21 @@ class TaxonomyMapping:
                 tmpTr = list(self.tr)
                 for [T3, T4, P] in tmpTr:
                     if(T1 == T3 or T2 == T3):
+                      if self.tr.count([T3, T4, P]) > 0:
                         self.tr.remove([T3, T4, P])
                         self.tr.append([tmpStr, T4, 0])
                     elif(T1 == T4 or T2 == T4):
+                      if self.tr.count([T3, T4, P]) > 0:
                         self.tr.remove([T3, T4, P])
                         self.tr.append([T3, tmpStr, 0])
                     for T5 in self.eqConLi:
                         if(T5 == T3 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
-                            self.tr.remove([T3,T4,P])
+                          if self.tr.count([T3, T4, P]) > 0:
+                            self.tr.remove([T3, T4, P])
                             self.tr.append([tmpStr,T4,0])
                         elif(T5 == T4 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
-                            self.tr.remove([T3,T4,P])
+                          if self.tr.count([T3, T4, P]) > 0:
+                            self.tr.remove([T3, T4, P])
                             self.tr.append([T3,tmpStr,0])
         tmpeqConLi = []
         for T in self.eqConLi:
