@@ -35,6 +35,8 @@ class TaxonomyMapping:
         self.map = {}                          # mapping between the concept name and its numbering
         self.baseAsp = ""                      # tmp string for the ASP input file
         self.baseCb = ""                       # tmp string for the combined concept ASP input file
+        self.basePw = ""                       # tmp string for the ASP pw input file
+        self.baseIx = ""                       # tmp string for the ASP ix input file
         self.pw = ""
         self.npw = 0                           # # of pws
         self.pwflag = True                     # Whether to output pw
@@ -232,7 +234,7 @@ class TaxonomyMapping:
     def testConsistency(self):
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 1"
-            if commands.getoutput(com).count("\n") < 5:
+            if commands.getoutput(com).find("Models     : 0") != -1:
                 return False
         else:
             com = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+self.pwswitch
@@ -241,14 +243,20 @@ class TaxonomyMapping:
         return True
 
     def inconsistencyExplanation(self):
-        com = "dlv -silent -filter=ie -n=1 "+self.pwfile+" "+self.ixswitch
-        ie = commands.getoutput(com)
+        if reasoner[self.options.reasoner] == reasoner["gringo"]:
+            com = "gringo "+self.pwfile+" "+ self.ixswitch+ " | claspD 1"
+            ie = commands.getoutput(com)
+            ie.replace(" ", ", ")
+        else:
+            com = "dlv -silent -filter=ie -n=1 "+self.pwfile+" "+self.ixswitch
+            ie = commands.getoutput(com)
+            ie.replace("{", "").replace("}", "")
         self.postProcessIE(ie);
 
     def postProcessIE(self, ie):
         print "Please see "+self.name+"_ie.pdf for the inconsistency relations between all the rules."
         if ie.find("{}") == -1 and ie != "":
-            ies = (re.match("\{(.*)\}", ie)).group(1).split(", ")
+            ies = ie.split(", ")
             # print ies
             ielist = []
             tmpmap = {}
@@ -1115,9 +1123,11 @@ class TaxonomyMapping:
         fdlv.close()
         pdlv = open(self.pwswitch, 'w')
         idlv = open(self.ixswitch, 'w')
+        pdlv.write(self.basePw)
         pdlv.write("pw.")
         if self.options.hideOverlaps:
             pdlv.write("hide.")
+        pdlv.write(self.baseIx)
         idlv.write("ix.")
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             if self.enc & encode["ob"]:
@@ -1126,7 +1136,7 @@ class TaxonomyMapping:
                 pdlv.write("\n#hide.\n#show rel/3.")
             elif self.enc & encode["cb"]:
                 pdlv.write("\n#hide.\n#show relout/3.")
-            idlv.write("\n#hide.\n#show ie/3.")
+            idlv.write("\n#hide.\n#show ie/1.")
         pdlv.close()
         idlv.close()
 
@@ -1398,7 +1408,7 @@ class TaxonomyMapping:
                               if reasoner[self.options.reasoner] == reasoner["dlv"]:
 			          self.baseAsp += ":- #count{X: vrs(X), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0, pw.\n"
                               elif reasoner[self.options.reasoner] == reasoner["gringo"]:
-			          self.baseAsp += ":- [vrs(X): in(" + t1.dlvName() + ", X): in(" + t.dlvName() + ", X)]0, pw.\n"
+			          self.baseAsp += ":- [vrs(X): in(" + t1.dlvName() + ", X): in(" + t.dlvName() + ", X)]0.\n"
 			      self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n"
 			      self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n\n"
 			    coverage += ",out(" + t1.dlvName() + ", X)"
@@ -1499,7 +1509,7 @@ class TaxonomyMapping:
             ruleNum = len(self.rules)
             self.articulations[i].ruleNum = ruleNum
             self.rules["r" + ruleNum.__str__()] = self.articulations[i].string
-            self.baseAsp += self.articulations[i].toASP(self.options.encode, self.options.reasoner)+ "\n"
+            self.baseAsp += self.articulations[i].toASP(self.options.encode, self.options.reasoner, self)+ "\n"
 
     def genAspDc(self):
         self.baseCb  += self.baseAsp
