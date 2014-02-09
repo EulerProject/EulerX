@@ -387,6 +387,7 @@ class TaxonomyMapping:
             raw = self.pw.split("\n")
             ## Filter out those trash in the gringo output
             for i in range(2, len(raw) - 2, 2):
+                if raw[i].find("rel") == -1: continue
                 pws.append(raw[i].strip().replace(") ",");"))
         elif reasoner[self.options.reasoner] == reasoner["dlv"]:
             raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
