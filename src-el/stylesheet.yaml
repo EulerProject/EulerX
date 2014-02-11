@@ -1,0 +1,13 @@
+edgestyle:
+  default: style=solid color=black
+  isa: style=solid color=black
+  outplus: style=solid color="#105ff9"
+graphstyle:
+  graph: "rankdir=BT\n labelloc=t\n labeljust=left\n fontsize=20\n label=\"Sample\
+    \ Graph\"\n"
+  subgraph: 'off'
+nodestyle:
+  '1': shape=box style="filled,rounded" color=black fillcolor="#CCFFCC"
+  '2': shape=octagon style=filled color=black fillcolor="#FFFFCC"
+  common: shape=Msquare style=filled color=black fillcolor="#EEEEEE"
+  default: shape=circle style=filled color=black fillcolor=white
