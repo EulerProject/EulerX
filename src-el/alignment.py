@@ -1208,9 +1208,10 @@ class TaxonomyMapping:
 
         if self.enc & encode["dl"]:
             maxint = int(self.options.dl)*num
-	    self.baseAsp = "#maxint=" + maxint.__str__() + ".\n\n"
+	    self.baseAsp  = "%%% Max Number of Euler Regions\n"
+	    self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
 	    self.baseAsp += con
-	    self.baseAsp += "%%% regions\n"
+	    self.baseAsp += "%%% Euler Regions\n"
 	    self.baseAsp += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
 
 	    self.baseAsp += "%%% bit\n"
@@ -1234,15 +1235,18 @@ class TaxonomyMapping:
         elif self.enc & encode["mn"]:
             maxint = prod
             if reasoner[self.options.reasoner] == reasoner["dlv"]:
-	        self.baseAsp = "#maxint=" + maxint.__str__() + ".\n\n"
-	        self.baseAsp += "%%% regions\n"
+	        self.baseAsp  = "%%% Max Number of Euler Regions\n"
+	        self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
+	        self.baseAsp += "%%% Euler Regions\n"
 	        self.baseAsp += "r(M):- #int(M),M>=1,M<=#maxint.\n\n"
 
 	        self.baseAsp += con
 
-	        self.baseAsp += "%%% bit\n"
+	        self.baseAsp += "%%% Euler Bit\n"
                 for i in range(len(couArray)):
 	            self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n"
+	        self.baseAsp += "\n"
+
             elif reasoner[self.options.reasoner] == reasoner["gringo"]:
 	        self.baseAsp = con
 	        self.baseAsp += "%%% regions\n"
