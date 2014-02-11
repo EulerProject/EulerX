@@ -1242,10 +1242,9 @@ class TaxonomyMapping:
 
 	        self.baseAsp += con
 
-	        self.baseAsp += "%%% Euler Bit\n"
+	        self.baseAsp += "\n%%% Euler Bit\n"
                 for i in range(len(couArray)):
 	            self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n"
-	        self.baseAsp += "\n"
 
             elif reasoner[self.options.reasoner] == reasoner["gringo"]:
 	        self.baseAsp = con
@@ -1382,7 +1381,7 @@ class TaxonomyMapping:
             print "EXCEPTION: encode ",self.options.encode," not defined!!"
 
     def genAspPC(self):
-        self.baseAsp += "%%% PC relations\n"
+        self.baseAsp += "\n%%% Parent-Child relations\n"
         for key in self.taxonomies.keys():
             queue = copy.deepcopy(self.taxonomies[key].roots)
             while len(queue) != 0:

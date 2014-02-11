@@ -15,10 +15,10 @@ concept2(A, B) :- concept(A,B,_).
 concept2(c2_c,1).
 concept(c2_d,1,0).
 concept(c2_f,1,1).
+
 %%% Euler Bit
 bit(M, 0, V):-r(M),M1=M/1, #mod(M1,3,V).
 bit(M, 1, V):-r(M),M1=M/3, #mod(M1,3,V).
-
 
 
 %%% Meaning of regions
@@ -39,7 +39,8 @@ ie(prod(A,B)) :- vr(X, A), ir(X, B), ix.
 %%% Inconsistency Explanation.
 ie(s(R, A, Y)) :- pie(R, A, Y), not cc(R, Y), ix.
 cc(R, Y) :- c(R, _, Y), ix.
-%%% PC relations
+
+%%% Parent-Child relations
 %% ISA
 % c1_b isa c1_a
 ir(X, r0) :- in(c1_b, X), out(c1_a, X), pw.
@@ -58,6 +59,7 @@ c(r1, A, 1) :- vr(X, A), in(c1_e, X), in(c1_a, X), ix.
 %% coverage
 out3(c1_a, X, r2) :- out(c1_b, X), out(c1_e, X), ix.
 out(c1_a, X) :- out(c1_b, X), out(c1_e, X), pw.
+
 %% sibling disjointness
 % c1_b ! c1_e
 ir(X, r3) :- in(c1_b, X), in(c1_e, X).
@@ -86,6 +88,7 @@ c(r5, A, 1) :- vr(X, A), in(c2_f, X), in(c2_c, X), ix.
 %% coverage
 out3(c2_c, X, r6) :- out(c2_d, X), out(c2_f, X), ix.
 out(c2_c, X) :- out(c2_d, X), out(c2_f, X), pw.
+
 %% sibling disjointness
 % c2_d ! c2_f
 ir(X, r7) :- in(c2_d, X), in(c2_f, X).
