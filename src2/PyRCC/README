@@ -1,0 +1,76 @@
+############################
+About PyRCC8
+############################
+
+A RCC8 based qualitative spatial reasoner written in pure Python
+
+PyRCC8 is an efficient qualitative spatial reasoner written in pure Python. It implements the RCC8 constraint language that has been popularly adopted by the Qualitative Spatial Reasoning and GIS communities.
+
+############################
+PyRCC8 source code
+############################
+
+http://pypi.python.org/pypi/PyRCC8/
+
+############################
+PyRCC8 Manual
+############################
+1. Create the input file for PyRCC8
+The input file is in file extension .csp, and by default put into ./csp folder
+
+The format of input file: Take "wiki.csp" as an example
+
+"wiki.csp"
+4 #wiki_example
+0 1 ( DC )
+0 2 ( NTPP TPP )
+0 3 ( DC EC )
+0 4 ( EC )
+1 2 ( DC EC )
+1 3 ( NTPP )
+1 4 ( EC )
+2 3 ( DC EC )
+.
+
+All the concepts are denoted by integers (Starting from 0)
+
+The first line shows the "last" concept (In this example, we have 5 concepts, which are 0,1,2,3,4; so the first line shows the "last concept" 4). "wiki_example" followed by a "#" is the comment of this example.
+
+Starting from the second line, each line represents a pair of concepts (denoted by integers) and the RCC8 relations between them (listed in parentheses)
+e.g the second line shows concept0 and concept1 are dis-connect; the fourth line shows concept0 and concept3 are either dis-connect or external connect
+
+The input file is ended with a dot "."
+
+
+2. Run PyRCC8 to check the consistency of the input relations (Refer to README file in package)
+
+rcc8.py [options] < [spatial CSP file]
+
+Options:
+  -h, --help            show this help message and exit
+  -m METHOD, --method=METHOD
+                        interaction mode: recursive, or iterative [default:
+                        recursive]
+  -v VARHEURISTIC, --varheuristic=VARHEURISTIC
+                        interaction mode: none, cardinality, or random
+                        [default: cardinality]
+  -p PCHEURISTIC, --pcheuristic=PCHEURISTIC
+                        interaction mode: none, weighted, or smart [default:
+                        weighted]
+  -s SPLIT, --split=SPLIT
+                        interaction mode: base, or horn [default: horn]
+  -l VALHEURISTIC, --valheuristic=VALHEURISTIC
+                        interaction mode: none, or lcv [default: lcv]
+  -r PROCESS, --process=PROCESS
+                        interaction mode: static, or dynamic [default:
+                        dynamic]
+  -o SCOPE, --scope=SCOPE
+                        interaction mode: local, or global [default: local]
+  -d, --print           print solution to output
+
+############################
+Author's homepage
+############################
+
+http://cgi.di.uoa.gr/~sioutis/
+
