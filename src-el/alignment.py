@@ -35,6 +35,8 @@ class TaxonomyMapping:
         self.map = {}                          # mapping between the concept name and its numbering
         self.baseAsp = ""                      # tmp string for the ASP input file
         self.baseCb = ""                       # tmp string for the combined concept ASP input file
+        self.basePw = ""                       # tmp string for the ASP pw input file
+        self.baseIx = ""                       # tmp string for the ASP ix input file
         self.pw = ""
         self.npw = 0                           # # of pws
         self.pwflag = True                     # Whether to output pw
@@ -232,7 +234,7 @@ class TaxonomyMapping:
     def testConsistency(self):
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 1"
-            if commands.getoutput(com).count("\n") < 5:
+            if commands.getoutput(com).find("Models     : 0") != -1:
                 return False
         else:
             com = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+self.pwswitch
@@ -241,14 +243,20 @@ class TaxonomyMapping:
         return True
 
     def inconsistencyExplanation(self):
-        com = "dlv -silent -filter=ie -n=1 "+self.pwfile+" "+self.ixswitch
-        ie = commands.getoutput(com)
+        if reasoner[self.options.reasoner] == reasoner["gringo"]:
+            com = "gringo "+self.pwfile+" "+ self.ixswitch+ " | claspD 1"
+            ie = commands.getoutput(com)
+            ie.replace(" ", ", ")
+        else:
+            com = "dlv -silent -filter=ie -n=1 "+self.pwfile+" "+self.ixswitch
+            ie = commands.getoutput(com)
+            ie.replace("{", "").replace("}", "")
         self.postProcessIE(ie);
 
     def postProcessIE(self, ie):
         print "Please see "+self.name+"_ie.pdf for the inconsistency relations between all the rules."
         if ie.find("{}") == -1 and ie != "":
-            ies = (re.match("\{(.*)\}", ie)).group(1).split(", ")
+            ies = ie.split(", ")
             # print ies
             ielist = []
             tmpmap = {}
@@ -387,6 +395,7 @@ class TaxonomyMapping:
             raw = self.pw.split("\n")
             ## Filter out those trash in the gringo output
             for i in range(2, len(raw) - 2, 2):
+                if raw[i].find("rel") == -1: continue
                 pws.append(raw[i].strip().replace(") ",");"))
         elif reasoner[self.options.reasoner] == reasoner["dlv"]:
             raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
@@ -530,17 +539,21 @@ class TaxonomyMapping:
                 tmpTr = list(self.tr)
                 for [T3, T4, P] in tmpTr:
                     if(T1 == T3 or T2 == T3):
+                      if self.tr.count([T3, T4, P]) > 0:
                         self.tr.remove([T3, T4, P])
                         self.tr.append([tmpStr, T4, 0])
                     elif(T1 == T4 or T2 == T4):
+                      if self.tr.count([T3, T4, P]) > 0:
                         self.tr.remove([T3, T4, P])
                         self.tr.append([T3, tmpStr, 0])
                     for T5 in self.eqConLi:
                         if(T5 == T3 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
-                            self.tr.remove([T3,T4,P])
+                          if self.tr.count([T3, T4, P]) > 0:
+                            self.tr.remove([T3, T4, P])
                             self.tr.append([tmpStr,T4,0])
                         elif(T5 == T4 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
-                            self.tr.remove([T3,T4,P])
+                          if self.tr.count([T3, T4, P]) > 0:
+                            self.tr.remove([T3, T4, P])
                             self.tr.append([T3,tmpStr,0])
         tmpeqConLi = []
         for T in self.eqConLi:
@@ -1114,9 +1127,11 @@ class TaxonomyMapping:
         fdlv.close()
         pdlv = open(self.pwswitch, 'w')
         idlv = open(self.ixswitch, 'w')
+        pdlv.write(self.basePw)
         pdlv.write("pw.")
         if self.options.hideOverlaps:
             pdlv.write("hide.")
+        pdlv.write(self.baseIx)
         idlv.write("ix.")
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             if self.enc & encode["ob"]:
@@ -1125,7 +1140,7 @@ class TaxonomyMapping:
                 pdlv.write("\n#hide.\n#show rel/3.")
             elif self.enc & encode["cb"]:
                 pdlv.write("\n#hide.\n#show relout/3.")
-            idlv.write("\n#hide.\n#show ie/3.")
+            idlv.write("\n#hide.\n#show ie/1.")
         pdlv.close()
         idlv.close()
 
@@ -1193,9 +1208,10 @@ class TaxonomyMapping:
 
         if self.enc & encode["dl"]:
             maxint = int(self.options.dl)*num
-	    self.baseAsp = "#maxint=" + maxint.__str__() + ".\n\n"
+	    self.baseAsp  = "%%% Max Number of Euler Regions\n"
+	    self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
 	    self.baseAsp += con
-	    self.baseAsp += "%%% regions\n"
+	    self.baseAsp += "%%% Euler Regions\n"
 	    self.baseAsp += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
 
 	    self.baseAsp += "%%% bit\n"
@@ -1219,15 +1235,17 @@ class TaxonomyMapping:
         elif self.enc & encode["mn"]:
             maxint = prod
             if reasoner[self.options.reasoner] == reasoner["dlv"]:
-	        self.baseAsp = "#maxint=" + maxint.__str__() + ".\n\n"
-	        self.baseAsp += "%%% regions\n"
+	        self.baseAsp  = "%%% Max Number of Euler Regions\n"
+	        self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
+	        self.baseAsp += "%%% Euler Regions\n"
 	        self.baseAsp += "r(M):- #int(M),M>=1,M<=#maxint.\n\n"
 
 	        self.baseAsp += con
 
-	        self.baseAsp += "%%% bit\n"
+	        self.baseAsp += "\n%%% Euler Bit\n"
                 for i in range(len(couArray)):
 	            self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n"
+
             elif reasoner[self.options.reasoner] == reasoner["gringo"]:
 	        self.baseAsp = con
 	        self.baseAsp += "%%% regions\n"
@@ -1363,7 +1381,7 @@ class TaxonomyMapping:
             print "EXCEPTION: encode ",self.options.encode," not defined!!"
 
     def genAspPC(self):
-        self.baseAsp += "%%% PC relations\n"
+        self.baseAsp += "\n%%% Parent-Child relations\n"
         for key in self.taxonomies.keys():
             queue = copy.deepcopy(self.taxonomies[key].roots)
             while len(queue) != 0:
@@ -1397,7 +1415,7 @@ class TaxonomyMapping:
                               if reasoner[self.options.reasoner] == reasoner["dlv"]:
 			          self.baseAsp += ":- #count{X: vrs(X), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0, pw.\n"
                               elif reasoner[self.options.reasoner] == reasoner["gringo"]:
-			          self.baseAsp += ":- [vrs(X): in(" + t1.dlvName() + ", X): in(" + t.dlvName() + ", X)]0, pw.\n"
+			          self.baseAsp += ":- [vrs(X): in(" + t1.dlvName() + ", X): in(" + t.dlvName() + ", X)]0.\n"
 			      self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n"
 			      self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n\n"
 			    coverage += ",out(" + t1.dlvName() + ", X)"
@@ -1498,7 +1516,7 @@ class TaxonomyMapping:
             ruleNum = len(self.rules)
             self.articulations[i].ruleNum = ruleNum
             self.rules["r" + ruleNum.__str__()] = self.articulations[i].string
-            self.baseAsp += self.articulations[i].toASP(self.options.encode, self.options.reasoner)+ "\n"
+            self.baseAsp += self.articulations[i].toASP(self.options.encode, self.options.reasoner, self)+ "\n"
 
     def genAspDc(self):
         self.baseCb  += self.baseAsp
