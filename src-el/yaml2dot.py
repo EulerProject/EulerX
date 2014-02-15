@@ -35,7 +35,11 @@ def apply_style(datafile, output):
             if (g!= "common" and g!= "none"):
                f.write('"'+ g + "." + n + '"\n')
             else:
-               f.write('"'+ n + '"\n')
+                f.write('"'+ n + '"')
+                if "+" in n:
+                    print(n)
+                    f.write(' [label="+"]')
+                f.write("\n")
         if (styles["graphstyle"]["subgraph"] == "on"and g != "none"):
             f.write("}")
     for l in edges:
@@ -47,9 +51,6 @@ def apply_style(datafile, output):
         for e in edges[l]:
             f.write('"' + e[0][1] + '" -> "' + e[1][1] + '"')
             f.write('[penwidth=' + e[2][1] + "]")
-        # some of the labels are not shown in the output
-            if (l != "isa"and l != "inplus" and l != "outplus"):
-                f.write(' [label="' + l + '"]')
             f.write("\n")
     f.write("}")            
     f.close()
