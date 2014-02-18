@@ -1,0 +1,21 @@
+taxonomy 1 Taxonomy1
+(13 14 15 16)
+
+taxonomy 2 Taxonomy2
+(24 25 26 30)
+(26 27 28 29)
+
+articulation tw1 tw1
+[1.13 equals 2.24]
+[1.14 equals 2.25]
+[1.15 is_included_in 2.26]
+[1.15 equals 2.27]
+[1.15 disjoint 2.28]
+[1.15 disjoint 2.29]
+[1.15 disjoint 2.30]
+[1.16 includes 2.28]
+[1.16 includes 2.29]
+[1.16 includes 2.30]
+[1.16 disjoint 2.27]
+[1.16 r3sum 2.28 2.29 2.30]
+[1.16 overlaps 2.26]
