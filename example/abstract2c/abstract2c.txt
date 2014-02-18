@@ -1,0 +1,18 @@
+taxonomy 1 Taxonomy1
+(A B F)
+(B C D E)
+(F G H)
+
+taxonomy 2 Taxonomy2
+(A B F)
+(B CD E)
+(F GH)
+
+articulation abs abstract2c
+[1_A equals 2_A confidence=1]
+[1_B {equals includes} 2_B confidence=1]
+[1_C is_included_in 2_CD confidence=1]
+[1_D {is_included_in overlaps} 2_CD confidence=1]
+[1_E equals 2_E confidence=1]
+[1_F is_included_in 2_F confidence=3]
+[1_G 1_H lsum 2_GH confidence=1]
