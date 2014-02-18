@@ -296,26 +296,26 @@ class TaxonomyMapping:
             #print diag
                 
 # Comment out the ie.pdf part tmporarily
-#            fie = open(self.iefile, 'w')
-#            fie.write("strict digraph "+self.name+"_ie {\n\nrankdir = LR\n\n")
-#            #fie.write("subgraph rules {\n")
-#            #for key in self.rules.keys():
-#            #    fie.write(key+"\n")
-#            #fie.write("}\n")
-#            #fie.write("subgraph inconsistencies {\n")
-#            #for key in tmpmap.keys():
-#            #    fie.write("\""+key+"\"\n")
-#            #fie.write("}\n")
-#            for key in tmpmap.keys():
-#                for value in tmpmap[key]:
-#                    fie.write("\""+value+"\" -> \"inconsistency="+key.__str__()+":"+tmpmap[key].__str__()+"\" \n")
-#            label=""
-#            for key in self.rules.keys():
-#                label += key+" : "+self.rules[key]+"\t"
-#            fie.write("graph [label=\""+label+"\"]\n")
-#            fie.write("}")
-#            fie.close()
-#            commands.getoutput("dot -Tpdf "+self.iefile+" -o "+self.iepdf)
+            fie = open(self.iefile, 'w')
+            fie.write("strict digraph "+self.name+"_ie {\n\nrankdir = LR\n\n")
+            #fie.write("subgraph rules {\n")
+            #for key in self.rules.keys():
+            #    fie.write(key+"\n")
+            #fie.write("}\n")
+            #fie.write("subgraph inconsistencies {\n")
+            #for key in tmpmap.keys():
+            #    fie.write("\""+key+"\"\n")
+            #fie.write("}\n")
+            for key in tmpmap.keys():
+                for value in tmpmap[key]:
+                    fie.write("\""+value+"\" -> \"inconsistency="+key.__str__()+":"+tmpmap[key].__str__()+"\" \n")
+            label=""
+            for key in self.rules.keys():
+                label += key+" : "+self.rules[key]+"\t"
+            fie.write("graph [label=\""+label+"\"]\n")
+            fie.write("}")
+            fie.close()
+            commands.getoutput("dot -Tpdf "+self.iefile+" -o "+self.iepdf)
 
     def getDiag(self, raw):
         rawl = len(raw)
