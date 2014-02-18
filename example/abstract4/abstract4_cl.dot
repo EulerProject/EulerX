@@ -2,7 +2,6 @@ graph abstract4_cluster {
 overlap=false
 splines=true
   node [shape=box style="filled, rounded" fillcolor="#FFFFCC"]
-"pw2" -- "pw0" [label=4,len=4]
 "pw2" -- "pw1" [label=1,len=1]
 "pw3" -- "pw0" [label=3,len=3]
 "pw3" -- "pw1" [label=2,len=2]
@@ -11,4 +10,5 @@ splines=true
 "pw5" -- "pw4" [label=2,len=2]
 "pw6" -- "pw3" [label=1,len=1]
 "pw6" -- "pw4" [label=2,len=2]
+"pw2" -- "pw0" [label=4,len=4]
 }
