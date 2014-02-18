@@ -1,0 +1,34 @@
+digraph {
+rankdir = BT
+subgraph cluster_t1 {
+style=invis;
+node [shape=box style="filled" fillcolor="#CCFFCC"];
+"1.A";
+"1.B";
+"1.C";
+"1.D";
+"1.E";
+"1.B" -> "1.A" [label=isa, color=black];
+"1.C" -> "1.A" [label=isa, color=black];
+"1.D" -> "1.A" [label=isa, color=black];
+"1.E" -> "1.A" [label=isa, color=black];
+}
+subgraph cluster_t2 {
+style=invis;
+node [shape=octagon style="filled" fillcolor="#FFFFCC"];
+"2.A";
+"2.B";
+"2.D";
+"2.F";
+"2.G";
+"2.B" -> "2.A" [label=isa, color=black];
+"2.D" -> "2.A" [label=isa, color=black];
+"2.F" -> "2.A" [label=isa, color=black];
+"2.G" -> "2.A" [label=isa, color=black];
+}
+"1.A" -> "2.A" [color=grey, style=dashed, label="< OR =="];
+"1.B" -> "2.B" [color=grey, style=dashed, label="=="];
+"1.C" -> "2.F" [color=grey, style=dashed, label="< OR ><"];
+"1.D" -> "2.D" [color=grey, style=dashed, label="=="];
+"1.E" -> "2.G" [color=grey, style=dashed, label="== OR ><"];
+}
