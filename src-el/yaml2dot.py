@@ -37,7 +37,6 @@ def apply_style(datafile, output):
             else:
                 f.write('"'+ n + '"')
                 if "+" in n:
-                    print(n)
                     f.write(' [label="+"]')
                 f.write("\n")
         if (styles["graphstyle"]["subgraph"] == "on"and g != "none"):
@@ -51,6 +50,8 @@ def apply_style(datafile, output):
         for e in edges[l]:
             f.write('"' + e[0][1] + '" -> "' + e[1][1] + '"')
             f.write('[penwidth=' + e[2][1] + "]")
+            if (int(e[2][1]) >1):
+                f.write(' [label="' + e[2][1] + '"]')
             f.write("\n")
     f.write("}")            
     f.close()
