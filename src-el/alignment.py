@@ -986,16 +986,18 @@ class TaxonomyMapping:
                     dmatrix[i].append(0)
                     fcl.write("0 "); continue
                 d = 0
+                s = ""
                 if obs:
                     for ob in pws[i]:
                         if ob not in pws[j]: d += 1
                     for ob in pws[j]:
                         if ob not in pws[i]: d += 1
                 else:
-                    s = ""
                     for key in pws[i].keys():
                         if pws[i][key] != pws[j][key]: 
-                            s = s + key + " " + relation.keys()[relation.values().index(pws[i][key])].__str__() + " " + relation.keys()[relation.values().index(pws[j][key])].__str__() + ";"
+                            s = s + key\
+                                  + " " + findkey(relation, pws[i][key]).__str__()\
+                                  + " " + findkey(relation, pws[j][key]).__str__() + ";"
                             d += 1
                 fcl.write(d.__str__()+" ")
                 dmatrix[i].append(d)
