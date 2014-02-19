@@ -992,13 +992,16 @@ class TaxonomyMapping:
                     for ob in pws[j]:
                         if ob not in pws[i]: d += 1
                 else:
+                    s = ""
                     for key in pws[i].keys():
-                        if pws[i][key] != pws[j][key]: d += 1
+                        if pws[i][key] != pws[j][key]: 
+                            s = s + key + " " + relation.keys()[relation.values().index(pws[i][key])].__str__() + " " + relation.keys()[relation.values().index(pws[j][key])].__str__() + ";"
+                            d += 1
                 fcl.write(d.__str__()+" ")
                 dmatrix[i].append(d)
                 if i != j and not self.options.simpCluster:
                     fcldot.write("\"pw"+i.__str__()+"\" -- \"pw"+j.__str__()+\
-                            "\" [label="+d.__str__()+",len="+d.__str__()+"]\n")
+                            "\" [label=\""+d.__str__()+"; "+s+"\",len="+d.__str__()+"]\n")
             fcl.write("\n")
         if self.options.simpCluster:
             for i in range(self.npw):
