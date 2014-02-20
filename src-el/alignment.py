@@ -503,33 +503,33 @@ class TaxonomyMapping:
             if not self.eq.has_key(T1):
                 continue
             tmpStr = ""
-            blueNode = False
+#            blueNode = False
             T1s = T1.split(".")
             # First taxonomy name
             if tmpTax == "": tmpTax = self.taxa1name
             for T2 in self.eq[T1]:
                 T2s = T2.split(".")
-                if(T1s[1] == T2s[1]):
-                    blueNode = True
-                else:
-                    if tmpStr != "":
-                        tmpStr = "\\n" + tmpStr
-                    tmpStr = T2 + tmpStr
+#                if(T1s[1] == T2s[1]):
+#                    blueNode = True
+#                else:
+                if tmpStr != "":
+                    tmpStr = "\\n" + tmpStr
+                tmpStr = T2 + tmpStr
             if tmpStr != "":
                 tmpStr = "\\n" + tmpStr + "\\n"
 #                if tmpStr.split(".")[0]  == tmpTax:
 #                    tmpStr = tmpStr + "\\n"
 #                else:
 #                    tmpStr = "\\n" + tmpStr
-            if blueNode:
-                tmpStr = T1s[1] + tmpStr
-                # fDot.write("\"" + tmpStr +"\" [color=blue];\n")
-                # fAllDot.write("\"" + tmpStr +"\" [color=blue];\n")
+#            if blueNode:
+#                tmpStr = T1s[1] + tmpStr
+#                # fDot.write("\"" + tmpStr +"\" [color=blue];\n")
+#                # fAllDot.write("\"" + tmpStr +"\" [color=blue];\n")
+#            else:
+            if T1s[0] == tmpTax:
+                tmpStr = T1 + tmpStr
             else:
-                if T1s[0] == tmpTax:
-                    tmpStr = T1 + tmpStr
-                else:
-                    tmpStr = tmpStr + T1
+                tmpStr = tmpStr + T1
             if tmpStr[0:2] == "\\n": tmpStr = tmpStr[2:]
             if tmpStr[-2:] == "\\n": tmpStr = tmpStr[:-2]
             self.eqConLi.append(tmpStr)
