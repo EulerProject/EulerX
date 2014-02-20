@@ -18,6 +18,9 @@ def remove_duplicate_string(li):
             else:
                 last = li[i]
 
+def removeBracPri(s):
+    return s.replace("[","").replace("]","").replace("'","")
+
 fileName = sys.argv[1]+".txt"
 misArts = []
 arts = []
@@ -212,15 +215,15 @@ anyRedW = []
 for anyGreen in allGreens:
     anyGreenW.append(anyGreen[0])
     if anyGreen[0] in solidGreenWs:
-        fOut.write(anyGreen[0] + ' [shape=box color="#00FF00" style="rounded,filled" label="' + anyGreen[1:].__str__() +'"];\n')
+        fOut.write(anyGreen[0] + ' [shape=box color="#00FF00" style="rounded,filled" label="' + removeBracPri(anyGreen[1:].__str__()) +'"];\n')
     else:
-        fOut.write(anyGreen[0] + ' [shape=box color="#00FF00" style=dashed label="' + anyGreen[1:].__str__() +'"];\n')
+        fOut.write(anyGreen[0] + ' [shape=box color="#00FF00" style=dashed label="' + removeBracPri(anyGreen[1:].__str__()) +'"];\n')
 for anyRed in allReds:
     anyRedW.append(anyRed[0])
     if anyRed[0] in solidRedWs:
-        fOut.write(anyRed[0] + ' [shape=octagon color="#FF0000" style=filled label="' + anyRed[1:].__str__() +'"];\n')
+        fOut.write(anyRed[0] + ' [shape=octagon color="#FF0000" style=filled label="' + removeBracPri(anyRed[1:].__str__()) +'"];\n')
     else:
-        fOut.write(anyRed[0] + ' [shape=octagon color="#FF0000" style=dashed label="' + anyRed[1:].__str__() +'"];\n')    
+        fOut.write(anyRed[0] + ' [shape=octagon color="#FF0000" style=dashed label="' + removeBracPri(anyRed[1:].__str__()) +'"];\n')    
 for up in ups:
     if up.split(",")[0][3:] in anyGreenW and up.split(",")[1][:-1] in anyGreenW:
         fOut.write(up.split(",")[1][:-1] + '->' + up.split(",")[0][3:] + '[color="#00FF00" style=dashed];\n')
@@ -238,24 +241,30 @@ fileDot = sys.argv[1]+"_lat.dot"
 f = open(fileDot,"w")
 f.write("digraph{\n")
 f.write("rankdir=TB\n")
-f.write('"AllOtherRed" [shape=octagon color="#FF0000" style=dashed]\n')
-f.write('"AllOtherGreen" [shape=box color="#00FF00" style=dashed]\n')
+if len(misList) != 1:
+    f.write('"AllOtherRed" [shape=octagon color="#FF0000" style=dashed]\n')
+if len(macList) != 1:
+    f.write('"AllOtherGreen" [shape=box color="#00FF00" style="rounded,dashed"]\n')
 for mcs in macList:
-    f.write('"' + str(mcs[1:]) + '" [shape=box color="#00FF00" style="rounded,filled"];\n')
+    f.write('"' + removeBracPri(str(mcs[1:])) + '" [shape=box color="#00FF00" style="rounded,filled"];\n')
 for mis in misList:
-    f.write('"' + str(mis) + '" [shape=octagon color="#FF0000" style="filled"];\n')
+    f.write('"' + removeBracPri(str(mis)) + '" [shape=octagon color="#FF0000" style="filled"];\n')
 for mcs in macList:
-    f.write('"AllOtherRed" -> "' + str(mcs[1:]) + '" [color=blue, arrowhead=none, label='+ str(len(arts)-len(mcs[1:])) +'];\n')
-    f.write('"' + str(mcs[1:]) + '" -> "AllOtherGreen" [color=green, style=dashed, label='+ str(len(mcs[1:])) +'];\n')
+    if len(misList) != 1:
+        f.write('"AllOtherRed" -> "' + removeBracPri(str(mcs[1:])) + '" [color=blue, arrowhead=none, label='+ str(len(arts)-len(mcs[1:])) +'];\n')
+    if len(macList) != 1:
+        f.write('"' + removeBracPri(str(mcs[1:])) + '" -> "AllOtherGreen" [color=green, style=dashed, label='+ str(len(mcs[1:])) +'];\n')
 for mis in misList:
-    f.write('"AllOtherRed" -> "' + str(mis) + '" [color=red, style=dashed, dir=back, label='+ str(len(arts)-len(mis)) +'];\n')
-    f.write('"' + str(mis) + '" -> "AllOtherGreen" [color=blue, arrowhead=none, label='+ str(len(mis)) +'];\n')
+    if len(misList) != 1:
+        f.write('"AllOtherRed" -> "' + removeBracPri(str(mis)) + '" [color=red, style=dashed, dir=back, label='+ str(len(arts)-len(mis)) +'];\n')
+    if len(macList) != 1:
+        f.write('"' + removeBracPri(str(mis)) + '" -> "AllOtherGreen" [color=blue, arrowhead=none, label='+ str(len(mis)) +'];\n')
 for mcs in macList:
     for mis in misList:
         if set(mcs[1:]).issubset(set(mis)):
-            f.write('"' + str(mis) + '" -> "' + str(mcs[1:]) + '" [color=blue, arrowhead=none, label=1];\n')
+            f.write('"' + removeBracPri(str(mis)) + '" -> "' + removeBracPri(str(mcs[1:])) + '" [color=blue, arrowhead=none, label=1];\n')
         elif set(mis).issubset(set(mcs[1:])):
-            f.write('"' + str(mcs[1:]) + '" -> "' + str(mis) + '" [color=blue, arrowhead=none, label=1];\n')
+            f.write('"' + removeBracPri(str(mcs[1:])) + '" -> "' + removeBracPri(str(mis)) + '" [color=blue, arrowhead=none, label=1];\n')
 
 f.write("}")
 f.close()
