@@ -9,4 +9,5 @@ euler -i $1.txt -e mnpw --ie > output.txt;
 echo "from MIS to MAC and get lattice..."
 python lattice.py $1;
 dot -Tpdf $1_lat.dot -o $1_lat.pdf;
+dot -Tpdf $1_fulllat.dot -o $1_fulllat.pdf
 echo "finish";
