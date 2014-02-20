@@ -203,8 +203,7 @@ for mac in macList:
 fileDot = sys.argv[1]+"_fulllat.dot"
 fIn = open("up.dlv","r")
 line = fIn.readline()
-ups = line[1:-1].split(", ")
-ups = fIn.readlines()
+ups = line[1:-2].split(", ")
 fOut = open(fileDot,"w")
 fOut.write("digraph{\n")
 fOut.write("rankdir=TB\n")
@@ -223,12 +222,12 @@ for anyRed in allReds:
     else:
         fOut.write(anyRed[0] + ' [shape=octagon color="#FF0000" style=dashed label="' + anyRed[1:].__str__() +'"];\n')    
 for up in ups:
-    if up.split(",")[0][3:] in anyGreenW and up.split(",")[1][:-3] in anyGreenW:
-        fOut.write(up.split(",")[1][:-3] + '->' + up.split(",")[0][3:] + '[color="#00FF00" style=dashed];\n')
-    if up.split(",")[0][3:] in anyRedW and up.split(",")[1][:-3] in anyRedW:
-        fOut.write(up.split(",")[1][:-3] + '->' + up.split(",")[0][3:] + '[dir=back color="#FF0000" style=dashed];\n')
-    if up.split(",")[0][3:] in anyGreenW and up.split(",")[1][:-3] in anyRedW:
-        fOut.write(up.split(",")[1][:-3] + '->' + up.split(",")[0][3:] + '[arrowhead=none color="#0000FF" style=filled];\n')
+    if up.split(",")[0][3:] in anyGreenW and up.split(",")[1][:-1] in anyGreenW:
+        fOut.write(up.split(",")[1][:-1] + '->' + up.split(",")[0][3:] + '[color="#00FF00" style=dashed];\n')
+    if up.split(",")[0][3:] in anyRedW and up.split(",")[1][:-1] in anyRedW:
+        fOut.write(up.split(",")[1][:-1] + '->' + up.split(",")[0][3:] + '[dir=back color="#FF0000" style=dashed];\n')
+    if up.split(",")[0][3:] in anyGreenW and up.split(",")[1][:-1] in anyRedW:
+        fOut.write(up.split(",")[1][:-1] + '->' + up.split(",")[0][3:] + '[arrowhead=none color="#0000FF" style=filled];\n')
 
 fOut.write("}")
 fIn.close()
@@ -241,22 +240,22 @@ f.write("digraph{\n")
 f.write("rankdir=TB\n")
 f.write('"AllOtherRed" [shape=octagon color="#FF0000" style=dashed]\n')
 f.write('"AllOtherGreen" [shape=box color="#00FF00" style=dashed]\n')
-for mcs in allGreens:
-    f.write('"' + str(mcs) + '" [shape=box color="#00FF00" style="rounded,filled"];\n')
+for mcs in macList:
+    f.write('"' + str(mcs[1:]) + '" [shape=box color="#00FF00" style="rounded,filled"];\n')
 for mis in misList:
     f.write('"' + str(mis) + '" [shape=octagon color="#FF0000" style="filled"];\n')
-for mcs in allGreens:
-    f.write('"AllOtherRed" -> "' + str(mcs) + '" [color=blue, arrowhead=none, label='+ str(len(arts)-len(mcs)) +'];\n')
-    f.write('"' + str(mcs) + '" -> "AllOtherGreen" [color=green, style=dashed, label='+ str(len(mcs)) +'];\n')
+for mcs in macList:
+    f.write('"AllOtherRed" -> "' + str(mcs[1:]) + '" [color=blue, arrowhead=none, label='+ str(len(arts)-len(mcs[1:])) +'];\n')
+    f.write('"' + str(mcs[1:]) + '" -> "AllOtherGreen" [color=green, style=dashed, label='+ str(len(mcs[1:])) +'];\n')
 for mis in misList:
     f.write('"AllOtherRed" -> "' + str(mis) + '" [color=red, style=dashed, dir=back, label='+ str(len(arts)-len(mis)) +'];\n')
     f.write('"' + str(mis) + '" -> "AllOtherGreen" [color=blue, arrowhead=none, label='+ str(len(mis)) +'];\n')
-for mcs in allGreens:
+for mcs in macList:
     for mis in misList:
-        if set(mcs).issubset(set(mis)):
-            f.write('"' + str(mis) + '" -> "' + str(mcs) + '" [color=blue, arrowhead=none, label=1];\n')
-        elif set(mis).issubset(set(mcs)):
-            f.write('"' + str(mcs) + '" -> "' + str(mis) + '" [color=blue, arrowhead=none, label=1];\n')
+        if set(mcs[1:]).issubset(set(mis)):
+            f.write('"' + str(mis) + '" -> "' + str(mcs[1:]) + '" [color=blue, arrowhead=none, label=1];\n')
+        elif set(mis).issubset(set(mcs[1:])):
+            f.write('"' + str(mcs[1:]) + '" -> "' + str(mis) + '" [color=blue, arrowhead=none, label=1];\n')
 
 f.write("}")
 f.close()
