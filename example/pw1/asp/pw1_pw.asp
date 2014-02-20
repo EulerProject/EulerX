@@ -59,7 +59,6 @@ c(r1, A, 1) :- vr(X, A), in(c1_e, X), in(c1_a, X), ix.
 %% coverage
 out3(c1_a, X, r2) :- out(c1_b, X), out(c1_e, X), ix.
 out(c1_a, X) :- out(c1_b, X), out(c1_e, X), pw.
-
 %% sibling disjointness
 % c1_b ! c1_e
 ir(X, r3) :- in(c1_b, X), in(c1_e, X).
@@ -88,7 +87,6 @@ c(r5, A, 1) :- vr(X, A), in(c2_f, X), in(c2_c, X), ix.
 %% coverage
 out3(c2_c, X, r6) :- out(c2_d, X), out(c2_f, X), ix.
 out(c2_c, X) :- out(c2_d, X), out(c2_f, X), pw.
-
 %% sibling disjointness
 % c2_d ! c2_f
 ir(X, r7) :- in(c2_d, X), in(c2_f, X).
