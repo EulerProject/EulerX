@@ -1,15 +1,12 @@
+import subprocess
 from subprocess import call
 import sys
 
 def removeRed(originList,removeList):
     delNodes = []
     for e in removeList:
-        for node in originList:
-            if e[:-1] == node:
-                delNodes.append(node)
-    for delNode in delNodes:
-        if originList.index(delNode) != -1:
-            originList.remove(delNode)
+        if e in originList:
+            originList.remove(e)
 
 def remove_duplicate_string(li):
     if li:
@@ -37,14 +34,13 @@ for line in lines:
             tmpmis = tmpmis + mis[mis.index(":")+2:] + ","
         misArts.append(tmpmis[:-1])
 f.close()
-#print misArts
 f = open(fileName, "r")
 lines = f.readlines()
 for line in lines:
     if line[0] == "[":
         arts.append(line[1:-2])
 f.close()
-#print "arts=",arts, len(arts)
+
 misArtIds = []
 misList = []
 for mis in misArts:
@@ -59,91 +55,186 @@ for mis in misArts:
         tmpindexesList.append(str(tmpindex))
     misArtIds.append(tmpindexes)
     misList.append(tmpindexesList)
-#print misArtId
+
 i = 0
-fileName = ""
-fileList = []
+solidRedWs = []
+allRedWs = []
 for misArtId in misArtIds:
     s = ""
+    ssR = ""
     for e in misArtId:
         s = s + "i(W," + str(e) + "),"
+    for e in range(1,len(arts)+1):
+        if e not in misArtId:
+            ssR = ssR + "o(W," + e.__str__() + "),"
+    ssR = s + ssR
     f = open("query.asp","w")
     f.write(s[:-1]+"?")
     f.close()
-    fileName = "mis" + str(i) + ".txt"
-    call("dlv -silent -brave expWorlds_aw.asp query.asp > " + fileName, shell=True)
-    fileList.append(fileName)
+    allRedW = subprocess.check_output("dlv -silent -brave expWorlds_aw.asp query.asp", shell=True)
+    for e in allRedW.split("\n")[:-1]:
+        allRedWs.append(e)
+    f = open("query.asp","w")
+    f.write(ssR[:-1]+"?")
+    f.close()
+    solidRedW = subprocess.check_output("dlv -silent -brave expWorlds_aw.asp query.asp", shell=True)
+    solidRedWs.append(solidRedW[:-1])
     i = i + 1
-    
 
 allNodes = []
 for i in range(2**len(arts)):
     allNodes.append(str(i))
-    
-for fileName in fileList:
-    f = open(fileName,"r")
-    miss = f.readlines()
+
+remove_duplicate_string(allRedWs)
+
+f = open("resultRed.txt","w")
+i = 0
+for node in allRedWs:
+    f = open("query.asp","w")
+    f.write("ai(A) :- i(" + node +",A).\n")
+    f.write("ai(A)?")
     f.close()
-    removeRed(allNodes,miss)
+    com = "echo \"" + node + "\" >> resultRed.txt"
+    call(com, shell=True)
+    com ="dlv -silent expWorlds_aw.asp query.asp -brave >> resultRed.txt" 
+    call(com, shell=True)
+    com = "echo \"\n\" >> \"resultRed.txt\""
+    call(com, shell=True)
+    print "done",i,"/",len(allRedWs)-1
+    i = i+1
+f.close()
 
-#print allNodes, len(allNodes)
+with open("resultRed_tmp.txt", "wt") as fout:
+    with open("resultRed.txt","rt") as fin:
+        for line in fin:
+            s = line.replace("\n",",")
+            fout.write(s)
+with open("resultRed_new.txt", "wt") as fout:
+    with open("resultRed_tmp.txt","rt") as fin:
+        for line in fin:
+            s = line.replace(",,,","\n")
+            fout.write(s)
+call("rm resultRed_tmp.txt", shell=True)
 
-#f = open("result.txt","w")
-#i = 0
-#for node in allNodes:
-#    f = open("query.asp","w")
-#    f.write("ai(A) :- i(" + node +",A).\n")
-#    f.write("ai(A)?")
-#    f.close()
-#    com ="dlv -silent expWorlds_aw.asp query.asp -brave >> result.txt" 
-#    call(com, shell=True)
-#    com = "echo \"\n\" >> \"result.txt\""
-#    call(com, shell=True)
-#    print "done",i
-#    i = i+1
-#f.close() 
+allReds = []
+f = open("resultRed_new.txt","r")
+lines = f.readlines()
+for line in lines:
+    if line != "\n":
+        oneRed = line[:-1].split(",")
+        allReds.append(oneRed)
+f.close()
+
+removeRed(allNodes,allRedWs)
+
+f = open("result.txt","w")
+i = 0
+for node in allNodes:
+    f = open("query.asp","w")
+    f.write("ai(A) :- i(" + node +",A).\n")
+    f.write("ai(A)?")
+    f.close()
+    com = "echo \"" + node + "\" >> result.txt"
+    call(com, shell=True)
+    com ="dlv -silent expWorlds_aw.asp query.asp -brave >> result.txt" 
+    call(com, shell=True)
+    com = "echo \"\n\" >> \"result.txt\""
+    call(com, shell=True)
+    print "done",i,"/",len(allNodes)-1
+    i = i+1
+f.close()
+
 
 with open("result_tmp.txt", "wt") as fout:
     with open("result.txt","rt") as fin:
         for line in fin:
             s = line.replace("\n",",")
             fout.write(s)
-
 with open("result_new.txt", "wt") as fout:
     with open("result_tmp.txt","rt") as fin:
         for line in fin:
             s = line.replace(",,,","\n")
             fout.write(s)
-
 call("rm result_tmp.txt", shell=True)
 
 allGreens = []
-
 f = open("result_new.txt","r")
 lines = f.readlines()
 for line in lines:
-    if line != ",,":
+    if line != "\n":
         oneGreen = line[:-1].split(",")
         allGreens.append(oneGreen)
-    
-delNodes = []
-for e1 in allGreens:
-    for e2 in allGreens:
-        if set(e1).issubset(set(e2)) and set(e1) != set(e2):
-            delNodes.append(e1)
-remove_duplicate_string(delNodes)
-#print "delNodes=",delNodes
-
-for delNode in delNodes:
-    if allGreens.index(delNode) != -1:
-        allGreens.remove(delNode)
-
-
-print "MIS=",misList, len(misList)
-print "MCS=",allGreens,len(allGreens)
 f.close()
 
-# get lattice
+macList = []
+for e in allGreens:
+    macList.append(e) 
+
+delNodes = []
+for e1 in macList:
+    for e2 in macList:
+        if (set(e1[1:]).issubset(set(e2[1:])) and set(e1[1:]) != set(e2[1:])) or e1[1:] == [""]:
+            delNodes.append(e1)
+remove_duplicate_string(delNodes)
+
+for delNode in delNodes:
+    if macList.index(delNode) != -1:
+        macList.remove(delNode)
+
+solidGreenWs = []
+for mac in macList:
+    s = ""
+    ssG= ""
+    f = open("query.asp","w")
+    for e in mac[1:]:
+        if e:
+            s = s + "i(W," + str(e) + "),"
+    for e in range(1,len(arts)+1):
+        if e.__str__() not in mac[1:]:
+            ssG = ssG + "o(W," + e.__str__() + "),"
+    ssG = s + ssG
+    f = open("query.asp","w")
+    f.write(ssG[:-1]+"?")
+    f.close()
+    solidGreenW = subprocess.check_output("dlv -silent -brave expWorlds_aw.asp query.asp", shell=True)
+    solidGreenWs.append(solidGreenW[:-1])
+
+# get full lattice
+fileDot = sys.argv[1]+"_fulllat.dot"
+fIn = open("up.dlv","r")
+line = fIn.readline()
+ups = line[1:-1].split(", ")
+ups = fIn.readlines()
+fOut = open(fileDot,"w")
+fOut.write("digraph{\n")
+fOut.write("rankdir=TB\n")
+anyGreenW = []
+anyRedW = []
+for anyGreen in allGreens:
+    anyGreenW.append(anyGreen[0])
+    if anyGreen[0] in solidGreenWs:
+        fOut.write(anyGreen[0] + ' [shape=box color="#00FF00" style="rounded,filled" label="' + anyGreen[1:].__str__() +'"];\n')
+    else:
+        fOut.write(anyGreen[0] + ' [shape=box color="#00FF00" style=dashed label="' + anyGreen[1:].__str__() +'"];\n')
+for anyRed in allReds:
+    anyRedW.append(anyRed[0])
+    if anyRed[0] in solidRedWs:
+        fOut.write(anyRed[0] + ' [shape=octagon color="#FF0000" style=filled label="' + anyRed[1:].__str__() +'"];\n')
+    else:
+        fOut.write(anyRed[0] + ' [shape=octagon color="#FF0000" style=dashed label="' + anyRed[1:].__str__() +'"];\n')    
+for up in ups:
+    if up.split(",")[0][3:] in anyGreenW and up.split(",")[1][:-3] in anyGreenW:
+        fOut.write(up.split(",")[1][:-3] + '->' + up.split(",")[0][3:] + '[color="#00FF00" style=dashed];\n')
+    if up.split(",")[0][3:] in anyRedW and up.split(",")[1][:-3] in anyRedW:
+        fOut.write(up.split(",")[1][:-3] + '->' + up.split(",")[0][3:] + '[dir=back color="#FF0000" style=dashed];\n')
+    if up.split(",")[0][3:] in anyGreenW and up.split(",")[1][:-3] in anyRedW:
+        fOut.write(up.split(",")[1][:-3] + '->' + up.split(",")[0][3:] + '[arrowhead=none color="#0000FF" style=filled];\n')
+
+fOut.write("}")
+fIn.close()
+fOut.close()
+
+# get reduced lattice
 fileDot = sys.argv[1]+"_lat.dot"
 f = open(fileDot,"w")
 f.write("digraph{\n")
