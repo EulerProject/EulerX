@@ -26,6 +26,7 @@ def apply_style(datafile, output):
     # if the style is not defined use the default
         if (styles["graphstyle"]["subgraph"] == "on" and g!="none"):
             f.write("subgraph cluster" + g + '{ label= "" style=invis\n')
+            print(g)
         if g in styles["nodestyle"]:
             group = g
         else:
@@ -42,20 +43,24 @@ def apply_style(datafile, output):
         if (styles["graphstyle"]["subgraph"] == "on"and g != "none"):
             f.write("}")
     for l in edges:
-        if l in styles["edgestyle"]:
-            label = l
-        else:
+        if not any(d["label"] == l for d in styles["edgestyle"]):
             label = "default"
-        f.write("edge["+ styles["edgestyle"][label] +"]\n")
+        else:
+            label = l
+        style = (item for item in styles["edgestyle"] if item["label"] == label).next()
+        f.write("edge["+ style["dot"] +"]\n")
         for e in edges[l]:
             f.write('"' + e[0][1] + '" -> "' + e[1][1] + '"')
-            f.write('[penwidth=' + e[2][1] + "]")
-            if (int(e[2][1]) >1):
+            if (style["display"] == "(w)display"):
+                f.write('[penwidth=' + e[2][1] + "]")
+        # check options for displaying label
+            if (style["display"] == "(w)penwidth") or (style["display"] == "(w)display"):
                 f.write(' [label="' + e[2][1] + '"]')
+            else:
+                f.write(' [label="' + style["display"] + '"]')
             f.write("\n")
     f.write("}")            
     f.close()
-    
 def parse_options():
 	# parse options
 	parser = optparse.OptionParser(usage = "%prog [options]", version = "%prog 0.1")
