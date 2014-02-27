@@ -42,6 +42,8 @@ class TaxonomyMapping:
         self.pwflag = True                     # Whether to output pw
         self.fixedCnt = 0                      # # of fixes /repairs
         self.options = options
+        if self.options.ieo:
+            self.options.ie = True
         self.enc = encode[options.encode]      # encoding
         self.name = os.path.splitext(os.path.basename(options.inputfile))[0]
         self.taxa1name = ""
@@ -275,27 +277,28 @@ class TaxonomyMapping:
                 tmpmap[key] = value.union(sets.Set(item))
                 #print key,tmpmap[key]
 
-            for key in tmpmap.keys():
-              #tmpset = sets.Set()
-              tmpset = tmpmap[key]
-              
-              addor  = True
-              for i in range(len(diagraw)):
-                if tmpset.issubset(list(diagraw)[i]):
-                  a = []
-                  a = list(diagraw)
-                  a.pop(i)
-                  a.insert(i,tmpset)
-                  diagraw = sets.Set(a)
-                elif tmpset.issuperset(list(diagraw)[i]):
-                  addor = False
-              if addor:
-                  diagraw.add(tmpset)
-            self.getDiag(diagraw)
-            #print "Min inconsistent subsets: "
-            #print diag
+            # If white box approach, not need to invoke HST algorithm
+            if self.options.ieo:
+               for key in tmpmap.keys():
+                 #tmpset = sets.Set()
+                 tmpset = tmpmap[key]
+                 
+                 addor  = True
+                 for i in range(len(diagraw)):
+                   if tmpset.issubset(list(diagraw)[i]):
+                     a = []
+                     a = list(diagraw)
+                     a.pop(i)
+                     a.insert(i,tmpset)
+                     diagraw = sets.Set(a)
+                   elif tmpset.issuperset(list(diagraw)[i]):
+                     addor = False
+                 if addor:
+                     diagraw.add(tmpset)
+               self.getDiag(diagraw)
+               #print "Min inconsistent subsets: "
+               #print diag
                 
-# Comment out the ie.pdf part tmporarily
             fie = open(self.iefile, 'w')
             fie.write("strict digraph "+self.name+"_ie {\n\nrankdir = LR\n\n")
             #fie.write("subgraph rules {\n")
