@@ -278,7 +278,7 @@ class TaxonomyMapping:
                 #print key,tmpmap[key]
 
             # If white box approach, not need to invoke HST algorithm
-            if self.options.ieo:
+            if not self.options.ieo:
                for key in tmpmap.keys():
                  #tmpset = sets.Set()
                  tmpset = tmpmap[key]
