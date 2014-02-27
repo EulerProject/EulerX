@@ -533,6 +533,7 @@ class TaxonomyMapping:
             if tmpStr[0:2] == "\\n": tmpStr = tmpStr[2:]
             if tmpStr[-2:] == "\\n": tmpStr = tmpStr[:-2]
             self.eqConLi.append(tmpStr)
+#            print "self.eqConLi=", self.eqConLi
             for T2 in self.eq[T1]:
 #                if self.eq.has_key(T2):
 #                    del self.eq[T2]
@@ -562,8 +563,12 @@ class TaxonomyMapping:
             for T7 in tmpeqConLi:
                 if (set(T6.split("\\n")).issubset(set(T7.split("\\n"))) and T6 != T7 and T6 in self.eqConLi):
                     self.eqConLi.remove(T6)
+        
+        tmpTr = list(self.tr)
         for T in self.eqConLi:
-            tmpCom += "  \""+T+"\"\n"      
+            for [T1, T2, P] in tmpTr:
+                if T == T1 or T == T2:
+                    tmpCom += "  \""+T+"\"\n"      
             
         # Duplicates
     	tmpTr = list(self.tr)
