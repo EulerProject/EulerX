@@ -45,7 +45,7 @@ class TaxonomyMapping:
         if self.options.ieo:
             self.options.ie = True
         # If not input visualization, change the default valude of encode to "mnpw"
-        if not self.options.iv and not self.options.encode:
+        if not self.options.inputViz and not self.options.encode:
             self.options.encode = "mnpw"
         self.enc = encode[options.encode]      # encoding
         self.name = os.path.splitext(os.path.basename(options.inputfile))[0]
