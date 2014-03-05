@@ -1405,7 +1405,7 @@ class TaxonomyMapping:
                     print "PC: ",queue
                 t = queue.pop(0)
                 # This is a nc flag
-                if t.abbrev.find("nc") != -1:
+                if t.abbrev == "nc":
 	            self.baseAsp += "ncf(" + t.dlvName() + ").\n"
                 if t.hasChildren():
                     if self.options.verbose:
