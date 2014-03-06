@@ -65,8 +65,10 @@ class Taxonomy:
                 self.taxa[child] = thisChild
             
             thisChild.parent = thisParent
-	    if(onlyOne):
-		taxaMap.addEMir(parent, child)
+            # the special case that parent = its only child
+            if onlyOne and taxaMap.options.enableCov:
+		taxaMap.addEMir(thisParent.dotName(), thisChild.dotName())
+		taxaMap.addEqMap(thisParent.dotName(), thisChild.dotName())
 	    else:
 	    	taxaMap.addTMir(self.abbrev, parent, child)
 	    	for sibling in thisParent.children:
@@ -94,7 +96,7 @@ class Taxonomy:
                 elements[len(elements)-1] += elements[0]
             self.addTaxon(elements[0])
             for index in range (1, len(elements)):
-                self.addDoubleTaxon(taxaMap, elements[0], elements[index], nchildren == 1)
+                self.addDoubleTaxon(taxaMap, elements[0], elements[index], nchildren == 1 and not nc)
         else:
             self.addTaxon(noParens)    
    
