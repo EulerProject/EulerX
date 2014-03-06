@@ -504,7 +504,6 @@ class TaxonomyMapping:
         alias = {}
         
         # Equalities
-        print self.eq
         for T1 in self.eq.keys():
             # self.eq is dynamically changed, so we need this check
             if not self.eq.has_key(T1):
@@ -664,7 +663,6 @@ class TaxonomyMapping:
         
         
         for [T1, T2, P] in self.tr:
-            print [T1,T2,P]
     	    if(P == 0):
     	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")
     	    elif(P == 1):
