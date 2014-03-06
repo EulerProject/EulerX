@@ -502,8 +502,9 @@ class TaxonomyMapping:
         tmpTax = ""   # First taxonomy name, actually it really doesn't
                       # matter which one is the first one
         alias = {}
-
-	# Equalities
+        
+        # Equalities
+        print self.eq
         for T1 in self.eq.keys():
             # self.eq is dynamically changed, so we need this check
             if not self.eq.has_key(T1):
@@ -539,7 +540,34 @@ class TaxonomyMapping:
             if tmpStr[0:2] == "\\n": tmpStr = tmpStr[2:]
             if tmpStr[-2:] == "\\n": tmpStr = tmpStr[:-2]
             self.eqConLi.append(tmpStr)
-#            print "self.eqConLi=", self.eqConLi
+
+            tmpeqConLi2 = []
+            for T in self.eqConLi:
+                tmpeqConLi2.append(T)
+
+            for T10 in tmpeqConLi2:
+                for T11 in tmpeqConLi2:
+                    if T10 != T11:
+                        tmpC = []
+                        ss = ""
+                        T10s = T10.split("\\n")
+                        T11s = T11.split("\\n")
+                        for c1 in T10s:
+                            if c1 in T11s:
+                                tmpC = T10s + T11s
+                                tmpC.sort()
+                                self.remove_duplicate_string(tmpC)
+                                for e in tmpC:
+                                    ss = ss + e + "\\n"
+                                ss = ss[:-2]
+                                if T10 in self.eqConLi:
+                                    self.eqConLi.remove(T10)
+                                if T11 in self.eqConLi:
+                                    self.eqConLi.remove(T11)
+                                if ss not in self.eqConLi:
+                                    self.eqConLi.append(ss)
+                                break 
+
             for T2 in self.eq[T1]:
 #                if self.eq.has_key(T2):
 #                    del self.eq[T2]
@@ -554,15 +582,18 @@ class TaxonomyMapping:
                         self.tr.remove([T3, T4, P])
                         self.tr.append([T3, tmpStr, 0])
                     for T5 in self.eqConLi:
-                        if(T5 == T3 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
+#                        if(T5 == T3 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
+                        if(T3 != T5 and set(T3.split("\\n")).issubset(set(T5.split("\\n")))):
                           if self.tr.count([T3, T4, P]) > 0:
                             self.tr.remove([T3, T4, P])
-                            self.tr.append([tmpStr,T4,0])
-                        elif(T5 == T4 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
+                            self.tr.append([T5,T4,0])
+                        elif(T4 != T5 and set(T4.split("\\n")).issubset(set(T5.split("\\n")))):
+#                        elif(T5 == T4 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
                           if self.tr.count([T3, T4, P]) > 0:
                             self.tr.remove([T3, T4, P])
-                            self.tr.append([T3,tmpStr,0])
+                            self.tr.append([T3,T5,0])
         tmpeqConLi = []
+#        print "self.eqConLi=", self.eqConLi
         for T in self.eqConLi:
             tmpeqConLi.append(T)
         for T6 in tmpeqConLi:
@@ -633,6 +664,7 @@ class TaxonomyMapping:
         
         
         for [T1, T2, P] in self.tr:
+            print [T1,T2,P]
     	    if(P == 0):
     	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")
     	    elif(P == 1):
