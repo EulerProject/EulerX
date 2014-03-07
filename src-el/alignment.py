@@ -429,7 +429,11 @@ class TaxonomyMapping:
                 pwTm.firstRcg = False
             if self.enc & encode["cb"]:
                 pwTm.mir = pwTm.basemir
-                pwTm.tr = []#pwTm.basetr
+                if self.options.hideOverlaps:
+                  pwTm.tr = []
+                # if not hiding orignal concepts, basetr is useful
+                else:
+                  pwTm.tr = pwTm.basetr
 
             outputstr += "\nPossible world "+i.__str__()+":\n{"
             if self.options.verbose: print pws[i]+"#"
