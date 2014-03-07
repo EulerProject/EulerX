@@ -389,8 +389,9 @@ class TaxonomyMapping:
             return
         if self.pw.lower().find("error") != -1:
             raise Exception(template.getEncErrMsg())
-        if not self.pwflag: return None
+        #if not self.pwflag: return None
         self.intOutPw(self.name, self.pwflag)
+        self.genMir()
 
     #
     # Internal routine with several callers
@@ -439,6 +440,7 @@ class TaxonomyMapping:
                 if self.options.verbose: print items[j],rel
                 dotc1 = self.dlvName2dot(rel[0])
                 dotc2 = self.dlvName2dot(rel[1])
+                print dotc1,dotc2,rel[2]
                 if self.options.verbose: print dotc1,rel[2],dotc2
                 if j != 0: outputstr += ", "
                 outputstr += dotc1+rel[2]+dotc2
@@ -486,10 +488,12 @@ class TaxonomyMapping:
         fpw = open(self.options.outputdir+name+".pw", 'w')
         fpw.write(outputstr)
         fpw.close()
-        self.genMir()
         if self.options.cluster: self.genPwCluster(pwmirs, False)
 
     def genPwRcg(self, fileName):
+        print self.mir
+        print self.tr
+        print self.eq
         fDot = open(self.options.outputdir+fileName+".dot", 'w')
         fAllDot = open(self.options.outputdir+self.name+"_all.dot", 'a')
         fDot.write("digraph {\n\nrankdir = RL\n\n")
@@ -602,8 +606,8 @@ class TaxonomyMapping:
         
         tmpTr = list(self.tr)
         for T in self.eqConLi:
-            for [T1, T2, P] in tmpTr:
-                if T == T1 or T == T2:
+            #for [T1, T2, P] in tmpTr:
+            #    if T == T1 or T == T2:
                     tmpCom += "  \""+T+"\"\n"      
             
         # Duplicates
@@ -1143,6 +1147,7 @@ class TaxonomyMapping:
             path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
             self.com = "dlv -silent -filter=relout "+self.cbfile+" "+ self.pwswitch + " | "+path+"/muniq -u"
             self.cb = commands.getoutput(self.com)
+            print self.cb
             if self.isCbNone():
                 self.remedy()
             if self.cb.find("error") != -1:

@@ -46,6 +46,12 @@ else
 echo "claspD check passed	:)"
 fi
 
+#if ! python src-el/pygtkCheck.py > /dev/null; then
+#echo "pygtk check failed	o_O	Please install pygtk  or make sure it is in your path !!!!"
+#else
+#echo "pygtk check passed	:)"
+#fi
+
 echo "=== End of checking full dependecies. You can run Euler with all supported reasoners. ==="
 #export PATH=src-el:$PATH
 #echo "Please  and restart your terminal since PATH has changed"
