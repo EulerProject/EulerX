@@ -8,6 +8,7 @@
 import sys
 import os
 import random
+import yaml
 from helper import *
 
 class InputVisual:
@@ -44,6 +45,23 @@ class InputVisual:
             self.artSymbol = "><"
         else:
             self.artSymbol = "!"
+    def add_edge(self, s,t,label):
+            edge = {}
+            edge.update({"s" : s})
+            edge.update({"t" : t})
+            edge.update({"w":"1"})
+            edge.update({"label" : label})
+            edges.update({s + "_" + t : edge})
+
+    def add_node(self, concept, group):
+            node = {}
+            node.update({"concept": concept})
+            node.update({"group": group})
+            if group!="common":
+                nodes.update({group + "." + concept: node})
+            else:
+                nodes.update({concept: node})
+
     
     def run(self, inputdir, inputfile, ivout):
         # open the file
@@ -58,6 +76,8 @@ class InputVisual:
         sum_list = []
         sc1_list = []
         sc2_list = []
+        nodes = {}
+        edges = {}
     
         # read each line of the file and update list
         while not_EOF:
@@ -74,11 +94,13 @@ class InputVisual:
             while len(line) != 1:
                 temp_list = line[1:-2].split(" ")
                 parent = name1 + "." + temp_list[0]
+                self.add_node(temp_list[0], name1)
                 for i in range(1,len(temp_list)):
                     child = name1 + "." + temp_list[i]
                     pc_tuple = (parent, child)
                     pc_list1.append(pc_tuple)
-                
+                    self.add_node(temp_list[i], name1)
+                self.add_edge(child, parent, "isa")
                 line = f_in.readline()
         
             # read taxonomy2 keywords
@@ -88,17 +110,20 @@ class InputVisual:
             # read (concept in taxonomy2)
             line = f_in.readline()
             if line.find(" ") == -1:
+                self.add_node(line[1:-2], name1)
                 sc2_list.append(name2 + "." + line[1:-2])
             else:
                 pass
             while len(line) != 1:
                 temp_list = line[1:-2].split(" ")
                 parent = name2 + "." + temp_list[0]
+                self.add_node(temp_list[0], name2)
                 for i in range(1,len(temp_list)):
                     child = name2 + "." + temp_list[i]
                     pc_tuple = (parent, child)
                     pc_list2.append(pc_tuple)
-                
+                    self.add_node(temp_list[i], name2)
+                self.add_edge(child, parent, "isa")
                 line = f_in.readline()
             
             # read articulation keywords
@@ -116,12 +141,28 @@ class InputVisual:
                 if len(temp_list) > 1:
                     if "lsum" in temp_list:
                         sum_list.append((temp_list[3], temp_list[0], temp_list[1]))
+                        self.add_node(temp_list[3][2]+ "+", "none")
+                        self.add_edge(temp_list[0], temp_list[3][2] + "+", "inplus")
+                        self.add_edge(temp_list[1], temp_list[3][2] + "+", "inplus")
+                        self.add_edge(temp_list[3][2] + "+", temp_list[3][2], "outplus")
                     elif "l3sum" in temp_list:
                         sum_list.append((temp_list[4], temp_list[0], temp_list[1], temp_list[2]))
+                        self.add_node(temp_list[4][2] + "+", "none")
+                        self.add_edge(temp_list[0], temp_list[4][2] + "+", "inplus")
+                        self.add_edge(temp_list[1], temp_list[4][2] + "+", "inplus")
+                        self.add_edge(temp_list[2], temp_list[4][2] + "+", "inplus")
+                        self.add_edge(temp_list[4][2] + "+", temp_list[4], "outplus")
                     elif "l4sum" in temp_list:
                         sum_list.append((temp_list[5], temp_list[0], temp_list[1], temp_list[2], temp_list[3]))
+                        self.add_node(temp_list[5][2] + "+", "none")
+                        self.add_edge(temp_list[0], temp_list[4][2] + "+", "inplus")
+                        self.add_edge(temp_list[1], temp_list[4][2]+ "+", "inplus")
+                        self.add_edge(temp_list[2], temp_list[4][2] + "+", "inplus")
+                        self.add_edge(temp_list[3], temp_list[4][2] + "+", "inplus")
+                        self.add_edge(temp_list[5][2] + "+", temp_list[5], "outplus")
                     elif "rsum" in temp_list:
                         sum_list.append((temp_list[0], temp_list[2], temp_list[3]))
+                        ######
                     elif "r3sum" in temp_list:
                         sum_list.append((temp_list[0], temp_list[2], temp_list[3], temp_list[4]))
                     elif "ldiff" in temp_list:
@@ -133,11 +174,14 @@ class InputVisual:
                             self.artName2Symbol(temp_list[1])
                             art_type = self.artSymbol
                             art_tuple = (temp_list[0], temp_list[len(temp_list)-1], art_type)
+                            self.add_edge(temp_list[0], temp_list[len(temp_list)-1], art_type)
+
                         else:
                             for i in range(1,len(temp_list)-1):
                                 self.artName2Symbol(temp_list[i])
                                 art_type = art_type + self.artSymbol + " OR "
                                 art_tuple = (temp_list[0], temp_list[len(temp_list)-1], art_type[:-4])
+                                self.add_edge(temp_list[0], temp_list[len(temp_list)-1], art_type[:-4])
                         art_list.append(art_tuple)
                      
                 line = f_in.readline()
@@ -193,4 +237,6 @@ class InputVisual:
         f_out.write("}")
         f_in.close()
         f_out.close()
-    
+    with open('out.yaml', 'w') as outfile:
+       outfile.write(yaml.safe_dump(nodes, default_flow_style=False))
+       outfile.write(yaml.safe_dump(edges, default_flow_style=False))
