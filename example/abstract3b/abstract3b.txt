@@ -1,0 +1,26 @@
+taxonomy 1 Taxonomy1
+(A B F I)
+(B C D E)
+(F G H)
+(I J K)
+
+taxonomy 2 Taxonomy2
+(A B F I)
+(B CD E)
+(F G H J)
+(I K)
+
+articulation abs abstract
+[1_A is_included_in 2_A]
+[1_B equals 2_B]
+[1_F is_included_in 2_F]
+[1_I includes 2_I]
+[1_C 1_D lsum 2_CD]
+[1_E equals 2_E]
+[1_G equals 2_G]
+[1_H equals 2_H]
+[1_J equals 2_J]
+[1_K equals 2_K]
+[1_F rdiff 2_F 2_J]
+[1_I 1_J lsum 2_K]
+

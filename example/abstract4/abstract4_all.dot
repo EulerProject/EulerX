@@ -1,0 +1,65 @@
+digraph {
+
+rankdir = RL
+
+  node [shape=box style="filled" fillcolor="#CCFFCC"]
+  "1.C"
+  node [shape=octagon style="filled" fillcolor="#FFFFCC"]
+  "2.A"
+  "2.A"
+  "2.A"
+  "2.A"
+  node [shape=Msquare style="filled" fillcolor="#EEEEEE"]
+  "1.B\n2.B"
+  "1.E\n2.G"
+  "1.D\n2.D"
+  "1.D\n2.D"
+  "1.E\n2.G"
+  "1.B\n2.B"
+  "1.B\n2.B"
+  "1.E\n2.G"
+  "1.D\n2.D"
+  node [shape=box style="filled" fillcolor="#CCFFCC"]
+  node [shape=octagon style="filled" fillcolor="#FFFFCC"]
+  "2.A"
+  "2.A"
+  node [shape=Msquare style="filled" fillcolor="#EEEEEE"]
+  "1.D\n2.D"
+  "1.B\n2.B"
+  "1.B\n2.B"
+  "1.D\n2.D"
+  "1.D\n2.D"
+  "1.B\n2.B"
+  node [shape=box style="filled" fillcolor="#CCFFCC"]
+  "1.C"
+  node [shape=octagon style="filled" fillcolor="#FFFFCC"]
+  "2.A"
+  "2.A"
+  "2.A"
+  node [shape=Msquare style="filled" fillcolor="#EEEEEE"]
+  "1.D\n2.D"
+  "1.B\n2.B"
+  "1.B\n2.B"
+  "1.D\n2.D"
+  "1.D\n2.D"
+  "1.B\n2.B"
+  node [shape=box style="filled" fillcolor="#CCFFCC"]
+  node [shape=octagon style="filled" fillcolor="#FFFFCC"]
+  node [shape=Msquare style="filled" fillcolor="#EEEEEE"]
+  "1.B\n2.B"
+  "1.A\n2.A"
+  "1.D\n2.D"
+  "1.D\n2.D"
+  "1.A\n2.A"
+  "1.B\n2.B"
+  "1.B\n2.B"
+  "1.A\n2.A"
+  "1.D\n2.D"
+  "1.A\n2.A"
+  "1.B\n2.B" -> "1.A\n2.A" [style=filled,label=1,penwidth=1,color="#27834d"];
+  "1.B\n2.B" -> "2.A" [style=filled,label=3,penwidth=3,color="#5c3826"];
+  "1.C" -> "2.A" [style=filled,label=2,penwidth=2,color="#415e3a"];
+  "1.D\n2.D" -> "1.A\n2.A" [style=filled,label=1,penwidth=1,color="#27834d"];
+  "1.D\n2.D" -> "2.A" [style=filled,label=3,penwidth=3,color="#5c3826"];
+  "1.E\n2.G" -> "2.A" [style=filled,label=1,penwidth=1,color="#27834d"];
+}

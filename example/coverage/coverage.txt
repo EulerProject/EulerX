@@ -1,0 +1,10 @@
+taxonomy 1 Taxonomy1
+(A B C)
+
+taxonomy 2 Taxonomy2
+(D)
+
+articulation abs abstract
+[1.A includes 2.D]
+[1.B disjoint 2.D]
+[1.C disjoint 2.D]
