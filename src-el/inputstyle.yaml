@@ -1,0 +1,24 @@
+  graphstyle: 
+    graph: "rankdir=BT\n"
+    subgraph: "on"
+  nodestyle: 
+    '1': "shape=box style=\"filled\" fillcolor=\"#CCFFCC\""
+    '2': "shape=octagon style=filled fillcolor=\"#FFFFCC\""
+    default: "shape=circle style=filled color=black fillcolor=white"
+  edgestyle: 
+    - 
+      label: "isa"
+      dot: "style=solid color=black"
+      display: "isa"
+    - 
+      label: "in"
+      dot: "style=solid color= black"
+      display: ""
+    - 
+      label: "out"
+      dot: "style=solid color= black"
+      display: ""
+    - 
+      label: "default"
+      dot: "style = dashed color=grey"
+      display: "label"
