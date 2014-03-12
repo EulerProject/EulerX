@@ -1166,7 +1166,7 @@ class TaxonomyMapping:
         self.genAspConcept()
         self.genAspPC()
         self.genAspAr()
-        if self.enc & encode["vr"] or self.enc & encode["dl"] or self.enc & encode["pl"] or self.enc & encode["mn"]:
+        if self.enc & encode["vr"] or self.enc & encode["dl"] or self.enc & encode["mn"]:
             self.genAspDc()
         if self.obs != [] and self.enc & encode["ob"]:
             self.genAspObs()
