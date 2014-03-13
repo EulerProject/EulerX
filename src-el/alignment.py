@@ -1,3 +1,12 @@
+#
+#       alignment.py
+#
+#  Alignment Module:
+#    We define the alignment class here for taxonomy alignment
+#    and dataset integration
+#
+
+
 import os
 import time
 import sets
