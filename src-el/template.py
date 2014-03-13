@@ -126,10 +126,10 @@ class template:
             +  "combined(Y,1,1) :- rel(X,Y,\"!\").\n"\
             +  "combined(Z,1,2) :- rel(X,Y,\"><\"), newcon(Z, X, Y, _).\n"\
             +  "%%% unhide the overlap concepts\n"\
-            +  "combined(X,0,0) :- rel(X,Y,\"><\").\n"\
+            +  "combined(X,1,0) :- rel(X,Y,\"><\").\n"\
             +  "combined(X,0,0) :- rel(X,Y,\"><\"), hide.\n"\
             +  "%%% unhide the overlap concepts\n"\
-            +  "combined(Y,0,1) :- rel(X,Y,\"><\").\n"\
+            +  "combined(Y,1,1) :- rel(X,Y,\"><\").\n"\
             +  "combined(Y,0,1) :- rel(X,Y,\"><\"), hide.\n"\
             +  "combined2(X,Y) :- combined(X,Y,Z).\n"\
             +  "combined2(X,1) :- not combined2(X,0), con(X).\n"\

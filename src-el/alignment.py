@@ -1187,7 +1187,7 @@ class TaxonomyMapping:
         pdlv.write(self.basePw)
         pdlv.write("pw.")
         if self.options.hideOverlaps:
-            pdlv.write("hide.")
+            pdlv.write("\nhide.")
         pdlv.write(self.baseIx)
         idlv.write("ix.")
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
