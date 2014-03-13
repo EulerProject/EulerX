@@ -1194,6 +1194,8 @@ class TaxonomyMapping:
 
     def genCbConcept(self):
         self.baseCb += "\n%%% combined concept\n"
+        print self.mirp
+        print self.mir
         for key1 in self.taxonomies.keys():
             for key2 in self.taxonomies.keys():
                 if key1 >= key2: continue
@@ -1205,8 +1207,8 @@ class TaxonomyMapping:
                         #   self.mirp.has_key(t2.dotName()+","+t1.dotName()+","+rcc5["overlaps"].__str__()):
                         p1 = t1.dotName()+","+t2.dotName()
                         p2 = t2.dotName()+","+t1.dotName()
-                        if self.mir.has_key(p1) and self.mir[p1] == rcc5["overlaps"] or\
-                           self.mir.has_key(p2) and self.mir[p2] == rcc5["overlaps"]:
+                        if self.mir.has_key(p1) and self.mir[p1] & rcc5["overlaps"] or\
+                           self.mir.has_key(p2) and self.mir[p2] & rcc5["overlaps"]:
 	                    self.baseCb += "newcon(" + t1.dlvName() + "_not_" + t2.dlvName() + ", "\
 	           	                + t1.dlvName() + ", " + t2.dlvName()  + ", 0).\n"
 	                    self.baseCb += "newcon(" + t1.dlvName() + "__" + t2.dlvName() + ", "\
