@@ -13,8 +13,9 @@ class template:
              + "in(X, M) :- r(M),concept(X,T,N),N1=N+1,bit(M,T,N1).\n"\
              + "out(X, M) :- r(M),concept(X,T,N),N1=N+1,not bit(M,T,N1).\n"\
              + "in(X, M) :- r(M),concept2(X,_),not out(X, M).\n"\
-             + "out(X, M) :- out3(X, M, _), ix.\n"\
-             + "irs(M) :- in(X, M), out(X, M), r(M), concept2(X,_).\n\n"\
+             + "outs(X, M) :- out3(X, M, _), ix.\n"\
+             + "in(X, M) :- r(M),concept2(X,_),not outs(X, M), ix.\n"\
+             + "ir(M, fi) :- in(X, M), out(X, M), r(M), concept2(X,_).\n\n"\
              + "%%% Constraints of regions.\n"\
              + "irs(X) :- ir(X, _).\n"\
              + "vrs(X) :- vr(X, _).\n"\
@@ -25,7 +26,6 @@ class template:
              + "%%% Inconsistency Explanation.\n"\
              + "ie(s(R, A, Y)) :- pie(R, A, Y), not cc(R, Y), ix.\n"\
              + "cc(R, Y) :- c(R, _, Y), ix.\n"
-             #+ "ir(M, fi) :- in(X, M), out(X, M), r(M), concept2(X,_).\n\n"\
 
     aspCbCon = "cb(X) :- newcon(X, _, _, _).\n"\
              + "cp(X) :- concept2(X, _).\n"\
@@ -87,15 +87,15 @@ class template:
             + ":- rel(X, Y, \">\"), rel(X, Y, \"><\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
             + ":- rel(X, Y, \">\"), rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
             + ":- rel(X, Y, \"><\"), rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
-            + ":- not rel(X, Y, \"=\"), not rel(X, Y, \"<\"), not rel(X, Y, \">\"), not rel(X, Y, \"><\"), not rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), N1 < N2, not ncf(X), not ncf(Y), pw.\n\n"\
+            + ":- not rel(X, Y, \"=\"), not rel(X, Y, \"<\"), not rel(X, Y, \">\"), not rel(X, Y, \"><\"), not rel(X, Y, \"!\"), concept2(X, N1), concept2(Y, N2), N1 < N2, pw.\n\n"\
             + "rel(X, Y, \"=\") :- not hint(X, Y, 0), hint(X, Y, 1), not hint(X, Y, 2), pw.\n"\
             + "rel(X, Y, \"<\") :- not hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2), pw.\n"\
             + "rel(X, Y, \">\") :- hint(X, Y, 0), hint(X, Y, 1), not hint(X, Y, 2), pw.\n"\
             + "rel(X, Y, \"><\") :- hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2), pw.\n"\
             + "rel(X, Y, \"!\") :- hint(X, Y, 0), not hint(X, Y, 1), hint(X, Y, 2), pw.\n\n\n"\
-            + "hint(X, Y, 0) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), out(Y, R), not ncf(X), not ncf(Y), pw.\n"\
-            + "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), in(Y, R), not ncf(X), not ncf(Y), pw.\n"\
-            + "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), out(X, R), in(Y, R), not ncf(X), not ncf(Y), pw.\n\n"
+            + "hint(X, Y, 0) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), out(Y, R), pw.\n"\
+            + "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), in(Y, R), pw.\n"\
+            + "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), out(X, R), in(Y, R), pw.\n\n"
 
 
     aspCbDc  = aspPwDc
@@ -125,14 +125,14 @@ class template:
             +  "combined(Y,1,1) :- rel(X,Y,\"=\").\n"\
             +  "combined(Y,1,1) :- rel(X,Y,\"!\").\n"\
             +  "combined(Z,1,2) :- rel(X,Y,\"><\"), newcon(Z, X, Y, _).\n"\
-            +  "%%% unhide the overlap concepts\n"\
-            +  "combined(X,0,0) :- rel(X,Y,\"><\").\n"\
+            +  "%%% unhide the overlap concepts"\
+            +  "combined(X,1,0) :- rel(X,Y,\"><\").\n"\
             +  "combined(X,0,0) :- rel(X,Y,\"><\"), hide.\n"\
-            +  "%%% unhide the overlap concepts\n"\
-            +  "combined(Y,0,1) :- rel(X,Y,\"><\").\n"\
+            +  "%%% unhide the overlap concepts"\
+            +  "combined(Y,1,1) :- rel(X,Y,\"><\").\n"\
             +  "combined(Y,0,1) :- rel(X,Y,\"><\"), hide.\n"\
             +  "combined2(X,Y) :- combined(X,Y,Z).\n"\
-            +  "combined2(X,1) :- not combined2(X,0), con(X).\n"\
+            +  "combined2(X,0) :- not combined2(X,1), con(X).\n"\
             +  "combined2(X,2) :- combined2(X,1), not combined2(X,0), con(X).\n"\
             +  "combined2(X,1) :- relcc(X,Y,\"<\").\n"\
             +  "combined2(X,1) :- relcc(X,Y,\">\").\n"\
@@ -143,33 +143,33 @@ class template:
             +  "combined2(Y,1) :- relcc(X,Y,\"=\"),con(Y).\n"\
             +  "combined2(Y,1) :- relcc(X,Y,\"!\").\n"\
             +  "hant(X, X, 3) :- combined2(X,1).\n"\
-            +  "hant(X, Y, 0) :- combined2(X,1), combined2(Y,1), not hant(X, Y, 3), vrs(R), in(X, R), out(Y, R).\n"\
-            +  "hant(X, Y, 1) :- combined2(X,1), combined2(Y,1), not hant(X, Y, 3), vrs(R), in(X, R),  in(Y, R).\n"\
-            +  "hant(X, Y, 2) :- combined2(X,1), combined2(Y,1), not hant(X, Y, 3), vrs(R), out(X, R), in(Y, R).\n"\
+            +  "hant(X, Y, 0) :- combined(X,1,_), combined(Y,1,_), not hant(X, Y, 3), vrs(R), in(X, R), out(Y, R).\n"\
+            +  "hant(X, Y, 1) :- combined(X,1,_), combined(Y,1,_), not hant(X, Y, 3), vrs(R), in(X, R),  in(Y, R).\n"\
+            +  "hant(X, Y, 2) :- combined(X,1,_), combined(Y,1,_), not hant(X, Y, 3), vrs(R), out(X, R), in(Y, R).\n"\
             +  "relcc(X, Y, \"=\") :- X<Y, not hant(X, Y, 0), hant(X, Y, 1), not hant(X, Y, 2), pw.\n"\
             +  "relcc(X, Y, \"<\") :- X<Y, not hant(X, Y, 0), hant(X, Y, 1), hant(X, Y, 2), pw.\n"\
             +  "relcc(X, Y, \">\") :- X<Y, hant(X, Y, 0), hant(X, Y, 1), not hant(X, Y, 2), pw.\n"\
             +  "relcc(X, Y, \"><\") :- X<Y, hant(X, Y, 0), hant(X, Y, 1), hant(X, Y, 2), pw.\n"\
             +  "relcc(X, Y, \"!\") :- X<Y, hant(X, Y, 0), not hant(X, Y, 1), hant(X, Y, 2), pw.\n"\
             +  "combined2(Z,1) :- relcc(X,Y,\"><\"), and(X, Y, Z).\n"\
-            +  "%%% unhide the overlap concepts\n"\
+            +  "%%% unhide the overlap concepts"\
             +  "combined2(X,1) :- relcc(X,Y,\"><\"), and(X, Y, Z).\n"\
             +  "combined2(X,0) :- relcc(X,Y,\"><\"), and(X, Y, Z), hide.\n"\
-            +  "%%% unhide the overlap concepts\n"\
+            +  "%%% unhide the overlap concepts"\
             +  "combined2(Y,1) :- relcc(X,Y,\"><\"), and(X, Y, Z).\n"\
             +  "combined2(Y,0) :- relcc(X,Y,\"><\"), and(X, Y, Z), hide.\n"\
             +  "combined2(Z,1) :- relcc(X,Y,\"><\"), minus(X, Y, Z).\n"\
-            +  "%%% unhide the overlap concepts\n"\
+            +  "%%% unhide the overlap concepts"\
             +  "combined2(X,1) :- relcc(X,Y,\"><\"), minus(X, Y, Z).\n"\
             +  "combined2(X,0) :- relcc(X,Y,\"><\"), minus(X, Y, Z), hide.\n"\
-            +  "%%% unhide the overlap concepts\n"\
+            +  "%%% unhide the overlap concepts"\
             +  "combined2(Y,1) :- relcc(X,Y,\"><\"), minus(X, Y, Z).\n"\
             +  "combined2(Y,0) :- relcc(X,Y,\"><\"), minus(X, Y, Z), hide.\n"\
             +  "combined2(Z,1) :- relcc(X,Y,\"><\"), minus(Y, X, Z).\n"\
-            +  "%%% unhide the overlap concepts\n"\
+            +  "%%% unhide the overlap concepts"\
             +  "combined2(X,1) :- relcc(X,Y,\"><\"), minus(Y, X, Z).\n"\
             +  "combined2(X,0) :- relcc(X,Y,\"><\"), minus(Y, X, Z), hide.\n"\
-            +  "%%% unhide the overlap concepts\n"\
+            +  "%%% unhide the overlap concepts"\
             +  "combined2(Y,1) :- relcc(X,Y,\"><\"), minus(Y, X, Z).\n"\
             +  "combined2(Y,0) :- relcc(X,Y,\"><\"), minus(Y, X, Z), hide.\n"\
             +  "relout(X, Y, Z) :- relcc(X, Y, Z), combined2(X, 2), combined2(Y, 2).\n"
