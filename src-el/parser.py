@@ -32,13 +32,11 @@ class EulerParser:
                                   help="input directory, by default ./")
             inst.add_option("-o", dest="outputdir", default="./",\
                                   help="output directory, by default ./")
-            inst.add_option("-e", dest="encode", default=0,\
+            inst.add_option("-e", dest="encode", default="vr",\
                                   help="encoding, e.g. mnpw, drpw, dlpw, etc.")
             inst.add_option("-b", dest="dl", default=2, help="dl encoding spare parameter")
             inst.add_option("--reasoner", dest="reasoner", type="string", default="dlv",\
                                   help="choose a reasoner")
-            inst.add_option("--repair", dest="repair", type="string", default="topdown",\
-                                  help="choose a repairing approach in case of inconsistency")
             inst.add_option("--cc", action="store_true", dest="consCheck", default=False,\
                                     help="consistency check only")
             inst.add_option("--dc", action="store_false", dest="enableCov", default=True,\
@@ -48,9 +46,7 @@ class EulerParser:
             inst.add_option("--ho", action="store_true", dest="hideOverlaps", default=False,\
                                   help="hide the concepts that are involved in overlapping, used with cb encoding")
             inst.add_option("--ie", action="store_true", dest="ie", default=False,\
-                                    help="inconsistency explanation / hybrid approach")
-            inst.add_option("--ieo", action="store_true", dest="ieo", default=False,\
-                                    help="inconsistency explanation / white box")
+                                    help="inconsistency explanation")
             inst.add_option("--countmir", action="store_true", dest="countOn", default=False,\
                                   help="count # of occurance for each of rcc5")
             inst.add_option("--rcgo", action="store_true", dest="rcgo", default=False,\
@@ -62,16 +58,12 @@ class EulerParser:
             inst.add_option("-N", action="store_false", dest="output", default=True,\
                                   help="no output")
             inst.add_option("-g", action="store_true", dest="generateCti", default=False,\
-                                  help="artifitial example generator, cannot be used with -i option")
+                                  help="artifitial example generator")
             inst.add_option("-n", dest="nary", type="int", default=0, help="N-nary, used with -g")
             inst.add_option("-m", dest="nnodes", type="int", default=0, help="#nodes, used with -g")
             inst.add_option("-d", dest="depth", type="int", default=2, help="depth, used with -g")
             inst.add_option("-t", dest="relation", type="string", default="<",\
                                   help="artifitial articulaiton rel, used with -g")
-            inst.add_option("-I", action="store_true", dest="incEx", default=False,\
-                                  help="generate an inconsistent example, used with -g")
-            inst.add_option("--iv", action="store_true", dest="inputViz", default=False,\
-                                    help="input visualization")
 	return inst
 
     instance = Callable(instance)

@@ -35,5 +35,5 @@ articulation tw1 tw1
 [1.50 equals 2.62]
 [1.51 is_included_in 2.61]
 [1.51 equals 2.63]
-[1.50 1.51 lsum 2.61]
+[1.51 1.52 lsum 2.61]
 [1.52 equals 2.64]

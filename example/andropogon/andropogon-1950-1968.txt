@@ -1,6 +1,5 @@
 taxonomy 1 Taxonomy1
-(24 25 26 30)
-(26 27 28 29)
+(24 25 26 27 28 29 30)
 
 taxonomy 2 Taxonomy2
 (31 32)
