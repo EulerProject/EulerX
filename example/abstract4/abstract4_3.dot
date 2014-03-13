@@ -3,20 +3,73 @@ digraph {
 rankdir = RL
 
   node [shape=box style="filled" fillcolor="#CCFFCC"]
+  "1.A"
+  "1.A"
+  "1.A"
+  "1.A"
   node [shape=octagon style="filled" fillcolor="#FFFFCC"]
+  "2.F"
+  "2.A"
+  "2.A"
+  "2.A"
+  "2.A"
+  "2.A"
+  "2.A"
+  "2.A"
+  "2.A"
+  "2.A"
   node [shape=Msquare style="filled" fillcolor="#EEEEEE"]
   "1.B\n2.B"
-  "1.A\n2.A"
   "1.D\n2.D"
   "1.D\n2.D"
-  "1.A\n2.A"
+  "1.A*2.G\n1.E\n1.E*2.G\n1.E*~2.F\n2.G\n~1.C*2.G"
+  "1.B\n2.B"
+  "1.A*2.F\n1.C\n1.C*2.F\n1.C*~2.G"
+  "~1.A*2.F\n~1.C*2.F"
+  "1.A*~2.F"
+  "1.A*~2.G"
+  "~1.E*2.F"
+  "1.A*2.G\n1.E\n1.E*2.G\n1.E*~2.F\n2.G\n~1.C*2.G"
+  "1.A*2.G\n1.E\n1.E*2.G\n1.E*~2.F\n2.G\n~1.C*2.G"
+  "1.A*~2.F"
+  "~1.A*2.F\n~1.C*2.F"
+  "~1.E*2.F"
   "1.B\n2.B"
   "1.B\n2.B"
-  "1.A\n2.A"
+  "1.A*~2.F"
+  "1.B\n2.B"
+  "1.A*~2.G"
   "1.D\n2.D"
-  "1.A\n2.A"
-  "1.B\n2.B" -> "1.A\n2.A" [style=filled, color=black];
-  "1.D\n2.D" -> "1.A\n2.A" [style=filled, color=black];
+  "1.D\n2.D"
+  "1.A*~2.F"
+  "1.D\n2.D"
+  "1.A*~2.G"
+  "1.A*2.F\n1.C\n1.C*2.F\n1.C*~2.G"
+  "1.A*2.F\n1.C\n1.C*2.F\n1.C*~2.G"
+  "~1.E*2.F"
+  "1.A*2.F\n1.C\n1.C*2.F\n1.C*~2.G"
+  "1.A*~2.G"
+  "1.A*2.G\n1.E\n1.E*2.G\n1.E*~2.F\n2.G\n~1.C*2.G"
+  "~1.A*2.F\n~1.C*2.F"
+  "1.B\n2.B"
+  "1.D\n2.D"
+  "1.A*2.F\n1.C\n1.C*2.F\n1.C*~2.G"
+  "2.F" -> "2.A" [style=filled, color=black];
+  "1.A*~2.F" -> "2.A" [style=filled, color=red];
+  "1.A*~2.G" -> "2.A" [style=filled, color=red];
+  "~1.E*2.F" -> "2.A" [style=filled, color=red];
+  "1.A*2.G\n1.E\n1.E*2.G\n1.E*~2.F\n2.G\n~1.C*2.G" -> "1.A" [style=filled, color=black];
+  "1.A*2.G\n1.E\n1.E*2.G\n1.E*~2.F\n2.G\n~1.C*2.G" -> "1.A*~2.F" [style=filled, color=black];
+  "~1.A*2.F\n~1.C*2.F" -> "~1.E*2.F" [style=filled, color=black];
+  "1.B\n2.B" -> "1.A" [style=filled, color=black];
+  "1.B\n2.B" -> "1.A*~2.F" [style=filled, color=black];
+  "1.B\n2.B" -> "1.A*~2.G" [style=filled, color=black];
+  "1.D\n2.D" -> "1.A" [style=filled, color=black];
+  "1.D\n2.D" -> "1.A*~2.F" [style=filled, color=black];
+  "1.D\n2.D" -> "1.A*~2.G" [style=filled, color=black];
+  "1.A*2.F\n1.C\n1.C*2.F\n1.C*~2.G" -> "1.A" [style=filled, color=black];
+  "1.A*2.F\n1.C\n1.C*2.F\n1.C*~2.G" -> "~1.E*2.F" [style=filled, color=black];
+  "1.A*2.F\n1.C\n1.C*2.F\n1.C*~2.G" -> "1.A*~2.G" [style=filled, color=black];
   subgraph cluster_lg {
     rankdir = LR
   }
