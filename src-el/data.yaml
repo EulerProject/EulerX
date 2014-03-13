@@ -1,0 +1,155 @@
+1+:
+  concept: 1+
+  group: none
+1.B:
+  concept: B
+  group: '1'
+1.B_2.B:
+  label: is_included_in
+  s: 1.B
+  t: 2.B
+  w: '1'
+1.B_A:
+  label: isa
+  s: 1.B
+  t: A
+  w: '2'
+1.C:
+  concept: C
+  group: '1'
+1.C_1.B:
+  label: isa
+  s: 1.C
+  t: 1.B
+  w: '2'
+1.C_plus:
+  label: inplus
+  s: 1.C
+  t: 1+
+  w: '1'
+1.D:
+  concept: D
+  group: '1'
+1.D_1.B:
+  label: isa
+  s: 1.D
+  t: 1.B
+  w: '2'
+1.F:
+  concept: F
+  group: '1'
+1.F_2.B:
+  label: overlaps
+  s: 1.F
+  t: 2.B
+  w: '1'
+1.F_2.F:
+  label: overlaps
+  s: 1.F
+  t: 2.F
+  w: '1'
+1.F_A:
+  label: isa
+  s: 1.F
+  t: A
+  w: '2'
+1.I:
+  concept: I
+  group: '1'
+1.I_A:
+  label: isa
+  s: 1.I
+  t: A
+  w: '2'
+2.B:
+  concept: B
+  group: '2'
+2.B_A:
+  label: isa
+  s: 2.B
+  t: A
+  w: '2'
+2.C:
+  concept: C
+  group: '2'
+2.C_2.B:
+  label: isa
+  s: 2.C
+  t: 2.B
+  w: '2'
+2.C_pus:
+  label: inplus
+  s: 2.C
+  t: 1+
+  w: '1'
+2.D:
+  concept: D
+  group: '2'
+2.D_A:
+  label: isa
+  s: 2.D
+  t: A
+  w: '2'
+2.F:
+  concept: F
+  group: '2'
+2.F_A:
+  label: isa
+  s: 2.F
+  t: A
+  w: '2'
+2.I:
+  concept: I
+  group: '2'
+2.I_2.F:
+  label: isa
+  s: 2.I
+  t: 2.F
+  w: '2'
+A:
+  concept: A
+  group: common
+E:
+  concept: E
+  group: common
+E_1.B:
+  label: isa
+  s: E
+  t: 1.B
+  w: '2'
+E_2.B:
+  label: isa
+  s: E
+  t: 2.B
+  w: '2'
+G:
+  concept: G
+  group: common
+G_1.F:
+  label: isa
+  s: G
+  t: 1.F
+  w: '2'
+G_2.F:
+  label: isa
+  s: G
+  t: 2.F
+  w: '2'
+H:
+  concept: H
+  group: common
+H_1.F:
+  label: isa
+  s: H
+  t: 1.F
+  w: '2'
+H_2.B:
+  label: isa
+  s: H
+  t: 2.B
+  w: '2'
+plus_2.D:
+  label: outplus
+  s: 1+
+  t: 2.D
+  w: '1'

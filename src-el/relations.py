@@ -25,7 +25,7 @@ relation["<"] = 1 << 2
 relation["!"] = 1 << 3
 #relation["<>"] = 1 << 3
 relation["><"] = 1 << 4
-# Infer bit
+# Imfer bit
 relation["infer"] = 1 << 5
 relation["{=, >}"] = 1 << 0 | 1 << 1
 relation["{=, <}"] = 1 << 0 | 1 << 2
@@ -73,25 +73,23 @@ reasoner["dlv"] = 1 << 0
 reasoner["gringo"] = 1 << 1
 
 encode = {}
+encode[0] = 0
 encode["dr"] = 1
 encode["direct"] = encode["dr"]
 encode["vr"] = 1 << 1
 encode["dl"] = 1 << 2
-encode["pl"] = 1 << 3
-encode["mn"] = 1 << 4
-encode["pw"] = 1 << 5
-encode["ve"] = 1 << 6
-encode["cb"] = 1 << 7  # combined concept
-encode["ob"] = 1 << 8  # observation
-encode["ct"] = 1 << 9
+encode["mn"] = 1 << 3 
+encode["pw"] = 1 << 4 
+encode["ve"] = 1 << 5 
+encode["cb"] = 1 << 6   # combined concept
+encode["ob"] = 1 << 7   # observation
+encode["ct"] = 1 << 8 
 encode["drpw"] = encode["dr"] | encode["pw"]
 encode["vrpw"] = encode["vr"] | encode["pw"]
 encode["dlpw"] = encode["dl"] | encode["pw"]
-encode["plpw"] = encode["pl"] | encode["pw"]
 encode["mnpw"] = encode["mn"] | encode["pw"]
 encode["vrve"] = encode["vr"] | encode["ve"]
 encode["dlve"] = encode["dl"] | encode["ve"]
-encode["plve"] = encode["pl"] | encode["ve"]
 encode["mnve"] = encode["mn"] | encode["ve"]
 encode["mncb"] = encode["mn"] | encode["cb"]
 encode["mnvr"] = encode["mn"] | encode["vr"]

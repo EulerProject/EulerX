@@ -238,7 +238,3 @@ f_out.write(".")
 
 f_in.close()
 f_out.close()    
-
-
-
-
