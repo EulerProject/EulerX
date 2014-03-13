@@ -1,0 +1,25 @@
+  graphstyle: 
+    graph: "rankdir=BT\n labelloc=t\n labeljust=left\n fontsize=20\n label=\"Sample Graph\"\n"
+    subgraph: "off"
+  nodestyle: 
+    '1': "shape=box style=\"filled,rounded\" color=black fillcolor=\"#CCFFCC\""
+    '2': "shape=octagon style=filled color=black fillcolor=\"#FFFFCC\""
+    common: "shape=Msquare style=filled color=black fillcolor=\"#EEEEEE\""
+    default: "shape=circle style=filled color=black fillcolor=white"
+  edgestyle: 
+    - 
+      label: "isa"
+      dot: "style=solid color=black"
+      display: "(w)display"
+    - 
+      label: "overlaps"
+      dot: "style=dotted color= blue dir=none"
+      display: "overlaps"
+    - 
+      label: "outplus"
+      dot: "style=solid color= green dir=lr"
+      display: "(w)penwidth"
+    - 
+      label: "default"
+      dot: "style=solid color=red dir=lr"
+      display: ""
