@@ -1,3 +1,9 @@
+# 
+#   Helper.py
+#
+#   Here we define some helper (common) routines that other
+#   modules can use
+#
 
 class Callable:
     def __init__(self, callable):
