@@ -1203,6 +1203,8 @@ class TaxonomyMapping:
 
     def genCbConcept(self):
         self.baseCb += "\n%%% combined concept\n"
+        print self.mirp
+        print self.mir
         for key1 in self.taxonomies.keys():
             for key2 in self.taxonomies.keys():
                 if key1 >= key2: continue
