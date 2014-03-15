@@ -685,7 +685,6 @@ class TaxonomyMapping:
         fAllDot.write(tmpCom)
         fAllDot.close()
         
-        print self.tr
         for [T1, T2, P] in self.tr:
     	    if(P == 0):
     	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")
