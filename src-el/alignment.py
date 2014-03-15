@@ -437,12 +437,13 @@ class TaxonomyMapping:
             else:
                 pwTm.firstRcg = False
             if self.enc & encode["cb"]:
-                pwTm.mir = pwTm.basemir
                 if self.options.hideOverlaps:
                   pwTm.tr = []
+                  pwTm.mir = {}
                 # if not hiding orignal concepts, basetr is useful
                 else:
                   pwTm.tr = pwTm.basetr
+                  pwTm.mir = pwTm.basemir
 
             outputstr += "\nPossible world "+i.__str__()+":\n{"
             if self.options.verbose: print pws[i]+"#"
@@ -487,7 +488,8 @@ class TaxonomyMapping:
             # for example, if mncb, genPW() is called for intermediate usage
             if self.enc & encode["pw"] and ss == "rel" or\
                self.enc & encode["cb"] and ss == "relout":
-                pwTm.genPwRcg(name + "_" + i.__str__())
+                pwTm.genPwRcg(name + "_" + i.__str__() + "_" + self.options.encode)
+                #pwTm.genPwCb(name + "_" + i.__str__())
                 for e in pwTm.tr:
                     self.trlist.append(e)
         self.genAllPwRcg(len(pws))
@@ -501,6 +503,15 @@ class TaxonomyMapping:
         fpw.write(outputstr)
         fpw.close()
         if self.options.cluster: self.genPwCluster(pwmirs, False)
+
+    def genPwCb(self, fileName):
+        self.name = fileName
+        self.cbfile = os.path.join(self.aspdir, self.name+"_cb.asp")
+        self.genCbConcept()
+        fcb = open(self.cbfile, 'w')
+        fcb.write(self.baseCb)
+        fcb.close()
+        self.genCB()
 
     def genPwRcg(self, fileName):
         fDot = open(self.options.outputdir+fileName+".dot", 'w')
@@ -674,7 +685,7 @@ class TaxonomyMapping:
         fAllDot.write(tmpCom)
         fAllDot.close()
         
-        
+        print self.tr
         for [T1, T2, P] in self.tr:
     	    if(P == 0):
     	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")
@@ -1203,8 +1214,6 @@ class TaxonomyMapping:
 
     def genCbConcept(self):
         self.baseCb += "\n%%% combined concept\n"
-        print self.mirp
-        print self.mir
         for key1 in self.taxonomies.keys():
             for key2 in self.taxonomies.keys():
                 if key1 >= key2: continue

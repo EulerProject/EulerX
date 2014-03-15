@@ -31,6 +31,7 @@ class template:
              + "cp(X) :- concept2(X, _).\n"\
              + "con(X) :- cb(X).\n"\
              + "con(X) :- cp(X).\n"\
+             + "combined2(C, 0) :- newcon(C, A, B, _), not rel(A, B, \"><\"), not rel(B, A, \"><\").\n"\
              + "in(X, M) :- newcon(X, Y, Z, 0), in(Y, M), out(Z, M).\n"\
              + "out(X, M) :- newcon(X, Y, Z, 0), out(Y, M).\n"\
              + "out(X, M) :- newcon(X, Y, Z, 0), in(Z, M).\n"\
