@@ -281,6 +281,14 @@ class Articulation:
 		#result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
 		#result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
 		#result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
+	    elif self.relations == (rcc5["is_included_in"] | rcc5["disjoint"]):
+                if reasoner[rnr] == reasoner["dlv"]:
+		    result += ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
+		    result += ":- rel(" + name1 + ", " + name2 + ", \"><\").\n" 
+                elif reasoner[rnr] == reasoner["gringo"]:
+		    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+		    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n" 
+		    align.basePw += ":- 1[vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)], 1[vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)].\n" 
 	    elif self.relations == (rcc5["includes"] | rcc5["overlaps"]):
                 if reasoner[rnr] == reasoner["dlv"]:
 		    result += "vrs(X) v irs(X) :- out(" + name1 + ",X), in(" + name2 + ",X), pw.\n" 
