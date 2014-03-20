@@ -20,24 +20,27 @@ def add_node(concept, group):
             nodes.update({group + "." + concept: node})
         else:
             nodes.update({concept: node})
-g = []          # group number
-groups = []     # members of a group
-art = []        
+art = []
+dictionary = {}
 f = open("in.txt", "r")
 for line in f.readlines():
     if line.startswith("taxonomy"):
-       g.append(line.split(" ")[1])
+       groups = []
+       g = line.split(" ")[1]
     if line.startswith("("):
         groups.append(line[1:-2].split(" "))
+    if line =="\n":
+            dictionary.update({g : groups})
     if line.startswith("["):
         art.append (line[1:-2])
-dictionary = dict (zip(g, groups))
-for key, value in dictionary.iteritems():
-    parent = value.pop(0)
-    add_node(parent, key)
-    for v in value:
-        add_node(v, key)
-        add_edge(key + "." + v, key + "." + parent, "isa")
+print(dictionary)
+for key, attr in dictionary.iteritems():
+    for value in attr:    
+            parent = value.pop(0)
+            add_node(parent, key)
+            for v in value:
+                add_node(v, key)
+                add_edge(key + "." + v, key + "." + parent, "isa")
 for a in art:
     if "{" in a:
         start = a.split(" {")[0]
@@ -48,7 +51,7 @@ for a in art:
                 label = label + " OR " + art2symbol[ops[i]]
         add_edge(start, end, label)
     else:
-        if "lsum" in a or "ldiff" in a:
+        if any(l in a for l in ["lsum", "ldiff"]):
             if "lsum" in a:
                     l = "lsum"
                     op = "+"
@@ -60,7 +63,7 @@ for a in art:
             add_edge(plus, a.split(" " + l + " ")[-1], "out")
             for i in range(0,len(a.split(" " + l)[0].split(" "))):
                 add_edge(a.split(" " + l)[0].split(" ")[i], plus, "in")
-        elif "rsum" in a or "rdiff" in a:
+        elif any(l in a for l in ["rsum", "rdiff"]):
             if "rsum" in a:
                     l = "rsum"
                     op = "+"
