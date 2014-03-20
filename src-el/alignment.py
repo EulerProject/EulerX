@@ -86,7 +86,7 @@ class TaxonomyMapping:
         self.ivpdf = os.path.join(options.outputdir, self.name+"_iv.pdf")
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             # possible world command
-            self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD --eq=0"
+            self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
             # consistency command
             self.con = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD --eq=1"
         elif reasoner[self.options.reasoner] == reasoner["dlv"]:
@@ -1921,6 +1921,20 @@ class TaxonomyMapping:
                 self.tr.append([r[1],r[5], provenance])
                 self.tr.append([r[2],r[5], provenance])
                 self.tr.append([r[3],r[5], provenance])
+                return None
+            if (r[1] == "r4sum"):
+                self.addIMir(r[0], r[2], provenance)
+                self.addIMir(r[0], r[3], provenance)
+                self.addIMir(r[0], r[4], provenance)
+                self.addIMir(r[0], r[5], provenance)
+                self.mir[r[0] + "," + r[2]] = rcc5["includes"]
+                self.mir[r[0] + "," + r[3]] = rcc5["includes"]
+                self.mir[r[0] + "," + r[4]] = rcc5["includes"]
+                self.mir[r[0] + "," + r[5]] = rcc5["includes"]
+                self.tr.append([r[2],r[0], provenance])
+                self.tr.append([r[3],r[0], provenance])
+                self.tr.append([r[4],r[0], provenance])
+                self.tr.append([r[5],r[0], provenance])
                 return None 
         if rcc5.has_key(r[1]):
 	    self.mir[r[0] + "," + r[2]] = rcc5[r[1]]

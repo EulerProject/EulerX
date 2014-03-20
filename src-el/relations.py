@@ -58,6 +58,7 @@ relation["=+"] = (1 << 5) + 1 #rsum
 relation["+3="] = 1 << 6 #l3sum
 relation["=3+"] = (1 << 6) + 1 #r3sum
 relation["+4="] = 1 << 7 #l4sum
+relation["=4+"] = (1 << 7) + 1 #r4sum
 relation["-="] = 1 << 8 #ldiff
 relation["=-"] = (1 << 8) + 1 #rdiff
 
