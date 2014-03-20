@@ -120,6 +120,8 @@ class InputVisual:
                         sum_list.append((temp_list[4], temp_list[0], temp_list[1], temp_list[2]))
                     elif "l4sum" in temp_list:
                         sum_list.append((temp_list[5], temp_list[0], temp_list[1], temp_list[2], temp_list[3]))
+                    elif "r4sum" in temp_list:
+                        sum_list.append((temp_list[0], temp_list[2], temp_list[3], temp_list[4], temp_list[5]))
                     elif "rsum" in temp_list:
                         sum_list.append((temp_list[0], temp_list[2], temp_list[3]))
                     elif "r3sum" in temp_list:
