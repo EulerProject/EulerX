@@ -1,0 +1,19 @@
+taxonomy 1 Taxonomy1
+(13 14 15 16)
+
+taxonomy 2 Taxonomy2
+(17 18 19 20)
+(20 21 22 23)
+
+articulation tw1 tw1
+[1.13 equals 2.17]
+[1.14 equals 2.18]
+[1.15 equals 2.21]
+[1.16 r3sum 2.19 2.22 2.23]
+[1.16 includes 2.19]
+[1.15 is_included_in 2.20]
+[1.14 disjoint 2.20]
+[1.16 overlaps 2.20]
+[1.16 includes 2.22]
+[1.16 includes 2.23]
+

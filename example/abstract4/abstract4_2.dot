@@ -1,0 +1,24 @@
+digraph {
+
+rankdir = RL
+
+  node [shape=box style="filled" fillcolor="#CCFFCC"]
+  "1.C"
+  node [shape=octagon style="filled" fillcolor="#FFFFCC"]
+  "2.A"
+  "2.A"
+  "2.A"
+  node [shape=Msquare style="filled" fillcolor="#EEEEEE"]
+  "1.D\n2.D"
+  "1.B\n2.B"
+  "1.B\n2.B"
+  "1.D\n2.D"
+  "1.D\n2.D"
+  "1.B\n2.B"
+  "1.C" -> "2.A" [style=filled, color=red];
+  "1.D\n2.D" -> "2.A" [style=filled, color=black];
+  "1.B\n2.B" -> "2.A" [style=filled, color=black];
+  subgraph cluster_lg {
+    rankdir = LR
+  }
+}
