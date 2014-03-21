@@ -120,12 +120,12 @@ class InputVisual:
                         sum_list.append((temp_list[4], temp_list[0], temp_list[1], temp_list[2]))
                     elif "l4sum" in temp_list:
                         sum_list.append((temp_list[5], temp_list[0], temp_list[1], temp_list[2], temp_list[3]))
-                    elif "r4sum" in temp_list:
-                        sum_list.append((temp_list[0], temp_list[2], temp_list[3], temp_list[4], temp_list[5]))
                     elif "rsum" in temp_list:
                         sum_list.append((temp_list[0], temp_list[2], temp_list[3]))
                     elif "r3sum" in temp_list:
                         sum_list.append((temp_list[0], temp_list[2], temp_list[3], temp_list[4]))
+                    elif "r4sum" in temp_list:
+                        sum_list.append((temp_list[0], temp_list[2], temp_list[3], temp_list[4], temp_list[5]))
                     elif "ldiff" in temp_list:
                         sum_list.append((temp_list[0], temp_list[1], temp_list[3]))
                     elif "rdiff" in temp_list:
@@ -187,6 +187,16 @@ class InputVisual:
         for e in art_list:
             f_out.write("\"" + e[0] + "\" -> \"" + e[1] + "\" [color=grey, style=dashed, label=\"" + e[2] + "\"];\n")
         for e in sum_list:
+#            implementation that lsum, rsum, etc are using a "+" node
+'''
+            nodePlus = 0
+            f_out.write("\"" + nodePlus.__str__() + "\" [label=\"+\"];\n")
+            for i in range(1,len(e)):
+                f_out.write("\"" + e[i] + "\" -> \"" + nodePlus.__str__() + "\" [constraint=false, color=grey, style=dashed];\n")
+            f_out.write("\"" + nodePlus.__str__() + "\" -> \"" + e[0] + "\" [constraint=false, color=grey, style=dashed];\n")
+            nodePlus += 1
+'''
+#            implementation that lsum, rsum, etc are using different colors
             r = lambda: random.randint(0,255)
             color = "#" + hex(r())[2:] + hex(r())[2:] + hex(r())[2:]
             for i in range(1,len(e)):
