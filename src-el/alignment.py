@@ -1,3 +1,12 @@
+#
+#       alignment.py
+#
+#  Alignment Module:
+#    We define the alignment class here for taxonomy alignment
+#    and dataset integration
+#
+
+
 import os
 import time
 import sets
@@ -77,7 +86,7 @@ class TaxonomyMapping:
         self.ivpdf = os.path.join(options.outputdir, self.name+"_iv.pdf")
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             # possible world command
-            self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD --eq=0"
+            self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
             # consistency command
             self.con = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD --eq=1"
         elif reasoner[self.options.reasoner] == reasoner["dlv"]:
@@ -428,12 +437,13 @@ class TaxonomyMapping:
             else:
                 pwTm.firstRcg = False
             if self.enc & encode["cb"]:
-                pwTm.mir = pwTm.basemir
                 if self.options.hideOverlaps:
                   pwTm.tr = []
+                  pwTm.mir = {}
                 # if not hiding orignal concepts, basetr is useful
                 else:
                   pwTm.tr = pwTm.basetr
+                  pwTm.mir = pwTm.basemir
 
             outputstr += "\nPossible world "+i.__str__()+":\n{"
             if self.options.verbose: print pws[i]+"#"
@@ -478,7 +488,8 @@ class TaxonomyMapping:
             # for example, if mncb, genPW() is called for intermediate usage
             if self.enc & encode["pw"] and ss == "rel" or\
                self.enc & encode["cb"] and ss == "relout":
-                pwTm.genPwRcg(name + "_" + i.__str__())
+                pwTm.genPwRcg(name + "_" + i.__str__() + "_" + self.options.encode)
+                #pwTm.genPwCb(name + "_" + i.__str__())
                 for e in pwTm.tr:
                     self.trlist.append(e)
         self.genAllPwRcg(len(pws))
@@ -492,6 +503,15 @@ class TaxonomyMapping:
         fpw.write(outputstr)
         fpw.close()
         if self.options.cluster: self.genPwCluster(pwmirs, False)
+
+    def genPwCb(self, fileName):
+        self.name = fileName
+        self.cbfile = os.path.join(self.aspdir, self.name+"_cb.asp")
+        self.genCbConcept()
+        fcb = open(self.cbfile, 'w')
+        fcb.write(self.baseCb)
+        fcb.close()
+        self.genCB()
 
     def genPwRcg(self, fileName):
         fDot = open(self.options.outputdir+fileName+".dot", 'w')
@@ -664,7 +684,6 @@ class TaxonomyMapping:
         fAllDot.write("  node [shape=Msquare style=\"filled\" fillcolor=\"#EEEEEE\"]\n")
         fAllDot.write(tmpCom)
         fAllDot.close()
-        
         
         for [T1, T2, P] in self.tr:
     	    if(P == 0):
@@ -1178,7 +1197,7 @@ class TaxonomyMapping:
         pdlv.write(self.basePw)
         pdlv.write("pw.")
         if self.options.hideOverlaps:
-            pdlv.write("hide.")
+            pdlv.write("\nhide.")
         pdlv.write(self.baseIx)
         idlv.write("ix.")
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
@@ -1205,8 +1224,8 @@ class TaxonomyMapping:
                         #   self.mirp.has_key(t2.dotName()+","+t1.dotName()+","+rcc5["overlaps"].__str__()):
                         p1 = t1.dotName()+","+t2.dotName()
                         p2 = t2.dotName()+","+t1.dotName()
-                        if self.mir.has_key(p1) and self.mir[p1] == rcc5["overlaps"] or\
-                           self.mir.has_key(p2) and self.mir[p2] == rcc5["overlaps"]:
+                        if self.mir.has_key(p1) and self.mir[p1] & rcc5["overlaps"] or\
+                           self.mir.has_key(p2) and self.mir[p2] & rcc5["overlaps"]:
 	                    self.baseCb += "newcon(" + t1.dlvName() + "_not_" + t2.dlvName() + ", "\
 	           	                + t1.dlvName() + ", " + t2.dlvName()  + ", 0).\n"
 	                    self.baseCb += "newcon(" + t1.dlvName() + "__" + t2.dlvName() + ", "\
@@ -1902,6 +1921,20 @@ class TaxonomyMapping:
                 self.tr.append([r[1],r[5], provenance])
                 self.tr.append([r[2],r[5], provenance])
                 self.tr.append([r[3],r[5], provenance])
+                return None
+            if (r[1] == "r4sum"):
+                self.addIMir(r[0], r[2], provenance)
+                self.addIMir(r[0], r[3], provenance)
+                self.addIMir(r[0], r[4], provenance)
+                self.addIMir(r[0], r[5], provenance)
+                self.mir[r[0] + "," + r[2]] = rcc5["includes"]
+                self.mir[r[0] + "," + r[3]] = rcc5["includes"]
+                self.mir[r[0] + "," + r[4]] = rcc5["includes"]
+                self.mir[r[0] + "," + r[5]] = rcc5["includes"]
+                self.tr.append([r[2],r[0], provenance])
+                self.tr.append([r[3],r[0], provenance])
+                self.tr.append([r[4],r[0], provenance])
+                self.tr.append([r[5],r[0], provenance])
                 return None 
         if rcc5.has_key(r[1]):
 	    self.mir[r[0] + "," + r[2]] = rcc5[r[1]]

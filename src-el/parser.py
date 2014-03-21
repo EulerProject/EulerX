@@ -44,7 +44,9 @@ class EulerParser:
             inst.add_option("--dc", action="store_false", dest="enableCov", default=True,\
                                     help="disable coverage")
             inst.add_option("--ur", action="store_true", dest="reduction", default=False,\
-                                  help="turn on uncertainty reduction")
+                                  help="turn on uncertainty reduction,\
+                                        NOTE: it is temporarily UNAVAILABLE because pygtk is not easy to install \
+                                        we may support it in the future using other GUI module.")
             inst.add_option("--ho", action="store_true", dest="hideOverlaps", default=False,\
                                   help="hide the concepts that are involved in overlapping, used with cb encoding")
             inst.add_option("--ie", action="store_true", dest="ie", default=False,\
