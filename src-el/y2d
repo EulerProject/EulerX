@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 import yaml
 import optparse
 from collections import defaultdict
