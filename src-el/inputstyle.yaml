@@ -2,8 +2,8 @@
     graph: "rankdir=BT\n"
     subgraph: "on"
   nodestyle: 
-    '1': "shape=box style=\"filled\" fillcolor=\"#CCFFCC\""
-    '2': "shape=octagon style=filled fillcolor=\"#FFFFCC\""
+    '2': "shape=box style=\"filled\" fillcolor=\"#CCFFCC\""
+    '1': "shape=octagon style=filled fillcolor=\"#FFFFCC\""
     default: "shape=circle style=filled color=black fillcolor=white"
   edgestyle: 
     - 

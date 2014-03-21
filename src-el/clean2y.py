@@ -21,7 +21,7 @@ def add_node(concept, group):
         else:
             nodes.update({concept: node})
 art = []
-dictionary = {}
+dictionary = {}  # group number and list of nodes in the group
 f = open("in.txt", "r")
 for line in f.readlines():
     if line.startswith("taxonomy"):
@@ -33,7 +33,6 @@ for line in f.readlines():
             dictionary.update({g : groups})
     if line.startswith("["):
         art.append (line[1:-2])
-print(dictionary)
 for key, attr in dictionary.iteritems():
     for value in attr:    
             parent = value.pop(0)
@@ -42,6 +41,10 @@ for key, attr in dictionary.iteritems():
                 add_node(v, key)
                 add_edge(key + "." + v, key + "." + parent, "isa")
 for a in art:
+    a = a.replace("3sum", "sum")
+    a = a.replace ("4sum", "sum")
+    a = a.replace("3diff", "diff")
+    a = a.replace ("4diff", "diff")
     if "{" in a:
         start = a.split(" {")[0]
         end = a.split("} ")[-1]
