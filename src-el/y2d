@@ -15,10 +15,10 @@ def read_stylesheet(stylefile):
         styles = yaml.load(style_file)      
         
 def apply_style(datafile, output):
-    f = open(output,"w")
+    f = output
     f.write("digraph{\n")
     f.write(str(styles["graphstyle"]["graph"]))
-    with open(datafile) as data_file:    
+    with datafile as data_file:    
         data = yaml.load(data_file)
     #separate nodes from edges
         for key, value in data.iteritems():
@@ -73,9 +73,6 @@ def parse_options():
 	parser.add_option("-s","--sfile",type="string",dest="sfile",
 					  default=None,
 					  help="file")
-	parser.add_option("-d","--dfile",type="string",dest="dfile",
-					  default=None,
-					  help="file")
 	(options,args) = parser.parse_args()
 	return (options,args)
 
@@ -83,18 +80,6 @@ def parse_options():
 if __name__ == '__main__':
 	(options,args) = parse_options()
 	if options.sfile == None:
-		options.sfile = "stylesheet.yaml"
-	if options.dfile == None:
-		options.dfile = "data.yaml"
+		options.sfile = "inputstyle.yaml"
 	read_stylesheet(options.sfile)
-	apply_style(options.dfile, "out.dot")
-
-
-
-
-
-
-
-
-
-
+	apply_style(sys.stdin, sys.stdout)
