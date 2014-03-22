@@ -58,7 +58,7 @@ class TaxonomyMapping:
             self.options.encode = "mnpw"
         self.enc = encode[options.encode]      # encoding
         self.name = os.path.splitext(os.path.basename(options.inputfile))[0]
-        self.taxa1name = ""
+        self.firstTName = ""                   # The abbrev name of the first taxonomy
         self.firstRcg = False
         self.trlist = []
         self.eqConLi = []                      # list of concepts that are equal
@@ -106,6 +106,9 @@ class TaxonomyMapping:
         taxon = taxonomy.getTaxon(taxonName)
         return taxon
 
+    def allPairsNeeded(self):
+        return self.options.allRelations or len(self.taxonomies) == 1
+
     def getAllArticulationPairs(self):
         taxa = []
         values = self.taxonomies.values()
@@ -121,12 +124,13 @@ class TaxonomyMapping:
 
     def getAllTaxonPairs(self):
         taxa = self.getAllArticulationPairs()
+        values = self.taxonomies.values()
         for taxonLoop in range(len(self.taxonomies)):
-            thisTaxonomy = self.taxonomies[self.taxonomies[taxonLoop]];
-            theseTaxa = thisTaxonomy.taxa
+            thisTaxonomy = values[taxonLoop];
+            theseTaxa = thisTaxonomy.taxa.values()
             for outerloop in range(len(theseTaxa)):
                 for innerloop in range(outerloop+1, len(theseTaxa)):
-                    newTuple = (theseTaxa[outerloop].dlvName(), theseTaxa[innerloop].dlvName())
+                    newTuple = (theseTaxa[outerloop], theseTaxa[innerloop])
                     taxa.append(newTuple)
         return taxa
 
@@ -536,7 +540,7 @@ class TaxonomyMapping:
 #            blueNode = False
             T1s = T1.split(".")
             # First taxonomy name
-            if tmpTax == "": tmpTax = self.taxa1name
+            if tmpTax == "": tmpTax = self.firstTName
             for T2 in self.eq[T1]:
                 T2s = T2.split(".")
 #                if(T1s[1] == T2s[1]):
@@ -1587,7 +1591,10 @@ class TaxonomyMapping:
 
     def genAspDc(self):
         self.baseCb  += self.baseAsp
-        self.baseAsp += template.getAspPwDc()
+        if self.allPairsNeeded():
+            self.baseAsp += template.getAspAllDc()
+        else:
+            self.baseAsp += template.getAspPwDc()
         self.baseCb  += template.getAspCbDc()
 
     def genAspObs(self):
@@ -1678,7 +1685,6 @@ class TaxonomyMapping:
     def readFile(self):
         file = open(os.path.join(self.options.inputdir, self.options.inputfile), 'r')
         lines = file.readlines()
-        self.taxa1name = lines[0].split(" ")[1]
         flag = ""
         for line in lines:
 
@@ -1690,6 +1696,9 @@ class TaxonomyMapping:
                 else:
                     taxName = re.match("(.*?)\s(.*)", taxName)
                     taxonomy.nameit(taxName.group(1), taxName.group(2))
+
+                if self.firstTName == "":
+                    self.firstTName = taxonomy.abbrev
                   
                 self.taxonomies[taxonomy.abbrev] = taxonomy
                 flag = "taxonomy"
@@ -1983,9 +1992,15 @@ class TaxonomyMapping:
 		elif (pair.find(child + ",") == 0):
 		    newPair = pair.replace(child + ",", parent + ",")
 	    	    self.mir[newPair] = rcc5["includes"]
+
+    # Output all the mir relations in the csv file
     def genMir(self):       
         fmir = open(self.mirfile, 'w')
-        for pair in self.getAllArticulationPairs():
+        # Get the pairs as needed
+        pairs =      self.getAllTaxonPairs()\
+                if self.allPairsNeeded()\
+                else self.getAllArticulationPairs()
+        for pair in pairs:
             pairkey = pair[0].dotName() + "," + pair[1].dotName()
             if self.options.verbose:
 		print pairkey
