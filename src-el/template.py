@@ -7,6 +7,7 @@ class template:
     global aspMnCon              # Base mn concept encoding
     global aspCbCon              # Base cb new concept encoding
     global aspPwDc               # Base pw decoding
+    global aspAllDc              # Base pw decoding with "--all"
     global aspCbDc               # Base cb decoding
 
     aspMnCon = "\n\n%%% Meaning of regions\n"\
@@ -31,6 +32,7 @@ class template:
              + "cp(X) :- concept2(X, _).\n"\
              + "con(X) :- cb(X).\n"\
              + "con(X) :- cp(X).\n"\
+	     + "combined2(C, 0) :- newcon(C, A, B, _), not rel(A, B, \"><\"), not rel(B, A, \"><\").\n"\
              + "in(X, M) :- newcon(X, Y, Z, 0), in(Y, M), out(Z, M).\n"\
              + "out(X, M) :- newcon(X, Y, Z, 0), out(Y, M).\n"\
              + "out(X, M) :- newcon(X, Y, Z, 0), in(Z, M).\n"\
@@ -92,11 +94,19 @@ class template:
             + "rel(X, Y, \"<\") :- not hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2), pw.\n"\
             + "rel(X, Y, \">\") :- hint(X, Y, 0), hint(X, Y, 1), not hint(X, Y, 2), pw.\n"\
             + "rel(X, Y, \"><\") :- hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2), pw.\n"\
-            + "rel(X, Y, \"!\") :- hint(X, Y, 0), not hint(X, Y, 1), hint(X, Y, 2), pw.\n\n\n"\
-            + "hint(X, Y, 0) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), out(Y, R), not ncf(X), not ncf(Y), pw.\n"\
+            + "rel(X, Y, \"!\") :- hint(X, Y, 0), not hint(X, Y, 1), hint(X, Y, 2), pw.\n\n\n"
+
+    hintart = "hint(X, Y, 0) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), out(Y, R), not ncf(X), not ncf(Y), pw.\n"\
             + "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), in(Y, R), not ncf(X), not ncf(Y), pw.\n"\
             + "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), out(X, R), in(Y, R), not ncf(X), not ncf(Y), pw.\n\n"
 
+    hintall = "hint(X, Y, 0) :- concept2(X, N1), concept2(Y, N2), X <> Y, vrs(R), in(X, R), out(Y, R), not ncf(X), not ncf(Y), pw.\n"\
+            + "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), X <> Y, vrs(R), in(X, R), in(Y, R), not ncf(X), not ncf(Y), pw.\n"\
+            + "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), X <> Y, vrs(R), out(X, R), in(Y, R), not ncf(X), not ncf(Y), pw.\n\n"
+
+    aspAllDc = aspPwDc + hintall
+
+    aspPwDc += hintart
 
     aspCbDc  = aspPwDc
             #+  "combined(XC,0,3) :- ctocc(X, XC, _), combined(X,2,_).\n"\
@@ -126,10 +136,10 @@ class template:
             +  "combined(Y,1,1) :- rel(X,Y,\"!\").\n"\
             +  "combined(Z,1,2) :- rel(X,Y,\"><\"), newcon(Z, X, Y, _).\n"\
             +  "%%% unhide the overlap concepts\n"\
-            +  "combined(X,0,0) :- rel(X,Y,\"><\").\n"\
+            +  "combined(X,1,0) :- rel(X,Y,\"><\").\n"\
             +  "combined(X,0,0) :- rel(X,Y,\"><\"), hide.\n"\
             +  "%%% unhide the overlap concepts\n"\
-            +  "combined(Y,0,1) :- rel(X,Y,\"><\").\n"\
+            +  "combined(Y,1,1) :- rel(X,Y,\"><\").\n"\
             +  "combined(Y,0,1) :- rel(X,Y,\"><\"), hide.\n"\
             +  "combined2(X,Y) :- combined(X,Y,Z).\n"\
             +  "combined2(X,1) :- not combined2(X,0), con(X).\n"\
@@ -193,6 +203,10 @@ class template:
         global aspPwDc
         return aspPwDc
 
+    def getAspAllDc():
+        global aspAllDc
+        return aspAllDc
+
     def getAspCbDc():
         global aspCbDc
         return aspCbDc
@@ -204,5 +218,6 @@ class template:
     getAspMnCon = Callable(getAspMnCon)
     getAspCbCon = Callable(getAspCbCon)
     getAspPwDc  = Callable(getAspPwDc)
+    getAspAllDc  = Callable(getAspAllDc)
     getAspCbDc  = Callable(getAspCbDc)
     getEncErrMsg= Callable(getEncErrMsg)
