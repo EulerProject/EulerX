@@ -49,6 +49,8 @@ class EulerParser:
                                   help="hide the concepts that are involved in overlapping, used with cb encoding")
             inst.add_option("--ie", action="store_true", dest="ie", default=False,\
                                     help="inconsistency explanation")
+            inst.add_option("--ieo", action="store_true", dest="ieo", default=False,\
+                                    help="white-box provenance")
             inst.add_option("--countmir", action="store_true", dest="countOn", default=False,\
                                   help="count # of occurance for each of rcc5")
             inst.add_option("--rcgo", action="store_true", dest="rcgo", default=False,\
