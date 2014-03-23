@@ -100,9 +100,9 @@ class template:
             + "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), in(Y, R), not ncf(X), not ncf(Y), pw.\n"\
             + "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), out(X, R), in(Y, R), not ncf(X), not ncf(Y), pw.\n\n"
 
-    hintall = "hint(X, Y, 0) :- concept2(X, N1), concept2(Y, N2), X <> Y, vrs(R), in(X, R), out(Y, R), not ncf(X), not ncf(Y), pw.\n"\
-            + "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), X <> Y, vrs(R), in(X, R), in(Y, R), not ncf(X), not ncf(Y), pw.\n"\
-            + "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), X <> Y, vrs(R), out(X, R), in(Y, R), not ncf(X), not ncf(Y), pw.\n\n"
+    hintall = "hint(X, Y, 0) :- concept2(X, N1), concept2(Y, N2), X < Y, vrs(R), in(X, R), out(Y, R), not ncf(X), not ncf(Y), pw.\n"\
+            + "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), X < Y, vrs(R), in(X, R), in(Y, R), not ncf(X), not ncf(Y), pw.\n"\
+            + "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), X < Y, vrs(R), out(X, R), in(Y, R), not ncf(X), not ncf(Y), pw.\n\n"
 
     aspAllDc = aspPwDc + hintall
 
