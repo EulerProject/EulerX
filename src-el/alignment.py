@@ -1,3 +1,12 @@
+#
+#       alignment.py
+#
+#  Alignment Module:
+#    We define the alignment class here for taxonomy alignment
+#    and dataset integration
+#
+
+
 import os
 import time
 import sets
@@ -35,14 +44,21 @@ class TaxonomyMapping:
         self.map = {}                          # mapping between the concept name and its numbering
         self.baseAsp = ""                      # tmp string for the ASP input file
         self.baseCb = ""                       # tmp string for the combined concept ASP input file
+        self.basePw = ""                       # tmp string for the ASP pw input file
+        self.baseIx = ""                       # tmp string for the ASP ix input file
         self.pw = ""
         self.npw = 0                           # # of pws
         self.pwflag = True                     # Whether to output pw
         self.fixedCnt = 0                      # # of fixes /repairs
         self.options = options
+        if self.options.ieo:
+            self.options.ie = True
+        # If not input visualization, change the default valude of encode to "mnpw"
+        if not self.options.inputViz and not self.options.encode:
+            self.options.encode = "mnpw"
         self.enc = encode[options.encode]      # encoding
         self.name = os.path.splitext(os.path.basename(options.inputfile))[0]
-        self.taxa1name = ""
+        self.firstTName = ""                   # The abbrev name of the first taxonomy
         self.firstRcg = False
         self.trlist = []
         self.eqConLi = []                      # list of concepts that are equal
@@ -70,7 +86,7 @@ class TaxonomyMapping:
         self.ivpdf = os.path.join(options.outputdir, self.name+"_iv.pdf")
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             # possible world command
-            self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD --eq=0"
+            self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
             # consistency command
             self.con = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD --eq=1"
         elif reasoner[self.options.reasoner] == reasoner["dlv"]:
@@ -90,6 +106,9 @@ class TaxonomyMapping:
         taxon = taxonomy.getTaxon(taxonName)
         return taxon
 
+    def allPairsNeeded(self):
+        return self.options.allRelations or len(self.taxonomies) == 1
+
     def getAllArticulationPairs(self):
         taxa = []
         values = self.taxonomies.values()
@@ -105,12 +124,13 @@ class TaxonomyMapping:
 
     def getAllTaxonPairs(self):
         taxa = self.getAllArticulationPairs()
+        values = self.taxonomies.values()
         for taxonLoop in range(len(self.taxonomies)):
-            thisTaxonomy = self.taxonomies[self.taxonomies[taxonLoop]];
-            theseTaxa = thisTaxonomy.taxa
+            thisTaxonomy = values[taxonLoop];
+            theseTaxa = thisTaxonomy.taxa.values()
             for outerloop in range(len(theseTaxa)):
                 for innerloop in range(outerloop+1, len(theseTaxa)):
-                    newTuple = (theseTaxa[outerloop].dlvName(), theseTaxa[innerloop].dlvName())
+                    newTuple = (theseTaxa[outerloop], theseTaxa[innerloop])
                     taxa.append(newTuple)
         return taxa
 
@@ -232,7 +252,7 @@ class TaxonomyMapping:
     def testConsistency(self):
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 1"
-            if commands.getoutput(com).count("\n") < 5:
+            if commands.getoutput(com).find("Models     : 0") != -1:
                 return False
         else:
             com = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+self.pwswitch
@@ -241,14 +261,20 @@ class TaxonomyMapping:
         return True
 
     def inconsistencyExplanation(self):
-        com = "dlv -silent -filter=ie -n=1 "+self.pwfile+" "+self.ixswitch
-        ie = commands.getoutput(com)
+        if reasoner[self.options.reasoner] == reasoner["gringo"]:
+            com = "gringo "+self.pwfile+" "+ self.ixswitch+ " | claspD 1"
+            ie = commands.getoutput(com)
+            ie.replace(" ", ", ")
+        else:
+            com = "dlv -silent -filter=ie -n=1 "+self.pwfile+" "+self.ixswitch
+            ie = commands.getoutput(com)
+            ie.replace("{", "").replace("}", "")
         self.postProcessIE(ie);
 
     def postProcessIE(self, ie):
         print "Please see "+self.name+"_ie.pdf for the inconsistency relations between all the rules."
         if ie.find("{}") == -1 and ie != "":
-            ies = (re.match("\{(.*)\}", ie)).group(1).split(", ")
+            ies = ie.split(", ")
             # print ies
             ielist = []
             tmpmap = {}
@@ -267,47 +293,48 @@ class TaxonomyMapping:
                 tmpmap[key] = value.union(sets.Set(item))
                 #print key,tmpmap[key]
 
-            for key in tmpmap.keys():
-              #tmpset = sets.Set()
-              tmpset = tmpmap[key]
-              
-              addor  = True
-              for i in range(len(diagraw)):
-                if tmpset.issubset(list(diagraw)[i]):
-                  a = []
-                  a = list(diagraw)
-                  a.pop(i)
-                  a.insert(i,tmpset)
-                  diagraw = sets.Set(a)
-                elif tmpset.issuperset(list(diagraw)[i]):
-                  addor = False
-              if addor:
-                  diagraw.add(tmpset)
-            self.getDiag(diagraw)
-            #print "Min inconsistent subsets: "
-            #print diag
+            # If white box approach, not need to invoke HST algorithm
+            if not self.options.ieo:
+               for key in tmpmap.keys():
+                 #tmpset = sets.Set()
+                 tmpset = tmpmap[key]
+                 
+                 addor  = True
+                 for i in range(len(diagraw)):
+                   if tmpset.issubset(list(diagraw)[i]):
+                     a = []
+                     a = list(diagraw)
+                     a.pop(i)
+                     a.insert(i,tmpset)
+                     diagraw = sets.Set(a)
+                   elif tmpset.issuperset(list(diagraw)[i]):
+                     addor = False
+                 if addor:
+                     diagraw.add(tmpset)
+               self.getDiag(diagraw)
+               #print "Min inconsistent subsets: "
+               #print diag
                 
-# Comment out the ie.pdf part tmporarily
-#            fie = open(self.iefile, 'w')
-#            fie.write("strict digraph "+self.name+"_ie {\n\nrankdir = LR\n\n")
-#            #fie.write("subgraph rules {\n")
-#            #for key in self.rules.keys():
-#            #    fie.write(key+"\n")
-#            #fie.write("}\n")
-#            #fie.write("subgraph inconsistencies {\n")
-#            #for key in tmpmap.keys():
-#            #    fie.write("\""+key+"\"\n")
-#            #fie.write("}\n")
-#            for key in tmpmap.keys():
-#                for value in tmpmap[key]:
-#                    fie.write("\""+value+"\" -> \"inconsistency="+key.__str__()+":"+tmpmap[key].__str__()+"\" \n")
-#            label=""
-#            for key in self.rules.keys():
-#                label += key+" : "+self.rules[key]+"\t"
-#            fie.write("graph [label=\""+label+"\"]\n")
-#            fie.write("}")
-#            fie.close()
-#            commands.getoutput("dot -Tpdf "+self.iefile+" -o "+self.iepdf)
+            fie = open(self.iefile, 'w')
+            fie.write("strict digraph "+self.name+"_ie {\n\nrankdir = LR\n\n")
+            #fie.write("subgraph rules {\n")
+            #for key in self.rules.keys():
+            #    fie.write(key+"\n")
+            #fie.write("}\n")
+            #fie.write("subgraph inconsistencies {\n")
+            #for key in tmpmap.keys():
+            #    fie.write("\""+key+"\"\n")
+            #fie.write("}\n")
+            for key in tmpmap.keys():
+                for value in tmpmap[key]:
+                    fie.write("\""+value+"\" -> \"inconsistency="+key.__str__()+":"+tmpmap[key].__str__()+"\" \n")
+            label=""
+            for key in self.rules.keys():
+                label += key+" : "+self.rules[key]+"\t"
+            fie.write("graph [label=\""+label+"\"]\n")
+            fie.write("}")
+            fie.close()
+            commands.getoutput("dot -Tpdf "+self.iefile+" -o "+self.iepdf)
 
     def getDiag(self, raw):
         rawl = len(raw)
@@ -375,8 +402,9 @@ class TaxonomyMapping:
             return
         if self.pw.lower().find("error") != -1:
             raise Exception(template.getEncErrMsg())
-        if not self.pwflag: return None
+        #if not self.pwflag: return None
         self.intOutPw(self.name, self.pwflag)
+        self.genMir()
 
     #
     # Internal routine with several callers
@@ -387,6 +415,7 @@ class TaxonomyMapping:
             raw = self.pw.split("\n")
             ## Filter out those trash in the gringo output
             for i in range(2, len(raw) - 2, 2):
+                if raw[i].find("rel") == -1: continue
                 pws.append(raw[i].strip().replace(") ",");"))
         elif reasoner[self.options.reasoner] == reasoner["dlv"]:
             raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
@@ -412,8 +441,13 @@ class TaxonomyMapping:
             else:
                 pwTm.firstRcg = False
             if self.enc & encode["cb"]:
-                pwTm.mir = pwTm.basemir
-                pwTm.tr = []#pwTm.basetr
+                if self.options.hideOverlaps:
+                  pwTm.tr = []
+                  pwTm.mir = {}
+                # if not hiding orignal concepts, basetr is useful
+                else:
+                  pwTm.tr = pwTm.basetr
+                  pwTm.mir = pwTm.basemir
 
             outputstr += "\nPossible world "+i.__str__()+":\n{"
             if self.options.verbose: print pws[i]+"#"
@@ -458,7 +492,8 @@ class TaxonomyMapping:
             # for example, if mncb, genPW() is called for intermediate usage
             if self.enc & encode["pw"] and ss == "rel" or\
                self.enc & encode["cb"] and ss == "relout":
-                pwTm.genPwRcg(name + "_" + i.__str__())
+                pwTm.genPwRcg(name + "_" + i.__str__() + "_" + self.options.encode)
+                #pwTm.genPwCb(name + "_" + i.__str__())
                 for e in pwTm.tr:
                     self.trlist.append(e)
         self.genAllPwRcg(len(pws))
@@ -471,8 +506,16 @@ class TaxonomyMapping:
         fpw = open(self.options.outputdir+name+".pw", 'w')
         fpw.write(outputstr)
         fpw.close()
-        self.genMir()
         if self.options.cluster: self.genPwCluster(pwmirs, False)
+
+    def genPwCb(self, fileName):
+        self.name = fileName
+        self.cbfile = os.path.join(self.aspdir, self.name+"_cb.asp")
+        self.genCbConcept()
+        fcb = open(self.cbfile, 'w')
+        fcb.write(self.baseCb)
+        fcb.close()
+        self.genCB()
 
     def genPwRcg(self, fileName):
         fDot = open(self.options.outputdir+fileName+".dot", 'w')
@@ -487,70 +530,109 @@ class TaxonomyMapping:
         tmpTax = ""   # First taxonomy name, actually it really doesn't
                       # matter which one is the first one
         alias = {}
-
-	# Equalities
+        
+        # Equalities
         for T1 in self.eq.keys():
             # self.eq is dynamically changed, so we need this check
             if not self.eq.has_key(T1):
                 continue
             tmpStr = ""
-            blueNode = False
+#            blueNode = False
             T1s = T1.split(".")
             # First taxonomy name
-            if tmpTax == "": tmpTax = self.taxa1name
+            if tmpTax == "": tmpTax = self.firstTName
             for T2 in self.eq[T1]:
                 T2s = T2.split(".")
-                if(T1s[1] == T2s[1]):
-                    blueNode = True
-                else:
-                    if tmpStr != "":
-                        tmpStr = "\\n" + tmpStr
-                    tmpStr = T2 + tmpStr
+#                if(T1s[1] == T2s[1]):
+#                    blueNode = True
+#                else:
+                if tmpStr != "":
+                    tmpStr = "\\n" + tmpStr
+                tmpStr = T2 + tmpStr
             if tmpStr != "":
                 tmpStr = "\\n" + tmpStr + "\\n"
 #                if tmpStr.split(".")[0]  == tmpTax:
 #                    tmpStr = tmpStr + "\\n"
 #                else:
 #                    tmpStr = "\\n" + tmpStr
-            if blueNode:
-                tmpStr = T1s[1] + tmpStr
-                # fDot.write("\"" + tmpStr +"\" [color=blue];\n")
-                # fAllDot.write("\"" + tmpStr +"\" [color=blue];\n")
+#            if blueNode:
+#                tmpStr = T1s[1] + tmpStr
+#                # fDot.write("\"" + tmpStr +"\" [color=blue];\n")
+#                # fAllDot.write("\"" + tmpStr +"\" [color=blue];\n")
+#            else:
+            if T1s[0] == tmpTax:
+                tmpStr = T1 + tmpStr
             else:
-                if T1s[0] == tmpTax:
-                    tmpStr = T1 + tmpStr
-                else:
-                    tmpStr = tmpStr + T1
+                tmpStr = tmpStr + T1
             if tmpStr[0:2] == "\\n": tmpStr = tmpStr[2:]
             if tmpStr[-2:] == "\\n": tmpStr = tmpStr[:-2]
             self.eqConLi.append(tmpStr)
+
+            tmpeqConLi2 = []
+            for T in self.eqConLi:
+                tmpeqConLi2.append(T)
+
+            for T10 in tmpeqConLi2:
+                for T11 in tmpeqConLi2:
+                    if T10 != T11:
+                        tmpC = []
+                        ss = ""
+                        T10s = T10.split("\\n")
+                        T11s = T11.split("\\n")
+                        for c1 in T10s:
+                            if c1 in T11s:
+                                tmpC = T10s + T11s
+                                tmpC.sort()
+                                self.remove_duplicate_string(tmpC)
+                                for e in tmpC:
+                                    ss = ss + e + "\\n"
+                                ss = ss[:-2]
+                                if T10 in self.eqConLi:
+                                    self.eqConLi.remove(T10)
+                                if T11 in self.eqConLi:
+                                    self.eqConLi.remove(T11)
+                                if ss not in self.eqConLi:
+                                    self.eqConLi.append(ss)
+                                break 
+
             for T2 in self.eq[T1]:
 #                if self.eq.has_key(T2):
 #                    del self.eq[T2]
                 tmpTr = list(self.tr)
                 for [T3, T4, P] in tmpTr:
                     if(T1 == T3 or T2 == T3):
+                      if self.tr.count([T3, T4, P]) > 0:
                         self.tr.remove([T3, T4, P])
                         self.tr.append([tmpStr, T4, 0])
                     elif(T1 == T4 or T2 == T4):
+                      if self.tr.count([T3, T4, P]) > 0:
                         self.tr.remove([T3, T4, P])
                         self.tr.append([T3, tmpStr, 0])
                     for T5 in self.eqConLi:
-                        if(T5 == T3 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
-                            self.tr.remove([T3,T4,P])
-                            self.tr.append([tmpStr,T4,0])
-                        elif(T5 == T4 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
-                            self.tr.remove([T3,T4,P])
-                            self.tr.append([T3,tmpStr,0])
+#                        if(T5 == T3 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
+                        if(T3 != T5 and set(T3.split("\\n")).issubset(set(T5.split("\\n")))):
+                          if self.tr.count([T3, T4, P]) > 0:
+                            self.tr.remove([T3, T4, P])
+                            self.tr.append([T5,T4,0])
+                        elif(T4 != T5 and set(T4.split("\\n")).issubset(set(T5.split("\\n")))):
+#                        elif(T5 == T4 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
+                          if self.tr.count([T3, T4, P]) > 0:
+                            self.tr.remove([T3, T4, P])
+                            self.tr.append([T3,T5,0])
         tmpeqConLi = []
+#        print "self.eqConLi=", self.eqConLi
         for T in self.eqConLi:
             tmpeqConLi.append(T)
         for T6 in tmpeqConLi:
             for T7 in tmpeqConLi:
                 if (set(T6.split("\\n")).issubset(set(T7.split("\\n"))) and T6 != T7 and T6 in self.eqConLi):
                     self.eqConLi.remove(T6)
+        
+        tmpTr = list(self.tr)
         for T in self.eqConLi:
-            tmpCom += "  \""+T+"\"\n"      
+            #for [T1, T2, P] in tmpTr:
+            #    if T == T1 or T == T2:
+                    tmpCom += "  \""+T+"\"\n"      
             
         # Duplicates
     	tmpTr = list(self.tr)
@@ -607,7 +689,6 @@ class TaxonomyMapping:
         fAllDot.write(tmpCom)
         fAllDot.close()
         
-        
         for [T1, T2, P] in self.tr:
     	    if(P == 0):
     	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")
@@ -618,10 +699,13 @@ class TaxonomyMapping:
                     fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
         if self.options.rcgo:
             fDot.write("  subgraph ig {\nedge [dir=none, style=dashed, color=blue, constraint=false]\n\n")
+            oskiplist = []
             for key in self.mir.keys():
-                if self.mir[key] == rcc5["overlaps"]:
+                if key not in oskiplist and self.mir[key] == rcc5["overlaps"]:
                     item = re.match("(.*),(.*)", key)
                     fDot.write("     \"" + item.group(1) + "\" -> \"" + item.group(2) + "\"\n")
+                    # Skip the reverse pair for redundant edges
+                    oskiplist.append(item.group(2)+","+item.group(1))
             fDot.write("  }\n")
         fDot.write("  subgraph cluster_lg {\n")
         fDot.write("    rankdir = LR\n")
@@ -973,6 +1057,7 @@ class TaxonomyMapping:
                     dmatrix[i].append(0)
                     fcl.write("0 "); continue
                 d = 0
+                s = ""
                 if obs:
                     for ob in pws[i]:
                         if ob not in pws[j]: d += 1
@@ -980,12 +1065,16 @@ class TaxonomyMapping:
                         if ob not in pws[i]: d += 1
                 else:
                     for key in pws[i].keys():
-                        if pws[i][key] != pws[j][key]: d += 1
+                        if pws[i][key] != pws[j][key]: 
+                            s = s + key\
+                                  + " " + findkey(relation, pws[i][key]).__str__()\
+                                  + " " + findkey(relation, pws[j][key]).__str__() + ";"
+                            d += 1
                 fcl.write(d.__str__()+" ")
                 dmatrix[i].append(d)
                 if i != j and not self.options.simpCluster:
                     fcldot.write("\"pw"+i.__str__()+"\" -- \"pw"+j.__str__()+\
-                            "\" [label="+d.__str__()+",len="+d.__str__()+"]\n")
+                            "\" [label=\""+d.__str__()+"; "+s+"\",len="+d.__str__()+"]\n")
             fcl.write("\n")
         if self.options.simpCluster:
             for i in range(self.npw):
@@ -1029,8 +1118,6 @@ class TaxonomyMapping:
         if self.options.cluster: pwobs = []
         for i in range(len(pws)):
             if pws[i].find("pp(") == -1: continue
-	    result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), #count{Y: vr(Y, _), in(" + name2 + ",Y), out(" + name1 + ",Y)} > 0, ix.\n"
-	    result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), #count{Y: vr(Y, _), in(" + name2 + ",Y), out(" + name1 + ",Y)} > 0, ix.\n\n"
             if reasoner[self.options.reasoner] == reasoner["dlv"]:
                 items = pws[i].split(";")
             elif reasoner[self.options.reasoner] == reasoner["gringo"]:
@@ -1105,7 +1192,7 @@ class TaxonomyMapping:
         self.genAspConcept()
         self.genAspPC()
         self.genAspAr()
-        if self.enc & encode["vr"] or self.enc & encode["dl"] or self.enc & encode["pl"] or self.enc & encode["mn"]:
+        if self.enc & encode["vr"] or self.enc & encode["dl"] or self.enc & encode["mn"]:
             self.genAspDc()
         if self.obs != [] and self.enc & encode["ob"]:
             self.genAspObs()
@@ -1114,9 +1201,11 @@ class TaxonomyMapping:
         fdlv.close()
         pdlv = open(self.pwswitch, 'w')
         idlv = open(self.ixswitch, 'w')
+        pdlv.write(self.basePw)
         pdlv.write("pw.")
         if self.options.hideOverlaps:
-            pdlv.write("hide.")
+            pdlv.write("\nhide.")
+        pdlv.write(self.baseIx)
         idlv.write("ix.")
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             if self.enc & encode["ob"]:
@@ -1125,7 +1214,7 @@ class TaxonomyMapping:
                 pdlv.write("\n#hide.\n#show rel/3.")
             elif self.enc & encode["cb"]:
                 pdlv.write("\n#hide.\n#show relout/3.")
-            idlv.write("\n#hide.\n#show ie/3.")
+            idlv.write("\n#hide.\n#show ie/1.")
         pdlv.close()
         idlv.close()
 
@@ -1142,8 +1231,8 @@ class TaxonomyMapping:
                         #   self.mirp.has_key(t2.dotName()+","+t1.dotName()+","+rcc5["overlaps"].__str__()):
                         p1 = t1.dotName()+","+t2.dotName()
                         p2 = t2.dotName()+","+t1.dotName()
-                        if self.mir.has_key(p1) and self.mir[p1] == rcc5["overlaps"] or\
-                           self.mir.has_key(p2) and self.mir[p2] == rcc5["overlaps"]:
+                        if self.mir.has_key(p1) and self.mir[p1] & rcc5["overlaps"] or\
+                           self.mir.has_key(p2) and self.mir[p2] & rcc5["overlaps"]:
 	                    self.baseCb += "newcon(" + t1.dlvName() + "_not_" + t2.dlvName() + ", "\
 	           	                + t1.dlvName() + ", " + t2.dlvName()  + ", 0).\n"
 	                    self.baseCb += "newcon(" + t1.dlvName() + "__" + t2.dlvName() + ", "\
@@ -1193,9 +1282,10 @@ class TaxonomyMapping:
 
         if self.enc & encode["dl"]:
             maxint = int(self.options.dl)*num
-	    self.baseAsp = "#maxint=" + maxint.__str__() + ".\n\n"
+	    self.baseAsp  = "%%% Max Number of Euler Regions\n"
+	    self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
 	    self.baseAsp += con
-	    self.baseAsp += "%%% regions\n"
+	    self.baseAsp += "%%% Euler Regions\n"
 	    self.baseAsp += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
 
 	    self.baseAsp += "%%% bit\n"
@@ -1219,15 +1309,17 @@ class TaxonomyMapping:
         elif self.enc & encode["mn"]:
             maxint = prod
             if reasoner[self.options.reasoner] == reasoner["dlv"]:
-	        self.baseAsp = "#maxint=" + maxint.__str__() + ".\n\n"
-	        self.baseAsp += "%%% regions\n"
+	        self.baseAsp  = "%%% Max Number of Euler Regions\n"
+	        self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
+	        self.baseAsp += "%%% Euler Regions\n"
 	        self.baseAsp += "r(M):- #int(M),M>=1,M<=#maxint.\n\n"
 
 	        self.baseAsp += con
 
-	        self.baseAsp += "%%% bit\n"
+	        self.baseAsp += "\n%%% Euler Bit\n"
                 for i in range(len(couArray)):
 	            self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n"
+
             elif reasoner[self.options.reasoner] == reasoner["gringo"]:
 	        self.baseAsp = con
 	        self.baseAsp += "%%% regions\n"
@@ -1363,7 +1455,7 @@ class TaxonomyMapping:
             print "EXCEPTION: encode ",self.options.encode," not defined!!"
 
     def genAspPC(self):
-        self.baseAsp += "%%% PC relations\n"
+        self.baseAsp += "\n%%% Parent-Child relations\n"
         for key in self.taxonomies.keys():
             queue = copy.deepcopy(self.taxonomies[key].roots)
             while len(queue) != 0:
@@ -1371,7 +1463,7 @@ class TaxonomyMapping:
                     print "PC: ",queue
                 t = queue.pop(0)
                 # This is a nc flag
-                if t.abbrev.find("nc") != -1:
+                if t.abbrev == "nc":
 	            self.baseAsp += "ncf(" + t.dlvName() + ").\n"
                 if t.hasChildren():
                     if self.options.verbose:
@@ -1397,7 +1489,7 @@ class TaxonomyMapping:
                               if reasoner[self.options.reasoner] == reasoner["dlv"]:
 			          self.baseAsp += ":- #count{X: vrs(X), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0, pw.\n"
                               elif reasoner[self.options.reasoner] == reasoner["gringo"]:
-			          self.baseAsp += ":- [vrs(X): in(" + t1.dlvName() + ", X): in(" + t.dlvName() + ", X)]0, pw.\n"
+			          self.baseAsp += ":- [vrs(X): in(" + t1.dlvName() + ", X): in(" + t.dlvName() + ", X)]0.\n"
 			      self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n"
 			      self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n\n"
 			    coverage += ",out(" + t1.dlvName() + ", X)"
@@ -1498,11 +1590,14 @@ class TaxonomyMapping:
             ruleNum = len(self.rules)
             self.articulations[i].ruleNum = ruleNum
             self.rules["r" + ruleNum.__str__()] = self.articulations[i].string
-            self.baseAsp += self.articulations[i].toASP(self.options.encode, self.options.reasoner)+ "\n"
+            self.baseAsp += self.articulations[i].toASP(self.options.encode, self.options.reasoner, self)+ "\n"
 
     def genAspDc(self):
         self.baseCb  += self.baseAsp
-        self.baseAsp += template.getAspPwDc()
+        if self.allPairsNeeded():
+            self.baseAsp += template.getAspAllDc()
+        else:
+            self.baseAsp += template.getAspPwDc()
         self.baseCb  += template.getAspCbDc()
 
     def genAspObs(self):
@@ -1593,7 +1688,6 @@ class TaxonomyMapping:
     def readFile(self):
         file = open(os.path.join(self.options.inputdir, self.options.inputfile), 'r')
         lines = file.readlines()
-        self.taxa1name = lines[0].split(" ")[1]
         flag = ""
         for line in lines:
 
@@ -1605,6 +1699,9 @@ class TaxonomyMapping:
                 else:
                     taxName = re.match("(.*?)\s(.*)", taxName)
                     taxonomy.nameit(taxName.group(1), taxName.group(2))
+
+                if self.firstTName == "":
+                    self.firstTName = taxonomy.abbrev
                   
                 self.taxonomies[taxonomy.abbrev] = taxonomy
                 flag = "taxonomy"
@@ -1836,6 +1933,20 @@ class TaxonomyMapping:
                 self.tr.append([r[1],r[5], provenance])
                 self.tr.append([r[2],r[5], provenance])
                 self.tr.append([r[3],r[5], provenance])
+                return None
+            if (r[1] == "r4sum"):
+                self.addIMir(r[0], r[2], provenance)
+                self.addIMir(r[0], r[3], provenance)
+                self.addIMir(r[0], r[4], provenance)
+                self.addIMir(r[0], r[5], provenance)
+                self.mir[r[0] + "," + r[2]] = rcc5["includes"]
+                self.mir[r[0] + "," + r[3]] = rcc5["includes"]
+                self.mir[r[0] + "," + r[4]] = rcc5["includes"]
+                self.mir[r[0] + "," + r[5]] = rcc5["includes"]
+                self.tr.append([r[2],r[0], provenance])
+                self.tr.append([r[3],r[0], provenance])
+                self.tr.append([r[4],r[0], provenance])
+                self.tr.append([r[5],r[0], provenance])
                 return None 
         if rcc5.has_key(r[1]):
 	    self.mir[r[0] + "," + r[2]] = rcc5[r[1]]
@@ -1884,9 +1995,15 @@ class TaxonomyMapping:
 		elif (pair.find(child + ",") == 0):
 		    newPair = pair.replace(child + ",", parent + ",")
 	    	    self.mir[newPair] = rcc5["includes"]
+
+    # Output all the mir relations in the csv file
     def genMir(self):       
         fmir = open(self.mirfile, 'w')
-        for pair in self.getAllArticulationPairs():
+        # Get the pairs as needed
+        pairs =      self.getAllTaxonPairs()\
+                if self.allPairsNeeded()\
+                else self.getAllArticulationPairs()
+        for pair in pairs:
             pairkey = pair[0].dotName() + "," + pair[1].dotName()
             if self.options.verbose:
 		print pairkey
