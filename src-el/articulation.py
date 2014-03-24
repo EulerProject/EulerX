@@ -40,6 +40,9 @@ class Articulation:
 	    elif (initInput.find("r3sum") != -1):
 	        self.relations = relation["=3+"]
 	        elements = re.match("(.*)\.(.*) r3sum (.*)\.(.*) (.*)\.(.*) (.*)\.(.*)", initInput)
+            elif (initInput.find("r4sum") != -1):
+		self.relations = relation["=4+"]
+		elements = re.match("(.*)\.(.*) r4sum (.*)\.(.*) (.*)\.(.*) (.*)\.(.*) (.*)\.(.*)", initInput)
 	    elif (initInput.find("ldiff") != -1):
 	        self.relations = relation["-="]
 	        elements = re.match("(.*)\.(.*) (.*)\.(.*) ldiff (.*)\.(.*)", initInput)
@@ -67,7 +70,7 @@ class Articulation:
                 taxon4taxon = elements.group(8)
                 self.taxon4 = mapping.getTaxon(taxon4taxonomy, taxon4taxon)
 	        self.numTaxon = 4
-            if(initInput.find("l4sum") != -1):
+            if(initInput.find("l4sum") != -1 or initInput.find("r4sum") != -1):
                 taxon4taxonomy = elements.group(7)
                 taxon4taxon = elements.group(8)
                 self.taxon4 = mapping.getTaxon(taxon4taxonomy, taxon4taxon)
@@ -104,7 +107,8 @@ class Articulation:
             self.taxon1 = mapping.getTaxon(taxon1taxonomy, taxon1taxon)
             self.taxon2 = mapping.getTaxon(taxon2taxonomy, taxon2taxon)
  
-    def toASP(self, enc, rnr):
+    def toASP(self, enc, rnr, align):
+        result = ""
         name1 = self.taxon1.dlvName()
         name2 = self.taxon2.dlvName()
         if encode[enc] & encode["vr"] or encode[enc] & encode["dl"] or encode[enc] & encode["mn"]:
@@ -116,7 +120,7 @@ class Articulation:
                 if reasoner[rnr] == reasoner["dlv"]:
 		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-		    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
+		    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
 	        result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
 	        result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
 		#result += "in(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
@@ -130,8 +134,8 @@ class Articulation:
 		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
 		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-		    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
-		    result += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0, pw.\n" 
+		    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
+		    align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0, pw.\n" 
 	        result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
 	        result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n\n"
 	        result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
@@ -145,8 +149,8 @@ class Articulation:
 		    result = ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
 		    result += ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-		    result = ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
-		    result += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
+		    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+		    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
 		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X), pw.\n" 
 	        result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
 	        result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
@@ -161,8 +165,8 @@ class Articulation:
 		    result = ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n" 
 		    result += ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-		    result = ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0, pw.\n" 
-		    result += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
+		    align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n" 
+		    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
 	        result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
 	        result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
 	        result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
@@ -178,9 +182,9 @@ class Articulation:
 		    result += ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
 		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-		    result = ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
-		    result += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
-		    result += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0, pw.\n" 
+		    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+		    align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n" 
+		    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
 	        result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
 	        result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
 	        result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
@@ -199,7 +203,7 @@ class Articulation:
 		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
 		    result += "vr(X, r" + self.ruleNum.__str__() + ") | ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n" 
-		    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
+		    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
 	        result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
 	        result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
 		#result += "in(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
@@ -214,7 +218,7 @@ class Articulation:
 		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
 		    result += "vr(X, r" + self.ruleNum.__str__() +") | ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
-		    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
+		    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
 	        result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
 	        result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
 		#result += "in(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
@@ -238,8 +242,8 @@ class Articulation:
 		    result += ":- #count{X: vrs(X), in(" + name2 + ",X), out(" + name1 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
 		    result  = "ir(X, r" + self.ruleNum.__str__() + ") | vr(X, r" + self.ruleNum.__str__() +") :- in(" + name1 + ",X), in(" + name2 + ",X).\n"
-		    result += ":- [vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)]0, pw.\n" 
-		    result += ":- [vrs(X), in(" + name2 + ",X), out(" + name1 + ",X)]0, pw.\n" 
+		    align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n" 
+		    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
 		#result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
 		#result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
 		#result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
@@ -274,39 +278,95 @@ class Articulation:
 	            result += "c(r" + self.ruleNum.__str__() + ", A, 2) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                 elif reasoner[rnr] == reasoner["gringo"]:
 		    result  = "vr(X, r" + self.ruleNum.__str__() + ") | ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
-		    result += "1[vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)] :- pw.\n" 
-		    result += "1[vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)] :- pw.\n" 
+		    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+		    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
 		#result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
 		#result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
 		#result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
 		#result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
+	    elif self.relations == (rcc5["is_included_in"] | rcc5["disjoint"]):
+                if reasoner[rnr] == reasoner["dlv"]:
+		    result += ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n"
+		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} > 0, #count{Y: vrs(Y), out(" + name2 + ",Y), in(" + name1 + ",Y)} > 0, pw.\n"
+		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, #count{Y: vrs(Y), out(" + name2 + ",Y), in(" + name1 + ",Y)} = 0, pw.\n"
+                # TODO Gringo encoding is problematic
+                elif reasoner[rnr] == reasoner["gringo"]:
+		    #align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+		    #align.basePw += ":- rel(" + name1 + ", " + name2 + ", \"><\").\n" 
+		    align.basePw += "rel(" + name1 + ", " + name2 + ", \"<\") | rel(" + name1 + ", " + name2 + ", \"!\").\n" 
+	        result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
+	        result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
+	        result += "pie(r" + self.ruleNum.__str__() + ", prod(A, B), 2) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), vr(Y, B), out("+ name2 + ",Y), in(" + name1 + ",Y), ix.\n"
+	        result += "pie(r" + self.ruleNum.__str__() + ", A, 3) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
+	        result += "c(r" + self.ruleNum.__str__() + ", A, 3) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
+	        result += "c(r" + self.ruleNum.__str__() + ", A, 3) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n\n"
+	    elif self.relations == (rcc5["includes"] | rcc5["overlaps"]):
+                if reasoner[rnr] == reasoner["dlv"]:
+		    result += "vrs(X) v irs(X) :- out(" + name1 + ",X), in(" + name2 + ",X), pw.\n" 
+		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
+		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n" 
+                elif reasoner[rnr] == reasoner["gringo"]:
+		    align.basePw += "vrs(X) | irs(X) :- out(" + name1 + ",X): in(" + name2 + ",X).\n" 
+		    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+		    align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n" 
 	    elif self.relations == (rcc5["includes"] | rcc5["disjoint"]):
                 if reasoner[rnr] == reasoner["dlv"]:
-		    result  = ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n"
+		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n"
 		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} > 0, #count{Y: vrs(Y), in(" + name2 + ",Y), out(" + name1 + ",Y)} > 0, pw.\n"
 		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, #count{Y: vrs(Y), in(" + name2 + ",Y), out(" + name1 + ",Y)} = 0, pw.\n"
                 elif reasoner[rnr] == reasoner["gringo"]:
-		    result  = ":- [vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)]0, pw.\n"
-		    result += ":- 1[vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)], 1[vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)], pw.\n" 
-		    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
+		    #align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n" 
+		    align.basePw += "rel(" + name1 + ", " + name2 + ", \"!\") | rel(" + name1 + ", " + name2 + ", \">\").\n" 
 	        result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
 	        result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n\n"
 	        result += "pie(r" + self.ruleNum.__str__() + ", prod(A, B), 2) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), vr(Y, B), in("+ name2 + ",Y), out(" + name1 + ",Y), ix.\n"
 	        result += "pie(r" + self.ruleNum.__str__() + ", A, 3) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
 	        result += "c(r" + self.ruleNum.__str__() + ", A, 3) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
 	        result += "c(r" + self.ruleNum.__str__() + ", A, 3) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
+	    elif self.relations == (rcc5["includes"] | rcc5["is_included_in"] | rcc5["equals"]):
+                if reasoner[rnr] == reasoner["dlv"]:
+		  result += "vr(X, r" + self.ruleNum.__str__() + ") v ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n" 
+		  result += "vr(X, r" + self.ruleNum.__str__() + ") v ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
+                  result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ", X)} > 0, #count{Y: vrs(Y), out(" + name1 + ",Y), in(" + name2 + ", Y)} > 0.\n"
+                  result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ", X)} = 0.\n\n"
+                elif reasoner[rnr] == reasoner["gringo"]:
+		  result += "vr(X, r" + self.ruleNum.__str__() + ") | ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n" 
+		  result += "vr(X, r" + self.ruleNum.__str__() + ") | ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
+                  result += ":- 1[vrs(X): in(" + name1 + ",X): out(" + name2 + ", X)], 1[vrs(X): out(" + name1 + ",X): in(" + name2 + ", X)].\n"
+                  result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)]0.\n\n"
+	    elif self.relations == (rcc5["is_included_in"] | rcc5["equals"] | rcc5["overlaps"]):
+                if reasoner[rnr] == reasoner["dlv"]:
+                  result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ", X)} > 0, #count{Y: vrs(Y), out(" + name1 + ",Y), in(" + name2 + ", Y)} = 0.\n"
+                  result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ", X)} = 0.\n\n"
+                elif reasoner[rnr] == reasoner["gringo"]:
+                  result += ":- 1[vrs(X): in(" + name1 + ",X): out(" + name2 + ", X)], [vrs(X): out(" + name1 + ",X): in(" + name2 + ", X)]0.\n"
+                  result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)]0.\n\n"
+	    elif self.relations == (rcc5["includes"] | rcc5["equals"] | rcc5["overlaps"]):
+                if reasoner[rnr] == reasoner["dlv"]:
+                  result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ", X)} = 0, #count{Y: vrs(Y), out(" + name1 + ",Y), in(" + name2 + ", Y)} > 0.\n"
+                  result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ", X)} = 0.\n\n"
+                elif reasoner[rnr] == reasoner["gringo"]:
+                  result += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ", X)]0, 1[vrs(X): out(" + name1 + ",X): in(" + name2 + ", X)].\n"
+                  result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)]0.\n\n"
+	    elif self.relations == (rcc5["includes"] | rcc5["is_included_in"] | rcc5["overlaps"]):
+                if reasoner[rnr] == reasoner["dlv"]:
+                  result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ", X)} = 0, #count{Y: vrs(Y), out(" + name1 + ",Y), in(" + name2 + ", Y)} = 0, #count{Z: vrs(Z), in(" + name1 + ",Z), in(" + name2 + ", Z)} > 0.\n"
+                  result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ", X)} = 0.\n\n"
+                elif reasoner[rnr] == reasoner["gringo"]:
+                  result += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ", X)]0, [vrs(X): out(" + name1 + ",X): in(" + name2 + ", X)]0, 1[vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)].\n"
+                  result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)]0.\n\n"
             elif self.relations == relation["+="]: # lsum
                 name3 = self.taxon3.dlvName()
                 if reasoner[rnr] == reasoner["dlv"]:
-		    result  = ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name3 + ",X)} = 0, pw.\n" 
+		    result += ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name3 + ",X)} = 0, pw.\n" 
 		    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name3 + ",X)} = 0, pw.\n" 
 		    result += ":- #count{X: vrs(X), out(" + name2 + ",X), in(" + name3 + ",X)} = 0, pw.\n" 
 		    result += ":- #count{X: vrs(X), in(" + name2 + ",X), in(" + name3 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-		    result  = ":- [vrs(X): out(" + name1 + ",X): in(" + name3 + ",X)]0.\n" 
-		    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name3 + ",X)]0.\n" 
-		    result += ":- [vrs(X): out(" + name2 + ",X): in(" + name3 + ",X)]0.\n" 
-		    result += ":- [vrs(X): in(" + name2 + ",X): in(" + name3 + ",X)]0.\n" 
+		    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name3 + ",X)]0.\n" 
+		    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name3 + ",X)]0.\n" 
+		    align.basePw += ":- [vrs(X): out(" + name2 + ",X): in(" + name3 + ",X)]0.\n" 
+		    align.basePw += ":- [vrs(X): in(" + name2 + ",X): in(" + name3 + ",X)]0.\n" 
 	        result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), out(" + name1 + ", X), in(" + name3 + ", X), ix.\n"
 	        result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), out(" + name1 + ", X), in(" + name3 + ", X), ix.\n\n"
 	        result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), in(" + name1 + ", X), in(" + name3 + ", X), ix.\n"
@@ -427,6 +487,32 @@ class Articulation:
 		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name1 + ",X).\n" 
 		result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name1 + ",X).\n"
 	    	result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name4 + ",X), out(" + name1 + ",X).\n"
+	    elif self.relations == relation["=4+"]:
+                name3 = self.taxon3.dlvName()
+                name4 = self.taxon4.dlvName()
+                name5 = self.taxon5.dlvName()
+                if reasoner[rnr] == reasoner["dlv"]:
+            	    result  = ":- #count{X: vrs(X), out(" + name2 + ",X), in(" + name1 + ",X)} = 0.\n" 
+            	    result += ":- #count{X: vrs(X), in(" + name2 + ",X), in(" + name1 + ",X)} = 0.\n" 
+            	    result += ":- #count{X: vrs(X), out(" + name3 + ",X), in(" + name1 + ",X)} = 0.\n" 
+            	    result += ":- #count{X: vrs(X), in(" + name3 + ",X), in(" + name1 + ",X)} = 0.\n"
+            	    result += ":- #count{X: vrs(X), out(" + name4 + ",X), in(" + name1 + ",X)} = 0.\n" 
+            	    result += ":- #count{X: vrs(X), in(" + name4 + ",X), in(" + name1 + ",X)} = 0.\n"
+            	    result += ":- #count{X: vrs(X), out(" + name5 + ",X), in(" + name1 + ",X)} = 0.\n" 
+            	    result += ":- #count{X: vrs(X), in(" + name5 + ",X), in(" + name1 + ",X)} = 0.\n"
+                elif reasoner[rnr] == reasoner["gringo"]:
+            	    result  = ":- [vrs(X): out(" + name2 + ",X): in(" + name1 + ",X)]0.\n" 
+            	    result += ":- [vrs(X): in(" + name2 + ",X): in(" + name1 + ",X)]0.\n" 
+            	    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name1 + ",X)]0.\n" 
+            	    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
+            	    result += ":- [vrs(X): out(" + name4 + ",X): in(" + name1 + ",X)]0.\n" 
+            	    result += ":- [vrs(X): in(" + name4 + ",X): in(" + name1 + ",X)]0.\n"
+            	    result += ":- [vrs(X): out(" + name5 + ",X): in(" + name1 + ",X)]0.\n" 
+            	    result += ":- [vrs(X): in(" + name5 + ",X): in(" + name1 + ",X)]0.\n"
+        	result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name1 + ",X).\n" 
+        	result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name1 + ",X).\n"
+        	result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name4 + ",X), out(" + name1 + ",X).\n"
+        	result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name5 + ",X), out(" + name1 + ",X).\n" 
 		#result += "in(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
 		#result += "in(" + name1 + ",X) :- in(" + name3 + ",X).\n" 
 		#result += "out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
