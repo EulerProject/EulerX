@@ -1307,6 +1307,9 @@ class TaxonomyMapping:
 	    self.baseAsp += ":- vrs(X), irs(X).\n\n"
 
         elif self.enc & encode["mn"]:
+            if len(self.taxonomies) == 1:
+                raise Exception("Polynomial encoding is not applicable for singleton taxonomy" +\
+                                " please use binary encoding for singleton example: eg. vrpw, vrve !!")
             maxint = prod
             if reasoner[self.options.reasoner] == reasoner["dlv"]:
 	        self.baseAsp  = "%%% Max Number of Euler Regions\n"
