@@ -32,7 +32,7 @@ class EulerParser:
                                   help="input directory, by default ./")
             inst.add_option("-o", dest="outputdir", default="./",\
                                   help="output directory, by default ./")
-            inst.add_option("-e", dest="encode", default="mnpw",\
+            inst.add_option("-e", dest="encode", default=0, \
                                   help="encoding, e.g. mnpw, drpw, dlpw, etc.")
             inst.add_option("-b", dest="dl", default=2, help="dl encoding spare parameter")
             inst.add_option("--reasoner", dest="reasoner", type="string", default="dlv",\
