@@ -8,15 +8,24 @@ from collections import defaultdict
 nodes = defaultdict(list)
 edges = defaultdict(list)
 # parse the stylesheet file
+def map_range(value, dMin, dMax, sMin, sMax):
+    # Find how 'wide' each range is
+    dSpan = dMax - dMin
+    sSpan = sMax - sMin
+
+    # Convert the range in data file into a 0-1 range (float)
+    scaledValue = float(value - dMin) / float(dSpan)
+
+    # Convert the 0-1 range into a value in the stylesheet range
+    return sMin + (scaledValue * sSpan)
 def read_stylesheet(stylefile):
     global styles
     with open(stylefile) as style_file:    
         styles = yaml.load(style_file)          
-def apply_style(datafile, output):
-    f = output
+def apply_style(data_file, f):
     f.write("digraph{\n")
     f.write(str(styles["graphstyle"]["graph"]))
-    with datafile as data_file:    
+    with data_file: 
         data = yaml.load(data_file)
     #separate nodes from edges
         for key, value in data.iteritems():
@@ -58,7 +67,15 @@ def apply_style(datafile, output):
             else:
                 f.write('"' + e[0][1] + '" -> "' + e[1][1] + '"')
             if (style["display"] == "(w)display"):
-                f.write('[penwidth=' + e[2][1] + "]")
+                if styles["graphstyle"]["wmap"] == "on":
+                	if not "w" in (item[0] for item in e):
+                            w = "1"
+                	else:
+                            w = e[2][1]
+                	w = str(map_range(int(w), 0, 1, int(styles["graphstyle"]["wmin"]), int(styles["graphstyle"]["wmax"])))
+                else:
+                	w = e[2][1]
+                f.write('[penwidth=' + w + "]")
         # check options for displaying label
             if (style["display"] == "(w)penwidth") or (style["display"] == "(w)display"):
                 f.write(' [label="' + e[2][1] + '"]')
