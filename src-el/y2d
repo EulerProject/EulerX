@@ -7,13 +7,11 @@ from collections import defaultdict
 
 nodes = defaultdict(list)
 edges = defaultdict(list)
-
 # parse the stylesheet file
 def read_stylesheet(stylefile):
     global styles
     with open(stylefile) as style_file:    
-        styles = yaml.load(style_file)      
-        
+        styles = yaml.load(style_file)          
 def apply_style(datafile, output):
     f = output
     f.write("digraph{\n")
@@ -54,7 +52,11 @@ def apply_style(datafile, output):
         style = (item for item in styles["edgestyle"] if item["label"] == l).next()
         f.write("edge["+ style["dot"] +"]\n")
         for e in edges[l]:
-            f.write('"' + e[0][1] + '" -> "' + e[1][1] + '"')
+            if e[2][1] == ">":
+                f.write('"' + e[1][1] + '" -> "' + e[0][1] + '"')
+                f.write(' [dir= back]')
+            else:
+                f.write('"' + e[0][1] + '" -> "' + e[1][1] + '"')
             if (style["display"] == "(w)display"):
                 f.write('[penwidth=' + e[2][1] + "]")
         # check options for displaying label
