@@ -9,9 +9,9 @@ else
   rm $1_mir.csv;
   rm $1.out;
   echo "$1 $2 Passed!"
+  rm *txt >& /dev/null
+  rm *dot >& /dev/null
+  rm *png >& /dev/null
+  rm *pdf >& /dev/null
+  rm -rf asp
 fi
-rm *txt >& /dev/null
-rm *dot >& /dev/null
-rm *png >& /dev/null
-rm *pdf >& /dev/null
-rm -rf asp
