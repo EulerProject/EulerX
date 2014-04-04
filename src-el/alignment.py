@@ -414,7 +414,7 @@ class TaxonomyMapping:
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             raw = self.pw.split("\n")
             ## Filter out those trash in the gringo output
-            for i in range(2, len(raw) - 2, 2):
+            for i in range(2, len(raw) - 2):
                 if raw[i].find("rel") == -1: continue
                 pws.append(raw[i].strip().replace(") ",");"))
         elif reasoner[self.options.reasoner] == reasoner["dlv"]:
@@ -1284,28 +1284,13 @@ class TaxonomyMapping:
             maxint = int(self.options.dl)*num
 	    self.baseAsp  = "%%% Max Number of Euler Regions\n"
 	    self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
-	    self.baseAsp += con
 	    self.baseAsp += "%%% Euler Regions\n"
 	    self.baseAsp += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
 
-	    self.baseAsp += "%%% bit\n"
+	    self.baseAsp += con
+	    self.baseAsp += "%%% Euler Bit\n"
 	    self.baseAsp += "bit(M, V):-r(M),#mod(M," + int(num).__str__() + ",V).\n\n"
-
-	    self.baseAsp += "%%% Meaning of regions\n"
-	    self.baseAsp += "in(X, M) :- r(M),concept(X,_,N),bit(M,N).\n"
-	    self.baseAsp += "in(X, M) v out(X, M) :- r(M),concept(X,_,N),bit(M,N1), N<>N1.\n"
-	    #self.baseAsp += "gin(X, M) v gout(X, M) :- r(M),concept(X,_,N),not cin(X, M), not cout(X, M).\n"
-	    #self.baseAsp += ":- gin(X, M), gout(X, M), r(M), concept(X,_,_).\n\n"
-            #self.baseAsp += "in(X, M) :- cin(X, M).\n"
-            #self.baseAsp += "in(X, M) :- gin(X, M).\n"
-            #self.baseAsp += "out(X, M) :- cout(X, M).\n"
-            #self.baseAsp += "out(X, M) :- gout(X, M).\n"
-	    self.baseAsp += "ir(M) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n\n"
-
-	    self.baseAsp += "%%% Constraints of regions.\n"
-	    self.baseAsp += "vrs(X) :- r(X), not irs(X).\n"
-	    self.baseAsp += ":- vrs(X), irs(X).\n\n"
-
+            self.baseAsp += template.getAspDlCon()
         elif self.enc & encode["mn"]:
             if len(self.taxonomies) == 1:
                 raise Exception("Polynomial encoding is not applicable for singleton taxonomy" +\
@@ -1324,11 +1309,11 @@ class TaxonomyMapping:
 	            self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n"
 
             elif reasoner[self.options.reasoner] == reasoner["gringo"]:
-	        self.baseAsp = con
-	        self.baseAsp += "%%% regions\n"
+	        self.baseAsp  = "%%% Euler regions\n"
 	        self.baseAsp += "r(1.."+maxint.__str__()+").\n\n"
+	        self.baseAsp += con
 
-	        self.baseAsp += "%%% bit\n"
+	        self.baseAsp += "%%% Euler Bit\n"
                 for i in range(len(couArray)):
 	            self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", V = M1 #mod " + couArray[i].__str__() + ".\n"
             self.baseAsp += template.getAspMnCon()
@@ -1339,79 +1324,8 @@ class TaxonomyMapping:
             self.baseAsp += template.getAspVrCon()
 
         elif self.enc & encode["direct"]:
-            self.baseAsp += con
-            self.baseAsp += "\n% GENERATE possible labels\n"
-	    self.baseAsp += "node(X) :- concept(X, _, _).\n"
-            self.baseAsp += "rel(X, Y, R) :- label(X, Y, R), X < Y.\n"
-	    self.baseAsp += "label(X, X, eq) :- node(X).\n"
-
-	    self.baseAsp += "label(X,Y,eq) v label(X,Y,ds) v label(X,Y,in) v label(X,Y,ls) v label(X,Y,ol) :-\n"
-	    self.baseAsp += "	    node(X),node(Y), X <> Y.\n\n"
-
-            self.baseAsp += "% Make sure they are pairwise disjoint\n"
-            self.baseAsp += ":- label(X,Y,eq), label(X,Y,ds).\n"
-            self.baseAsp += ":- label(X,Y,eq), label(X,Y,in).\n"
-            self.baseAsp += ":- label(X,Y,eq), label(X,Y,ls).\n"
-            self.baseAsp += ":- label(X,Y,eq), label(X,Y,ol).\n"
-
-            self.baseAsp += ":- label(X,Y,ds), label(X,Y,in).\n"
-            self.baseAsp += ":- label(X,Y,ds), label(X,Y,ls).\n"
-            self.baseAsp += ":- label(X,Y,ds), label(X,Y,ol).\n"
-
-	    self.baseAsp += ":- label(X,Y,in), label(X,Y,ls).\n"
-	    self.baseAsp += ":- label(X,Y,in), label(X,Y,ol).\n"
-	    self.baseAsp += ":- label(X,Y,ls), label(X,Y,ol).\n"
-
-            self.baseAsp += "% integrity constraint for weak composition\n"
-            self.baseAsp += "label(X, Y, in) :- label(Y, X, ls).\n"
-            self.baseAsp += "label(X, Y, ls) :- label(Y, X, in).\n"
-            self.baseAsp += "label(X, Y, ol) :- label(Y, X, ol).\n"
-            self.baseAsp += "label(X, Y, ds) :- label(Y, X, ds).\n"
-            self.baseAsp += "sum(X, Y, Z) :- sum(X, Z, Y).\n"
-            self.baseAsp += "label(X, Y, in) :- sum(X, Y, _).\n"
-
-	    self.baseAsp += "label(X,Z,eq) :- label(X,Y,eq), label(Y,Z,eq).\n"
-	    self.baseAsp += "label(X,Z,in) :- label(X,Y,eq), label(Y,Z,in).\n"
-	    self.baseAsp += "label(X,Z,ls) :- label(X,Y,eq), label(Y,Z,ls).\n"
-	    self.baseAsp += "label(X,Z,ol) :- label(X,Y,eq), label(Y,Z,ol).\n"
-	    self.baseAsp += "label(X,Z,ds) :- label(X,Y,eq), label(Y,Z,ds).\n"
-
-	    self.baseAsp += "label(X,Z,in) :- label(X,Y,in), label(Y,Z,eq).\n"
-	    self.baseAsp += "label(X,Z,in) :- label(X,Y,in), label(Y,Z,in).\n"
-	    self.baseAsp += "label(X,Z,eq) v label(X,Z,in) v label(X,Z,ol) v label(X,Z,ls) :- label(X,Y,in), label(Y,Z,ls).\n"
-	    self.baseAsp += "label(X,Z,in) v label(X,Z,ol) :- label(X,Y,in), label(Y,Z,ol).\n"
-	    self.baseAsp += "label(X,Z,in) v label(X,Z,ol) v label(X,Z,ds) :- label(X,Y,in), label(Y,Z,ds).\n"
-
-	    self.baseAsp += "label(X,Z,ls) :- label(X,Y,ls), label(Y,Z,eq).\n"
-	    self.baseAsp += "%% Any of RCC5 is possible for X vs Z\n"
-	    self.baseAsp += "%label(X,Z,eq) v label(X,Z,ds) v label(X,Z,ol) :- label(X,Y,ls), label(Y,Z,in).\n"
-	    self.baseAsp += "label(X,Z,ls) :- label(X,Y,ls), label(Y,Z,ls).\n"
-	    self.baseAsp += "label(X,Z,ls) v label(X,Z,ol) v label(X,Z,ds) :- label(X,Y,ls), label(Y,Z,ol).\n"
-	    self.baseAsp += "label(X,Z,ds) :- label(X,Y,ls), label(Y,Z,ds).\n"
-
-	    self.baseAsp += "label(X,Z,ol) :- label(X,Y,ol), label(Y,Z,eq).\n"
-	    self.baseAsp += "label(X,Z,in) v label(X,Z,ol) v label(X,Z,ds) :- label(X,Y,ol), label(Y,Z,in).\n"
-	    self.baseAsp += "label(X,Z,ol) v label(X,Z,ls) :- label(X,Y,ol), label(Y,Z,ls).\n"
-	    self.baseAsp += "%% Any of RCC5 is possible for X vs Z\n"
-	    self.baseAsp += "%label(X,Z,eq) v label(X,Z,ds) v label(X,Z,in) v label(X,Z,ls) v label(X,Z,ol) :- label(X,Y,ol), label(Y,Z,ol).\n"
-	    self.baseAsp += "label(X,Z,in) v label(X,Z,ol) v label(X,Z,ds) :- label(X,Y,ol), label(Y,Z,ds).\n"
-
-	    self.baseAsp += "label(X,Z,ds) :- label(X,Y,ds), label(Y,Z,eq).\n"
-	    self.baseAsp += "label(X,Z,ds) :- label(X,Y,ds), label(Y,Z,in).\n"
-	    self.baseAsp += "label(X,Z,ls) v label(X,Z,ol) v label(X,Z,ds) :- label(X,Y,ds), label(Y,Z,ls).\n"
-	    self.baseAsp += "label(X,Z,ls) v label(X,Z,ol) v label(X,Z,ds) :- label(X,Y,ds), label(Y,Z,ol).\n"
-	    self.baseAsp += "%% Any of RCC5 is possible for X vs Z\n"
-	    self.baseAsp += "%label(X,Z,eq) v label(X,Z,ds) v label(X,Z,in) v label(X,Z,ls) v label(X,Z,ol) :- label(X,Y,ds), label(Y,Z,ds).\n\n"
-
-            self.baseAsp += "label(X, Y, ds) :- sum(X, X1, X2), label(X1, Y, ds), label(X2, Y, ds).\n"
-            self.baseAsp += "sum(X, Y, X2) :- sum(X, X1, X2), label(X1, Y, eq).\n"
-            self.baseAsp += "sum(Y, X1, X2) :- sum(X, X1, X2), label(X, Y, eq).\n"
-            # A + (B + C) = (A + B) + C
-            self.baseAsp += "label(X, Y, eq) :- sum(X, A, X1), sum(X1, B, C), sum(Y, B, Y1), sum(Y1, A, C).\n"
-            self.baseAsp += "label(X, Y, ol) v label(X, Y, in) :- sum(X, X1, X2), label(X1, Y, ol), label(X2, Y, ol).\n"
-            self.baseAsp += "label(X, Y, R) :- sum(X, X1, X2), sum(Y, Y1, Y2), label(X1, Y1, eq), label(X2, Y2, R).\n"
-            self.baseAsp += "label(X2, Y2, R) :- sum(X, X1, X2), sum(Y, Y1, Y2), label(X1, Y1, eq), label(X, Y, R).\n"
-            self.baseAsp += "label(X, Y, in) v label(X, Y, eq) :- sum(Y, Y1, Y2), label(X, Y1, in), label(X, Y2, in).\n"
+            self.baseAsp  = con
+            self.baseAsp += template.getAspDrCon()
 
         else:
             print "EXCEPTION: encode ",self.options.encode," not defined!!"
