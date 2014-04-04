@@ -40,15 +40,19 @@ Maps each “group” to a dot string. Example:
     '1': "shape=box style=\"filled,rounded\" color=black fillcolor=\"#CCFFCC\""
 3- edgestyle:
 Maps each “label” to a dot string. 
-There are 3 options for showing label: 
-(w) penwidth: show penwidth as label
+There are 3 options for showing label that are defined by assigning the following values to "display" key in edgestyle 
+(w)display: show penwidth as label
 “label”: show the label from data file 
-“ “: no label
+"[displaystring]": show the specified string as label (special caseL: "" means no label)
 
 Example:
       label: "isa"
       dot: "style=solid color=black"
       display: "(w)display"
+      
+Also, "(w)display" means apply the penwidth value
+
 
 
 “default” style will be applied if no style is defined for a node group or edge label. 
+
