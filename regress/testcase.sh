@@ -10,7 +10,8 @@ else
   rm $1.out;
   echo "$1 $2 Passed!"
 fi
-rm *txt
-rm *dot
-rm *png
+rm *txt >& /dev/null
+rm *dot >& /dev/null
+rm *png >& /dev/null
+rm *pdf >& /dev/null
 rm -rf asp

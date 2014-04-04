@@ -6,10 +6,24 @@ class template:
 
     global aspVrCon              # Base vr concept encoding
     global aspMnCon              # Base mn concept encoding
+    global aspDlCon              # Base dl concept encoding
+    global aspDrCon              # Base dr concept encoding
     global aspCbCon              # Base cb new concept encoding
     global aspPwDc               # Base pw decoding
     global aspAllDc              # Base pw decoding with "--all"
     global aspCbDc               # Base cb decoding
+
+    # Base constraints of regions for several encodings
+    aspRnCnt = "%%% Constraints of regions.\n"\
+	     + "irs(X) :- ir(X, _).\n"\
+	     + "vrs(X) :- vr(X, _).\n"\
+	     + "vr(X, X) :- not irs(X), r(X).\n"\
+	     + "ir(X, X) :- not vrs(X), r(X).\n"\
+	     + "ie(prod(A,B)) :- vr(X, A), ir(X, B), ix.\n"\
+	     + ":- vrs(X), irs(X), pw.\n\n"\
+	     + "%%% Inconsistency Explanation.\n"\
+	     + "ie(s(R, A, Y)) :- pie(R, A, Y), not cc(R, Y), ix.\n"\
+	     + "cc(R, Y) :- c(R, _, Y), ix.\n"
 
     aspVrCon = "\n%%% power\n"\
 	     + "p(0,1).\n"\
@@ -28,25 +42,7 @@ class template:
 	     + "out(X, M) :- r(M),concept(X,_,N),bit(M,N,0).\n\n"\
 	     + "ir(M, fi) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n"\
 	     + "irs(M) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n"\
-	     + "%%% Constraints of regions.\n"\
-	     + "irs(X) :- ir(X, _).\n"\
-	     + "vrs(X) :- vr(X, _).\n"\
-	     + "vr(X, X) :- not irs(X), r(X).\n"\
-	     + "ir(X, X) :- not vrs(X), r(X).\n"\
-	     + "ie(prod(A,B)) :- vr(X, A), ir(X, B), ix.\n"\
-	     + ":- vrs(X), irs(X), pw.\n\n"\
-	     + "%%% Inconsistency Explanation.\n"\
-	     + "ie(s(R, A, Y)) :- pie(R, A, Y), not cc(R, Y), ix.\n"\
-	     + "cc(R, Y) :- c(R, _, Y), ix.\n"
-#	     + "in(X, M) v out(X, M) :- r(M),concept(X,_,N),count(N).\n"
-#	     + "in(X, M) :- r(M),concept(X,_,N),bit(M,N,1).\n"
-#	     + "out(X, M) :- r(M),concept(X,_,N),bit(M,N,0).\n\n"
-#	     + "ir(M) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n"
-#	     + "%%% Constraints of regions.\n"
-#	     + "ir(0).\n"
-#	     + "vrs(X) v irs(X):- r(X).\n"
-#	     + ":- vrs(X), irs(X).\n\n"
-
+             + aspRnCnt
 
     aspMnCon = "\n\n%%% Meaning of regions\n"\
              + "in(X, M) :- r(M),concept(X,T,N),N1=N+1,bit(M,T,N1).\n"\
@@ -54,17 +50,7 @@ class template:
              + "in(X, M) :- r(M),concept2(X,_),not out(X, M).\n"\
              + "out(X, M) :- out3(X, M, _), ix.\n"\
              + "irs(M) :- in(X, M), out(X, M), r(M), concept2(X,_).\n\n"\
-             + "%%% Constraints of regions.\n"\
-             + "irs(X) :- ir(X, _).\n"\
-             + "vrs(X) :- vr(X, _).\n"\
-             + "vr(X, X) :- not irs(X), r(X).\n"\
-             + "ir(X, X) :- not vrs(X), r(X), pw.\n"\
-             + "ie(prod(A,B)) :- vr(X, A), ir(X, B), ix.\n"\
-             + ":- vrs(X), irs(X), pw.\n\n"\
-             + "%%% Inconsistency Explanation.\n"\
-             + "ie(s(R, A, Y)) :- pie(R, A, Y), not cc(R, Y), ix.\n"\
-             + "cc(R, Y) :- c(R, _, Y), ix.\n"
-             #+ "ir(M, fi) :- in(X, M), out(X, M), r(M), concept2(X,_).\n\n"\
+             + aspRnCnt
 
     aspCbCon = "cb(X) :- newcon(X, _, _, _).\n"\
              + "cp(X) :- concept2(X, _).\n"\
@@ -108,13 +94,76 @@ class template:
 	     + "nminus(X, Y, Z) :- con(X), con(Y), con(Z), r(M), in(X, M), in(Y, M), in(Z, M).\n"\
 	     + "minus(X, Y, Z) :- con(X), con(Y), con(Z), not nminus(X, Y, Z).\n"
 
-   #self.baseCb += "\n%%% power\n"
-   #self.baseCb += "p(1,1).\n"
-   #self.baseCb += "p(N,M) :- #int(N),N>0,#succ(N1,N),p(N1,M1),M=M1*2.\n\n"
-   
-   #self.baseCb += "%%% bit2\n"
-   #self.baseCb += "bit2(M, N, 0):-cb(M),r(N),p(N,P),M1=M/P,#mod(M1,2,0).\n"
-   #self.baseCb += "bit2(M, N, 1):-cb(M),r(N),not bit2(M,N,0).\n\n"
+
+    aspDlCon = "%%% Meaning of regions\n"\
+	     + "in(X, M) :- r(M),concept(X,_,N),bit(M,N).\n"\
+	     + "in(X, M) v out(X, M) :- r(M),concept(X,_,N),bit(M,N1), N<>N1.\n"\
+	     + "irs(M) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n\n"\
+	     + "vrs(M) :- r(M), not irs(M).\n\n"\
+             + aspRnCnt
+
+
+    aspDrCon = "\n% GENERATE possible labels\n"\
+	     + "node(X) :- concept(X, _, _).\n"\
+             + "rel(X, Y, R) :- label(X, Y, R), X < Y.\n"\
+	     + "label(X, X, eq) :- node(X).\n"\
+	     + "label(X,Y,eq) v label(X,Y,ds) v label(X,Y,in) v label(X,Y,ls) v label(X,Y,ol) :-\n"\
+	     + "	    node(X),node(Y), X <> Y.\n\n"\
+             + "% Make sure they are pairwise disjoint\n"\
+             + ":- label(X,Y,eq), label(X,Y,ds).\n"\
+             + ":- label(X,Y,eq), label(X,Y,in).\n"\
+             + ":- label(X,Y,eq), label(X,Y,ls).\n"\
+             + ":- label(X,Y,eq), label(X,Y,ol).\n"\
+             + ":- label(X,Y,ds), label(X,Y,in).\n"\
+             + ":- label(X,Y,ds), label(X,Y,ls).\n"\
+             + ":- label(X,Y,ds), label(X,Y,ol).\n"\
+	     + ":- label(X,Y,in), label(X,Y,ls).\n"\
+	     + ":- label(X,Y,in), label(X,Y,ol).\n"\
+	     + ":- label(X,Y,ls), label(X,Y,ol).\n"\
+             + "% integrity constraint for weak composition\n"\
+             + "label(X, Y, in) :- label(Y, X, ls).\n"\
+             + "label(X, Y, ls) :- label(Y, X, in).\n"\
+             + "label(X, Y, ol) :- label(Y, X, ol).\n"\
+             + "label(X, Y, ds) :- label(Y, X, ds).\n"\
+             + "sum(X, Y, Z) :- sum(X, Z, Y).\n"\
+             + "label(X, Y, in) :- sum(X, Y, _).\n"\
+	     + "label(X,Z,eq) :- label(X,Y,eq), label(Y,Z,eq).\n"\
+	     + "label(X,Z,in) :- label(X,Y,eq), label(Y,Z,in).\n"\
+	     + "label(X,Z,ls) :- label(X,Y,eq), label(Y,Z,ls).\n"\
+	     + "label(X,Z,ol) :- label(X,Y,eq), label(Y,Z,ol).\n"\
+	     + "label(X,Z,ds) :- label(X,Y,eq), label(Y,Z,ds).\n"\
+	     + "label(X,Z,in) :- label(X,Y,in), label(Y,Z,eq).\n"\
+	     + "label(X,Z,in) :- label(X,Y,in), label(Y,Z,in).\n"\
+	     + "label(X,Z,eq) v label(X,Z,in) v label(X,Z,ol) v label(X,Z,ls) :- label(X,Y,in), label(Y,Z,ls).\n"\
+	     + "label(X,Z,in) v label(X,Z,ol) :- label(X,Y,in), label(Y,Z,ol).\n"\
+	     + "label(X,Z,in) v label(X,Z,ol) v label(X,Z,ds) :- label(X,Y,in), label(Y,Z,ds).\n"\
+	     + "label(X,Z,ls) :- label(X,Y,ls), label(Y,Z,eq).\n"\
+	     + "%% Any of RCC5 is possible for X vs Z\n"\
+	     + "%label(X,Z,eq) v label(X,Z,ds) v label(X,Z,ol) :- label(X,Y,ls), label(Y,Z,in).\n"\
+	     + "label(X,Z,ls) :- label(X,Y,ls), label(Y,Z,ls).\n"\
+	     + "label(X,Z,ls) v label(X,Z,ol) v label(X,Z,ds) :- label(X,Y,ls), label(Y,Z,ol).\n"\
+	     + "label(X,Z,ds) :- label(X,Y,ls), label(Y,Z,ds).\n"\
+	     + "label(X,Z,ol) :- label(X,Y,ol), label(Y,Z,eq).\n"\
+	     + "label(X,Z,in) v label(X,Z,ol) v label(X,Z,ds) :- label(X,Y,ol), label(Y,Z,in).\n"\
+	     + "label(X,Z,ol) v label(X,Z,ls) :- label(X,Y,ol), label(Y,Z,ls).\n"\
+	     + "%% Any of RCC5 is possible for X vs Z\n"\
+	     + "%label(X,Z,eq) v label(X,Z,ds) v label(X,Z,in) v label(X,Z,ls) v label(X,Z,ol) :- label(X,Y,ol), label(Y,Z,ol).\n"\
+	     + "label(X,Z,in) v label(X,Z,ol) v label(X,Z,ds) :- label(X,Y,ol), label(Y,Z,ds).\n"\
+	     + "label(X,Z,ds) :- label(X,Y,ds), label(Y,Z,eq).\n"\
+	     + "label(X,Z,ds) :- label(X,Y,ds), label(Y,Z,in).\n"\
+	     + "label(X,Z,ls) v label(X,Z,ol) v label(X,Z,ds) :- label(X,Y,ds), label(Y,Z,ls).\n"\
+	     + "label(X,Z,ls) v label(X,Z,ol) v label(X,Z,ds) :- label(X,Y,ds), label(Y,Z,ol).\n"\
+	     + "%% Any of RCC5 is possible for X vs Z\n"\
+	     + "%label(X,Z,eq) v label(X,Z,ds) v label(X,Z,in) v label(X,Z,ls) v label(X,Z,ol) :- label(X,Y,ds), label(Y,Z,ds).\n\n"\
+             + "label(X, Y, ds) :- sum(X, X1, X2), label(X1, Y, ds), label(X2, Y, ds).\n"\
+             + "sum(X, Y, X2) :- sum(X, X1, X2), label(X1, Y, eq).\n"\
+             + "sum(Y, X1, X2) :- sum(X, X1, X2), label(X, Y, eq).\n"\
+             + "%% A + (B + C) = (A + B) + C\n"\
+             + "label(X, Y, eq) :- sum(X, A, X1), sum(X1, B, C), sum(Y, B, Y1), sum(Y1, A, C).\n"\
+             + "label(X, Y, ol) v label(X, Y, in) :- sum(X, X1, X2), label(X1, Y, ol), label(X2, Y, ol).\n"\
+             + "label(X, Y, R) :- sum(X, X1, X2), sum(Y, Y1, Y2), label(X1, Y1, eq), label(X2, Y2, R).\n"\
+             + "label(X2, Y2, R) :- sum(X, X1, X2), sum(Y, Y1, Y2), label(X1, Y1, eq), label(X, Y, R).\n"\
+             + "label(X, Y, in) v label(X, Y, eq) :- sum(Y, Y1, Y2), label(X, Y1, in), label(X, Y2, in).\n"\
 
     aspPwDc = "%%% Decoding now\n"\
             + ":- rel(X, Y, \"=\"), rel(X, Y, \"<\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
@@ -133,6 +182,8 @@ class template:
             + "rel(X, Y, \">\") :- hint(X, Y, 0), hint(X, Y, 1), not hint(X, Y, 2), pw.\n"\
             + "rel(X, Y, \"><\") :- hint(X, Y, 0), hint(X, Y, 1), hint(X, Y, 2), pw.\n"\
             + "rel(X, Y, \"!\") :- hint(X, Y, 0), not hint(X, Y, 1), hint(X, Y, 2), pw.\n\n\n"
+
+
 
     hintart = "hint(X, Y, 0) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), out(Y, R), not ncf(X), not ncf(Y), pw.\n"\
             + "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), N1 < N2, vrs(R), in(X, R), in(Y, R), not ncf(X), not ncf(Y), pw.\n"\
@@ -229,13 +280,25 @@ class template:
     #    dlvDc += "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), vrs(R), in(X, R), in(Y, R), pw.\n"
     #    dlvDc += "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), vrs(R), out(X, R), in(Y, R), pw.\n\n"
 
+    # Binary encoding base constraints
     def getAspVrCon():
         global aspVrCon
         return aspVrCon
 
+    # Polynomial encoding base constraints
     def getAspMnCon():
         global aspMnCon
         return aspMnCon
+
+    # Probability encoding base constraints
+    def getAspDlCon():
+        global aspDlCon
+        return aspDlCon
+
+    # Direct encoding base constraints
+    def getAspDrCon():
+        global aspDrCon
+        return aspDrCon
 
     def getAspCbCon():
         global aspCbCon
@@ -259,6 +322,8 @@ class template:
 
     getAspVrCon = Callable(getAspVrCon)
     getAspMnCon = Callable(getAspMnCon)
+    getAspDlCon = Callable(getAspDlCon)
+    getAspDrCon = Callable(getAspDrCon)
     getAspCbCon = Callable(getAspCbCon)
     getAspPwDc  = Callable(getAspPwDc)
     getAspAllDc  = Callable(getAspAllDc)
