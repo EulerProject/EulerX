@@ -4,11 +4,49 @@ class template:
     global encErrMsg
     encErrMsg = "\nEncoding error, please contact Mingmin at michen@ucdavis.edu"
 
+    global aspVrCon              # Base vr concept encoding
     global aspMnCon              # Base mn concept encoding
     global aspCbCon              # Base cb new concept encoding
     global aspPwDc               # Base pw decoding
     global aspAllDc              # Base pw decoding with "--all"
     global aspCbDc               # Base cb decoding
+
+    aspVrCon = "\n%%% power\n"\
+	     + "p(0,1).\n"\
+	     + "p(N,M) :- #int(N),N>0,#succ(N1,N),p(N1,M1),M=M1*2.\n\n"\
+	     + "%%% regions\n"\
+	     + "r(M):- #int(M),M>=0,M<#maxint.\n\n"\
+	     + "%%% count of concepts\n"\
+	     + "count(N):- #int(N),N>=0,N<#count{Y:concept(Y,_,_)}.\n\n"\
+	     + "%%% bit\n"\
+	     + "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P,#mod(M1,2,0).\n"\
+	     + "bit(M, N, 1):-r(M),count(N),not bit(M,N,0).\n\n"\
+	     + "%%% Meaning of regions\n"\
+             + "in(X, M) :- not out(X, M), r(M),concept(X,_,N),count(N).\n"\
+             + "out(X, M) :- not in(X, M), r(M),concept(X,_,N),count(N).\n"\
+	     + "in(X, M) :- r(M),concept(X,_,N),bit(M,N,1).\n"\
+	     + "out(X, M) :- r(M),concept(X,_,N),bit(M,N,0).\n\n"\
+	     + "ir(M, fi) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n"\
+	     + "irs(M) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n"\
+	     + "%%% Constraints of regions.\n"\
+	     + "irs(X) :- ir(X, _).\n"\
+	     + "vrs(X) :- vr(X, _).\n"\
+	     + "vr(X, X) :- not irs(X), r(X).\n"\
+	     + "ir(X, X) :- not vrs(X), r(X).\n"\
+	     + "ie(prod(A,B)) :- vr(X, A), ir(X, B), ix.\n"\
+	     + ":- vrs(X), irs(X), pw.\n\n"\
+	     + "%%% Inconsistency Explanation.\n"\
+	     + "ie(s(R, A, Y)) :- pie(R, A, Y), not cc(R, Y), ix.\n"\
+	     + "cc(R, Y) :- c(R, _, Y), ix.\n"
+#	     + "in(X, M) v out(X, M) :- r(M),concept(X,_,N),count(N).\n"
+#	     + "in(X, M) :- r(M),concept(X,_,N),bit(M,N,1).\n"
+#	     + "out(X, M) :- r(M),concept(X,_,N),bit(M,N,0).\n\n"
+#	     + "ir(M) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n"
+#	     + "%%% Constraints of regions.\n"
+#	     + "ir(0).\n"
+#	     + "vrs(X) v irs(X):- r(X).\n"
+#	     + ":- vrs(X), irs(X).\n\n"
+
 
     aspMnCon = "\n\n%%% Meaning of regions\n"\
              + "in(X, M) :- r(M),concept(X,T,N),N1=N+1,bit(M,T,N1).\n"\
@@ -191,6 +229,10 @@ class template:
     #    dlvDc += "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), vrs(R), in(X, R), in(Y, R), pw.\n"
     #    dlvDc += "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), vrs(R), out(X, R), in(Y, R), pw.\n\n"
 
+    def getAspVrCon():
+        global aspVrCon
+        return aspVrCon
+
     def getAspMnCon():
         global aspMnCon
         return aspMnCon
@@ -215,6 +257,7 @@ class template:
         global encErrMsg
         return encErrMsg
 
+    getAspVrCon = Callable(getAspVrCon)
     getAspMnCon = Callable(getAspMnCon)
     getAspCbCon = Callable(getAspCbCon)
     getAspPwDc  = Callable(getAspPwDc)
