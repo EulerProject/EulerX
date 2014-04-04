@@ -1115,6 +1115,7 @@ class TaxonomyMapping:
         self.npw = 0
         outputstr = ""
         lastpw = ""
+        print pws
         if self.options.cluster: pwobs = []
         for i in range(len(pws)):
             if pws[i].find("pp(") == -1: continue
@@ -1188,7 +1189,6 @@ class TaxonomyMapping:
         self.outPW(self.name, pws, self.options.output, "relout")
  
     def genASP(self):
-        self.baseAsp == ""
         self.genAspConcept()
         self.genAspPC()
         self.genAspAr()
@@ -1336,48 +1336,7 @@ class TaxonomyMapping:
         elif self.enc & encode["vr"]:
 	    self.baseAsp = "#maxint=" + int(2**num).__str__() + ".\n\n"
 	    self.baseAsp += con
-	    self.baseAsp += "\n%%% power\n"
-	    self.baseAsp += "p(0,1).\n"
-	    self.baseAsp += "p(N,M) :- #int(N),N>0,#succ(N1,N),p(N1,M1),M=M1*2.\n\n"
-
-	    self.baseAsp += "%%% regions\n"
-	    self.baseAsp += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
-
-	    self.baseAsp += "%%% count of concepts\n"
-	    self.baseAsp += "count(N):- #int(N),N>=0,N<#count{Y:concept(Y,_,_)}.\n\n"
-
-	    self.baseAsp += "%%% bit\n"
-	    self.baseAsp += "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P,#mod(M1,2,0).\n"
-	    self.baseAsp += "bit(M, N, 1):-r(M),count(N),not bit(M,N,0).\n\n"
-
-	    self.baseAsp += "%%% Meaning of regions\n"
-            self.baseAsp += "in(X, M) :- not out(X, M), r(M),concept(X,_,N),count(N).\n"
-            self.baseAsp += "out(X, M) :- not in(X, M), r(M),concept(X,_,N),count(N).\n"
-	    self.baseAsp += "in(X, M) :- r(M),concept(X,_,N),bit(M,N,1).\n"
-	    self.baseAsp += "out(X, M) :- r(M),concept(X,_,N),bit(M,N,0).\n\n"
-	    #self.baseAsp += "ir(M, fi) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n"
-	    self.baseAsp += "irs(M) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n"
-
-	    self.baseAsp += "%%% Constraints of regions.\n"
-	    self.baseAsp += "irs(X) :- ir(X, _).\n"
-	    self.baseAsp += "vrs(X) :- vr(X, _).\n"
-	    self.baseAsp += "vr(X, X) :- not irs(X), r(X).\n"
-	    self.baseAsp += "ir(X, X) :- not vrs(X), r(X).\n"
-	    self.baseAsp += "ie(prod(A,B)) :- vr(X, A), ir(X, B), ix.\n"
-	    self.baseAsp += ":- vrs(X), irs(X), pw.\n\n"
-
-	    self.baseAsp += "%%% Inconsistency Explanation.\n"
-	    self.baseAsp += "ie(s(R, A, Y)) :- pie(R, A, Y), not cc(R, Y), ix.\n"
-	    self.baseAsp += "cc(R, Y) :- c(R, _, Y), ix.\n"
-#	    self.baseAsp += "in(X, M) v out(X, M) :- r(M),concept(X,_,N),count(N).\n"
-#	    self.baseAsp += "in(X, M) :- r(M),concept(X,_,N),bit(M,N,1).\n"
-#	    self.baseAsp += "out(X, M) :- r(M),concept(X,_,N),bit(M,N,0).\n\n"
-#	    self.baseAsp += "ir(M) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n"
-#
-#	    self.baseAsp += "%%% Constraints of regions.\n"
-#	    self.baseAsp += "ir(0).\n"
-#	    self.baseAsp += "vrs(X) v irs(X):- r(X).\n"
-#	    self.baseAsp += ":- vrs(X), irs(X).\n\n"
+            self.baseAsp += template.getAspVrCon()
 
         elif self.enc & encode["direct"]:
             self.baseAsp += con
@@ -1814,9 +1773,6 @@ class TaxonomyMapping:
             if self.obslen > 3 and not self.exptmp:
                 self.temporal.append(obsin[3])
         self.obs.append(obs)
-
-    #class Observation:
-     #   def __init__(self, , flag):
 
 
     def dotName2dlv(self, dotName):
