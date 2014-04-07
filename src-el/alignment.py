@@ -1329,6 +1329,8 @@ class TaxonomyMapping:
 	        self.baseAsp += "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P,#mod(M1,2,0).\n"
 	        self.baseAsp += con
             elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+                # TODO vrpw may not be working for gringo, gringo 4 may be needed
+                # raise Exception("Reasoner: vrpw is not supported for gringo !!")
 	        self.baseAsp  = "%%% Euler regions\n"
 	        self.baseAsp += "r(0.."+(maxint-1).__str__()+").\n\n"
 	        self.baseAsp += "%%% count of concepts\n"
