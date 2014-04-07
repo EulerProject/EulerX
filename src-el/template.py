@@ -27,13 +27,8 @@ class template:
 
     aspVrCon = "\n%%% power\n"\
 	     + "p(0,1).\n"\
-	     + "p(N,M) :- #int(N),N>0,#succ(N1,N),p(N1,M1),M=M1*2.\n\n"\
-	     + "%%% regions\n"\
-	     + "r(M):- #int(M),M>=0,M<#maxint.\n\n"\
-	     + "%%% count of concepts\n"\
-	     + "count(N):- #int(N),N>=0,N<#count{Y:concept(Y,_,_)}.\n\n"\
+	     + "p(N,M) :- r(N),N=N1+1,p(N1,M1),M=M1*2.\n\n"\
 	     + "%%% bit\n"\
-	     + "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P,#mod(M1,2,0).\n"\
 	     + "bit(M, N, 1):-r(M),count(N),not bit(M,N,0).\n\n"\
 	     + "%%% Meaning of regions\n"\
              + "in(X, M) :- not out(X, M), r(M),concept(X,_,N),count(N).\n"\

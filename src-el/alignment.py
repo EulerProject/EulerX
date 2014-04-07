@@ -71,8 +71,8 @@ class TaxonomyMapping:
             os.mkdir(self.aspdir)
         self.pwfile = os.path.join(self.aspdir, self.name+"_pw."+self.options.reasoner)
         self.cbfile = os.path.join(self.aspdir, self.name+"_cb."+self.options.reasoner)
-        self.pwswitch = os.path.join(self.aspdir, "pw."+self.options.reasoner)
-        self.ixswitch = os.path.join(self.aspdir, "ix."+self.options.reasoner)
+        self.pwswitch = os.path.join(self.aspdir, self.name+"_pwswitch."+self.options.reasoner)
+        self.ixswitch = os.path.join(self.aspdir, self.name+"_ixswitch."+self.options.reasoner)
         self.ivout = os.path.join(options.outputdir, self.name+"_iv.dot")
         self.cbout = os.path.join(options.outputdir, self.name+"_cb.txt")
         self.obout = os.path.join(options.outputdir, self.name+"_ob.txt")
@@ -84,13 +84,13 @@ class TaxonomyMapping:
         self.iefile = os.path.join(options.outputdir, self.name+"_ie.dot")
         self.iepdf = os.path.join(options.outputdir, self.name+"_ie.pdf")
         self.ivpdf = os.path.join(options.outputdir, self.name+"_iv.pdf")
+        path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             # possible world command
-            self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
+            self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0 | "+path+"/muniq -u"
             # consistency command
             self.con = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD --eq=1"
         elif reasoner[self.options.reasoner] == reasoner["dlv"]:
-            path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
             # possible world command
             self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
             # consistency command
@@ -1319,8 +1319,22 @@ class TaxonomyMapping:
             self.baseAsp += template.getAspMnCon()
 
         elif self.enc & encode["vr"]:
-	    self.baseAsp = "#maxint=" + int(2**num).__str__() + ".\n\n"
-	    self.baseAsp += con
+            maxint = int(2**num)
+            if reasoner[self.options.reasoner] == reasoner["dlv"]:
+	        self.baseAsp = "#maxint=" + maxint.__str__() + ".\n\n"
+	        self.baseAsp += "%%% regions\n"
+	        self.baseAsp += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
+	        self.baseAsp += "%%% count of concepts\n"
+	        self.baseAsp += "count(N):- #int(N),N>=0,N<"+num.__str__()+".\n\n"
+	        self.baseAsp += "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P,#mod(M1,2,0).\n"
+	        self.baseAsp += con
+            elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+	        self.baseAsp  = "%%% Euler regions\n"
+	        self.baseAsp += "r(0.."+(maxint-1).__str__()+").\n\n"
+	        self.baseAsp += "%%% count of concepts\n"
+	        self.baseAsp += "count(0.."+(num-1).__str__()+").\n\n"
+	        self.baseAsp += "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P, 0 = M1 #mod 2.\n"
+	        self.baseAsp += con
             self.baseAsp += template.getAspVrCon()
 
         elif self.enc & encode["direct"]:
