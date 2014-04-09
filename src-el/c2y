@@ -85,6 +85,7 @@ for a in art:
                 add_edge(a.split(" " + l)[-1].split(" ")[i], plus,"in")
         else:
             add_edge(a.split(" ")[0], a.split(" ")[2], art2symbol.get(a.split(" ")[1], a.split(" ")[1]))
+f.close()
 with sys.stdout as outfile:
    outfile.write(yaml.safe_dump(nodes, default_flow_style=False))
    outfile.write(yaml.safe_dump(edges, default_flow_style=False))
