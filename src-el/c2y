@@ -66,7 +66,7 @@ for a in art:
             else:
                     l = "ldiff"
                     op = "-"
-            plus = a.split(" " + l)[-1][-1] + op
+            plus = a.split(l + " ")[-1].replace(".","") + op
             add_node(plus, "none")
             add_edge(plus, a.split(" " + l + " ")[-1], "out")
             for i in range(0,len(a.split(" " + l)[0].split(" "))):
@@ -78,14 +78,13 @@ for a in art:
             else:
                     l= "rdiff"
                     op = "-"
-            plus = a.split(" " + l)[0][-1] + op
+            plus = a.split(" " + l)[0].replace(".","") + op
             add_node(plus, "none")
             add_edge(plus, a.split(" " + l + " ")[0], "out")
             for i in range(1,len(a.split(" " + l)[-1].split(" "))):
                 add_edge(a.split(" " + l)[-1].split(" ")[i], plus,"in")
         else:
             add_edge(a.split(" ")[0], a.split(" ")[2], art2symbol.get(a.split(" ")[1], a.split(" ")[1]))
-f.close()
 with sys.stdout as outfile:
    outfile.write(yaml.safe_dump(nodes, default_flow_style=False))
-   outfile.write(yaml.safe_dump(edges, default_flow_style=False))        
+   outfile.write(yaml.safe_dump(edges, default_flow_style=False))
