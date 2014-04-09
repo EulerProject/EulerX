@@ -23,7 +23,8 @@ edges = {}
 art2symbol = {"equals":"==",
                   "is_included_in":"<",
                   "includes":">",
-                  "overlaps":"><"}
+                  "overlaps":"><",
+              "disjoint":"!"}
 art = []
 dictionary = {}  # group number and list of nodes in the group
 f = sys.stdin 
