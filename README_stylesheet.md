@@ -33,9 +33,11 @@ YAML/Json Stylesheet Format
 1- graphstyle:
 Graph attributes for dot file. Example:
  graph: "rankdir=TB\n labelloc=t\n labeljust=left\n fontsize=20\n label=\"Sample Graph\"\n"
-subgraph: a switch for subgraph. Example:
+ subgraph: a switch for subgraph. Example:
     subgraph: "on"
-If the value of subgraph is “on”, nodes will be clustered based on their “group” in the output dot file. Anything other than “on” (e.g. “off”) means no subgraph in the output. 
+  If the value of subgraph is “on”, nodes will be clustered based on their “group” in the output dot file. Anything other than “on” (e.g. “off”) means no subgraph in the output. 
+  legend: a switch similar to subgraph
+   If the value of legend is "on", a table showing the number of nodes an edges will be added to the output dot file. 
 wmap: a switch for penwidth scaling. The value "on" here means the penwidths in the input graph get mapped to the speified range in the stylesheet.
 wmin, wmax: range of penwidth
 
