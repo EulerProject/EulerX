@@ -116,6 +116,6 @@ def parse_options():
 if __name__ == '__main__':
 	(options,args) = parse_options()
 	if options.sfile == None:
-		options.sfile = "inputstyle.yaml"
+		options.sfile = "../example_stylesheet/inputstyle.yaml"
 	read_stylesheet(options.sfile)
 	apply_style(sys.stdin, sys.stdout)
