@@ -8,6 +8,7 @@ from collections import defaultdict
 nodes = defaultdict(list)
 edges = defaultdict(list)
 wList = []
+
 # parse the stylesheet file
 def scale(value, dMin, dMax, sMin, sMax):
     # Find how 'wide' each range is
@@ -38,23 +39,26 @@ def apply_style(data_file, f):
                     wList.append(data[key]["w"])
                 else:
                     wList.append("1")
-                if not any(d["label"] == value["label"] for d in styles["edgestyle"]):
+                if value["label"] in ["==", "<>", "!", ">" , "<"]:
+                    edges["Art."].append(value.items())
+                elif not any(d["label"] == value["label"] for d in styles["edgestyle"]):
                     edges["default"].append(value.items())
                 else:
                     edges[data[key]["label"]].append(value.items())
-    glabel = '<TR> <TD COLSPAN="2"><B>Nodes</B></TD> </TR> \n' 
+    glabel = '<TR> <TD COLSPAN="2"><font face="Arial Black"> Nodes</font></TD> </TR> \n' 
     for g in nodes:
-        glabel = glabel + "<TR> \n <TD>" + g + "</TD> \n <TD>" + str(len(nodes[g])) + "</TD> \n </TR> \n"
     # if the style is not defined use the default
-        if (styles["graphstyle"]["subgraph"] == "on" and g!="none"):
+        if (styles["graphstyle"]["subgraph"] == "on" and g!="(+)"):
             f.write("subgraph cluster" + g + '{ style=invis\n')
         if g in styles["nodestyle"]:
             group = g
         else:
             group = "default"
+        color = styles["nodestyle"][group].split("fillcolor=")[1]
+        glabel = glabel + "<TR> \n <TD bgcolor=" + color + ">" + g + "</TD> \n <TD>" + str(len(nodes[g])) + "</TD> \n </TR> \n"
         f.write("node[" + styles["nodestyle"][group] + '] \n')
         for n in nodes[g]:
-            if (g!= "common" and g!= "none"):
+            if (g!= "common" and g!= "(+)"):
                f.write('"'+ g + "." + n + '"\n')
             else:
                 f.write('"'+ n + '"')
@@ -63,38 +67,38 @@ def apply_style(data_file, f):
                 elif "-" in n:
                     f.write(' [label="-"]')
                 f.write("\n")
-        if (styles["graphstyle"]["subgraph"] == "on" and g != "none"):
+        if (styles["graphstyle"]["subgraph"] == "on" and g != "(+)"):
             f.write("}\n")
-    glabel = glabel + '<TR> <TD COLSPAN="2"><B>Edges</B></TD> </TR> \n'  
+    glabel = glabel + '<TR> <TD COLSPAN="2"><font face = "Arial Black"> Edges </font></TD> </TR> \n'  
     for l in edges:
         style = (item for item in styles["edgestyle"] if item["label"] == l).next()
         f.write("edge["+ style["dot"] +"]\n")
-        glabel = glabel + "<TR> \n <TD>" + l + "</TD> \n <TD>" + str(len(edges[l])) + "</TD> \n </TR> \n"
+        color = style["dot"]. split ("color=")[1].split(" ")[0]
+        glabel = glabel + "<TR> \n <TD><font color =" + color + ">" + l + "</font></TD> \n <TD>" + str(len(edges[l])) + "</TD> \n </TR> \n"
         for e in edges[l]:
             if e[2][1] == ">":
                 f.write('"' + e[1][1] + '" -> "' + e[0][1] + '"')
                 f.write(' [dir= back]')
             else:
                 f.write('"' + e[0][1] + '" -> "' + e[1][1] + '"')
-            if style["display"] == "(w)penwidth":
+            w = e[2][1]
+            if style["display"] == "(w)display":
                 if styles["graphstyle"]["wmap"] == "on":
-                	w = e[2][1]
-                	if not "w" in (item[0] for item in e):
-                            w = "1"
-                	w = str(scale(int(w), int(min(wList)), int(max(wList)), int(styles["graphstyle"]["wmin"]), int(styles["graphstyle"]["wmax"])))              	
-                f.write('[penwidth=' + w + "]")
+                    w = str(scale(int(w), int(min(wList)), int(max(wList)), int(styles["graphstyle"]["wmin"]), int(styles["graphstyle"]["wmax"])))
+                f.write(' [label="' + w + '"]')
         # check options for displaying label
-            elif style["display"] == "(w)display":
-                f.write(' [label="' + e[2][1] + '"]')
             elif (style["display"] == "label"):
                 f.write(' [label="' + e[-1][1] + '"]')
             else:
-                f.write(' [label="' + style["display"] + '"]')
+                if style["display"] !="":
+                    f.write(' [label="' + style["display"] + '"]')
+ #           f.write('[penwidth=' + w + "]")
             f.write("\n")
     if styles["graphstyle"]["legend"] == "on":
-        f.write('{rank = sink Legend [fillcolor= white margin=0 label=< <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
+        f.write("node[shape=box]")
+        f.write('{rank=min Legend [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
         f.write(glabel)
-        f.write("</TABLE> \n >] }")
+        f.write("</TABLE> \n >] } \n")
     f.write("}")            
     f.close()
 def parse_options():
@@ -105,7 +109,6 @@ def parse_options():
 					  help="file")
 	(options,args) = parser.parse_args()
 	return (options,args)
-
 # MAIN 
 if __name__ == '__main__':
 	(options,args) = parse_options()

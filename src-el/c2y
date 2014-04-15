@@ -13,7 +13,7 @@ def add_node(concept, group):
         node = {}
         node.update({"concept": concept})
         node.update({"group": group})
-        if group!="none":
+        if group!="(+)":
             nodes.update({group + "." + concept: node})
         else:
             nodes.update({concept: node})
@@ -67,7 +67,7 @@ for a in art:
                     l = "ldiff"
                     op = "-"
             plus = a.split(l + " ")[-1].replace(".","") + op
-            add_node(plus, "none")
+            add_node(plus, "(+)")
             add_edge(plus, a.split(" " + l + " ")[-1], "out")
             for i in range(0,len(a.split(" " + l)[0].split(" "))):
                 add_edge(a.split(" " + l)[0].split(" ")[i], plus, "in")
@@ -79,7 +79,7 @@ for a in art:
                     l= "rdiff"
                     op = "-"
             plus = a.split(" " + l)[0].replace(".","") + op
-            add_node(plus, "none")
+            add_node(plus, "(+)")
             add_edge(plus, a.split(" " + l + " ")[0], "out")
             for i in range(1,len(a.split(" " + l)[-1].split(" "))):
                 add_edge(a.split(" " + l)[-1].split(" ")[i], plus,"in")
