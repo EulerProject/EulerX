@@ -1,27 +1,32 @@
   graphstyle: 
     graph: "rankdir=BT\n"
     subgraph: "off"
-    wmap: "off"
-    wmin: "0"
+    legend: "on"
+    wmap: "on"
+    wmin: "1"
     wmax: "5"
   nodestyle: 
     "2": "shape=box style=\"filled\" fillcolor=\"#CCFFCC\""
     "1": "shape=octagon style=filled fillcolor=\"#FFFFCC\""
-    default: "shape=circle style=filled color=black fillcolor=white"
+    default: "shape=circle style=filled fillcolor=\"#FFFFFF\""
   edgestyle: 
     - 
       label: "isa"
-      dot: "style=solid color=black"
+      dot: "style=solid color=\"#000000\" constraint=true"
       display: ""
     - 
       label: "in"
-      dot: "style=solid color= black"
+      dot: "style=solid color=\"#000000\" constraint=true"
       display: ""
     - 
       label: "out"
-      dot: "style=solid color= black"
-      display: (w)display
+      dot: "style=solid color=\"#000000\" constraint=true"
+      display: ""
+    - 
+      label: "Art."
+      dot: "style=dotted color=\"#AA00FF\" constraint=true penwidth=3"
+      display: "label"
     - 
       label: "default"
-      dot: "style = dashed color=grey"
+      dot: "style=dotted color=\"#AA00FF\" constraint=true"
       display: "label"
