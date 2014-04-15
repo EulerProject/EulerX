@@ -39,7 +39,7 @@ def apply_style(data_file, f):
                     wList.append(data[key]["w"])
                 else:
                     wList.append("1")
-                if value["label"] in ["==", "<>", "!", ">" , "<"] or "OR" in value["label"]:
+                if value["label"] in ["==", "><", "!", ">" , "<"] or "OR" in value["label"]:
                     edges["Art."].append(value.items())
                 elif not any(d["label"] == value["label"] for d in styles["edgestyle"]):
                     edges["default"].append(value.items())
