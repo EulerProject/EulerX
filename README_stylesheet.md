@@ -32,7 +32,8 @@ YAML/Json Stylesheet Format
 
 1- graphstyle:
 Graph attributes for dot file. Example:
- graph: "rankdir=TB\n labelloc=t\n labeljust=left\n fontsize=20\n label=\"Sample Graph\"\n"
+ graph: "rankdir=TB"
+ (if rankdir= LR, in the the "second" taxonomy source and target will be swapped with backward "isa" edges, so that the two taxonomies face each other) 
  subgraph: a switch for subgraph. Example:
     subgraph: "on"
   If the value of subgraph is “on”, nodes will be clustered based on their “group” in the output dot file. Anything other than “on” (e.g. “off”) means no subgraph in the output. 
@@ -42,7 +43,6 @@ wmap: a switch for penwidth scaling. The value "on" here means the penwidths in 
 wmin, wmax: range of penwidth
 
 Note: penwidth ("w") in the input graph is an optional key so if penwidth is not defined for an edge, when scaling the penwith values, the code assumes pendiwth of 1 for that edge. 
-
 2- nodestyle:
 Maps each “group” to a dot string. Example:
     '1': "shape=box style=\"filled,rounded\" color=black fillcolor=\"#CCFFCC\""
@@ -53,15 +53,13 @@ There are 3 options for showing label that are defined by assigning the followin
 (w)display: show penwidth as label
 “label”: show the label from data file 
 "[displaystring]": show the specified string as label (special caseL: "" means no label)
-
+ 
+ If the value of "penwidth" is on and "w" is defined in the datafile, the penwidth of edges is assigned accordingly. "w" is set to 1 if it is not defined in the data file.
 Example:
       label: "isa"
       dot: "style=solid color=black"
       display: "(w)display"
       
 Also, "(w)display" means apply the penwidth value
-
-
-
 “default” style will be applied if no style is defined for a node group or edge label. 
 
