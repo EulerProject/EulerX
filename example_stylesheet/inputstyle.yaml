@@ -1,8 +1,8 @@
   graphstyle: 
-    graph: "rankdir=BT\n"
+    graph: "rankdir=BT"
     subgraph: "off"
     legend: "on"
-    wmap: "on"
+    wmap: "off"
     wmin: "1"
     wmax: "5"
   nodestyle: 
@@ -12,21 +12,27 @@
   edgestyle: 
     - 
       label: "isa"
-      dot: "style=solid color=\"#000000\" constraint=true"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1"
       display: ""
+      penwidth: "off"
     - 
       label: "in"
-      dot: "style=solid color=\"#000000\" constraint=true"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1"
       display: ""
+      penwidth: "off"
     - 
       label: "out"
-      dot: "style=solid color=\"#000000\" constraint=true"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1"
       display: ""
+      penwidth: "off"
     - 
       label: "Art."
       dot: "style=dotted color=\"#AA00FF\" constraint=true penwidth=3"
       display: "label"
+      penwidth: "off"
     - 
       label: "default"
-      dot: "style=dotted color=\"#AA00FF\" constraint=true"
+      dot: "style=dotted color=\"#AA00FF\" constraint=true penwidth=1"
       display: "label"
+      penwidth: "off"
+
