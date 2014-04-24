@@ -74,11 +74,18 @@ def apply_style(data_file, f):
             f.write("}\n")
     glabel = glabel + '<TR> <TD COLSPAN="2"><font face = "Arial Black"> Edges </font></TD> </TR> \n'  
     for l in edges:
+<<<<<<< local
+        style = (item for item in styles["edgestyle"] if item["label"] == l).next()
+        #for item in styles["edgestyle"]:
+        #    if item["label"] == l:
+        #        style = item
+=======
         if l in nodes:
             label = "isa"
         else:
             label = l 
         style = (item for item in styles["edgestyle"] if item["label"] == label).next()
+>>>>>>> other
         f.write("edge["+ style["dot"] +"]\n")
         color = style["dot"]. split ("color=")[1].split(" ")[0]
         if l in nodes:
