@@ -126,6 +126,7 @@ def apply_style(data_file, f):
         f.write(mapp)
         f.write("</TABLE> \n >] } \n")       
     f.write("}") 
+    f.close()
 def parse_options():
 	# parse options
 	parser = optparse.OptionParser(usage = "%prog [options]", version = "%prog 0.1")
