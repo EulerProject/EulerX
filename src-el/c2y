@@ -2,6 +2,7 @@
 
 import sys
 import yaml
+from random import randint
 
 def add_edge(s,t,label):
         edge = {}
@@ -13,6 +14,7 @@ def add_node(concept, group):
         node = {}
         node.update({"concept": concept})
         node.update({"group": group})
+        node.update({"name": "test" + str(randint(0,100))})
         if group!="(+)":
             nodes.update({group + "." + concept: node})
         else:
