@@ -78,18 +78,11 @@ def apply_style(data_file, f):
             f.write("}\n")
     glabel = glabel + '<TR> <TD COLSPAN="2"><font face = "Arial Black"> Edges </font></TD> </TR> \n'  
     for l in edges:
-<<<<<<< local
-        style = (item for item in styles["edgestyle"] if item["label"] == l).next()
-        #for item in styles["edgestyle"]:
-        #    if item["label"] == l:
-        #        style = item
-=======
         if l in nodes:
             label = "isa"
         else:
             label = l 
         style = (item for item in styles["edgestyle"] if item["label"] == label).next()
->>>>>>> other
         f.write("edge["+ style["dot"] +"]\n")
         color = style["dot"]. split ("color=")[1].split(" ")[0]
         if l in nodes:
@@ -132,8 +125,7 @@ def apply_style(data_file, f):
         f.write('{rank=source Mapping [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
         f.write(mapp)
         f.write("</TABLE> \n >] } \n")       
-    f.write("}")            
-    f.close()
+    f.write("}") 
 def parse_options():
 	# parse options
 	parser = optparse.OptionParser(usage = "%prog [options]", version = "%prog 0.1")
