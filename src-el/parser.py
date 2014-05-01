@@ -74,7 +74,9 @@ class EulerParser:
             inst.add_option("-I", action="store_true", dest="incEx", default=False,\
                                   help="generate an inconsistent example, used with -g")
             inst.add_option("--iv", action="store_true", dest="inputViz", default=False,\
-                                    help="input visualization")
+                                  help="input visualization")
+            inst.add_option("--simpall", action="store_true", dest="simpAllView", default=False,\
+                                  help="simplify the pw aggregate view")
 	return inst
 
     instance = Callable(instance)
