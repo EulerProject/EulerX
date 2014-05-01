@@ -50,6 +50,8 @@ class TaxonomyMapping:
         self.npw = 0                           # # of pws
         self.pwflag = True                     # Whether to output pw
         self.fixedCnt = 0                      # # of fixes /repairs
+        self.inputVizNodes = {}                # nodes for input visualization 
+        self.inputVizEdges = {}                # edges for input visualization
         self.options = options
         if self.options.ieo:
             self.options.ie = True
@@ -1581,6 +1583,7 @@ class TaxonomyMapping:
         file = open(os.path.join(self.options.inputdir, self.options.inputfile), 'r')
         lines = file.readlines()
         flag = ""
+        
         for line in lines:
 
             if (re.match("taxonomy", line)):
@@ -1597,6 +1600,10 @@ class TaxonomyMapping:
                   
                 self.taxonomies[taxonomy.abbrev] = taxonomy
                 flag = "taxonomy"
+                
+                # for input viz
+#                groups = []
+                
 
             elif (re.match("location", line)):
                 flag = "location"
@@ -1996,7 +2003,31 @@ class TaxonomyMapping:
             rels[i][3] = newColor
         # write to dot file
         fAllDot = open(self.options.outputdir+self.name+"_all.dot", 'a')
-        for [T1, T2, cnt, color] in rels:
-            fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",penwidth=" + str(cnt) + ",color=\"" + color + "\"];\n")
+        if self.options.simpAllView:
+            for [T1, T2, cnt, color] in rels:
+                if cnt == numOfPws:
+                    fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",color=\"#FF0000\"];\n")
+                else:
+                    fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",color=\"#00FF00\"];\n")
+        else:
+            for [T1, T2, cnt, color] in rels:
+                fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",penwidth=" + str(cnt) + ",color=\"" + color + "\"];\n")
         fAllDot.write("}\n")
-        fAllDot.close()            
+        fAllDot.close()
+        
+    def addInputVizNodes(self, concept, group):
+        node = {}
+        node.update({"concept": concept})
+        node.update({"group": group})
+        node.update({"name": "test" + str(randint(0,100))})
+        if group != "(+)":
+            self.inputVizNodes.update({group + "." + concept: node})
+        else:
+            self.inputVizNodes.update({concept: node})
+    
+    def addInputVizEdge(self, s, t, label):
+        edge = {}
+        edge.update({"s" : s})
+        edge.update({"t" : t})
+        edge.update({"label" : label})
+        self.inputVizEdges.update({s + "_" + t : edge})
