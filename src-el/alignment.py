@@ -1714,14 +1714,14 @@ class TaxonomyMapping:
             elems = re.match("(.*)_not_(.*)", dlvName)
             conc1 = re.match("c(.*)_(.*)", elems.group(1))
             conc2 = re.match("c(.*)_(.*)", elems.group(2))
-            return conc1.group(1) + "." + conc1.group(2) + "*~"\
+            return conc1.group(1) + "." + conc1.group(2) + "\\\\"\
                   +conc2.group(1) + "." + conc2.group(2)
         elif(dlvName.find("not_") != -1):
             elems = re.match("not_(.*)__(.*)", dlvName)
             conc1 = re.match("c(.*)_(.*)", elems.group(1))
             conc2 = re.match("c(.*)_(.*)", elems.group(2))
-            return "~" + conc1.group(1) + "." + conc1.group(2) + "*"\
-                  +conc2.group(1) + "." + conc2.group(2)
+            return conc2.group(1) + "." + conc2.group(2) + "\\\\"\
+                  +conc1.group(1) + "." + conc1.group(2)
         elif(dlvName.find("__") != -1):
             elems = re.match("(.*)__(.*)", dlvName)
             conc1 = re.match("c(.*)_(.*)", elems.group(1))
