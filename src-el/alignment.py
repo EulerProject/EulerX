@@ -14,12 +14,14 @@ import inspect
 import itertools
 import threading
 import StringIO
+import yaml
 from taxonomy import * 
 from alignment import * 
 #from redWind import *
 from template import *
 from helper import *
 from inputViz import *
+from random import randint
 
 class TaxonomyMapping:
 
@@ -86,6 +88,8 @@ class TaxonomyMapping:
         self.iefile = os.path.join(options.outputdir, self.name+"_ie.dot")
         self.iepdf = os.path.join(options.outputdir, self.name+"_ie.pdf")
         self.ivpdf = os.path.join(options.outputdir, self.name+"_iv.pdf")
+        self.iv2dot = os.path.join(options.outputdir, self.name+".dot")
+        self.iv2pdf = os.path.join(options.outputdir, self.name+".pdf")
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             # possible world command
@@ -1584,6 +1588,10 @@ class TaxonomyMapping:
         lines = file.readlines()
         flag = ""
         
+        # used for input viz
+        group2concepts = {}
+        art = []
+        
         for line in lines:
 
             if (re.match("taxonomy", line)):
@@ -1600,11 +1608,9 @@ class TaxonomyMapping:
                   
                 self.taxonomies[taxonomy.abbrev] = taxonomy
                 flag = "taxonomy"
-                
-                # for input viz
-#                groups = []
-                
+                groups = []     # used for input viz
 
+                
             elif (re.match("location", line)):
                 flag = "location"
               
@@ -1616,12 +1622,16 @@ class TaxonomyMapping:
             elif (re.match("\(.*\)", line)):
                 if flag == "taxonomy":
                     taxonomy.addTaxaWithList(self, line)
+                    groups.append(re.match("\((.*)\)", line).group(1).split(" "))
                 elif flag == "location":
                     self.addLocation(line)
                 elif flag == "temporal":
                     self.addTemporal(line)
                 else:
                     None
+                    
+            elif (re.match("\s", line)):
+                group2concepts.update({taxonomy.abbrev : groups})
 
             elif (re.match("articulation", line)):
                 self.basetr = self.tr
@@ -1630,6 +1640,8 @@ class TaxonomyMapping:
             elif (re.match("\[.*?\]", line)):
                 inside = re.match("\[(.*)\]", line).group(1)
                 self.addArticulation(inside)
+                art.append(re.match("\[(.*)\]", line).group(1)) # used for input viz
+                
                 # self.articulations += [Articulation(inside, self)]
 		# if inside.find("{") != -1:
 		#     r = re.match("(.*) \{(.*)\} (.*)", inside)
@@ -1657,7 +1669,10 @@ class TaxonomyMapping:
                # hyp = hypElements[1]
                # hypArticulation = Articulation(hyp, self)
                # self.hypothesis = hypArticulation
-                   
+            
+        # used for input viz
+        self.inputVisualization(group2concepts, art)
+                           
         return True              
 
     def addArticulation(self, artStr):
@@ -2015,7 +2030,7 @@ class TaxonomyMapping:
         fAllDot.write("}\n")
         fAllDot.close()
         
-    def addInputVizNodes(self, concept, group):
+    def addInputVizNode(self, concept, group):
         node = {}
         node.update({"concept": concept})
         node.update({"group": group})
@@ -2031,3 +2046,67 @@ class TaxonomyMapping:
         edge.update({"t" : t})
         edge.update({"label" : label})
         self.inputVizEdges.update({s + "_" + t : edge})
+        
+    def inputVisualization(self, group2concepts, art):
+        art2symbol = {"equals":"==","is_included_in":"<","includes":">","overlaps":"><","disjoint":"!"}
+        
+        for key, attr in group2concepts.iteritems():
+            for value in attr:
+                parent = value.pop(0)
+                self.addInputVizNode(parent, key)
+                for v in value:
+                    self.addInputVizNode(v, key)
+                    self.addInputVizEdge(key + "." + v, key + "." + parent, "isa")
+        
+        for a in art:
+            a = a.replace("3sum", "sum")
+            a = a.replace ("4sum", "sum")
+            a = a.replace("3diff", "diff")
+            a = a.replace ("4diff", "diff")
+        
+            if "{" in a:
+                start = a.split(" {")[0]
+                end = a.split("} ")[-1]
+                ops = a.split("{", 1)[1].split("}")[0].split(" ")
+                label = art2symbol.get(ops[0], ops[0])
+                for i in range(1,len(ops)):
+                    label = label + " OR " + art2symbol.get(ops[i], ops[i])
+                self.addInputVizEdge(start, end, label)
+            else:
+                if any(l in a for l in ["lsum", "ldiff"]):
+                    if "lsum" in a:
+                        l = "lsum"
+                        op = "+"
+                    else:
+                        l = "ldiff"
+                        op = "-"
+                    plus = a.split(l + " ")[-1].replace(".","") + op
+                    self.addInputVizNode(plus, "(+)")
+                    self.addInputVizEdge(plus, a.split(" " + l + " ")[-1], "out")
+                    for i in range(0,len(a.split(" " + l)[0].split(" "))):
+                        self.addInputVizEdge(a.split(" " + l)[0].split(" ")[i], plus, "in")
+                elif any(l in a for l in ["rsum", "rdiff"]):
+                    if "rsum" in a:
+                        l = "rsum"
+                        op = "+"
+                    else:
+                        l= "rdiff"
+                        op = "-"
+                    plus = a.split(" " + l)[0].replace(".","") + op
+                    self.addInputVizNode(plus, "(+)")
+                    self.addInputVizEdge(plus, a.split(" " + l + " ")[0], "out")
+                    for i in range(1,len(a.split(" " + l)[-1].split(" "))):
+                        self.addInputVizEdge(a.split(" " + l)[-1].split(" ")[i], plus,"in")
+                else:
+                    self.addInputVizEdge(a.split(" ")[0], a.split(" ")[2], art2symbol.get(a.split(" ")[1], a.split(" ")[1]))
+                
+        # create the yaml file
+        fInputVizYaml = open(self.options.outputdir+self.name+".yaml", 'w')
+        fInputVizYaml.write(yaml.safe_dump(self.inputVizNodes, default_flow_style=False))
+        fInputVizYaml.write(yaml.safe_dump(self.inputVizEdges, default_flow_style=False))
+        fInputVizYaml.close()        
+        
+        # apply the inputviz stylesheet
+        commands.getoutput("cat "+self.options.outputdir+self.name+".yaml"+" | y2d -s "+self.options.stylesheetdir+"inputstyle.yaml" + ">" + self.iv2dot)
+        commands.getoutput("dot -Tpdf "+self.iv2dot+" -o "+self.iv2pdf)
+        
