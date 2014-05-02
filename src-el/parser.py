@@ -32,6 +32,8 @@ class EulerParser:
                                   help="input directory, by default ./")
             inst.add_option("-o", dest="outputdir", default="./",\
                                   help="output directory, by default ./")
+            inst.add_option("-s", dest="stylesheetdir", default="../../example_stylesheet/",\
+                                  help="stylesheet directory, by default example_stylesheet/")
             inst.add_option("-e", dest="encode", default=0, \
                                   help="encoding, e.g. mnpw, drpw, dlpw, etc.")
             inst.add_option("-b", dest="dl", default=2, help="dl encoding spare parameter")
