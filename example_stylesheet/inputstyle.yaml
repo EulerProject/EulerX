@@ -1,7 +1,8 @@
   graphstyle: 
-    graph: "rankdir=BT"
+    graph: "rankdir=LR"
     subgraph: "off"
-    legend: "on"
+    legend: "off"
+    mapping: "off"
     wmap: "off"
     wmin: "1"
     wmax: "5"

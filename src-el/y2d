@@ -33,7 +33,7 @@ def apply_style(data_file, f):
     #separate nodes from edges
         for key, value in data.iteritems():
             if "group" in data[key]:
-                nodes[data[key]["group"]].append(data[key]["concept"])
+                nodes[data[key]["group"]].append(value.items())
             elif "label" in data[key]:
                 if "w" in data[key]:
                     wList.append(data[key]["w"])
@@ -49,7 +49,10 @@ def apply_style(data_file, f):
                 else:
                     edges[data[key]["label"]].append(value.items())
     glabel = '<TR> <TD COLSPAN="2"><font face="Arial Black"> Nodes</font></TD> </TR> \n'
+    mapp = ""
     for g in nodes:
+        if (g!= "common" and g!= "(+)"):
+            mapp = mapp + '<TR> <TD COLSPAN="2"><font face="Arial Black"> Taxonomy' + g + '</font></TD> </TR> \n'
     # if the style is not defined use the default
         if (styles["graphstyle"]["subgraph"] == "on" and g!="(+)"):
             f.write("subgraph cluster" + g + '{ style=invis\n')
@@ -62,30 +65,24 @@ def apply_style(data_file, f):
         f.write("node[" + styles["nodestyle"][group] + '] \n')
         for n in nodes[g]:
             if (g!= "common" and g!= "(+)"):
-               f.write('"'+ g + "." + n + '"\n')
+               f.write('"'+ g + "." + n[0][1]+ '"\n')
+               mapp = mapp + "<TR> \n <TD bgcolor=" + color + ">" + g + "." + n[0][1] + "</TD> \n <TD>" + n[2][1] + "</TD> \n </TR> \n"
             else:
-                f.write('"'+ n + '"')
-                if "+" in n:
+                f.write('"'+ n[0][1] + '"')
+                if "+" in n[0][1]:
                     f.write(' [label="+"]')
-                elif "-" in n:
+                elif "-" in n[0][1]:
                     f.write(' [label="-"]')
                 f.write("\n")
         if (styles["graphstyle"]["subgraph"] == "on" and g != "(+)"):
             f.write("}\n")
     glabel = glabel + '<TR> <TD COLSPAN="2"><font face = "Arial Black"> Edges </font></TD> </TR> \n'  
     for l in edges:
-<<<<<<< local
-        style = (item for item in styles["edgestyle"] if item["label"] == l).next()
-        #for item in styles["edgestyle"]:
-        #    if item["label"] == l:
-        #        style = item
-=======
         if l in nodes:
             label = "isa"
         else:
             label = l 
         style = (item for item in styles["edgestyle"] if item["label"] == label).next()
->>>>>>> other
         f.write("edge["+ style["dot"] +"]\n")
         color = style["dot"]. split ("color=")[1].split(" ")[0]
         if l in nodes:
@@ -94,18 +91,20 @@ def apply_style(data_file, f):
             label = l
         glabel = glabel + "<TR> \n <TD><font color =" + color + ">" + label + "</font></TD> \n <TD>" + str(len(edges[l])) + "</TD> \n </TR> \n"
         for e in edges[l]:
-            if (styles["graphstyle"]["graph"].split("rankdir=")[1] == "LR" and l == edges["Art."][0][0][1].split(".")[0]) or (e[2][1] == ">"):
+            source = edges["Art."][0][0][1].split(".")[0]
+            if (styles["graphstyle"]["graph"].split("rankdir=")[1] == "LR" and l == source) or (l=="out" and e[1][1].split(".")[0] == source) or (l == "in" and e[0][1].split(".")[0] != source):
                 f.write('"' + e[1][1] + '" -> "' + e[0][1] + '"')
                 f.write(" [dir=back]")
             else:
-                f.write('"' + e[0][1] + '" -> "' + e[1][1] + '"')
+               f.write('"' + e[0][1] + '" -> "' + e[1][1] + '"')
             if any("w" in edge for edge in e):
-            # if w is not defined in the input
+            # if w is defined in the input
                 w = e[2][1]
             else:
                 w = 1
             if styles["graphstyle"]["wmap"] == "on":
                 w = str(scale(int(w), int(min(wList)), int(max(wList)), int(styles["graphstyle"]["wmin"]), int(styles["graphstyle"]["wmax"])))
+
             if style["display"] == "(w)display":
                 f.write(' [label="' + w + '"]')
         # check options for displaying label
@@ -117,11 +116,16 @@ def apply_style(data_file, f):
                 f.write('[penwidth=' + str(w) + "]")
             f.write("\n")
     if styles["graphstyle"]["legend"] == "on":
-        f.write("node[shape=box]")
+        f.write("node[shape=box] \n")
         f.write('{rank=min Legend [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
         f.write(glabel)
         f.write("</TABLE> \n >] } \n")
-    f.write("}")            
+
+    if styles["graphstyle"]["mapping"] == "on":
+        f.write('{rank=source Mapping [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
+        f.write(mapp)
+        f.write("</TABLE> \n >] } \n")       
+    f.write("}") 
     f.close()
 def parse_options():
 	# parse options
