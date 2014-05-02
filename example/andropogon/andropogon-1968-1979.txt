@@ -1,0 +1,14 @@
+taxonomy 1 Taxonomy1
+(31 32)
+
+taxonomy 2 Taxonomy2
+(33 34 35 38)
+(35 36 37)
+
+articulation tw1 tw1
+[1.31 equals 1.32]
+[1.31 equals 2.33]
+[1.32 includes 2.34]
+[1.32 includes 2.35]
+[1.32 includes 2.38]
+[1.32 r3sum 2.34 2.35 2.38]

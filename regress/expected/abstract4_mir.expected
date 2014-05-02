@@ -1,0 +1,25 @@
+1.a,2.a,inferred,{=, <}
+1.a,2.b,input,>
+1.a,2.d,input,>
+1.a,2.g,inferred,{>, ><}
+1.a,2.f,inferred,{>, ><}
+1.c,2.a,inferred,<
+1.c,2.b,input,!
+1.c,2.d,input,!
+1.c,2.g,inferred,{!, ><}
+1.c,2.f,inferred,{<, ><}
+1.b,2.a,inferred,<
+1.b,2.b,input,=
+1.b,2.d,input,!
+1.b,2.g,input,!
+1.b,2.f,input,!
+1.e,2.a,inferred,<
+1.e,2.b,input,!
+1.e,2.d,input,!
+1.e,2.g,inferred,{=, ><}
+1.e,2.f,inferred,{!, ><}
+1.d,2.a,inferred,<
+1.d,2.b,input,!
+1.d,2.d,input,=
+1.d,2.g,input,!
+1.d,2.f,input,!
