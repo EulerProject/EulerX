@@ -29,11 +29,7 @@ art2symbol = {"equals":"==",
               "disjoint":"!"}
 art = []
 dictionary = {}  # group number and list of nodes in the group
-<<<<<<< local
-f = open("in.txt","r") 
-=======
 f = sys.stdin
->>>>>>> other
 for line in f.readlines():
     if line.startswith("taxonomy"):
        groups = []
