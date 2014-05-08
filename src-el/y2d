@@ -41,11 +41,11 @@ def apply_style(data_file, f):
                     wList.append("1")
                 if value["label"] in ["==", "><", "!", ">" , "<"] or "OR" in value["label"]:
                     edges["Art."].append(value.items())
-                elif not any(d["label"] == value["label"] for d in styles["edgestyle"]):
-                    edges["default"].append(value.items())
                 elif value["label"] == "isa":
                     # separate "isa" edges based on their group
-                    edges[value["s"].split(".")[0]].append(value.items())                   
+                    edges[value["s"].split(".")[0]].append(value.items())
+                elif not any(d["label"] == value["label"] for d in styles["edgestyle"]):
+                    edges["default"].append(value.items())
                 else:
                     edges[data[key]["label"]].append(value.items())
     glabel = '<TR> <TD COLSPAN="2"><font face="Arial Black"> Nodes</font></TD> </TR> \n'
@@ -76,23 +76,28 @@ def apply_style(data_file, f):
                 f.write("\n")
         if (styles["graphstyle"]["subgraph"] == "on" and g != "(+)"):
             f.write("}\n")
-    glabel = glabel + '<TR> <TD COLSPAN="2"><font face = "Arial Black"> Edges </font></TD> </TR> \n'  
+    glabel = glabel + '<TR> <TD COLSPAN="2"><font face = "Arial Black"> Edges </font></TD> </TR> \n'
+    # source nodes in articulations
+    sources = set()
+    for e in edges["Art."]:
+        sources.update(e[0][1].split(".")[0])
     for l in edges:
         if l in nodes:
             label = "isa"
         else:
-            label = l 
+            label = l
+        if not any(d["label"] == label for d in styles["edgestyle"]):
+            label = "default" 
         style = (item for item in styles["edgestyle"] if item["label"] == label).next()
         f.write("edge["+ style["dot"] +"]\n")
         color = style["dot"]. split ("color=")[1].split(" ")[0]
         if l in nodes:
-            label = "isa_" + l
+            lbl = "isa_" + l
         else:
-            label = l
-        glabel = glabel + "<TR> \n <TD><font color =" + color + ">" + label + "</font></TD> \n <TD>" + str(len(edges[l])) + "</TD> \n </TR> \n"
+            lbl = l
+        glabel = glabel + "<TR> \n <TD><font color =" + color + ">" + lbl + "</font></TD> \n <TD>" + str(len(edges[l])) + "</TD> \n </TR> \n"
         for e in edges[l]:
-            source = edges["Art."][0][0][1].split(".")[0]
-            if (styles["graphstyle"]["graph"].split("rankdir=")[1] == "LR" and l == source) or (l=="out" and e[1][1].split(".")[0] == source) or (l == "in" and e[0][1].split(".")[0] != source):
+            if (styles["graphstyle"]["face2face"] == "on" and l in sources) or (l=="out" and e[1][1].split(".")[0] in sources) or (l == "in" and e[0][1].split(".")[0] not in sources):
                 f.write('"' + e[1][1] + '" -> "' + e[0][1] + '"')
                 f.write(" [dir=back]")
             else:
@@ -104,13 +109,12 @@ def apply_style(data_file, f):
                 w = 1
             if styles["graphstyle"]["wmap"] == "on":
                 w = str(scale(int(w), int(min(wList)), int(max(wList)), int(styles["graphstyle"]["wmin"]), int(styles["graphstyle"]["wmax"])))
-
             if style["display"] == "(w)display":
                 f.write(' [label="' + w + '"]')
         # check options for displaying label
             elif (style["display"] == "label"):
                 f.write(' [label="' + e[-1][1] + '"]')
-            elif style["display"] !="":
+            elif style["display"] != "":
                 f.write(' [label="' + style["display"] + '"]')
             if style["penwidth"] == "on":
                 f.write('[penwidth=' + str(w) + "]")
@@ -122,10 +126,11 @@ def apply_style(data_file, f):
         f.write("</TABLE> \n >] } \n")
 
     if styles["graphstyle"]["mapping"] == "on":
+        f.write("node[shape=box] \n")
         f.write('{rank=source Mapping [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
         f.write(mapp)
         f.write("</TABLE> \n >] } \n")       
-    f.write("}") 
+    f.write("}")            
     f.close()
 def parse_options():
 	# parse options
