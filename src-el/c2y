@@ -29,14 +29,18 @@ art2symbol = {"equals":"==",
               "disjoint":"!"}
 art = []
 dictionary = {}  # group number and list of nodes in the group
+<<<<<<< local
+f = open("in.txt","r") 
+=======
 f = sys.stdin
+>>>>>>> other
 for line in f.readlines():
     if line.startswith("taxonomy"):
        groups = []
        g = line.split(" ")[1]
     if line.startswith("("):
         groups.append(line[1:-2].split(" "))
-    if line =="\n":
+    if line ==  "\n":
             dictionary.update({g : groups})
     if line.startswith("["):
         art.append (line[1:-2])
@@ -85,8 +89,10 @@ for a in art:
             add_edge(plus, a.split(" " + l + " ")[0], "out")
             for i in range(1,len(a.split(" " + l)[-1].split(" "))):
                 add_edge(a.split(" " + l)[-1].split(" ")[i], plus,"in")
+       # elif a.split(" ")[1] == "includes":
+#                add_edge(a.split(" ")[2], a.split(" ")[0], art2symbol.get("is_included_in"))
         else:
-            add_edge(a.split(" ")[0], a.split(" ")[2], art2symbol.get(a.split(" ")[1], a.split(" ")[1]))
+                add_edge(a.split(" ")[0], a.split(" ")[2], art2symbol.get(a.split(" ")[1], a.split(" ")[1]))
 f.close()
 with sys.stdout as outfile:
    outfile.write(yaml.safe_dump(nodes, default_flow_style=False))

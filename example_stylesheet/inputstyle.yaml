@@ -1,7 +1,8 @@
   graphstyle: 
     graph: "rankdir=LR"
-    subgraph: "off"
-    legend: "off"
+    face2face: "on"
+    subgraph: "on"
+    legend: "on"
     mapping: "off"
     wmap: "off"
     wmin: "1"
@@ -33,6 +34,11 @@
       penwidth: "off"
     - 
       label: "default"
-      dot: "style=dotted color=\"#AA00FF\" constraint=true penwidth=1"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1"
       display: "label"
+      penwidth: "off"
+    - 
+      label: "=="
+      dot: "style=dotted color=\"#AA00FF\" constraint=true penwidth=3"
+      display: "="
       penwidth: "off"
