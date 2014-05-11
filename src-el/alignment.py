@@ -669,13 +669,13 @@ class TaxonomyMapping:
             
         # Node Coloring
         for [T1, T2, P] in self.tr:
-            if(T1.find("*") == -1 and T1.find("\\n") == -1 and T1.find(".") != -1):
+            if(T1.find("*") == -1 and T1.find("\\") == -1 and T1.find("\\n") == -1 and T1.find(".") != -1):
                 T1s = T1.split(".")
                 if tmpTax == T1s[0]: taxa1 += "  \""+T1+"\"\n"
                 else: taxa2 += "  \""+T1+"\"\n"
             else:
                 tmpCom += "  \""+T1+"\"\n"
-            if(T2.find("*") == -1 and T2.find("\\n") == -1 and T2.find(".") != -1):
+            if(T2.find("*") == -1 and T2.find("\\") == -1 and T2.find("\\n") == -1 and T2.find(".") != -1):
                 T2s = T2.split(".")
                 if tmpTax == T2s[0]: taxa1 += "  \""+T2+"\"\n"
                 else: taxa2 += "  \""+T2+"\"\n"

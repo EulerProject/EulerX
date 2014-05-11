@@ -85,6 +85,8 @@ class Articulation:
                 elements = re.match("(.*)\.(.*) {(.*)} (.*)\.(.*)", initInput)
             else:
                 elements = re.match("(.*)\.(.*) (.*) (.*)\.(.*)", initInput)
+            if elements is None:
+                raise Exception("Syntax error in \""+initInput+"\"!!")
             
             taxon1taxonomy = elements.group(1)
             taxon1taxon = elements.group(2)
