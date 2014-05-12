@@ -533,8 +533,6 @@ class TaxonomyMapping:
         taxa1 = ""     # cache of taxa in the first taxonomy
         taxa2 = ""     # cache of taxa in the second taxonomy
 
-        tmpTax = ""   # First taxonomy name, actually it really doesn't
-                      # matter which one is the first one
         alias = {}
         
         # Equalities
@@ -545,8 +543,6 @@ class TaxonomyMapping:
             tmpStr = ""
 #            blueNode = False
             T1s = T1.split(".")
-            # First taxonomy name
-            if tmpTax == "": tmpTax = self.firstTName
             for T2 in self.eq[T1]:
                 T2s = T2.split(".")
 #                if(T1s[1] == T2s[1]):
@@ -557,7 +553,7 @@ class TaxonomyMapping:
                 tmpStr = T2 + tmpStr
             if tmpStr != "":
                 tmpStr = "\\n" + tmpStr + "\\n"
-#                if tmpStr.split(".")[0]  == tmpTax:
+#                if tmpStr.split(".")[0]  == self.firstTName:
 #                    tmpStr = tmpStr + "\\n"
 #                else:
 #                    tmpStr = "\\n" + tmpStr
@@ -566,7 +562,7 @@ class TaxonomyMapping:
 #                # fDot.write("\"" + tmpStr +"\" [color=blue];\n")
 #                # fAllDot.write("\"" + tmpStr +"\" [color=blue];\n")
 #            else:
-            if T1s[0] == tmpTax:
+            if T1s[0] == self.firstTName:
                 tmpStr = T1 + tmpStr
             else:
                 tmpStr = tmpStr + T1
@@ -671,13 +667,13 @@ class TaxonomyMapping:
         for [T1, T2, P] in self.tr:
             if(T1.find("*") == -1 and T1.find("\\") == -1 and T1.find("\\n") == -1 and T1.find(".") != -1):
                 T1s = T1.split(".")
-                if tmpTax == T1s[0]: taxa1 += "  \""+T1+"\"\n"
+                if self.firstTName == T1s[0]: taxa1 += "  \""+T1+"\"\n"
                 else: taxa2 += "  \""+T1+"\"\n"
             else:
                 tmpCom += "  \""+T1+"\"\n"
             if(T2.find("*") == -1 and T2.find("\\") == -1 and T2.find("\\n") == -1 and T2.find(".") != -1):
                 T2s = T2.split(".")
-                if tmpTax == T2s[0]: taxa1 += "  \""+T2+"\"\n"
+                if self.firstTName == T2s[0]: taxa1 += "  \""+T2+"\"\n"
                 else: taxa2 += "  \""+T2+"\"\n"
             else:
                 tmpCom += "  \""+T2+"\"\n"
