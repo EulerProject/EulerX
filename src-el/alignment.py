@@ -15,6 +15,7 @@ import itertools
 import threading
 import StringIO
 import yaml
+import string
 from taxonomy import * 
 from alignment import * 
 #from redWind import *
@@ -532,6 +533,9 @@ class TaxonomyMapping:
         tmpCom = ""    # cache of combined taxa
         taxa1 = ""     # cache of taxa in the first taxonomy
         taxa2 = ""     # cache of taxa in the second taxonomy
+        tmpComLi = [] # cache of list of combined taxa for --rcgo option in RCG
+        replace1 = "" # used for replace combined concept in --rcgo option in RCG
+        replace2 = "" # used for replace combined concept in --rcgo option in RCG
 
         alias = {}
         
@@ -634,7 +638,8 @@ class TaxonomyMapping:
         for T in self.eqConLi:
             #for [T1, T2, P] in tmpTr:
             #    if T == T1 or T == T2:
-                    tmpCom += "  \""+T+"\"\n"      
+            tmpComLi.append(T)
+            tmpCom += "  \""+T+"\"\n"      
             
         # Duplicates
     	tmpTr = list(self.tr)
@@ -670,12 +675,14 @@ class TaxonomyMapping:
                 if self.firstTName == T1s[0]: taxa1 += "  \""+T1+"\"\n"
                 else: taxa2 += "  \""+T1+"\"\n"
             else:
+                tmpComLi.append(T1)
                 tmpCom += "  \""+T1+"\"\n"
             if(T2.find("*") == -1 and T2.find("\\") == -1 and T2.find("\\n") == -1 and T2.find(".") != -1):
                 T2s = T2.split(".")
                 if self.firstTName == T2s[0]: taxa1 += "  \""+T2+"\"\n"
                 else: taxa2 += "  \""+T2+"\"\n"
             else:
+                tmpComLi.append(T2)
                 tmpCom += "  \""+T2+"\"\n"
         fDot.write("  node [shape=box style=\"filled\" fillcolor=\"#CCFFCC\"]\n")
         fDot.write(taxa1)
@@ -703,9 +710,20 @@ class TaxonomyMapping:
             fDot.write("  subgraph ig {\nedge [dir=none, style=dashed, color=blue, constraint=false]\n\n")
             oskiplist = []
             for key in self.mir.keys():
-                if key not in oskiplist and self.mir[key] == rcc5["overlaps"]:
+                if self.mir[key] == rcc5["overlaps"] and key not in oskiplist: # and key not in oskiplist
                     item = re.match("(.*),(.*)", key)
-                    fDot.write("     \"" + item.group(1) + "\" -> \"" + item.group(2) + "\"\n")
+                    replace1 = item.group(1)
+                    replace2 = item.group(2)
+                    for comb in tmpComLi:
+                        if item.group(1) in comb.split("\\n"):
+                            replace1 = comb
+                            break
+                    for comb in tmpComLi:
+                        if item.group(2) in comb.split("\\n"):
+                            replace2 = comb
+                            break                            
+#                    fDot.write("     \"" + item.group(1) + "\" -> \"" + item.group(2) + "\"\n")
+                    fDot.write("     \"" + replace1 + "\" -> \"" + replace2 + "\"\n")
                     # Skip the reverse pair for redundant edges
                     oskiplist.append(item.group(2)+","+item.group(1))
             fDot.write("  }\n")
