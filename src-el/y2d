@@ -51,7 +51,7 @@ def apply_style(data_file, f):
     glabel = '<TR> <TD COLSPAN="2"><font face="Arial Black"> Nodes</font></TD> </TR> \n'
     mapp = ""
     for g in nodes:
-        if (g!= "combo" and g!= "(+)"):
+        if (g!= "comb" and g!= "(+)"):
             mapp = mapp + '<TR> <TD COLSPAN="2"><font face="Arial Black"> Taxonomy' + g + '</font></TD> </TR> \n'
     # if the style is not defined use the default
         if (styles["graphstyle"]["subgraph"] == "on" and g!="(+)"):
@@ -64,7 +64,7 @@ def apply_style(data_file, f):
         glabel = glabel + "<TR> \n <TD bgcolor=" + color + ">" + g + "</TD> \n <TD>" + str(len(nodes[g])) + "</TD> \n </TR> \n"
         f.write("node[" + styles["nodestyle"][group] + '] \n')
         for n in nodes[g]:
-            if (g!= "combo" and g!= "(+)"):
+            if (g!= "comb" and g!= "(+)"):
                f.write('"'+ g + "." + n[0][1]+ '"\n')
                mapp = mapp + "<TR> \n <TD bgcolor=" + color + ">" + g + "." + n[0][1] + "</TD> \n <TD>" + n[2][1] + "</TD> \n </TR> \n"
             else:
