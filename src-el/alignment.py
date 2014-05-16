@@ -53,8 +53,10 @@ class TaxonomyMapping:
         self.npw = 0                           # # of pws
         self.pwflag = True                     # Whether to output pw
         self.fixedCnt = 0                      # # of fixes /repairs
-        self.inputVizNodes = {}                # nodes for input visualization 
-        self.inputVizEdges = {}                # edges for input visualization
+        self.inputVizNodes = {}                # nodes for input visualization in stylesheet 
+        self.inputVizEdges = {}                # edges for input visualization in stylesheet
+        self.rcgVizNodes = {}                  # nodes for rcg visualization in stylesheet
+        self.rcgVizEdges = {}                  # edges for rcg visualization in stylesheet
         self.options = options
         if self.options.ieo:
             self.options.ie = True
@@ -536,6 +538,8 @@ class TaxonomyMapping:
         tmpComLi = [] # cache of list of combined taxa for --rcgo option in RCG
         replace1 = "" # used for replace combined concept in --rcgo option in RCG
         replace2 = "" # used for replace combined concept in --rcgo option in RCG
+        rcgVizNodes = {} # used for rcg nodes visualization in stylesheet
+        rcgVizEdges = {} # used for rcg edges visualization in stylesheet
 
         alias = {}
         
@@ -668,22 +672,32 @@ class TaxonomyMapping:
             print "Transitive reduction:"
             print self.tr
             
-        # Node Coloring
+        # Node Coloring (Creating dot file, will be replaced by stylesheet processor)
         for [T1, T2, P] in self.tr:
             if(T1.find("*") == -1 and T1.find("\\") == -1 and T1.find("\\n") == -1 and T1.find(".") != -1):
                 T1s = T1.split(".")
-                if self.firstTName == T1s[0]: taxa1 += "  \""+T1+"\"\n"
-                else: taxa2 += "  \""+T1+"\"\n"
+                if self.firstTName == T1s[0]:
+                    taxa1 += "  \""+T1+"\"\n"               # used in old viz
+                else:
+                    taxa2 += "  \""+T1+"\"\n"
+                self.addRcgVizNode(T1s[1], T1s[0])          # used in stylesheet
             else:
                 tmpComLi.append(T1)
                 tmpCom += "  \""+T1+"\"\n"
+                self.addRcgVizNode(T1, "comb")
             if(T2.find("*") == -1 and T2.find("\\") == -1 and T2.find("\\n") == -1 and T2.find(".") != -1):
                 T2s = T2.split(".")
-                if self.firstTName == T2s[0]: taxa1 += "  \""+T2+"\"\n"
-                else: taxa2 += "  \""+T2+"\"\n"
+                if self.firstTName == T2s[0]:
+                    taxa1 += "  \""+T2+"\"\n"
+                else:
+                    taxa2 += "  \""+T2+"\"\n"
+                self.addRcgVizNode(T2s[1], T2s[0])
             else:
                 tmpComLi.append(T2)
                 tmpCom += "  \""+T2+"\"\n"
+                self.addRcgVizNode(T2, "comb")
+                
+        # Dot drawing used for old viz
         fDot.write("  node [shape=box style=\"filled\" fillcolor=\"#CCFFCC\"]\n")
         fDot.write(taxa1)
         fDot.write("  node [shape=octagon style=\"filled\" fillcolor=\"#FFFFCC\"]\n")
@@ -700,12 +714,15 @@ class TaxonomyMapping:
         
         for [T1, T2, P] in self.tr:
     	    if(P == 0):
-    	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")
+    	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")       # used in old viz
+                self.addRcgVizEdge(T1, T2, "input")
     	    elif(P == 1):
     	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=red];\n")
+                self.addRcgVizEdge(T1, T2, "inferred")
     	    elif(P == 2):
                 if False:
                     fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
+                    self.addRcgVizEdge(T1, T2, "redundant")
         if self.options.rcgo:
             fDot.write("  subgraph ig {\nedge [dir=none, style=dashed, color=blue, constraint=false]\n\n")
             oskiplist = []
@@ -724,19 +741,30 @@ class TaxonomyMapping:
                             break                            
 #                    fDot.write("     \"" + item.group(1) + "\" -> \"" + item.group(2) + "\"\n")
                     fDot.write("     \"" + replace1 + "\" -> \"" + replace2 + "\"\n")
+                    self.addRcgVizEdge(replace1, replace2, "overlaps")
                     # Skip the reverse pair for redundant edges
                     oskiplist.append(item.group(2)+","+item.group(1))
             fDot.write("  }\n")
-        fDot.write("  subgraph cluster_lg {\n")
-        fDot.write("    rankdir = LR\n")
+        #fDot.write("  subgraph cluster_lg {\n")
+        #fDot.write("    rankdir = LR\n")
         #fDot.write("    label = \"Legend\";\n")
         #fDot.write("    A1 -> B1 [label=\"is included in (given)\" style=filled, color=black]\n")
         #fDot.write("    A2 -> B2 [label=\"is included in (inferred)\" style=filled, color=red]\n")
         #fDot.write("    A3 -> B3 [label=\"overlaps\" dir=none, style=dashed, color=blue]\n")
-        fDot.write("  }\n")
+        #fDot.write("  }\n")
         fDot.write("}\n")
         fDot.close()
         commands.getoutput("dot -Tpdf "+self.options.outputdir+fileName+".dot -o "+self.options.outputdir+fileName+".pdf")
+        
+        # create the yaml file
+        fRcgVizYaml = open(self.options.outputdir+fileName+".yaml", 'w')
+        fRcgVizYaml.write(yaml.safe_dump(self.rcgVizNodes, default_flow_style=False))
+        fRcgVizYaml.write(yaml.safe_dump(self.rcgVizEdges, default_flow_style=False))
+        fRcgVizYaml.close()
+        
+        # apply the rcgviz stylesheet
+#        commands.getoutput("cat "+self.options.outputdir+fileName+".yaml"+" | y2d -s "+self.options.stylesheetdir+"rcgstyle.yaml" + ">" + self.options.outputdir+fileName+".dot")
+
 
     def bottomupRemedy(self):
         first = True
@@ -2123,4 +2151,21 @@ class TaxonomyMapping:
         # apply the inputviz stylesheet
         commands.getoutput("cat "+self.options.outputdir+self.name+".yaml"+" | y2d -s "+self.options.stylesheetdir+"inputstyle.yaml" + ">" + self.iv2dot)
         commands.getoutput("dot -Tpdf "+self.iv2dot+" -o "+self.iv2pdf)
+
+    def addRcgVizNode(self, concept, group):
+        node = {}
+        node.update({"concept": concept})
+        node.update({"group": group})
+        node.update({"name": "test" + str(randint(0,100))})
+        self.rcgVizNodes.update({group + "." + concept: node})
+    
+    def addRcgVizEdge(self, s, t, label):
+        edge = {}
+        edge.update({"s" : s})
+        edge.update({"t" : t})
+        edge.update({"label" : label})
+        self.rcgVizEdges.update({s + "_" + t : edge})
+
+
+
         
