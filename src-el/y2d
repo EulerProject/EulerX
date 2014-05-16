@@ -84,10 +84,6 @@ def apply_style(data_file, f):
     for l in edges:
         if l in nodes:
             label = "isa"
-        elif l== "Art.":
-            for e in edges[l]:
-                if any(d["label"] == e[-1][1] for d in styles["edgestyle"]):
-                    label = e[-1][1]
         else:
             label = l
         if not any(d["label"] == label for d in styles["edgestyle"]):
