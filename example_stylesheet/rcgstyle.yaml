@@ -15,21 +15,21 @@
   edgestyle: 
     - 
       label: "input"
-      dot: "style=solid color=\"#000000\" constraint=true penwidth=1"
+      dot: "arrowhead=normal style=solid color=\"#000000\" constraint=true penwidth=1"
       display: ""
       penwidth: "off"
     - 
       label: "inferred"
-      dot: "style=solid color=\"#FF0000\" constraint=true penwidth=1"
+      dot: "arrowhead=normal style=solid color=\"#FF0000\" constraint=true penwidth=1"
       display: ""
       penwidth: "off"
     - 
       label: "overlaps"
-      dot: "style=dotted color=\"#0000FF\" constraint=true penwidth=1"
+      dot: "arrowhead=none style=dotted color=\"#0000FF\" constraint=true penwidth=1"
       display: ""
       penwidth: "off"
     - 
       label: "redundant"
-      dot: "style=dotted color=\"#000000\" constraint=true penwidth=1"
+      dot: "arrowhead=normal style=dotted color=\"#000000\" constraint=true penwidth=1"
       display: ""
       penwidth: "off"

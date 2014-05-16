@@ -527,9 +527,9 @@ class TaxonomyMapping:
         self.genCB()
 
     def genPwRcg(self, fileName):
-        fDot = open(self.options.outputdir+fileName+".dot", 'w')
+#        fDot = open(self.options.outputdir+fileName+".dot", 'w')
         fAllDot = open(self.options.outputdir+self.name+"_all.dot", 'a')
-        fDot.write("digraph {\n\nrankdir = RL\n\n")
+#        fDot.write("digraph {\n\nrankdir = RL\n\n")
         if self.firstRcg:
             fAllDot.write("digraph {\n\nrankdir = RL\n\n")
         tmpCom = ""    # cache of combined taxa
@@ -698,12 +698,12 @@ class TaxonomyMapping:
                 self.addRcgVizNode(T2, "comb")
                 
         # Dot drawing used for old viz
-        fDot.write("  node [shape=box style=\"filled\" fillcolor=\"#CCFFCC\"]\n")
-        fDot.write(taxa1)
-        fDot.write("  node [shape=octagon style=\"filled\" fillcolor=\"#FFFFCC\"]\n")
-        fDot.write(taxa2)
-        fDot.write("  node [shape=Msquare style=\"filled\" fillcolor=\"#EEEEEE\"]\n")
-        fDot.write(tmpCom)
+#        fDot.write("  node [shape=box style=\"filled\" fillcolor=\"#CCFFCC\"]\n")
+#        fDot.write(taxa1)
+#        fDot.write("  node [shape=octagon style=\"filled\" fillcolor=\"#FFFFCC\"]\n")
+#        fDot.write(taxa2)
+#        fDot.write("  node [shape=Msquare style=\"filled\" fillcolor=\"#EEEEEE\"]\n")
+#        fDot.write(tmpCom)
         fAllDot.write("  node [shape=box style=\"filled\" fillcolor=\"#CCFFCC\"]\n")
         fAllDot.write(taxa1)
         fAllDot.write("  node [shape=octagon style=\"filled\" fillcolor=\"#FFFFCC\"]\n")
@@ -714,17 +714,17 @@ class TaxonomyMapping:
         
         for [T1, T2, P] in self.tr:
     	    if(P == 0):
-    	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")       # used in old viz
+#    	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")       # used in old viz
                 self.addRcgVizEdge(T1, T2, "input")
     	    elif(P == 1):
-    	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=red];\n")
+#    	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=red];\n")
                 self.addRcgVizEdge(T1, T2, "inferred")
     	    elif(P == 2):
                 if False:
-                    fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
+#                    fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
                     self.addRcgVizEdge(T1, T2, "redundant")
         if self.options.rcgo:
-            fDot.write("  subgraph ig {\nedge [dir=none, style=dashed, color=blue, constraint=false]\n\n")
+#            fDot.write("  subgraph ig {\nedge [dir=none, style=dashed, color=blue, constraint=false]\n\n")
             oskiplist = []
             for key in self.mir.keys():
                 if self.mir[key] == rcc5["overlaps"] and key not in oskiplist: # and key not in oskiplist
@@ -740,11 +740,11 @@ class TaxonomyMapping:
                             replace2 = comb
                             break                            
 #                    fDot.write("     \"" + item.group(1) + "\" -> \"" + item.group(2) + "\"\n")
-                    fDot.write("     \"" + replace1 + "\" -> \"" + replace2 + "\"\n")
+#                    fDot.write("     \"" + replace1 + "\" -> \"" + replace2 + "\"\n")
                     self.addRcgVizEdge(replace1, replace2, "overlaps")
                     # Skip the reverse pair for redundant edges
                     oskiplist.append(item.group(2)+","+item.group(1))
-            fDot.write("  }\n")
+#            fDot.write("  }\n")
         #fDot.write("  subgraph cluster_lg {\n")
         #fDot.write("    rankdir = LR\n")
         #fDot.write("    label = \"Legend\";\n")
@@ -752,9 +752,9 @@ class TaxonomyMapping:
         #fDot.write("    A2 -> B2 [label=\"is included in (inferred)\" style=filled, color=red]\n")
         #fDot.write("    A3 -> B3 [label=\"overlaps\" dir=none, style=dashed, color=blue]\n")
         #fDot.write("  }\n")
-        fDot.write("}\n")
-        fDot.close()
-        commands.getoutput("dot -Tpdf "+self.options.outputdir+fileName+".dot -o "+self.options.outputdir+fileName+".pdf")
+#        fDot.write("}\n")
+#        fDot.close()
+#        commands.getoutput("dot -Tpdf "+self.options.outputdir+fileName+".dot -o "+self.options.outputdir+fileName+".pdf")
         
         # create the yaml file
         fRcgVizYaml = open(self.options.outputdir+fileName+".yaml", 'w')
@@ -763,7 +763,8 @@ class TaxonomyMapping:
         fRcgVizYaml.close()
         
         # apply the rcgviz stylesheet
-#        commands.getoutput("cat "+self.options.outputdir+fileName+".yaml"+" | y2d -s "+self.options.stylesheetdir+"rcgstyle.yaml" + ">" + self.options.outputdir+fileName+".dot")
+        commands.getoutput("cat "+self.options.outputdir+fileName+".yaml"+" | y2d -s "+self.options.stylesheetdir+"rcgstyle.yaml" + ">" + self.options.outputdir+fileName+".dot")
+        commands.getoutput("dot -Tpdf "+self.options.outputdir+fileName+".dot -o "+self.options.outputdir+fileName+".pdf")
 
 
     def bottomupRemedy(self):
@@ -2165,7 +2166,3 @@ class TaxonomyMapping:
         edge.update({"t" : t})
         edge.update({"label" : label})
         self.rcgVizEdges.update({s + "_" + t : edge})
-
-
-
-        
