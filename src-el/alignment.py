@@ -93,15 +93,16 @@ class TaxonomyMapping:
         self.ivpdf = os.path.join(options.outputdir, self.name+"_iv.pdf")
         self.iv2dot = os.path.join(options.outputdir, self.name+".dot")
         self.iv2pdf = os.path.join(options.outputdir, self.name+".pdf")
-        path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+        self.path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+        self.stylesheetdir = self.path + "/../example_stylesheet/"
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             # possible world command
-            self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0 | "+path+"/muniq -u"
+            self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0 | "+self.path+"/muniq -u"
             # consistency command
             self.con = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD --eq=1"
         elif reasoner[self.options.reasoner] == reasoner["dlv"]:
             # possible world command
-            self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
+            self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+self.path+"/muniq -u"
             # consistency command
             self.con = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+ self.pwswitch
         else:
@@ -763,7 +764,7 @@ class TaxonomyMapping:
         fRcgVizYaml.close()
         
         # apply the rcgviz stylesheet
-        commands.getoutput("cat "+self.options.outputdir+fileName+".yaml"+" | y2d -s "+self.options.stylesheetdir+"rcgstyle.yaml" + ">" + self.options.outputdir+fileName+".dot")
+        commands.getoutput("cat "+self.options.outputdir+fileName+".yaml"+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + self.options.outputdir+fileName+".dot")
         commands.getoutput("dot -Tpdf "+self.options.outputdir+fileName+".dot -o "+self.options.outputdir+fileName+".pdf")
 
 
@@ -2150,7 +2151,7 @@ class TaxonomyMapping:
         fInputVizYaml.close()        
         
         # apply the inputviz stylesheet
-        commands.getoutput("cat "+self.options.outputdir+self.name+".yaml"+" | y2d -s "+self.options.stylesheetdir+"inputstyle.yaml" + ">" + self.iv2dot)
+        commands.getoutput("cat "+self.options.outputdir+self.name+".yaml"+" | y2d -s "+self.stylesheetdir+"inputstyle.yaml" + ">" + self.iv2dot)
         commands.getoutput("dot -Tpdf "+self.iv2dot+" -o "+self.iv2pdf)
 
     def addRcgVizNode(self, concept, group):
