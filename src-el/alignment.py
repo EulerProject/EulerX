@@ -75,10 +75,8 @@ class TaxonomyMapping:
         self.runningUser = getpass.getuser()   # get the current username
         self.runningHost = socket.gethostname()# get the current host
         self.runningDate = strftime("%Y-%m-%d-%H:%M:%S", localtime())
-        options.outputdir = os.path.join(options.inputdir, self.runningUser+"-"+self.runningHost+"-"+self.runningDate)
         if options.outputdir is None:
-            options.outputdir = options.inputdir
-#            options.outputdir = os.path.join(opions.inputdir, self.runningUser+"-"+self.runningHost+"-"+self.runningDate)
+            options.outputdir = os.path.join(options.inputdir, self.runningUser+"-"+self.runningHost+"-"+self.runningDate)
         if not os.path.exists(options.outputdir):
             os.mkdir(options.outputdir)
         self.aspdir = os.path.join(options.outputdir, "asp")
