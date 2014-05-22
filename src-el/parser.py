@@ -30,7 +30,7 @@ class EulerParser:
             inst.add_option("-i", dest="inputfile", help="input file")
             inst.add_option("-r", dest="inputdir", default="",\
                                   help="input directory, by default ./")
-            inst.add_option("-o", dest="outputdir", default="./",\
+            inst.add_option("-o", dest="outputdir", default=None,\
                                   help="output directory, by default ./")
             inst.add_option("-e", dest="encode", default=0, \
                                   help="encoding, e.g. mnpw, drpw, dlpw, etc.")
