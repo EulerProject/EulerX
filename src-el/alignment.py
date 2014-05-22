@@ -16,6 +16,8 @@ import threading
 import StringIO
 import yaml
 import string
+import getpass
+import socket
 from taxonomy import * 
 from alignment import * 
 #from redWind import *
@@ -23,6 +25,7 @@ from template import *
 from helper import *
 from inputViz import *
 from random import randint
+from time import localtime, strftime
 
 class TaxonomyMapping:
 
@@ -69,8 +72,13 @@ class TaxonomyMapping:
         self.firstRcg = False
         self.trlist = []
         self.eqConLi = []                      # list of concepts that are equal
+        self.runningUser = getpass.getuser()   # get the current username
+        self.runningHost = socket.gethostname()# get the current host
+        self.runningDate = strftime("%Y-%m-%d-%H:%M:%S", localtime())
+        options.outputdir = os.path.join(options.inputdir, self.runningUser+"-"+self.runningHost+"-"+self.runningDate)
         if options.outputdir is None:
             options.outputdir = options.inputdir
+#            options.outputdir = os.path.join(opions.inputdir, self.runningUser+"-"+self.runningHost+"-"+self.runningDate)
         if not os.path.exists(options.outputdir):
             os.mkdir(options.outputdir)
         self.aspdir = os.path.join(options.outputdir, "asp")
@@ -84,6 +92,7 @@ class TaxonomyMapping:
         self.cbout = os.path.join(options.outputdir, self.name+"_cb.txt")
         self.obout = os.path.join(options.outputdir, self.name+"_ob.txt")
         self.mirfile = os.path.join(options.outputdir, self.name+"_mir.csv")
+        self.pwoutputfile = os.path.join(options.outputdir, self.name+".pw")
         self.clfile = os.path.join(options.outputdir, self.name+"_cl.csv")
         self.cldot = os.path.join(options.outputdir, self.name+"_cl.dot")
         self.cldotpdf = os.path.join(options.outputdir, self.name+"_cl_dot.pdf")
@@ -440,7 +449,9 @@ class TaxonomyMapping:
         outputstr = ""
         # mirs for each pw
         if self.options.cluster: pwmirs = []
-        fAllDot = open(self.options.outputdir+self.name+"_all.dot", 'w')
+        rcgAllDotFile = os.path.join(self.options.outputdir, self.name+"_all.dot")
+        rcgAllPdfFile = os.path.join(self.options.outputdir, self.name+"_all.pdf")
+        fAllDot = open(rcgAllDotFile, 'w')
         for i in range(len(pws)):
             if self.options.cluster: pwmirs.append({})
 
@@ -508,12 +519,13 @@ class TaxonomyMapping:
                     self.trlist.append(e)
         self.genAllPwRcg(len(pws))
         fAllDot.close()
-        commands.getoutput("dot -Tpdf "+self.options.outputdir+self.name+"_all.dot -o "+self.options.outputdir+self.name+"_all.pdf")
+        commands.getoutput("dot -Tpdf "+rcgAllDotFile+" -o "+rcgAllPdfFile)
         if self.options.reduction:
             outputstr = self.uncReduction(pws)
         if pwflag:
             if self.options.output: print outputstr
-        fpw = open(self.options.outputdir+name+".pw", 'w')
+#        fpw = open(self.options.outputdir+name+".pw", 'w')
+        fpw = open(self.pwoutputfile, 'w')
         fpw.write(outputstr)
         fpw.close()
         if self.options.cluster: self.genPwCluster(pwmirs, False)
@@ -529,7 +541,9 @@ class TaxonomyMapping:
 
     def genPwRcg(self, fileName):
 #        fDot = open(self.options.outputdir+fileName+".dot", 'w')
-        fAllDot = open(self.options.outputdir+self.name+"_all.dot", 'a')
+#        fAllDot = open(self.options.outputdir+self.name+"_all.dot", 'a')
+        rcgAllFile = os.path.join(self.options.outputdir, self.name+"_all.dot")
+        fAllDot = open(rcgAllFile, 'a')
 #        fDot.write("digraph {\n\nrankdir = RL\n\n")
         if self.firstRcg:
             fAllDot.write("digraph {\n\nrankdir = RL\n\n")
@@ -758,14 +772,18 @@ class TaxonomyMapping:
 #        commands.getoutput("dot -Tpdf "+self.options.outputdir+fileName+".dot -o "+self.options.outputdir+fileName+".pdf")
         
         # create the yaml file
-        fRcgVizYaml = open(self.options.outputdir+fileName+".yaml", 'w')
+        rcgYamlFile = os.path.join(self.options.outputdir, fileName+".yaml")
+        rcgDotFile = os.path.join(self.options.outputdir, fileName+".dot")
+        rcgPdfFile = os.path.join(self.options.outputdir, fileName+".pdf")
+        fRcgVizYaml = open(rcgYamlFile, 'w')
         fRcgVizYaml.write(yaml.safe_dump(self.rcgVizNodes, default_flow_style=False))
         fRcgVizYaml.write(yaml.safe_dump(self.rcgVizEdges, default_flow_style=False))
         fRcgVizYaml.close()
         
         # apply the rcgviz stylesheet
-        commands.getoutput("cat "+self.options.outputdir+fileName+".yaml"+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + self.options.outputdir+fileName+".dot")
-        commands.getoutput("dot -Tpdf "+self.options.outputdir+fileName+".dot -o "+self.options.outputdir+fileName+".pdf")
+#        commands.getoutput("cat "+self.options.outputdir+fileName+".yaml"+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + self.options.outputdir+fileName+".dot")
+        commands.getoutput("cat "+rcgYamlFile+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + rcgDotFile)
+        commands.getoutput("dot -Tpdf "+rcgDotFile+" -o "+rcgPdfFile)
 
 
     def bottomupRemedy(self):
@@ -2061,7 +2079,9 @@ class TaxonomyMapping:
             newColor = "#" + str(hex(int(newPointDec[0])))[2:] + str(hex(int(newPointDec[1])))[2:] + str(hex(int(newPointDec[2])))[2:]
             rels[i][3] = newColor
         # write to dot file
-        fAllDot = open(self.options.outputdir+self.name+"_all.dot", 'a')
+        rcgAllFile = os.path.join(self.options.outputdir, self.name+"_all.dot")
+#        fAllDot = open(self.options.outputdir+self.name+"_all.dot", 'a')
+        fAllDot = open(rcgAllFile, 'a')
         if self.options.simpAllView:
             for [T1, T2, cnt, color] in rels:
                 if cnt == numOfPws:
@@ -2145,13 +2165,17 @@ class TaxonomyMapping:
                     self.addInputVizEdge(a.split(" ")[0], a.split(" ")[2], art2symbol.get(a.split(" ")[1], a.split(" ")[1]))
                 
         # create the yaml file
-        fInputVizYaml = open(self.options.outputdir+self.name+".yaml", 'w')
+        inputYamlFile = os.path.join(self.options.outputdir, self.name+".yaml")
+        inputDotFile = os.path.join(self.options.outputdir, self.name+".dot")
+        inputPdfFile = os.path.join(self.options.outputdir, self.name+".pdf")
+        
+        fInputVizYaml = open(inputYamlFile, 'w')
         fInputVizYaml.write(yaml.safe_dump(self.inputVizNodes, default_flow_style=False))
         fInputVizYaml.write(yaml.safe_dump(self.inputVizEdges, default_flow_style=False))
         fInputVizYaml.close()        
         
         # apply the inputviz stylesheet
-        commands.getoutput("cat "+self.options.outputdir+self.name+".yaml"+" | y2d -s "+self.stylesheetdir+"inputstyle.yaml" + ">" + self.iv2dot)
+        commands.getoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"inputstyle.yaml" + ">" + self.iv2dot)
         commands.getoutput("dot -Tpdf "+self.iv2dot+" -o "+self.iv2pdf)
 
     def addRcgVizNode(self, concept, group):
