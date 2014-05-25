@@ -1,0 +1,13 @@
+taxonomy t1 1
+(a)
+
+taxonomy t2 2
+(b)
+
+taxonomy t3 3
+(c)
+
+articulation art overlap
+[t1.a overlaps t2.b]
+[t2.b overlaps t3.c]
+[t1.a overlaps t3.c]
