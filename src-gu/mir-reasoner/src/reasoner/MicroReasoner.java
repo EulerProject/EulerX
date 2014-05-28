@@ -56,22 +56,9 @@ public class MicroReasoner {
 		boolean foundNewFromR = reasonFromR();
 		// if the tree is inconsistent, throw an exception
 		if (isInconsistent())
-			throw new InvalidTaxonomyException("Inconsistency somewhere in the tiny trees for " + 
-							   AB.getTaxon1() + " and " + AB.getTaxon2() + '.');
+			throw new InvalidTaxonomyException("Inconsistency somewhere in the tiny trees for " + AB.getTaxon1() + " and " + AB.getTaxon2() + '.');
 	 	// else return whether new information was found
 	 	return foundNewToR || foundNewFromR;
-
-		/* TODO to run continuously
-		// if new information was discovered, run the reasoner again
-		if (foundNewToR || foundNewFromR){
-			//reasonOverTinyTrees(); // TODO do we want to do this?  Or shall we just run it once?
-			if (reasonOverTinyTrees())
-				System.out.println("Actually discovered something the second time around..."); // TODO
-			return true;
-		}
-
-		return false;
-		*/
 	}
 
 	public void updateRelations(Map<TaxonPair, String> articulations){
