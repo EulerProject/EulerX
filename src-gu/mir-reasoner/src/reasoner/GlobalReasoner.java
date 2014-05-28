@@ -41,7 +41,7 @@ public class GlobalReasoner {
 		// update the working map of articulations and clear the map of new articulations
 		decomposedArticulations.putAll(articulations);
 
-		// run each microreasoner, storing new relations in decomposedNewArticulations
+		// run each microreasoner, storing new relations in decomposedArticulations
 		boolean foundNew = false;
 		for (MicroReasoner microreasoner : microreasoners){
 			microreasoner.updateRelations(decomposedArticulations);
