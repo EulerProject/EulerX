@@ -88,7 +88,11 @@ public class Taxon {
 
 	private static Taxon decomposeTaxon(Taxon parent, Taxon T){
 		// create the decomposed node and set its parent
-		Taxon _T = new Taxon(T.getNamespace(), T.getClassname());
+		Taxon _T;
+		if (T.isFalse())
+			_T = new Taxon(T.getNamespace(), T.getClassname(), false);
+		else
+			_T = new Taxon(T.getNamespace(), T.getClassname());
 		_T.setParent(parent);
 
 		// pull the children of T
@@ -116,7 +120,7 @@ public class Taxon {
 			falseNodeNumber++;
 			// make last and cur the children of the false node
 			f.addChild(decomposeTaxon(_T, last));
-			f.addChild(cur);
+			f.addChild(decomposeTaxon(_T, cur));
 			// move the false node into cur
 			cur = f;
 		}
@@ -124,7 +128,7 @@ public class Taxon {
 		last = children.get(indexOfLast);
 		// add last and cur as the children of the decomposed node
 		_T.addChild(decomposeTaxon(_T, last)); 
-		_T.addChild(cur);
+		_T.addChild(decomposeTaxon(_T, cur));
 
 		// return the decomposed node
 		return _T;
