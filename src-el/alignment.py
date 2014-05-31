@@ -30,7 +30,11 @@ from time import localtime, strftime
 class TaxonomyMapping:
 
     # Constructor
-    def __init__(self, options):
+    #
+    #    options - IN
+    #    snap    - whether to take a snapshot of the software
+    #
+    def __init__(self, options, snap = False):
         self.mir = {}                          # MIR
         self.mirc = {}                         # MIRC
         self.mirp = {}                         # MIR Provenance
@@ -86,6 +90,17 @@ class TaxonomyMapping:
         self.cbfile = os.path.join(self.aspdir, self.name+"_cb."+self.options.reasoner)
         self.pwswitch = os.path.join(self.aspdir, self.name+"_pwswitch."+self.options.reasoner)
         self.ixswitch = os.path.join(self.aspdir, self.name+"_ixswitch."+self.options.reasoner)
+        # Log stdout and stderr
+        self.stdoutfile = os.path.join(options.outputdir, self.name+".stdout")
+        sys.stdout = Logger(self.stdoutfile)
+        self.stderrfile = os.path.join(options.outputdir, self.name+".stderr")
+        sys.stderr = Logger(self.stderrfile)
+        # Take a snapshot of the software
+        if snap:
+            self.snapfile = os.path.join(options.outputdir, "snap.out")
+            fsnap = open(self.snapfile, 'w')
+            fsnap.write(commands.getoutput("eulersnap"))
+            fsnap.close()
         self.ivout = os.path.join(options.outputdir, self.name+"_iv.dot")
         self.cbout = os.path.join(options.outputdir, self.name+"_cb.txt")
         self.obout = os.path.join(options.outputdir, self.name+"_ob.txt")
