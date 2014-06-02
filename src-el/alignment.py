@@ -100,6 +100,8 @@ class TaxonomyMapping:
             self.snapfile = os.path.join(options.outputdir, "snap.out")
             fsnap = open(self.snapfile, 'w')
             fsnap.write(commands.getoutput("eulersnap"))
+            fsnap.write("\n\n##### Running User, Host and Date:\n")
+            fsnap.write("User:\t"+self.runningUser+"\nHost:\t"+self.runningHost+"\nDate:\t"+self.runningDate)
             fsnap.close()
         self.ivout = os.path.join(options.outputdir, self.name+"_iv.dot")
         self.cbout = os.path.join(options.outputdir, self.name+"_cb.txt")
