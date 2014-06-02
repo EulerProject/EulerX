@@ -671,7 +671,8 @@ class TaxonomyMapping:
             #for [T1, T2, P] in tmpTr:
             #    if T == T1 or T == T2:
             tmpComLi.append(T)
-            tmpCom += "  \""+T+"\"\n"      
+            tmpCom += "  \""+T+"\"\n"
+            self.addRcgVizNode(T, "comb")      
             
         # Duplicates
     	tmpTr = list(self.tr)
@@ -789,8 +790,10 @@ class TaxonomyMapping:
         rcgDotFile = os.path.join(self.options.outputdir, fileName+".dot")
         rcgPdfFile = os.path.join(self.options.outputdir, fileName+".pdf")
         fRcgVizYaml = open(rcgYamlFile, 'w')
-        fRcgVizYaml.write(yaml.safe_dump(self.rcgVizNodes, default_flow_style=False))
-        fRcgVizYaml.write(yaml.safe_dump(self.rcgVizEdges, default_flow_style=False))
+        if self.rcgVizNodes:
+            fRcgVizYaml.write(yaml.safe_dump(self.rcgVizNodes, default_flow_style=False))
+        if self.rcgVizEdges:
+            fRcgVizYaml.write(yaml.safe_dump(self.rcgVizEdges, default_flow_style=False))
         fRcgVizYaml.close()
         
         # apply the rcgviz stylesheet
