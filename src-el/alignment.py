@@ -770,6 +770,14 @@ class TaxonomyMapping:
                             break                            
 #                    fDot.write("     \"" + item.group(1) + "\" -> \"" + item.group(2) + "\"\n")
 #                    fDot.write("     \"" + replace1 + "\" -> \"" + replace2 + "\"\n")
+                    if "\\n" in replace1:
+                        self.addRcgVizNode(replace1, "comb")
+                    else:
+                        self.addRcgVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1))
+                    if "\\n" in replace2:
+                        self.addRcgVizNode(replace2, "comb")
+                    else:
+                        self.addRcgVizNode(re.match("(.*)\.(.*)", replace2).group(2), re.match("(.*)\.(.*)", replace2).group(1))
                     self.addRcgVizEdge(replace1, replace2, "overlaps")
                     # Skip the reverse pair for redundant edges
                     oskiplist.append(item.group(2)+","+item.group(1))
