@@ -7,16 +7,27 @@
 # pw(1,...), pw(1,..)
 # Input: DLV program 
 # Output: All refined possible worlds
-# Usage: python save_all_worlds.py input.dlv
+# Usage: 
+# 	with filter: python awf.py -filter=FILTER1,FILTER2... input.dlv
+# 	without filter: python awf.py input.dlv
 #=============================================================================================
 from subprocess import call
 import sys
 
-filter = sys.argv[1]
-fileName = sys.argv[2]
-fileNameOut = fileName + ".out"
+#filter = sys.argv[1]
+#fileName = sys.argv[2]
+for arg in sys.argv:
+	if "-filter=" in arg:
+		filter = arg
+		fileName = sys.argv[sys.argv.index(arg) + 1]
+		break
+	filter = "-filter="
+	fileName = sys.argv[1]
 
-call("dlv -silent -filter=" + filter + " " + fileName + " > " + fileName + ".out", shell=True)
+fileNameOut = fileName + ".out"
+s = "dlv -silent " + filter + " " + fileName + " > " + fileNameOut
+#call("dlv -silent -filter=" + filter + " " + fileName + " > " + fileName + ".out", shell=True)
+call(s, shell=True)
 f_in = open(fileNameOut, "r")
 f_out = open(fileName[:-4] + "_aw.asp", "w")
 outList = []
