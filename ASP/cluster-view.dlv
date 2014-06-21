@@ -1,0 +1,54 @@
+% distance matrix
+dist(w0,w1,5).
+dist(w0,w2,4).
+dist(w0,w3,3).
+dist(w0,w4,6).
+dist(w0,w5,6).
+dist(w0,w6,4).
+dist(w1,w2,1).
+dist(w1,w3,2).
+dist(w1,w4,1).
+dist(w1,w5,3).
+dist(w1,w6,3).
+dist(w2,w3,3).
+dist(w2,w4,2).
+dist(w2,w5,2).
+dist(w2,w6,4).
+dist(w3,w4,3).
+dist(w3,w5,5).
+dist(w3,w6,1).
+dist(w4,w5,2).
+dist(w4,w6,2).
+dist(w5,w6,4).
+% find the symmetric distances
+dist(X,Y,D):-dist(Y,X,D).
+
+% an edge is marked as red if there exists an indirect path between its two endpoints with a lower cost.
+red(X,Y):-dist(X,Y,D),hop2(X,Y,D).
+hop2(X,Y,D3):-dist(X,Z,D1),dist(Z,Y,D2),D3=D1+D2,X!=Z,Z!=Y.
+
+draw(X,Y,D):-dist(X,Y,D),not red(X,Y),X<Y.
+
+world(W):-dist(W,_,_).
+
+% Parisa's version
+% find the total distance from each world to all other worlds
+% tdist(W,T):-world(W),#sum{D: dist(W,W2,D),world(W2)}=T.
+
+% Mingmin's version
+dist(X,X,0) :- world(X).
+map(w0,0).
+map(w1,1).
+map(w2,2).
+map(w3,3).
+map(w4,4).
+map(w5,5).
+map(w6,6).
+#maxint=1000.
+nworlds(N) :- #count{X : world(X)} = N.
+tdistn(W, 0, 0) :- world(W).
+tdistn(W, D, N1) :- tdistn(W, D1, N2), N1=N2+1, map(W2, N2), dist(W, W2, D2), D=D1+D2, N1 <= N, nworlds(N).
+tdist(W, D) :- tdistn(W, D, N), nworlds(N).
+
+% find the world with minimum total distance 
+center(W):-tdist(W,T),#min{T1:tdist(W1,T1)}=T.
