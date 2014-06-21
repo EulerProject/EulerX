@@ -1,4 +1,4 @@
-% distance matrix
+% Distance matrix
 dist(w0,w1,5).
 dist(w0,w2,4).
 dist(w0,w3,3).
@@ -20,6 +20,7 @@ dist(w3,w6,1).
 dist(w4,w5,2).
 dist(w4,w6,2).
 dist(w5,w6,4).
+
 % find the symmetric distances
 dist(X,Y,D):-dist(Y,X,D).
 
