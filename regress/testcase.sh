@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-euler -i cases/$1.txt -e $3 --reasoner=$2 >& $1.out
+euler -i cases/$1.txt -e $3 --reasoner=$2 -o ./ >& $1.out
 if [[ -n "$(diff $1_mir.csv expected/$1_mir.expected)" ]]; then
   diff $1_mir.csv expected/$1_mir.expected > $1.dif;
   echo "There is new dif in $1.dif!"
