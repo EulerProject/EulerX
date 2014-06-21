@@ -1,4 +1,4 @@
-% Distance matrix
+% Distance matrix (asymmetric: upper triangular values only)
 dist(w0,w1,5).
 dist(w0,w2,4).
 dist(w0,w3,3).
@@ -21,23 +21,49 @@ dist(w4,w5,2).
 dist(w4,w6,2).
 dist(w5,w6,4).
 
-% find the symmetric distances
-dist(X,Y,D):-dist(Y,X,D).
+% Symmetric closure: add lower triangular values
+dist(X,Y,D) :-
+	dist(Y,X,D).
 
-% an edge is marked as red if there exists an indirect path between its two endpoints with a lower cost.
-red(X,Y):-dist(X,Y,D),hop2(X,Y,D).
-hop2(X,Y,D3):-dist(X,Z,D1),dist(Z,Y,D2),D3=D1+D2,X!=Z,Z!=Y.
+% An edge can be reduced, if there is a 2-hop of equal length
+red(X,Y) :-
+	dist(X,Y,D),
+	hop2(X,Y,D).
 
-draw(X,Y,D):-dist(X,Y,D),not red(X,Y),X<Y.
+% Distance D of a 2-hop from X to Y:
+hop2(X,Y,D) :-
+	dist(X,Z,D1),
+	dist(Z,Y,D2),
+	D = D1 + D2,
+	X != Z,Z != Y.
 
-world(W):-dist(W,_,_).
+% Only non-reduced edges need to be drawn:
+draw(X,Y,D) :-
+	dist(X,Y,D),
+	not red(X,Y),
+	X < Y.        % break symmetry again: just 1 edge is enough
 
-% Parisa's version
-% find the total distance from each world to all other worlds
-% tdist(W,T):-world(W),#sum{D: dist(W,W2,D),world(W2)}=T.
+world(W) :- 
+	dist(W,_,_).
+
+% Parisa's version (FIXED)
+% BL: DLV Manual on aggregation: http://www.dlvsystem.com/html/DLV_User_Manual.html#AEN1040
+% BL: specifically: Example 2-31 says:
+%     #sum returns the sum of the FIRST local variable to be aggregated over in the symbolic set.
+% That's why we need to write D,W2 instead of just D !
+% Find the total distance from each world to all other worlds
+tdist0(W,T) :-
+	world(W),
+%	#sum{D: dist(W,W2,D),world(W2) } = T.
+	#sum{D,W2: dist(W,W2,D),world(W2) } = T.
 
 % Mingmin's version
-dist(X,X,0) :- world(X).
+dist(X,X,0) :- world(X). % complete the distance matrix 
+
+% BL: Whoops -- what is this for? 
+% BL: Why not use the 1st column wherever the 2nd is used?
+% BL: oh.. I see below: you "step" through all the worlds via 2nd column
+% BL: ... but this could be done also using the order on the 1st column!
 map(w0,0).
 map(w1,1).
 map(w2,2).
@@ -45,11 +71,44 @@ map(w3,3).
 map(w4,4).
 map(w5,5).
 map(w6,6).
-#maxint=1000.
-nworlds(N) :- #count{X : world(X)} = N.
-tdistn(W, 0, 0) :- world(W).
-tdistn(W, D, N1) :- tdistn(W, D1, N2), N1=N2+1, map(W2, N2), dist(W, W2, D2), D=D1+D2, N1 <= N, nworlds(N).
-tdist(W, D) :- tdistn(W, D, N), nworlds(N).
 
-% find the world with minimum total distance 
-center(W):-tdist(W,T),#min{T1:tdist(W1,T1)}=T.
+% BL: oh ho ho -- it's magic!? ;-)
+#maxint=1000.
+
+% BL: count how many worlds there are
+nworlds(N) :- 
+	#count{X : world(X)} = N.
+
+% BL: Alright: the mystery relation. What does it represent?
+% BL: OK, after looking at the rules, I think it's this:
+% BL: tdistn(W,D,N) 
+% BL:   D is the sum of distances of world W to all worlds <= N
+tdistn(W, 0, 0) :- 
+	world(W).
+tdistn(W, D, N1) :- 
+	tdistn(W, D1, N2), 
+	N1=N2+1, 
+	map(W2, N2), 
+	dist(W, W2, D2), 
+	D=D1+D2, 
+	N1 <= N, 
+	nworlds(N).
+
+% Compute the distance to all other worlds
+tdist(W, D) :- 
+	tdistn(W, D, N), 
+	nworlds(N).
+
+% Find the world with minimum total distance 
+center(W) :-
+	tdist(W,T),
+	#min{ T1 : tdist(W1,T1) } = T.
+
+
+%%% BL: Control Run: 
+% [ASP :)]$ dlv cv2.dlv -filter=tdist,tdist0
+% DLV [build BEN/Dec 21 2011   gcc 4.2.1 (Apple Inc. build 5666) (dot 3)]
+% 
+% {tdist0(w0,28), tdist0(w1,15), tdist0(w2,16), tdist0(w3,17), tdist0(w4,16), tdist0(w5,22), tdist0(w6,18), tdist(w0,28), tdist(w1,15), tdist(w2,16), tdist(w3,17), tdist(w4,16), tdist(w5,22), tdist(w6,18)}
+
+% NOTE: tdist0 (Parisa version: FIXED) and tdist (Mingmin) now agree!
