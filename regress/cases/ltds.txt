@@ -1,0 +1,8 @@
+taxonomy 1 Taxonomy1
+(a)
+
+taxonomy 2 Taxonomy2
+(a)
+
+articulation tw1 tw1
+[1.a {is_included_in disjoint} 2.a]

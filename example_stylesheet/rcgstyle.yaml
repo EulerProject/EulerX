@@ -1,0 +1,35 @@
+  graphstyle: 
+    graph: "rankdir=RL"
+    face2face: "off"
+    subgraph: "off"
+    legend: "on"
+    mapping: "off"
+    wmap: "off"
+    wmin: "1"
+    wmax: "5"
+  nodestyle: 
+    "1": "shape=box style=\"filled\" fillcolor=\"#CCFFCC\""
+    "2": "shape=octagon style=filled fillcolor=\"#FFFFCC\""
+    "comb": "shape=Msquare style=\"filled\" fillcolor=\"#EEEEEE\""
+    default: "shape=circle style=filled fillcolor=\"#FFFFFF\""
+  edgestyle: 
+    - 
+      label: "input"
+      dot: "arrowhead=normal style=solid color=\"#000000\" constraint=true penwidth=1"
+      display: ""
+      penwidth: "off"
+    - 
+      label: "inferred"
+      dot: "arrowhead=normal style=solid color=\"#FF0000\" constraint=true penwidth=1"
+      display: ""
+      penwidth: "off"
+    - 
+      label: "overlaps"
+      dot: "arrowhead=none style=dotted color=\"#0000FF\" constraint=true penwidth=1"
+      display: ""
+      penwidth: "off"
+    - 
+      label: "redundant"
+      dot: "arrowhead=normal style=dotted color=\"#000000\" constraint=true penwidth=1"
+      display: ""
+      penwidth: "off"

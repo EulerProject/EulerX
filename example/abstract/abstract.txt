@@ -1,0 +1,19 @@
+taxonomy 1 Taxonomy1
+(A B F I)
+(B C D E)
+(F G H)
+
+taxonomy 2 Taxonomy2
+(A B F)
+(B C H E)
+(F G I)
+
+articulation abs abstract
+[1.A equals 2.A]
+[1.B is_included_in 2.B]
+[1.C 1.D lsum 2.C]
+[1.E equals 2.E]
+[1.F overlaps 2.F]
+[1.G equals 2.G]
+[1.H equals 2.H]
+[1.F overlaps 2.B]
