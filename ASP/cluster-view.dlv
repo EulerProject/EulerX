@@ -46,12 +46,16 @@ draw(X,Y,D) :-
 world(W) :- 
 	dist(W,_,_).
 
-% Parisa's version
-% find the total distance from each world to all other worlds
-% BL: Mingmin found a bug: in case of duplicate D values, only 1 of them is added..
+% Parisa's version (FIXED)
+% BL: DLV Manual on aggregation: http://www.dlvsystem.com/html/DLV_User_Manual.html#AEN1040
+% BL: specifically: Example 2-31 says:
+%     #sum returns the sum of the FIRST local variable to be aggregated over in the symbolic set.
+% That's why we need to write D,W2 instead of just D !
+% Find the total distance from each world to all other worlds
 tdist0(W,T) :-
 	world(W),
-	#sum{D: dist(W,W2,D),world(W2) } = T.
+%	#sum{D: dist(W,W2,D),world(W2) } = T.
+	#sum{D,W2: dist(W,W2,D),world(W2) } = T.
 
 % Mingmin's version
 dist(X,X,0) :- world(X). % complete the distance matrix 
@@ -102,8 +106,9 @@ center(W) :-
 
 
 %%% BL: Control Run: 
-% $ dlv cv1.dlv -filter=tdist,tdist0
+% [ASP :)]$ dlv cv2.dlv -filter=tdist,tdist0
 % DLV [build BEN/Dec 21 2011   gcc 4.2.1 (Apple Inc. build 5666) (dot 3)]
-% {tdist0(w0,18), tdist0(w1,11), tdist0(w2,10), tdist0(w3,11), tdist0(w4,12), tdist0(w5,20), tdist0(w6,10), tdist(w0,28), tdist(w1,15), tdist(w2,16), tdist(w3,17), tdist(w4,16), tdist(w5,22), tdist(w6,18)}
 % 
-% NOTE: tdist0 (Parisa) and tdist (Mingmin) differ (aggregation problem)
+% {tdist0(w0,28), tdist0(w1,15), tdist0(w2,16), tdist0(w3,17), tdist0(w4,16), tdist0(w5,22), tdist0(w6,18), tdist(w0,28), tdist(w1,15), tdist(w2,16), tdist(w3,17), tdist(w4,16), tdist(w5,22), tdist(w6,18)}
+
+% NOTE: tdist0 (Parisa version: FIXED) and tdist (Mingmin) now agree!
