@@ -276,51 +276,50 @@ class template:
     #    dlvDc += "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), vrs(R), out(X, R), in(Y, R), pw.\n\n"
 
     # Binary encoding base constraints
+    @Callable
     def getAspVrCon():
         global aspVrCon
         return aspVrCon
 
     # Polynomial encoding base constraints
+    @Callable
     def getAspMnCon():
         global aspMnCon
         return aspMnCon
 
     # Probability encoding base constraints
+    @Callable
     def getAspDlCon():
         global aspDlCon
         return aspDlCon
 
     # Direct encoding base constraints
+    @Callable
     def getAspDrCon():
         global aspDrCon
         return aspDrCon
 
+    @Callable
     def getAspCbCon():
         global aspCbCon
         return aspCbCon
 
+    @Callable
     def getAspPwDc():
         global aspPwDc
         return aspPwDc
 
+    @Callable
     def getAspAllDc():
         global aspAllDc
         return aspAllDc
 
+    @Callable
     def getAspCbDc():
         global aspCbDc
         return aspCbDc
 
+    @Callable
     def getEncErrMsg():
         global encErrMsg
         return encErrMsg
-
-    getAspVrCon = Callable(getAspVrCon)
-    getAspMnCon = Callable(getAspMnCon)
-    getAspDlCon = Callable(getAspDlCon)
-    getAspDrCon = Callable(getAspDrCon)
-    getAspCbCon = Callable(getAspCbCon)
-    getAspPwDc  = Callable(getAspPwDc)
-    getAspAllDc  = Callable(getAspAllDc)
-    getAspCbDc  = Callable(getAspCbDc)
-    getEncErrMsg= Callable(getEncErrMsg)
