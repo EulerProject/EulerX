@@ -1,3 +1,7 @@
+# lattice.py
+# Author: Shizhu Yu
+# <fill me with good Python best practice stuff> 
+
 import subprocess
 from subprocess import call
 import sys
@@ -209,26 +213,27 @@ line = fIn.readline()
 ups = line[1:-2].split(", ")
 fOut = open(fileDot,"w")
 fOut.write("digraph{\n")
+fOut.write('node[fontname="Helvetica-Narrow"]\n')
 fOut.write("rankdir=TB\n")
 anyGreenW = []
 anyRedW = []
 for anyGreen in allGreens:
     anyGreenW.append(anyGreen[0])
     if anyGreen[0] in solidGreenWs:
-        fOut.write(anyGreen[0] + ' [shape=box color="#00FF00" style="rounded,filled" label="' + removeBracPri(anyGreen[1:].__str__()) +'"];\n')
+        fOut.write(anyGreen[0] + ' [shape=box color="#006400" fillcolor="#A0FFA0" style="rounded,filled" label="' + removeBracPri(anyGreen[1:].__str__()) +'"];\n')
     else:
-        fOut.write(anyGreen[0] + ' [shape=box color="#00FF00" style=dashed label="' + removeBracPri(anyGreen[1:].__str__()) +'"];\n')
+        fOut.write(anyGreen[0] + ' [shape=box color="#006400" style=dashed label="' + removeBracPri(anyGreen[1:].__str__()) +'"];\n')
 for anyRed in allReds:
     anyRedW.append(anyRed[0])
     if anyRed[0] in solidRedWs:
-        fOut.write(anyRed[0] + ' [shape=octagon color="#FF0000" style=filled label="' + removeBracPri(anyRed[1:].__str__()) +'"];\n')
+        fOut.write(anyRed[0] + ' [shape=octagon color="#FF0000" fillcolor="#FFB0B0" style=filled label="' + removeBracPri(anyRed[1:].__str__()) +'"];\n')
     else:
-        fOut.write(anyRed[0] + ' [shape=octagon color="#FF0000" style=dashed label="' + removeBracPri(anyRed[1:].__str__()) +'"];\n')    
+        fOut.write(anyRed[0] + ' [shape=octagon color="#FF0000" fillcolor="#FFB0B0" style=dashed label="' + removeBracPri(anyRed[1:].__str__()) +'"];\n')    
 for up in ups:
     if up.split(",")[0][3:] in anyGreenW and up.split(",")[1][:-1] in anyGreenW:
-        fOut.write(up.split(",")[1][:-1] + '->' + up.split(",")[0][3:] + '[color="#00FF00" style=dashed];\n')
+        fOut.write(up.split(",")[1][:-1] + '->' + up.split(",")[0][3:] + '[color="#006400" style=dashed];\n')
     if up.split(",")[0][3:] in anyRedW and up.split(",")[1][:-1] in anyRedW:
-        fOut.write(up.split(",")[1][:-1] + '->' + up.split(",")[0][3:] + '[dir=back color="#FF0000" style=dashed];\n')
+        fOut.write(up.split(",")[1][:-1] + '->' + up.split(",")[0][3:] + '[dir=back color="#CC0000" style=dashed];\n')
     if up.split(",")[0][3:] in anyGreenW and up.split(",")[1][:-1] in anyRedW:
         fOut.write(up.split(",")[1][:-1] + '->' + up.split(",")[0][3:] + '[arrowhead=none color="#0000FF" style=filled];\n')
 
@@ -240,20 +245,21 @@ fOut.close()
 fileDot = sys.argv[1]+"_lat.dot"
 f = open(fileDot,"w")
 f.write("digraph{\n")
+f.write('node[fontname="Helvetica-Narrow"]\n')
 f.write("rankdir=TB\n")
 if len(misList) != 1:
-    f.write('"AllOtherRed" [shape=octagon color="#FF0000" style=dashed]\n')
+    f.write('"AllOtherRed" [shape=octagon fillcolor="#FFB0B0" style=dashed]\n')
 if len(macList) != 1:
-    f.write('"AllOtherGreen" [shape=box color="#00FF00" style="rounded,dashed"]\n')
+    f.write('"AllOtherGreen" [shape=box color="#006400" style="rounded,dashed"]\n')
 for mcs in macList:
-    f.write('"' + removeBracPri(str(mcs[1:])) + '" [shape=box color="#00FF00" style="rounded,filled"];\n')
+    f.write('"' + removeBracPri(str(mcs[1:])) + '" [shape=box color="#006400" fillcolor="#A0FFA0" style="rounded,filled"];\n')
 for mis in misList:
-    f.write('"' + removeBracPri(str(mis)) + '" [shape=octagon color="#FF0000" style="filled"];\n')
+    f.write('"' + removeBracPri(str(mis)) + '" [shape=octagon color="#FF0000" fillcolor="#FFB0B0" style="filled"];\n')
 for mcs in macList:
     if len(misList) != 1:
         f.write('"AllOtherRed" -> "' + removeBracPri(str(mcs[1:])) + '" [color=blue, arrowhead=none, label='+ str(len(arts)-len(mcs[1:])) +'];\n')
     if len(macList) != 1:
-        f.write('"' + removeBracPri(str(mcs[1:])) + '" -> "AllOtherGreen" [color=green, style=dashed, label='+ str(len(mcs[1:])) +'];\n')
+        f.write('"' + removeBracPri(str(mcs[1:])) + '" -> "AllOtherGreen" [color="#006400" style=dashed, label='+ str(len(mcs[1:])) +'];\n')
 for mis in misList:
     if len(misList) != 1:
         f.write('"AllOtherRed" -> "' + removeBracPri(str(mis)) + '" [color=red, style=dashed, dir=back, label='+ str(len(arts)-len(mis)) +'];\n')
