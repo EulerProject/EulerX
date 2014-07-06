@@ -1,0 +1,33 @@
+#! /usr/bin/env python
+
+import csv
+import sys
+import dict
+           
+data = {} # a nested dictionary to store the taxonomies
+
+
+with sys.stdin as source:
+    reader = csv.reader(source)
+    next(reader, None) #skip header row
+# build a nested dictionary
+    for name, author, rank in reader:
+        if author not in data:
+            data[author]={}
+        if rank not in data[author]:
+            data[author][rank]=[]
+        data[author][rank].append(name)
+with sys.stdout as dest:
+    writer = csv.writer(dest)
+#assign identifiers to each entity
+    j = 0
+    for author, value in data.iteritems():
+        j += 1
+        i = 1
+        numRanks = []
+        for rank in value.keys():
+            numRanks.append(dict.rank2num[rank])
+        for rank in [k[0] for k in sorted(zip(value.keys(), numRanks), key=lambda l: l[1])]:
+            for name in sorted(value[rank]):
+                writer.writerow((str(j) + "." + str(dict.rank2num[rank]) + str(i), author, rank, name))
+                i += 1

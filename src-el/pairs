@@ -1,0 +1,34 @@
+#! /usr/bin/env python
+
+import csv
+import sys
+import dict
+
+data = {}
+
+with sys.stdin as source:
+    lines = csv.reader(source)
+    next(lines, None) #skip header row
+    # categorize the lines based on the first 3 letters of the name
+    for line in lines:
+        if line[3][0:3] not in data:
+            data[line[3][0:3]]= []
+        data[line[3][0:3]].append(line)
+# compare the items in the list two by two
+
+with sys.stdout as dest:
+    writer = csv.writer(dest)
+    for d in data:
+        for i in data[d]:
+            art = []
+            isa = []
+            for j in data[d]:
+                if i!=j:
+                    if i[1]!=j[1]:
+                        art.append(j[0])
+                    else:
+                        if dict.rank2num[i[2]] < dict.rank2num[j[2]]:
+                            isa.append(j[0])
+            i.append(isa)
+            i.append(art)
+            writer.writerow(i)
