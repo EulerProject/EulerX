@@ -2,7 +2,7 @@
 
 import csv
 import sys
-import dict
+import dictionary
            
 data = {} # a nested dictionary to store the taxonomies
 
@@ -26,8 +26,8 @@ with sys.stdout as dest:
         i = 1
         numRanks = []
         for rank in value.keys():
-            numRanks.append(dict.rank2num[rank])
+            numRanks.append(dictionary.rank2num[rank])
         for rank in [k[0] for k in sorted(zip(value.keys(), numRanks), key=lambda l: l[1])]:
             for name in sorted(value[rank]):
-                writer.writerow((str(j) + "." + str(dict.rank2num[rank]) + str(i), author, rank, name))
+                writer.writerow((str(j) + "." + str(dictionary.rank2num[rank]) + str(i), name, author, rank))
                 i += 1
