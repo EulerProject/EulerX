@@ -165,44 +165,29 @@ rule[rcc5["equals"] | rcc5["disjoint"]] =\
                    + ":- #count{X : vrs(X), in($x, X), in($y, X)} > 0, #count{Y : vrs(Y), out($x, Y), in($y, Y)} = 0.\n"\
                    + ":- #count{X : vrs(X), in($x, X), in($y, X)} = 0, #count{Y : vrs(Y), out($x, Y), in($y, Y)} > 0.\n"
 rule[rcc5["equals"] | rcc5["is_included_in"]] =\
-		   "ir(X, $r) :- in($x,X), out($y,X).\n"
-		   + "ir(X, prod($r,R)) :- in($x,X), out3($y, X, R), ix.\n" 
-	           + "pie($r, A, 1) :- ir(X, A), in($x, X), in($y, X), ix.\n"
-	           + "c($r, A, 1) :- vr(X, A), in($x, X), in($y, X), ix.\n\n"
+		   "ir(X, $r) :- in($x,X), out($y,X).\n"\
+		   "ir(X, prod($r,R)) :- in($x,X), out3($y, X, R), ix.\n"\
+	           "pie($r, A, 1) :- ir(X, A), in($x, X), in($y, X), ix.\n"\
+	           "c($r, A, 1) :- vr(X, A), in($x, X), in($y, X), ix.\n\n"
 ruleEx[rcc5["equals"] | rcc5["is_included_in"]] =\
 		   "vr(X, $r) v ir(X, $r) :- out($x,X), in($y,X).\n"\
-		   + ":- #count{X: vrs(X), in($x,X), in($y,X)} = 0, pw.\n" 
+		   ":- #count{X: vrs(X), in($x,X), in($y,X)} = 0, pw.\n"
 rule[rcc5["equals"] | rcc5["includes"]] =\
 		   "ir(X, $r) :- out($x,X), in($y,X).\n"\
-		   + "ir(X, prod($r,R)) :- out3($x, X, R), in($y,X), ix.\n"\
-	           + "pie($r, A, 1) :- ir(X, A), in($x, X), in($y, X), ix.\n"\
-	           + "c($r, A, 1) :- vr(X, A), in($x, X), in($y, X), ix.\n\n"
+		   "ir(X, prod($r,R)) :- out3($x, X, R), in($y,X), ix.\n"\
+	           "pie($r, A, 1) :- ir(X, A), in($x, X), in($y, X), ix.\n"\
+	           "c($r, A, 1) :- vr(X, A), in($x, X), in($y, X), ix.\n\n"
 ruleEx[rcc5["equals"] | rcc5["includes"]] =\
 		   "vr(X, $r) v ir(X, $r) :- in($x,X), out($y,X).\n"\
-		   + ":- #count{X: vrs(X), in($x,X), in($y,X)} = 0, pw.\n" 
-	    elif self.relations == (rcc5["is_included_in"] | rcc5["includes"]):
-		result  = "ir(X, r" + self.ruleNum.__str__() + ") :- in($x,X), out($y,X), vr(Y, _), in($y,Y), out($x,Y).\n"
-                if reasoner[rnr] == reasoner["dlv"]:
-		    result += "ir(Y, r" + self.ruleNum.__str__() + ") :- #count{X: vrs(X), in($x,X), out($y,X)} > 0, in($y,Y), out($x,Y).\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-		    result += "ir(Y, r" + self.ruleNum.__str__() + ") :- 1[vrs(X): in($x,X): out($y,X)], in($y,Y), out($x,Y).\n"
-		#result += "in($y,X) v out($y,X) :- in($x,X).\n" 
-		#result += "in($x,X) v out($x,X) :- out($y,X).\n" 
-		#result += "in($y,X) v out($y,X) :- out($x,X).\n" 
-		#result += "in($x,X) v out($x,X) :- in($y,X).\n" 
-	    elif self.relations == (rcc5["disjoint"] | rcc5["overlaps"]):
-                if reasoner[rnr] == reasoner["dlv"]:
-		    result  = "ir(X, r" + self.ruleNum.__str__() + ") v vr(X, r" + self.ruleNum.__str__() +") :- in($x,X), in($y,X).\n"
-		    result += ":- #count{X: vrs(X), in($x,X), out($y,X)} = 0, pw.\n" 
-		    result += ":- #count{X: vrs(X), in($y,X), out($x,X)} = 0, pw.\n" 
-                elif reasoner[rnr] == reasoner["gringo"]:
-		    result  = "ir(X, r" + self.ruleNum.__str__() + ") | vr(X, r" + self.ruleNum.__str__() +") :- in($x,X), in($y,X).\n"
-		    align.basePw += ":- [vrs(X): in($x,X): out($y,X)]0.\n" 
-		    align.basePw += ":- [vrs(X): out($x,X): in($y,X)]0.\n" 
-		#result += "in($y,X) v out($y,X) :- in($x,X).\n" 
-		#result += "in($x,X) v out($x,X) :- out($y,X).\n" 
-		#result += "in($y,X) v out($y,X) :- out($x,X).\n" 
-		#result += "in($x,X) v out($x,X) :- in($y,X).\n" 
+		   ":- #count{X: vrs(X), in($x,X), in($y,X)} = 0, pw.\n" 
+rule[rcc5["is_included_in"] | rcc5["includes"]] =\
+		   "ir(X, $r) :- in($x,X), out($y,X), vr(Y, _), in($y,Y), out($x,Y).\n"\
+		   "ir(Y, $r) :- #count{X: vrs(X), in($x,X), out($y,X)} > 0, in($y,Y), out($x,Y).\n"
+rule[rcc5["disjoint"] | rcc5["overlaps"] =\
+		   "ir(X, $r) v vr(X, $r) :- in($x,X), in($y,X).\n"
+ruleEx[rcc5["disjoint"] | rcc5["overlaps"] =\
+		   ":- #count{X: vrs(X), in($x,X), out($y,X)} = 0, pw.\n" 
+		   ":- #count{X: vrs(X), in($y,X), out($x,X)} = 0, pw.\n" 
 	    elif self.relations == (rcc5["equals"] | rcc5["overlaps"]):
                 if reasoner[rnr] == reasoner["dlv"]:
 		    result  = ":- #count{X: vrs(X), in($x,X), out($y,X)} > 0, #count{Y: vrs(Y), in($y,Y), out($x,Y)} = 0, pw.\n"
