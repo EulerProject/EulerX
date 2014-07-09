@@ -464,12 +464,6 @@ rule[rcc5["equals"] | rcc5["overlaps"]] =\
         	result += "ir(X, $r) :- in(" + name3 + ",X), out($x,X).\n"
         	result += "ir(X, $r) :- in(" + name4 + ",X), out($x,X).\n"
         	result += "ir(X, $r) :- in(" + name5 + ",X), out($x,X).\n" 
-		#result += "in($x,X) :- in($y,X).\n" 
-		#result += "in($x,X) :- in(" + name3 + ",X).\n" 
-		#result += "out($y,X) :- out($x,X).\n" 
-		#result += "out(" + name3 + ",X) :- out($x,X).\n" 
-		#result += "in($y,X) v in(" + name3 + ",X) :- in($x,X).\n" 
-		#result += "out(" +name1 + ",X) :- out($y,X), out(" + name3 + ",X).\n" 
 	    else:
 		print "Relation ",self.relations," is not yet supported!!!!"
 		result = "\n"
