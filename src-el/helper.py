@@ -19,7 +19,6 @@ class Logger(object):
         self.log = open(filename, "a")
 
     def __del__(self):
-        self.terminal.close()
         self.log.close()  
 
     def write(self, message):

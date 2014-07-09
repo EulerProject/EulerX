@@ -1,17 +1,7 @@
 from helper import *
 
 class template:
-    global encErrMsg
     encErrMsg = "\nEncoding error, please contact Mingmin at michen@ucdavis.edu"
-
-    global aspVrCon              # Base vr concept encoding
-    global aspMnCon              # Base mn concept encoding
-    global aspDlCon              # Base dl concept encoding
-    global aspDrCon              # Base dr concept encoding
-    global aspCbCon              # Base cb new concept encoding
-    global aspPwDc               # Base pw decoding
-    global aspAllDc              # Base pw decoding with "--all"
-    global aspCbDc               # Base cb decoding
 
     # Base constraints of regions for several encodings
     aspRnCnt = "%%% Constraints of regions.\n"\
@@ -25,6 +15,7 @@ class template:
 	     + "ie(s(R, A, Y)) :- pie(R, A, Y), not cc(R, Y), ix.\n"\
 	     + "cc(R, Y) :- c(R, _, Y), ix.\n"
 
+    # Base vr concept encoding
     aspVrCon = "\n%%% power\n"\
 	     + "p(0,1).\n"\
 	     + "p(N,M) :- r(N),N=N1+1,p(N1,M1),M=M1*2.\n\n"\
@@ -39,6 +30,7 @@ class template:
 	     + "irs(M) :- in(X, M), out(X, M), r(M), concept(X,_,_).\n"\
              + aspRnCnt
 
+    # Base mn concept encoding
     aspMnCon = "\n\n%%% Meaning of regions\n"\
              + "in(X, M) :- r(M),concept(X,T,N),N1=N+1,bit(M,T,N1).\n"\
              + "out(X, M) :- r(M),concept(X,T,N),N1=N+1,not bit(M,T,N1).\n"\
@@ -47,6 +39,7 @@ class template:
              + "irs(M) :- in(X, M), out(X, M), r(M), concept2(X,_).\n\n"\
              + aspRnCnt
 
+    # Base cb new concept encoding
     aspCbCon = "cb(X) :- newcon(X, _, _, _).\n"\
              + "cp(X) :- concept2(X, _).\n"\
              + "con(X) :- cb(X).\n"\
@@ -90,6 +83,7 @@ class template:
 	     + "%minus(X, Y, Z) :- con(X), con(Y), con(Z), not nminus(X, Y, Z).\n"
 
 
+    # Base dl concept encoding
     aspDlCon = "%%% Meaning of regions\n"\
 	     + "in(X, M) :- r(M),concept(X,_,N),bit(M,N).\n"\
 	     + "in(X, M) v out(X, M) :- r(M),concept(X,_,N),bit(M,N1), N<>N1.\n"\
@@ -98,6 +92,7 @@ class template:
              + aspRnCnt
 
 
+    # Base dr concept encoding
     aspDrCon = "\n% GENERATE possible labels\n"\
 	     + "node(X) :- concept(X, _, _).\n"\
              + "rel(X, Y, R) :- label(X, Y, R), X < Y.\n"\
@@ -160,6 +155,7 @@ class template:
              + "label(X2, Y2, R) :- sum(X, X1, X2), sum(Y, Y1, Y2), label(X1, Y1, eq), label(X, Y, R).\n"\
              + "label(X, Y, in) v label(X, Y, eq) :- sum(Y, Y1, Y2), label(X, Y1, in), label(X, Y2, in).\n"\
 
+    # Base pw decoding
     aspPwDc = "%%% Decoding now\n"\
             + ":- rel(X, Y, \"=\"), rel(X, Y, \"<\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
             + ":- rel(X, Y, \"=\"), rel(X, Y, \">\"), concept2(X, N1), concept2(Y, N2), pw.\n"\
@@ -188,85 +184,71 @@ class template:
             + "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), X < Y, vrs(R), in(X, R), in(Y, R), not ncf(X), not ncf(Y), pw.\n"\
             + "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), X < Y, vrs(R), out(X, R), in(Y, R), not ncf(X), not ncf(Y), pw.\n\n"
 
+    # Base pw decoding with "--all"
     aspAllDc = aspPwDc + hintall
 
     aspPwDc += hintart
 
-    aspCbDc  = aspPwDc
-            #+  "combined(XC,0,3) :- ctocc(X, XC, _), combined(X,2,_).\n"\
-            #+  "combined(Y,0,2) :- relcc(X,Y,\"=\"), newcon(X, _, _, 1), newcon(Y, _, _, 0).\n"\
-            #+  "combined(Y,0,2) :- relcc(X,Y,\"=\"), newcon(X, _, _, 1), newcon(Y, _, _, 2).\n"\
-            #+  "combined(Y,0,2) :- relcc(Y,X,\"=\"), newcon(X, _, _, 1), newcon(Y, _, _, 0).\n"\
-            #+  "combined(Y,0,2) :- relcc(Y,X,\"=\"), newcon(X, _, _, 1), newcon(Y, _, _, 2).\n"\
-            #+  "combined(XC,0,2) :- rel(X,Y,\"><\"), ctocc(X, XC, _).\n"\
-            #+  "combined(YC,0,2) :- rel(X,Y,\"><\"), ctocc(Y, YC, _).\n"\
-            #+  "combined2(Y,0) :- relcc(X,Y,\"=\"),cb(Y).\n"\
-            #+  "hant(X, Y, 0) :- combined(X,1,Z), combined(Y,1,W), not hant(X, Y, 3), vrs(R), in(X, R), out(Y, R).\n"\
-            #+  "hant(X, Y, 0) :- combined(X,1,2), combined(Y,1,2), not hant(X, Y, 3), vrs(R), in(X, R), out(Y, R).\n"\
-            #+  "hant(X, Y, 1) :- combined(X,1,Z), combined(Y,1,W), not hant(X, Y, 3), vrs(R), in(X, R),  in(Y, R).\n"\
-            #+  "hant(X, Y, 1) :- combined(X,1,2), combined(Y,1,2), not hant(X, Y, 3), vrs(R), in(X, R),  in(Y, R).\n"\
-            #+  "hant(X, Y, 2) :- combined(X,1,Z), combined(Y,1,W), not hant(X, Y, 3), vrs(R), out(X, R), in(Y, R).\n"\
-            #+  "hant(X, Y, 2) :- combined(X,1,2), combined(Y,1,2), not hant(X, Y, 3), vrs(R), out(X, R), in(Y, R).\n"\
-            #+  "combined2(X,0) :- relcc(X,Y,\"><\").\n"\
-            #+  "combined2(Y,0) :- relcc(X,Y,\"><\").\n"\
-    aspCbDc += "%%% Combined concept decoding\n"\
-            +  "combined(X,1,0) :- rel(X,Y,\">\").\n"\
-            +  "combined(X,1,0) :- rel(X,Y,\"<\").\n"\
-            +  "combined(X,1,0) :- rel(X,Y,\"=\").\n"\
-            +  "combined(X,1,0) :- rel(X,Y,\"!\").\n"\
-            +  "combined(Y,1,1) :- rel(X,Y,\">\").\n"\
-            +  "combined(Y,1,1) :- rel(X,Y,\"<\").\n"\
-            +  "combined(Y,1,1) :- rel(X,Y,\"=\").\n"\
-            +  "combined(Y,1,1) :- rel(X,Y,\"!\").\n"\
-            +  "combined(Z,1,2) :- rel(X,Y,\"><\"), newcon(Z, X, Y, _).\n"\
-            +  "%%% unhide the overlap concepts\n"\
-            +  "combined(X,1,0) :- rel(X,Y,\"><\").\n"\
-            +  "combined(X,0,0) :- rel(X,Y,\"><\"), hide.\n"\
-            +  "%%% unhide the overlap concepts\n"\
-            +  "combined(Y,1,1) :- rel(X,Y,\"><\").\n"\
-            +  "combined(Y,0,1) :- rel(X,Y,\"><\"), hide.\n"\
-            +  "combined2(X,Y) :- combined(X,Y,Z).\n"\
-            +  "combined2(X,1) :- not combined2(X,0), con(X).\n"\
-            +  "combined2(X,2) :- combined2(X,1), not combined2(X,0), con(X).\n"\
-            +  "combined2(X,1) :- relcc(X,Y,\"<\").\n"\
-            +  "combined2(X,1) :- relcc(X,Y,\">\").\n"\
-            +  "combined2(X,1) :- relcc(X,Y,\"=\").\n"\
-            +  "combined2(X,1) :- relcc(X,Y,\"!\").\n"\
-            +  "combined2(Y,1) :- relcc(X,Y,\"<\").\n"\
-            +  "combined2(Y,1) :- relcc(X,Y,\">\").\n"\
-            +  "combined2(Y,1) :- relcc(X,Y,\"=\"),con(Y).\n"\
-            +  "combined2(Y,1) :- relcc(X,Y,\"!\").\n"\
-            +  "hant(X, X, 3) :- combined2(X,1).\n"\
-            +  "hant(X, Y, 0) :- combined2(X,1), combined2(Y,1), not hant(X, Y, 3), vrs(R), in(X, R), out(Y, R).\n"\
-            +  "hant(X, Y, 1) :- combined2(X,1), combined2(Y,1), not hant(X, Y, 3), vrs(R), in(X, R),  in(Y, R).\n"\
-            +  "hant(X, Y, 2) :- combined2(X,1), combined2(Y,1), not hant(X, Y, 3), vrs(R), out(X, R), in(Y, R).\n"\
-            +  "relcc(X, Y, \"=\") :- X<Y, not hant(X, Y, 0), hant(X, Y, 1), not hant(X, Y, 2), pw.\n"\
-            +  "relcc(X, Y, \"<\") :- X<Y, not hant(X, Y, 0), hant(X, Y, 1), hant(X, Y, 2), pw.\n"\
-            +  "relcc(X, Y, \">\") :- X<Y, hant(X, Y, 0), hant(X, Y, 1), not hant(X, Y, 2), pw.\n"\
-            +  "relcc(X, Y, \"><\") :- X<Y, hant(X, Y, 0), hant(X, Y, 1), hant(X, Y, 2), pw.\n"\
-            +  "relcc(X, Y, \"!\") :- X<Y, hant(X, Y, 0), not hant(X, Y, 1), hant(X, Y, 2), pw.\n"\
-            +  "%combined2(Z,1) :- relcc(X,Y,\"><\"), and(X, Y, Z).\n"\
-            +  "%%%% unhide the overlap concepts\n"\
-            +  "%combined2(X,1) :- relcc(X,Y,\"><\"), and(X, Y, Z).\n"\
-            +  "%combined2(X,0) :- relcc(X,Y,\"><\"), and(X, Y, Z), hide.\n"\
-            +  "%%%% unhide the overlap concepts\n"\
-            +  "%combined2(Y,1) :- relcc(X,Y,\"><\"), and(X, Y, Z).\n"\
-            +  "%combined2(Y,0) :- relcc(X,Y,\"><\"), and(X, Y, Z), hide.\n"\
-            +  "%combined2(Z,1) :- relcc(X,Y,\"><\"), minus(X, Y, Z).\n"\
-            +  "%%%% unhide the overlap concepts\n"\
-            +  "%combined2(X,1) :- relcc(X,Y,\"><\"), minus(X, Y, Z).\n"\
-            +  "%combined2(X,0) :- relcc(X,Y,\"><\"), minus(X, Y, Z), hide.\n"\
-            +  "%%%% unhide the overlap concepts\n"\
-            +  "%combined2(Y,1) :- relcc(X,Y,\"><\"), minus(X, Y, Z).\n"\
-            +  "%combined2(Y,0) :- relcc(X,Y,\"><\"), minus(X, Y, Z), hide.\n"\
-            +  "%combined2(Z,1) :- relcc(X,Y,\"><\"), minus(Y, X, Z).\n"\
-            +  "%%%% unhide the overlap concepts\n"\
-            +  "%combined2(X,1) :- relcc(X,Y,\"><\"), minus(Y, X, Z).\n"\
-            +  "%combined2(X,0) :- relcc(X,Y,\"><\"), minus(Y, X, Z), hide.\n"\
-            +  "%%%% unhide the overlap concepts\n"\
-            +  "%combined2(Y,1) :- relcc(X,Y,\"><\"), minus(Y, X, Z).\n"\
-            +  "%combined2(Y,0) :- relcc(X,Y,\"><\"), minus(Y, X, Z), hide.\n"\
-            +  "relout(X, Y, Z) :- relcc(X, Y, Z), combined2(X, 2), combined2(Y, 2).\n"
+    # Base cb decoding
+    aspCbDc  = aspPwDc +\
+              "%%% Combined concept decoding\n"\
+              "combined(X,1,0) :- rel(X,Y,\">\").\n"\
+              "combined(X,1,0) :- rel(X,Y,\"<\").\n"\
+              "combined(X,1,0) :- rel(X,Y,\"=\").\n"\
+              "combined(X,1,0) :- rel(X,Y,\"!\").\n"\
+              "combined(Y,1,1) :- rel(X,Y,\">\").\n"\
+              "combined(Y,1,1) :- rel(X,Y,\"<\").\n"\
+              "combined(Y,1,1) :- rel(X,Y,\"=\").\n"\
+              "combined(Y,1,1) :- rel(X,Y,\"!\").\n"\
+              "combined(Z,1,2) :- rel(X,Y,\"><\"), newcon(Z, X, Y, _).\n"\
+              "%%% unhide the overlap concepts\n"\
+              "combined(X,1,0) :- rel(X,Y,\"><\").\n"\
+              "combined(X,0,0) :- rel(X,Y,\"><\"), hide.\n"\
+              "%%% unhide the overlap concepts\n"\
+              "combined(Y,1,1) :- rel(X,Y,\"><\").\n"\
+              "combined(Y,0,1) :- rel(X,Y,\"><\"), hide.\n"\
+              "combined2(X,Y) :- combined(X,Y,Z).\n"\
+              "combined2(X,1) :- not combined2(X,0), con(X).\n"\
+              "combined2(X,2) :- combined2(X,1), not combined2(X,0), con(X).\n"\
+              "combined2(X,1) :- relcc(X,Y,\"<\").\n"\
+              "combined2(X,1) :- relcc(X,Y,\">\").\n"\
+              "combined2(X,1) :- relcc(X,Y,\"=\").\n"\
+              "combined2(X,1) :- relcc(X,Y,\"!\").\n"\
+              "combined2(Y,1) :- relcc(X,Y,\"<\").\n"\
+              "combined2(Y,1) :- relcc(X,Y,\">\").\n"\
+              "combined2(Y,1) :- relcc(X,Y,\"=\"),con(Y).\n"\
+              "combined2(Y,1) :- relcc(X,Y,\"!\").\n"\
+              "hant(X, X, 3) :- combined2(X,1).\n"\
+              "hant(X, Y, 0) :- combined2(X,1), combined2(Y,1), not hant(X, Y, 3), vrs(R), in(X, R), out(Y, R).\n"\
+              "hant(X, Y, 1) :- combined2(X,1), combined2(Y,1), not hant(X, Y, 3), vrs(R), in(X, R),  in(Y, R).\n"\
+              "hant(X, Y, 2) :- combined2(X,1), combined2(Y,1), not hant(X, Y, 3), vrs(R), out(X, R), in(Y, R).\n"\
+              "relcc(X, Y, \"=\") :- X<Y, not hant(X, Y, 0), hant(X, Y, 1), not hant(X, Y, 2), pw.\n"\
+              "relcc(X, Y, \"<\") :- X<Y, not hant(X, Y, 0), hant(X, Y, 1), hant(X, Y, 2), pw.\n"\
+              "relcc(X, Y, \">\") :- X<Y, hant(X, Y, 0), hant(X, Y, 1), not hant(X, Y, 2), pw.\n"\
+              "relcc(X, Y, \"><\") :- X<Y, hant(X, Y, 0), hant(X, Y, 1), hant(X, Y, 2), pw.\n"\
+              "relcc(X, Y, \"!\") :- X<Y, hant(X, Y, 0), not hant(X, Y, 1), hant(X, Y, 2), pw.\n"\
+              "%combined2(Z,1) :- relcc(X,Y,\"><\"), and(X, Y, Z).\n"\
+              "%%%% unhide the overlap concepts\n"\
+              "%combined2(X,1) :- relcc(X,Y,\"><\"), and(X, Y, Z).\n"\
+              "%combined2(X,0) :- relcc(X,Y,\"><\"), and(X, Y, Z), hide.\n"\
+              "%%%% unhide the overlap concepts\n"\
+              "%combined2(Y,1) :- relcc(X,Y,\"><\"), and(X, Y, Z).\n"\
+              "%combined2(Y,0) :- relcc(X,Y,\"><\"), and(X, Y, Z), hide.\n"\
+              "%combined2(Z,1) :- relcc(X,Y,\"><\"), minus(X, Y, Z).\n"\
+              "%%%% unhide the overlap concepts\n"\
+              "%combined2(X,1) :- relcc(X,Y,\"><\"), minus(X, Y, Z).\n"\
+              "%combined2(X,0) :- relcc(X,Y,\"><\"), minus(X, Y, Z), hide.\n"\
+              "%%%% unhide the overlap concepts\n"\
+              "%combined2(Y,1) :- relcc(X,Y,\"><\"), minus(X, Y, Z).\n"\
+              "%combined2(Y,0) :- relcc(X,Y,\"><\"), minus(X, Y, Z), hide.\n"\
+              "%combined2(Z,1) :- relcc(X,Y,\"><\"), minus(Y, X, Z).\n"\
+              "%%%% unhide the overlap concepts\n"\
+              "%combined2(X,1) :- relcc(X,Y,\"><\"), minus(Y, X, Z).\n"\
+              "%combined2(X,0) :- relcc(X,Y,\"><\"), minus(Y, X, Z), hide.\n"\
+              "%%%% unhide the overlap concepts\n"\
+              "%combined2(Y,1) :- relcc(X,Y,\"><\"), minus(Y, X, Z).\n"\
+              "%combined2(Y,0) :- relcc(X,Y,\"><\"), minus(Y, X, Z), hide.\n"\
+              "relout(X, Y, Z) :- relcc(X, Y, Z), combined2(X, 2), combined2(Y, 2).\n"
             #+  "relout(X, Y, Z) :- relcc(X, Y, Z), combined(X, 2, T), combined(Y, 2, S), T<S.\n"\
             #+  "relout(X, Y, Z) :- relcc(X, Y, Z), combined(X, 2, 2), combined(Y, 2, 2).\n"
 
@@ -278,48 +260,39 @@ class template:
     # Binary encoding base constraints
     @Callable
     def getAspVrCon():
-        global aspVrCon
-        return aspVrCon
+        return template.aspVrCon
 
     # Polynomial encoding base constraints
     @Callable
     def getAspMnCon():
-        global aspMnCon
-        return aspMnCon
+        return template.aspMnCon
 
     # Probability encoding base constraints
     @Callable
     def getAspDlCon():
-        global aspDlCon
-        return aspDlCon
+        return template.aspDlCon
 
     # Direct encoding base constraints
     @Callable
     def getAspDrCon():
-        global aspDrCon
-        return aspDrCon
+        return template.aspDrCon
 
     @Callable
     def getAspCbCon():
-        global aspCbCon
-        return aspCbCon
+        return template.aspCbCon
 
     @Callable
     def getAspPwDc():
-        global aspPwDc
-        return aspPwDc
+        return template.aspPwDc
 
     @Callable
     def getAspAllDc():
-        global aspAllDc
-        return aspAllDc
+        return template.aspAllDc
 
     @Callable
     def getAspCbDc():
-        global aspCbDc
-        return aspCbDc
+        return template.aspCbDc
 
     @Callable
     def getEncErrMsg():
-        global encErrMsg
-        return encErrMsg
+        return template.encErrMsg

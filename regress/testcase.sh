@@ -10,7 +10,11 @@ else
   rm $1.out;
   echo "$1 $2 Passed!"
   rm *txt >& /dev/null
+  rm *yaml >& /dev/null
+  rm *out >& /dev/null
+  rm *stderr >& /dev/null
   rm *dot >& /dev/null
+  rm *pw >& /dev/null
   rm *png >& /dev/null
   rm *pdf >& /dev/null
   rm -rf asp
