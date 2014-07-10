@@ -5,7 +5,7 @@ class CtiParser:
 
     inst = None
 
-    @Callable
+    @staticmethod
     def instance():
         if CtiParser.inst is None:
             CtiParser.inst = OptionParser(usage="usage: %prog [options]",
@@ -17,7 +17,7 @@ class EulerParser:
 
     inst = None
 
-    @Callable
+    @staticmethod
     def instance():
         if EulerParser.inst is None:
             EulerParser.inst = OptionParser(usage="usage: %prog [options]",
