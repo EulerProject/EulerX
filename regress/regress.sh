@@ -10,6 +10,7 @@
 ./testcase.sh abstract4 gringo mnpw
 ./testcase.sh ltds dlv mnpw
 ./testcase.sh ltds gringo mnpw
+./testcase.sh eqoldj dlv mnpw
 ./testcase.sh singleton dlv vrpw
 ### TODO binary encoding for gringo may not be working well,
 ###      gringo4 may be needed
