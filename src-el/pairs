@@ -27,7 +27,7 @@ with sys.stdout as dest:
                     if i[2]!=j[2]:
                         art.append(j[0])
                     else:
-                        if dictionary.rank2num[i[3]] < dictionary.rank2num[j[3]]:
+                        if dictionary.rank2num.get(i[3],(0,0))[0] < dictionary.rank2num.get(j[3],(0,0))[0]:
                             isa.append(j[0])
             i.append(isa)
             i.append(art)
