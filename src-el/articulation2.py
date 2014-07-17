@@ -224,69 +224,53 @@ rule[rcc5["is_included_in"] | rcc5["disjoint"]] =\
 rule[rcc5["includes"] | rcc5["overlaps"]] =\
 		   "vrs(X) v irs(X) :- out($x,X), in($y,X), pw.\n"\
 		   ":- #count{X: vrs(X), in($x,X), in($y,X)} = 0, pw.\n"\
-		   ":- #count{X: vrs(X), in($x,X), out($y,X)} = 0, pw.\n" 
-	    elif self.relations == (rcc5["includes"] | rcc5["disjoint"]):
-                if reasoner[rnr] == reasoner["dlv"]:
-		    result += ":- #count{X: vrs(X), in($x,X), out($y,X)} = 0, pw.\n"
-		    result += ":- #count{X: vrs(X), in($x,X), in($y,X)} > 0, #count{Y: vrs(Y), in($y,Y), out($x,Y)} > 0, pw.\n"
-		    result += ":- #count{X: vrs(X), in($x,X), in($y,X)} = 0, #count{Y: vrs(Y), in($y,Y), out($x,Y)} = 0, pw.\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-		    #align.basePw += ":- [vrs(X): in($x,X): out($y,X)]0.\n" 
-		    align.basePw += "rel($x, $y, \"!\") | rel($x, $y, \">\").\n" 
-	        result += "pie($r, A, 1) :- ir(X, A), in($x, X), out($y, X), ix.\n"
-	        result += "c($r, A, 1) :- vr(X, A), in($x, X), out($y, X), ix.\n\n"
-	        result += "pie($r, prod(A, B), 2) :- vr(X, A), in($x, X), in($y, X), vr(Y, B), in("+ name2 + ",Y), out($x,Y), ix.\n"
-	        result += "pie($r, A, 3) :- ir(X, A), in($x, X), in($y, X), ix.\n"
-	        result += "c($r, A, 3) :- vr(X, A), in($x, X), in($y, X), ix.\n\n"
-	        result += "c($r, A, 3) :- vr(X, A), out($x, X), in($y, X), ix.\n\n"
-	    elif self.relations == (rcc5["includes"] | rcc5["is_included_in"] | rcc5["equals"]):
-                if reasoner[rnr] == reasoner["dlv"]:
-		  result += "vr(X, $r) v ir(X, $r) :- out($x,X), in($y,X).\n" 
-		  result += "vr(X, $r) v ir(X, $r) :- in($x,X), out($y,X).\n" 
-                  result += ":- #count{X: vrs(X), in($x,X), out($y, X)} > 0, #count{Y: vrs(Y), out($x,Y), in($y, Y)} > 0.\n"
-                  result += ":- #count{X: vrs(X), in($x,X), in($y, X)} = 0.\n\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-		  result += "vr(X, $r) | ir(X, $r) :- out($x,X), in($y,X).\n" 
-		  result += "vr(X, $r) | ir(X, $r) :- in($x,X), out($y,X).\n" 
-                  result += ":- 1[vrs(X): in($x,X): out($y, X)], 1[vrs(X): out($x,X): in($y, X)].\n"
-                  result += ":- [vrs(X): in($x,X): in($y, X)]0.\n\n"
-	    elif self.relations == (rcc5["is_included_in"] | rcc5["equals"] | rcc5["overlaps"]):
-                if reasoner[rnr] == reasoner["dlv"]:
-                  result += ":- #count{X: vrs(X), in($x,X), out($y, X)} > 0, #count{Y: vrs(Y), out($x,Y), in($y, Y)} = 0.\n"
-                  result += ":- #count{X: vrs(X), in($x,X), in($y, X)} = 0.\n\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-                  result += ":- 1[vrs(X): in($x,X): out($y, X)], [vrs(X): out($x,X): in($y, X)]0.\n"
-                  result += ":- [vrs(X): in($x,X): in($y, X)]0.\n\n"
-	    elif self.relations == (rcc5["includes"] | rcc5["equals"] | rcc5["overlaps"]):
-                if reasoner[rnr] == reasoner["dlv"]:
-                  result += ":- #count{X: vrs(X), in($x,X), out($y, X)} = 0, #count{Y: vrs(Y), out($x,Y), in($y, Y)} > 0.\n"
-                  result += ":- #count{X: vrs(X), in($x,X), in($y, X)} = 0.\n\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-                  result += ":- [vrs(X): in($x,X): out($y, X)]0, 1[vrs(X): out($x,X): in($y, X)].\n"
-                  result += ":- [vrs(X): in($x,X): in($y, X)]0.\n\n"
-	    elif self.relations == (rcc5["equals"] | rcc5["includes"] | rcc5["disjoint"]):
-                if reasoner[rnr] == reasoner["dlv"]:
-                  result += ":- #count{X: vrs(X), out($x, X), in($y, X)} = 0, #count{Y: vrs(Y), in(" + name1 +", Y), in($y, Y)} = 0.\n"
-                  result += ":- #count{X: vrs(X), out($x, X), in($y, X)} > 0, #count{Y: vrs(Y), in(" + name1 +", Y), in($y, Y)} > 0.\n"
-                  result += ":- #count{X: vrs(X), out($x, X), in($y, X)} > 0, #count{Y: vrs(Y), in(" + name1 +", Y), in($y, Y)} = 0, #count{Z: vrs(Z), in($x, Z), out($y, Z)} = 0.\n\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-                  # TODO
-                  result = ""
-	    elif self.relations == (rcc5["equals"] | rcc5["is_included_in"] | rcc5["disjoint"]):
-                if reasoner[rnr] == reasoner["dlv"]:
-                  result += ":- #count{X: vrs(X), in($x, X), out($y, X)} = 0, #count{Y:vrs(Y), in($x, Y), in($y, Y)} = 0.\n"
-                  result += ":- #count{X: vrs(X), in($x, X), out($y, X)} > 0, #count{Y:vrs(Y), in($x, Y), in($y, Y)} > 0.\n"
-                  result += ":- #count{X: vrs(X), in($x, X), out($y, X)} > 0, #count{Y:vrs(Y), in($x, Y), in($y, Y)} = 0, #count{Z: vrs(Z), out($x, Z), in($y, Z)} = 0.\n\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-                  # TODO
-                  result = ""
-	    elif self.relations == (rcc5["includes"] | rcc5["is_included_in"] | rcc5["overlaps"]):
-                if reasoner[rnr] == reasoner["dlv"]:
-                  result += ":- #count{X: vrs(X), in($x,X), out($y, X)} = 0, #count{Y: vrs(Y), out($x,Y), in($y, Y)} = 0, #count{Z: vrs(Z), in($x,Z), in($y, Z)} > 0.\n"
-                  result += ":- #count{X: vrs(X), in($x,X), in($y, X)} = 0.\n\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-                  result += ":- [vrs(X): in($x,X): out($y, X)]0, [vrs(X): out($x,X): in($y, X)]0, 1[vrs(X): in($x,X): in($y, X)].\n"
-                  result += ":- [vrs(X): in($x,X): in($y, X)]0.\n\n"
+		   ":- #count{X: vrs(X), in($x,X), out($y,X)} = 0, pw.\n"
+rule[rcc5["includes"] | rcc5["disjoint"]] =\
+		   ":- #count{X: vrs(X), in($x,X), out($y,X)} = 0, pw.\n"\
+		   ":- #count{X: vrs(X), in($x,X), in($y,X)} > 0, #count{Y: vrs(Y), in($y,Y), out($x,Y)} > 0, pw.\n"\
+		   ":- #count{X: vrs(X), in($x,X), in($y,X)} = 0, #count{Y: vrs(Y), in($y,Y), out($x,Y)} = 0, pw.\n"\
+	           "pie($r, A, 1) :- ir(X, A), in($x, X), out($y, X), ix.\n"\
+	           "c($r, A, 1) :- vr(X, A), in($x, X), out($y, X), ix.\n\n"\
+	           "pie($r, prod(A, B), 2) :- vr(X, A), in($x, X), in($y, X), vr(Y, B), in("+ name2 + ",Y), out($x,Y), ix.\n"\
+	           "pie($r, A, 3) :- ir(X, A), in($x, X), in($y, X), ix.\n"\
+	           "c($r, A, 3) :- vr(X, A), in($x, X), in($y, X), ix.\n\n"\
+	           "c($r, A, 3) :- vr(X, A), out($x, X), in($y, X), ix.\n\n"
+rule[rcc5["includes"] | rcc5["is_included_in"] | rcc5["equals"]] =\
+		   "vr(X, $r) v ir(X, $r) :- out($x,X), in($y,X).\n"\
+		   "vr(X, $r) v ir(X, $r) :- in($x,X), out($y,X).\n"\
+                   ":- #count{X: vrs(X), in($x,X), out($y, X)} > 0, #count{Y: vrs(Y), out($x,Y), in($y, Y)} > 0.\n"\
+                   ":- #count{X: vrs(X), in($x,X), in($y, X)} = 0.\n\n"
+rule[rcc5["is_included_in"] | rcc5["equals"] | rcc5["overlaps"]] =\
+                   ":- #count{X: vrs(X), in($x,X), out($y, X)} > 0, #count{Y: vrs(Y), out($x,Y), in($y, Y)} = 0.\n"\
+                   ":- #count{X: vrs(X), in($x,X), in($y, X)} = 0.\n\n"
+rule[rcc5["includes"] | rcc5["equals"] | rcc5["overlaps"]] =\
+                   ":- #count{X: vrs(X), in($x,X), out($y, X)} = 0, #count{Y: vrs(Y), out($x,Y), in($y, Y)} > 0.\n"\
+                   ":- #count{X: vrs(X), in($x,X), in($y, X)} = 0.\n\n"
+rule[rcc5["equals"] | rcc5["includes"] | rcc5["disjoint"]] =\
+                   ":- #count{X: vrs(X), out($x, X), in($y, X)} = 0, #count{Y: vrs(Y), in($x, Y), in($y, Y)} = 0.\n"\
+                   ":- #count{X: vrs(X), out($x, X), in($y, X)} > 0, #count{Y: vrs(Y), in($x, Y), in($y, Y)} > 0.\n"\
+                   ":- #count{X: vrs(X), out($x, X), in($y, X)} > 0, #count{Y: vrs(Y), in($x, Y), in($y, Y)} = 0, #count{Z: vrs(Z), in($x, Z), out($y, Z)} = 0.\n\n"
+rule[rcc5["equals"] | rcc5["is_included_in"] | rcc5["disjoint"]] =\
+                   ":- #count{X: vrs(X), in($x, X), out($y, X)} = 0, #count{Y:vrs(Y), in($x, Y), in($y, Y)} = 0.\n"\
+                   ":- #count{X: vrs(X), in($x, X), out($y, X)} > 0, #count{Y:vrs(Y), in($x, Y), in($y, Y)} > 0.\n"\
+                   ":- #count{X: vrs(X), in($x, X), out($y, X)} > 0, #count{Y:vrs(Y), in($x, Y), in($y, Y)} = 0, #count{Z: vrs(Z), out($x, Z), in($y, Z)} = 0.\n\n"
+rule[rcc5["includes"] | rcc5["is_included_in"] | rcc5["overlaps"]] =\
+                   ":- #count{X: vrs(X), in($x,X), out($y, X)} = 0, #count{Y: vrs(Y), out($x,Y), in($y, Y)} = 0, #count{Z: vrs(Z), in($x,Z), in($y, Z)} > 0.\n"\
+                   ":- #count{X: vrs(X), in($x,X), in($y, X)} = 0.\n\n"
+rule[rcc5["disjoint"] | rcc5["equals"] | rcc5["overlaps"]] =\
+                   ":- #count{X : vrs(X), in($x, X), out($y, X)} > 0, #count{Y : vrs(Y), out($x, Y ), in($y, Y )} = 0.\n"\
+                   ":- #count{X : vrs(X), in($x, X), out($y, X)} = 0, #count{Y : vrs(Y), out($x, Y ), in($y, Y )} > 0.\n"\
+                   ":- #count{X : vrs(X), in($x, X), out($y, X)} = 0, #count{Y : vrs(Y), in($x, Y ), in($y, Y )} = 0, #count{Z : vrs(Z), out($x, Z), in($y, Z)} = 0.\n\n"
+rule[rcc5["disjoint"] | rcc5["is_included_in"] | rcc5["overlaps"]] =\
+                   ":- #count{X : vrs(X), in($x, X), out($y, X)} = 0, #count{Y: vrs(Y), out($x, Y), in($y, Y)} = 0.\n"\
+                   ":- #count{X : vrs(X), in($x, X), out($y, X)} > 0, #count{Y: vrs(Y), in($x, Y), in($y, Y)} > 0, #count{Z: vrs(Z), out($x, Z), in($y, Z)} = 0.\n\n"
+rule[rcc5["includes"] | rcc5["disjoint"] | rcc5["overlaps"]] =\
+                   ":- #count{X : vrs(X), in($x, X), out($y, X)} = 0, #count{Y : vrs(Y), out($x, Y), in($y, Y)} = 0.\n"\
+                   ":- #count{X : vrs(X), in($x, X), out($y, X)} = 0, #count{Y : vrs(Y), in($x, Y), in($y, Y)} > 0, #count{Z : vrs(Z), out($x, Z), in($y, Z)} > 0.\n"
+rule[rcc5["includes"] | rcc5["is_included_in"] | rcc5["disjoint"]] =\
+                   ":- #count{X: vrs(X), in($x, X), out($y, X)} = 0, #count{Y: vrs(Y), out($x, Y), in($y, Y)} = 0.\n"\
+                   ":- #count{X: vrs(X), in($x, X), out($y, X)} > 0, #count{Y: vrs(Y), in($x, Y), in($y, Y)} > 0, #count{Z : vrs(Z), out($x, Z), in($y, Z)} > 0.\n\n"
+
             elif self.relations == relation["+="]: # lsum
                 name3 = self.taxon3.dlvName()
                 if reasoner[rnr] == reasoner["dlv"]:
