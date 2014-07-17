@@ -12,6 +12,8 @@
 ./testcase.sh ltds gringo mnpw
 ./testcase.sh eqoldj dlv mnpw
 ./testcase.sh ltoldj dlv mnpw
+./testcase.sh gtoldj dlv mnpw
+./testcase.sh gtltdj dlv mnpw
 ./testcase.sh singleton dlv vrpw
 ### TODO binary encoding for gringo may not be working well,
 ###      gringo4 may be needed
