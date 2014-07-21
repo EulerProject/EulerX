@@ -1078,8 +1078,8 @@ class TaxonomyMapping:
                 print "************************************"
                 return True
             self.articulations.insert(i, a)
-        print "Don't know how to repair"
-        print "************************************"
+        print "No immediate repair option, consider running --ie and/or --repair=HST\n"\
+              "************************************"
         return False
 
     def uncReduction(self, pws):
