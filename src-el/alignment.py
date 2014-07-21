@@ -1043,8 +1043,8 @@ class TaxonomyMapping:
                 self.tr = copy.deepcopy(tmptr)
                 self.eq = copy.deepcopy(tmpeq)
             if fixed : return True
-        print "Don't know how to repair"
-        print "************************************"
+        print "No immediate repair option, consider running --ie and/or --repair=HST\n"\
+              "************************************"
         return False
 
 
