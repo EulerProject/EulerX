@@ -74,6 +74,7 @@ class TaxonomyMapping:
         self.enc = encode[options.encode]      # encoding
         self.name = os.path.splitext(os.path.basename(options.inputfile))[0]
         self.firstTName = ""                   # The abbrev name of the first taxonomy
+        self.secondTName = ""                  # The abbrev name of the second taxonomy
         self.firstRcg = False
         self.trlist = []
         self.eqConLi = []                      # list of concepts that are equal
@@ -604,6 +605,7 @@ class TaxonomyMapping:
             if T1s[0] == self.firstTName:
                 tmpStr = T1 + tmpStr
             else:
+                self.secondTName = T1s[0]
                 tmpStr = tmpStr + T1
             if tmpStr[0:2] == "\\n": tmpStr = tmpStr[2:]
             if tmpStr[-2:] == "\\n": tmpStr = tmpStr[:-2]
@@ -711,6 +713,7 @@ class TaxonomyMapping:
                 if self.firstTName == T1s[0]:
                     taxa1 += "  \""+T1+"\"\n"               # used in old viz
                 else:
+                    self.secondTName = T1s[0]
                     taxa2 += "  \""+T1+"\"\n"
                 self.addRcgVizNode(T1s[1], T1s[0])          # used in stylesheet
             else:
@@ -722,6 +725,7 @@ class TaxonomyMapping:
                 if self.firstTName == T2s[0]:
                     taxa1 += "  \""+T2+"\"\n"
                 else:
+                    self.secondTName = T2s[0]
                     taxa2 += "  \""+T2+"\"\n"
                 self.addRcgVizNode(T2s[1], T2s[0])
             else:
@@ -811,7 +815,7 @@ class TaxonomyMapping:
         global styles
         with open(self.stylesheetdir+"rcgstyle.yaml") as rcgStyleFileOld:
             styles = yaml.load(rcgStyleFileOld)
-            
+                    
         # if taxonomy names are not in stylesheet, rewrite styesheet
         if T1s[0] not in styles["nodestyle"] and T2s[0] not in styles["nodestyle"]:
             fOld = open(self.stylesheetdir+"rcgstyle.yaml", "r")
@@ -823,7 +827,7 @@ class TaxonomyMapping:
                     index = contents.index(line)
                     break
                 
-            value = '    "' + T1s[0] + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n    "' + T2s[0] + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n' 
+            value = '    "' + self.firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n    "' + self.secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n' 
                                 
             contents.insert(index+1, value)
 
