@@ -18,6 +18,7 @@ import yaml
 import string
 import getpass
 import socket
+import fileinput
 from taxonomy import * 
 from alignment import * 
 #from redWind import *
@@ -805,6 +806,32 @@ class TaxonomyMapping:
         if self.rcgVizEdges:
             fRcgVizYaml.write(yaml.safe_dump(self.rcgVizEdges, default_flow_style=False))
         fRcgVizYaml.close()
+        
+        # check whether stylesheet taxonomy names are in stylesheet
+        global styles
+        with open(self.stylesheetdir+"rcgstyle.yaml") as rcgStyleFileOld:
+            styles = yaml.load(rcgStyleFileOld)
+            
+        # if taxonomy names are not in stylesheet, rewrite styesheet
+        if T1s[0] not in styles["nodestyle"] and T2s[0] not in styles["nodestyle"]:
+            fOld = open(self.stylesheetdir+"rcgstyle.yaml", "r")
+            contents = fOld.readlines()
+            fOld.close()
+            
+            for line in contents:
+                if "nodestyle" in line:
+                    index = contents.index(line)
+                    break
+                
+            value = '    "' + T1s[0] + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n    "' + T2s[0] + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n' 
+                                
+            contents.insert(index+1, value)
+
+            fNew = open(self.stylesheetdir+"rcgstyle.yaml", "w")
+            contents = "".join(contents)
+            fNew.write(contents)
+            fNew.close()
+        
         
         # apply the rcgviz stylesheet
 #        commands.getoutput("cat "+self.options.outputdir+fileName+".yaml"+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + self.options.outputdir+fileName+".dot")
