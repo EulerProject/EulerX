@@ -270,57 +270,62 @@ rule[rcc5["includes"] | rcc5["disjoint"] | rcc5["overlaps"]] =\
 rule[rcc5["includes"] | rcc5["is_included_in"] | rcc5["disjoint"]] =\
                    ":- #count{X: vrs(X), in($x, X), out($y, X)} = 0, #count{Y: vrs(Y), out($x, Y), in($y, Y)} = 0.\n"\
                    ":- #count{X: vrs(X), in($x, X), out($y, X)} > 0, #count{Y: vrs(Y), in($x, Y), in($y, Y)} > 0, #count{Z : vrs(Z), out($x, Z), in($y, Z)} > 0.\n\n"
-
-            elif self.relations == relation["+="]: # lsum
-                name3 = self.taxon3.dlvName()
-                if reasoner[rnr] == reasoner["dlv"]:
-		    result += ":- #count{X: vrs(X), out($x,X), in(" + name3 + ",X)} = 0, pw.\n" 
-		    result += ":- #count{X: vrs(X), in($x,X), in(" + name3 + ",X)} = 0, pw.\n" 
-		    result += ":- #count{X: vrs(X), out($y,X), in(" + name3 + ",X)} = 0, pw.\n" 
-		    result += ":- #count{X: vrs(X), in($y,X), in(" + name3 + ",X)} = 0, pw.\n" 
-                elif reasoner[rnr] == reasoner["gringo"]:
-		    align.basePw += ":- [vrs(X): out($x,X): in(" + name3 + ",X)]0.\n" 
-		    align.basePw += ":- [vrs(X): in($x,X): in(" + name3 + ",X)]0.\n" 
-		    align.basePw += ":- [vrs(X): out($y,X): in(" + name3 + ",X)]0.\n" 
-		    align.basePw += ":- [vrs(X): in($y,X): in(" + name3 + ",X)]0.\n" 
-	        result += "pie($r, A, 1) :- ir(X, A), out($x, X), in(" + name3 + ", X), ix.\n"
-	        result += "c($r, A, 1) :- vr(X, A), out($x, X), in(" + name3 + ", X), ix.\n\n"
-	        result += "pie($r, A, 2) :- ir(X, A), in($x, X), in(" + name3 + ", X), ix.\n"
-	        result += "c($r, A, 2) :- vr(X, A), in($x, X), in(" + name3 + ", X), ix.\n\n"
-	        result += "pie($r, A, 3) :- ir(X, A), out($y, X), in(" + name3 + ", X), ix.\n"
-	        result += "c($r, A, 3) :- vr(X, A), out($y, X), in(" + name3 + ", X), ix.\n\n"
-	        result += "pie($r, A, 4) :- ir(X, A), in($y, X), in(" + name3 + ", X), ix.\n"
-	        result += "c($r, A, 4) :- vr(X, A), in($y, X), in(" + name3 + ", X), ix.\n\n"
-		result += "ir(X, $r) :- in($x,X), out(" + name3 + ",X), pw.\n" 
-		result += "ir(X, $r) :- in($y,X), out(" + name3 + ",X), pw.\n" 
-		#result += "in(" + name3 + ",X) :- in($x,X).\n" 
-		#result += "in(" + name3 + ",X) :- in($y,X).\n" 
-		#result += "out($x,X) :- out(" + name3 + ",X).\n" 
-		#result += "out($y,X) :- out(" + name3 + ",X).\n" 
-		#result += "in($x,X) v in($y,X) :- in(" + name3 + ",X).\n" 
-		#result += "out(" +name3 + ",X) :- out($x,X), out($y,X).\n"
+rule[rcc5["includes"] | rcc5["is_included_in"] | rcc5["overlaps"] | rcc5["equals"]] =\
+                   ":- #count{X: vrs(X), in($x, X), out($y, X)} > 0,"\
+                   "#count{Y: vrs(Y), in($x, Y), in($y, Y)} = 0,"\
+                   "#count{Z: vrs(Z), out($x, Z), in($y, Z)} > 0.\n\n"
+rule[rcc5["disjoint"] | rcc5["is_included_in"] | rcc5["overlaps"] | rcc5["equals"]] =\
+                   ":- #count{X: vrs(X), in($x, X), out($y, X)} > 0,"\
+                   "#count{Y: vrs(Y), in($x, Y), in($y, Y)} > 0,"\
+                   "#count{Z: vrs(Z), out($x, Z), in($y, Z)} = 0.\n\n"
+rule[rcc5["includes"] | rcc5["disjoint"] | rcc5["overlaps"] | rcc5["equals"]] =\
+                   ":- #count{X: vrs(X), in($x, X), out($y, X)} = 0,"\
+                   "#count{Y: vrs(Y), in($x, Y), in($y, Y)} > 0,"\
+                   "#count{Z: vrs(Z), out($x, Z), in($y, Z)} > 0.\n\n"
+rule[rcc5["includes"] | rcc5["is_included_in"] | rcc5["disjoint"] | rcc5["equals"]] =\
+                   ":- #count{X: vrs(X), in($x, X), out($y, X)} > 0,"\
+                   "#count{Y: vrs(Y), in($x, Y), in($y, Y)} > 0,"\
+                   "#count{Z: vrs(Z), out($x, Z), in($y, Z)} > 0.\n\n"
+rule[rcc5["includes"] | rcc5["is_included_in"] | rcc5["overlaps"] | rcc5["disjoint"]] =\
+                   ":- #count{X: vrs(X), in($x, X), out($y, X)} = 0,"\
+                   "#count{Y: vrs(Y), out($x, Y), in($y, Y)} = 0.\n\n"
+rule[relation["+="]] =\ # lsum
+                   ":- #count{X: vrs(X), out($x,X), in($z,X)} = 0, pw.\n"\
+                   ":- #count{X: vrs(X), in($x,X), in($z,X)} = 0, pw.\n"\
+                   ":- #count{X: vrs(X), out($y,X), in($z,X)} = 0, pw.\n"\ 
+                   ":- #count{X: vrs(X), in($y,X), in($z,X)} = 0, pw.\n"\
+                   "pie($r, A, 1) :- ir(X, A), out($x, X), in($z, X), ix.\n"\
+                   "c($r, A, 1) :- vr(X, A), out($x, X), in($z, X), ix.\n\n"\
+                   "pie($r, A, 2) :- ir(X, A), in($x, X), in($z, X), ix.\n"\
+                   "c($r, A, 2) :- vr(X, A), in($x, X), in($z, X), ix.\n\n"\
+                   "pie($r, A, 3) :- ir(X, A), out($y, X), in($z, X), ix.\n"\
+                   "c($r, A, 3) :- vr(X, A), out($y, X), in($z, X), ix.\n\n"\
+                   "pie($r, A, 4) :- ir(X, A), in($y, X), in($z, X), ix.\n"\
+                   "c($r, A, 4) :- vr(X, A), in($y, X), in($z, X), ix.\n\n"\
+	           "ir(X, $r) :- in($x,X), out($z,X), pw.\n"\
+	           "ir(X, $r) :- in($y,X), out($z,X), pw.\n"
             elif self.relations == relation["=-"]: # rdiff
                 name3 = self.taxon3.dlvName()
                 if reasoner[rnr] == reasoner["dlv"]:
 		    result  = ":- #count{X: vrs(X), out($x,X), in($y,X)} = 0.\n" 
 		    result += ":- #count{X: vrs(X), in($x,X), in($y,X)} = 0.\n" 
-		    result += ":- #count{X: vrs(X), out(" + name3 + ",X), in($y,X)} = 0.\n" 
-		    result += ":- #count{X: vrs(X), in(" + name3 + ",X), in($y,X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), out($z,X), in($y,X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), in($z,X), in($y,X)} = 0.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
 		    result  = ":- [vrs(X): out($x,X): in($y,X)]0.\n" 
 		    result += ":- [vrs(X): in($x,X): in($y,X)]0.\n" 
-		    result += ":- [vrs(X): out(" + name3 + ",X): in($y,X)]0.\n" 
-		    result += ":- [vrs(X): in(" + name3 + ",X): in($y,X)]0.\n" 
+		    result += ":- [vrs(X): out($z,X): in($y,X)]0.\n" 
+		    result += ":- [vrs(X): in($z,X): in($y,X)]0.\n" 
 	        result += "pie($r, A, 1) :- ir(X, A), out($x, X), in($y, X), ix.\n"
 	        result += "c($r, A, 1) :- vr(X, A), out($x, X), in($y, X), ix.\n\n"
 	        result += "pie($r, A, 2) :- ir(X, A), in($x, X), in($y, X), ix.\n"
 	        result += "c($r, A, 2) :- vr(X, A), in($x, X), in($y, X), ix.\n\n"
-	        result += "pie($r, A, 3) :- ir(X, A), out(" + name3 + ", X), in($y, X), ix.\n"
-	        result += "c($r, A, 3) :- vr(X, A), out(" + name3 + ", X), in($y, X), ix.\n\n"
-	        result += "pie($r, A, 4) :- ir(X, A), in(" + name3 + ", X), in($y, X), ix.\n"
-	        result += "c($r, A, 4) :- vr(X, A), in(" + name3 + ", X), in($y, X), ix.\n\n"
+	        result += "pie($r, A, 3) :- ir(X, A), out($z, X), in($y, X), ix.\n"
+	        result += "c($r, A, 3) :- vr(X, A), out($z, X), in($y, X), ix.\n\n"
+	        result += "pie($r, A, 4) :- ir(X, A), in($z, X), in($y, X), ix.\n"
+	        result += "c($r, A, 4) :- vr(X, A), in($z, X), in($y, X), ix.\n\n"
 		result += "ir(X, $r) :- in($x,X), out($y,X).\n" 
-		result += "ir(X, $r) :- in(" + name3 + ",X), out($y,X).\n" 
+		result += "ir(X, $r) :- in($z,X), out($y,X).\n" 
             elif self.relations == relation["+3="]:
                 name3 = self.taxon3.dlvName()
                 name4 = self.taxon4.dlvName()
@@ -329,20 +334,20 @@ rule[rcc5["includes"] | rcc5["is_included_in"] | rcc5["disjoint"]] =\
 		    result += ":- #count{X: vrs(X), in($x,X), in(" + name4 + ",X)} = 0.\n" 
 		    result += ":- #count{X: vrs(X), out($y,X), in(" + name4 + ",X)} = 0.\n" 
 		    result += ":- #count{X: vrs(X), in($y,X), in(" + name4 + ",X)} = 0.\n"
-		    result += ":- #count{X: vrs(X), out(" + name3 + ",X), in(" + name4 + ",X)} = 0.\n" 
-		    result += ":- #count{X: vrs(X), in(" + name3 + ",X), in(" + name4 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), out($z,X), in(" + name4 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), in($z,X), in(" + name4 + ",X)} = 0.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
 		    result  = ":- [vrs(X): out($x,X): in(" + name4 + ",X)]0.\n" 
 		    result += ":- [vrs(X): in($x,X): in(" + name4 + ",X)]0.\n" 
 		    result += ":- [vrs(X): out($y,X): in(" + name4 + ",X)]0.\n" 
 		    result += ":- [vrs(X): in($y,X): in(" + name4 + ",X)]0.\n"
-		    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name4 + ",X)]0.\n" 
-		    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name4 + ",X)]0.\n"
+		    result += ":- [vrs(X): out($z,X): in(" + name4 + ",X)]0.\n" 
+		    result += ":- [vrs(X): in($z,X): in(" + name4 + ",X)]0.\n"
 		result += "ir(X, $r) :- in($x,X), out(" + name4 + ",X).\n" 
 		result += "ir(X, $r) :- in($y,X), out(" + name4 + ",X).\n"
-		result += "ir(X, $r) :- in(" + name3 + ",X), out(" + name4 + ",X).\n"
+		result += "ir(X, $r) :- in($z,X), out(" + name4 + ",X).\n"
 		result += "ir(X, $r) :- out(" +name1 + ",X), out($y,X),\
-                           out(" + name3 + ",X), in(" + name4 + ",X).\n"
+                           out($z,X), in(" + name4 + ",X).\n"
             elif self.relations == relation["+4="]:
                 name3 = self.taxon3.dlvName()
                 name4 = self.taxon4.dlvName()
@@ -352,8 +357,8 @@ rule[rcc5["includes"] | rcc5["is_included_in"] | rcc5["disjoint"]] =\
 		    result += ":- #count{X: vrs(X), in($x,X), in(" + name5 + ",X)} = 0.\n" 
 		    result += ":- #count{X: vrs(X), out($y,X), in(" + name5 + ",X)} = 0.\n" 
 		    result += ":- #count{X: vrs(X), in($y,X), in(" + name5 + ",X)} = 0.\n"
-		    result += ":- #count{X: vrs(X), out(" + name3 + ",X), in(" + name5 + ",X)} = 0.\n" 
-		    result += ":- #count{X: vrs(X), in(" + name3 + ",X), in(" + name5 + ",X)} = 0.\n"
+		    result += ":- #count{X: vrs(X), out($z,X), in(" + name5 + ",X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), in($z,X), in(" + name5 + ",X)} = 0.\n"
 		    result += ":- #count{X: vrs(X), out(" + name4 + ",X), in(" + name5 + ",X)} = 0.\n" 
 		    result += ":- #count{X: vrs(X), in(" + name4 + ",X), in(" + name5 + ",X)} = 0.\n"
                 elif reasoner[rnr] == reasoner["gringo"]:
@@ -361,47 +366,47 @@ rule[rcc5["includes"] | rcc5["is_included_in"] | rcc5["disjoint"]] =\
 		    result += ":- [vrs(X): in($x,X): in(" + name5 + ",X)]0.\n" 
 		    result += ":- [vrs(X): out($y,X): in(" + name5 + ",X)]0.\n" 
 		    result += ":- [vrs(X): in($y,X): in(" + name5 + ",X)]0.\n"
-		    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name5 + ",X)]0.\n" 
-		    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name5 + ",X)]0.\n"
+		    result += ":- [vrs(X): out($z,X): in(" + name5 + ",X)]0.\n" 
+		    result += ":- [vrs(X): in($z,X): in(" + name5 + ",X)]0.\n"
 		    result += ":- [vrs(X): out(" + name4 + ",X): in(" + name5 + ",X)]0.\n" 
 		    result += ":- [vrs(X): in(" + name4 + ",X): in(" + name5 + ",X)]0.\n"
 		result += "ir(X, $r) :- in($x,X), out(" + name5 + ",X).\n" 
 		result += "ir(X, $r) :- in($y,X), out(" + name5 + ",X).\n"
-		result += "ir(X, $r) :- in(" + name3 + ",X), out(" + name5 + ",X).\n"
+		result += "ir(X, $r) :- in($z,X), out(" + name5 + ",X).\n"
 		result += "ir(X, $r) :- in(" + name4 + ",X), out(" + name5 + ",X).\n" 
             elif self.relations == relation["=+"] or self.relations == relation["-="]: # rsum and ldiff
                 name3 = self.taxon3.dlvName()
                 if reasoner[rnr] == reasoner["dlv"]:
 		    result  = ":- #count{X: vrs(X), out($y,X), in($x,X)} = 0.\n" 
 		    result += ":- #count{X: vrs(X), in($y,X), in($x,X)} = 0.\n" 
-		    result += ":- #count{X: vrs(X), out(" + name3 + ",X), in($x,X)} = 0.\n" 
-		    result += ":- #count{X: vrs(X), in(" + name3 + ",X), in($x,X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), out($z,X), in($x,X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), in($z,X), in($x,X)} = 0.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
                     result  = ":- [vrs(X): out($y,X): in($x,X)]0.\n"            
                     result += ":- [vrs(X): in($y,X): in($x,X)]0.\n"            
-                    result += ":- [vrs(X): out(" + name3 + ",X): in($x,X)]0.\n"            
-                    result += ":- [vrs(X): in(" + name3 + ",X): in($x,X)]0.\n"
+                    result += ":- [vrs(X): out($z,X): in($x,X)]0.\n"            
+                    result += ":- [vrs(X): in($z,X): in($x,X)]0.\n"
 		result += "ir(X, $r) :- in($y,X), out($x,X).\n" 
-		result += "ir(X, $r) :- in(" + name3 + ",X), out($x,X).\n"
+		result += "ir(X, $r) :- in($z,X), out($x,X).\n"
             elif self.relations == relation["=3+"]:
                 name3 = self.taxon3.dlvName()
                 name4 = self.taxon4.dlvName()
                 if reasoner[rnr] == reasoner["dlv"]:
 		    result  = ":- #count{X: vrs(X), out($y,X), in($x,X)} = 0.\n" 
 		    result += ":- #count{X: vrs(X), in($y,X), in($x,X)} = 0.\n" 
-		    result += ":- #count{X: vrs(X), out(" + name3 + ",X), in($x,X)} = 0.\n" 
-		    result += ":- #count{X: vrs(X), in(" + name3 + ",X), in($x,X)} = 0.\n"
+		    result += ":- #count{X: vrs(X), out($z,X), in($x,X)} = 0.\n" 
+		    result += ":- #count{X: vrs(X), in($z,X), in($x,X)} = 0.\n"
 		    result += ":- #count{X: vrs(X), out(" + name4 + ",X), in($x,X)} = 0.\n" 
 		    result += ":- #count{X: vrs(X), in(" + name4 + ",X), in($x,X)} = 0.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
                     result  = ":- [vrs(X): out($y,X): in($x,X)]0.\n"            
                     result += ":- [vrs(X): in($y,X): in($x,X)]0.\n"            
-                    result += ":- [vrs(X): out(" + name3 + ",X): in($x,X)]0.\n"            
-                    result += ":- [vrs(X): in(" + name3 + ",X): in($x,X)]0.\n"
+                    result += ":- [vrs(X): out($z,X): in($x,X)]0.\n"            
+                    result += ":- [vrs(X): in($z,X): in($x,X)]0.\n"
                     result += ":- [vrs(X): out(" + name4 + ",X): in($x,X)]0.\n"            
                     result += ":- [vrs(X): in(" + name4 + ",X): in($x,X)]0.\n"
 		result += "ir(X, $r) :- in($y,X), out($x,X).\n" 
-		result += "ir(X, $r) :- in(" + name3 + ",X), out($x,X).\n"
+		result += "ir(X, $r) :- in($z,X), out($x,X).\n"
 	    	result += "ir(X, $r) :- in(" + name4 + ",X), out($x,X).\n"
 	    elif self.relations == relation["=4+"]:
                 name3 = self.taxon3.dlvName()
@@ -410,8 +415,8 @@ rule[rcc5["includes"] | rcc5["is_included_in"] | rcc5["disjoint"]] =\
                 if reasoner[rnr] == reasoner["dlv"]:
             	    result  = ":- #count{X: vrs(X), out($y,X), in($x,X)} = 0.\n" 
             	    result += ":- #count{X: vrs(X), in($y,X), in($x,X)} = 0.\n" 
-            	    result += ":- #count{X: vrs(X), out(" + name3 + ",X), in($x,X)} = 0.\n" 
-            	    result += ":- #count{X: vrs(X), in(" + name3 + ",X), in($x,X)} = 0.\n"
+            	    result += ":- #count{X: vrs(X), out($z,X), in($x,X)} = 0.\n" 
+            	    result += ":- #count{X: vrs(X), in($z,X), in($x,X)} = 0.\n"
             	    result += ":- #count{X: vrs(X), out(" + name4 + ",X), in($x,X)} = 0.\n" 
             	    result += ":- #count{X: vrs(X), in(" + name4 + ",X), in($x,X)} = 0.\n"
             	    result += ":- #count{X: vrs(X), out(" + name5 + ",X), in($x,X)} = 0.\n" 
@@ -419,14 +424,14 @@ rule[rcc5["includes"] | rcc5["is_included_in"] | rcc5["disjoint"]] =\
                 elif reasoner[rnr] == reasoner["gringo"]:
             	    result  = ":- [vrs(X): out($y,X): in($x,X)]0.\n" 
             	    result += ":- [vrs(X): in($y,X): in($x,X)]0.\n" 
-            	    result += ":- [vrs(X): out(" + name3 + ",X): in($x,X)]0.\n" 
-            	    result += ":- [vrs(X): in(" + name3 + ",X): in($x,X)]0.\n"
+            	    result += ":- [vrs(X): out($z,X): in($x,X)]0.\n" 
+            	    result += ":- [vrs(X): in($z,X): in($x,X)]0.\n"
             	    result += ":- [vrs(X): out(" + name4 + ",X): in($x,X)]0.\n" 
             	    result += ":- [vrs(X): in(" + name4 + ",X): in($x,X)]0.\n"
             	    result += ":- [vrs(X): out(" + name5 + ",X): in($x,X)]0.\n" 
             	    result += ":- [vrs(X): in(" + name5 + ",X): in($x,X)]0.\n"
         	result += "ir(X, $r) :- in($y,X), out($x,X).\n" 
-        	result += "ir(X, $r) :- in(" + name3 + ",X), out($x,X).\n"
+        	result += "ir(X, $r) :- in($z,X), out($x,X).\n"
         	result += "ir(X, $r) :- in(" + name4 + ",X), out($x,X).\n"
         	result += "ir(X, $r) :- in(" + name5 + ",X), out($x,X).\n" 
 	    else:
