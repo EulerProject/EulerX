@@ -18,6 +18,7 @@ with sys.stdin as source:
 # compare the items in the list two by two
 with sys.stdout as dest:
     writer = csv.writer(dest)
+    writer.writerow(["id", "Name_Simple", "According_To", "Rank", "Suggested ISA Pairs", "Suggested Articulation Pairs"])
     for d in data:
         for i in data[d]:
             art = []
@@ -25,19 +26,22 @@ with sys.stdout as dest:
             for j in data[d]:
                 if i!=j:
                     if i[2]!=j[2]:
-                        art.append(j[0])
+                        art.append([j[0],j[1]])
                     else:
-                        if dictionary.rank2num.get(i[3],(0,0))[0] < dictionary.rank2num.get(j[3],(0,0))[0]:
-                            isa.append(j[0])
+                        rank1 = dictionary.rank2num.get(i[3],(0,0))[0]
+                        rank2 = dictionary.rank2num.get(j[3],(0,0))[0] 
+                        if isa == [] and rank1 > rank2:
+                            isa.append([j[0],j[1]])
             i.append(isa)
             i.append(art)
             writer.writerow(i)
 
-with open("pairs.txt", 'wb') as pairs:
-    pairs.write("Suggested Pairs \n \n")
+with open("pairs.csv", 'wb') as pairs:
+    writer = csv.writer(pairs)
+    writer.writerow(["id", "Name", "Relationship", "id", "Name"])
     for d in data:
         for i in data[d]:
             for p in i[4]:
-               pairs.write(i[0] + " " * (15 -len(i[0])) + p + "\n")
+               writer.writerow([i[0], i[1] , "ISA", p[0],p[1]])
             for a in i[5]:
-               pairs.write(i[0] + " " * (15 - len(i[0])) + a + "\n")
+               writer.writerow([i[0], i[1], " ", a[0],a[1]])
