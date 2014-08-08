@@ -818,7 +818,7 @@ class TaxonomyMapping:
             styles = yaml.load(rcgStyleFileOld)
                     
         # if taxonomy names are not in stylesheet, rewrite styesheet
-        if T1s[0] not in styles["nodestyle"] and T2s[0] not in styles["nodestyle"]:
+        if self.firstTName not in styles["nodestyle"] and self.secondTName not in styles["nodestyle"]:
             fOld = open(self.stylesheetdir+"rcgstyle.yaml", "r")
             contents = fOld.readlines()
             fOld.close()
