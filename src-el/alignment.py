@@ -21,7 +21,7 @@ import socket
 import fileinput
 from taxonomy import * 
 from alignment import * 
-#from redWind import *
+from redCon import *
 from template import *
 from helper import *
 from inputViz import *
@@ -1114,50 +1114,51 @@ class TaxonomyMapping:
         return False
 
     def uncReduction(self, pws):
-        #ppw = sets.Set()
-        #for pair in self.mir.keys():
-        #    if self.mir[pair] & ~relation["infer"] not in rcc5.values():
-        #        userAns = RedWindow(pair, self.mir[pair])
-        #        self.mir[pair] = userAns.main()
-        #        self.adjustMirc(pair)
-        #        # Reduce pws
-        #        tmpppw = sets.Set()
-        #        for i in range(5):
-        #          rel = 1 << i
-        #          if self.mir[pair] & rel and pair+","+rel.__str__() in self.mirp.keys():
-        #            for pw in self.mirp[pair+","+rel.__str__()]:
-        #                tmpppw.add(pw)
-        #        # Adjust mir
-        #        for tmppair in self.mir.keys():
-        #          for j in range(5):
-        #            relj = 1 << j
-        #            if tmppair+","+relj.__str__() in self.mirp.keys() and\
-        #               pw in self.mirp[tmppair+","+relj.__str__()]:
-        #              if len(tmpppw) ==1:
-        #                self.mir[tmppair] = relj
-        #              else:
-        #                self.mir[tmppair] |= relj
-        #        if len(tmpppw) != 0:
-        #          if len(ppw) == 0:
-        #            ppw = tmpppw
-        #          else:
-        #            ppw = ppw.intersection(tmpppw)
-        #        else:
-        #          print "Inconsistent again !!"
-        #          ppw = tmpppw
+        ppw = sets.Set(range(len(pws)))
+        for pair in self.mir.keys():
+            if self.mir[pair] & ~relation["infer"] not in rcc5.values():
+                userAns = RedCon(pair, self.mir[pair])
+                self.mir[pair] = userAns.main()
+                self.adjustMirc(pair)
+                # Reduce pws
+                tmpppw = sets.Set()
+                for i in range(5):
+                  rel = 1 << i
+                  if self.mir[pair] & rel and pair+","+rel.__str__() in self.mirp.keys():
+                    for pw in self.mirp[pair+","+rel.__str__()]:
+                        if pw not in ppw: continue
+                        tmpppw.add(pw)
+                        # Adjust mir
+                        for tmppair in self.mir.keys():
+                          for j in range(5):
+                            relj = 1 << j
+                            if tmppair+","+relj.__str__() in self.mirp.keys() and\
+                               pw in self.mirp[tmppair+","+relj.__str__()]:
+                              if len(tmpppw) ==1:
+                                self.mir[tmppair] = relj
+                              else:
+                                self.mir[tmppair] |= relj
+                if len(tmpppw) != 0:
+                  #if len(ppw) == len(pws):
+                    ppw = tmpppw
+                  #else:
+                  #  ppw = ppw.intersection(tmpppw)
+                else:
+                  print "Inconsistent again !!"
+                  ppw = tmpppw
         outputstr = ""
-        #for i in ppw:
-        #    if self.options.cluster: pwmirs.append({})
-        #    outputstr += "Possible world "+i.__str__()+": {"
-        #    items = pws[i].split(";")
-        #    for j in range(len(items)):
-        #        rel = items[j].replace("rel(","").replace(")","").split(",")
-        #        dotc1 = self.dlvName2dot(rel[0])
-        #        dotc2 = self.dlvName2dot(rel[1])
-        #        if j != 0: outputstr += ", "
-        #        outputstr += dotc1+rel[2]+dotc2
-        #    outputstr += "}\n"
-        #return outputstr
+        for i in ppw:
+            if self.options.cluster: pwmirs.append({})
+            outputstr += "Possible world "+i.__str__()+": {"
+            items = pws[i].split(";")
+            for j in range(len(items)):
+                rel = items[j].replace("rel(","").replace(")","").split(",")
+                dotc1 = self.dlvName2dot(rel[0])
+                dotc2 = self.dlvName2dot(rel[1])
+                if j != 0: outputstr += ", "
+                outputstr += dotc1+rel[2]+dotc2
+            outputstr += "}\n"
+        return outputstr
 
     def adjustMirc(self, pair):
         self.mirc[pair] = []
