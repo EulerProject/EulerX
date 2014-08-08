@@ -82,7 +82,7 @@ class TaxonomyMapping:
         self.runningHost = socket.gethostname()# get the current host
         self.runningDate = strftime("%Y-%m-%d-%H:%M:%S", localtime())
         if options.outputdir is None:
-            options.outputdir = os.path.join(options.inputdir, self.runningUser+"-"+self.runningHost+"-"+self.runningDate)
+            options.outputdir = os.path.join(options.inputdir, self.runningUser+"-"+self.runningHost+"-"+self.runningDate+"-"+self.name)
         if not os.path.exists(options.outputdir):
             os.mkdir(options.outputdir)
         self.aspdir = os.path.join(options.outputdir, "asp")
@@ -175,9 +175,10 @@ class TaxonomyMapping:
             inputVisualizer = InputVisual.instance()
             inputVisualizer.run(self.options.inputdir, self.options.inputfile, self.ivout)
             commands.getoutput("dot -Tpdf "+self.ivout+" -o "+self.ivpdf)
-	    if not self.enc:
-		return
-	self.genASP()
+        if not self.enc:
+            return
+        print "******* You are running example", self.name, "*******"
+        self.genASP()
         if self.options.consCheck:
             if not self.testConsistency():
                 print "Input is inconsistent o_O"
