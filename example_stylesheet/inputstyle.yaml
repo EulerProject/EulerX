@@ -1,0 +1,44 @@
+  graphstyle: 
+    graph: "rankdir=LR"
+    face2face: "on"
+    subgraph: "on"
+    legend: "on"
+    mapping: "off"
+    wmap: "off"
+    wmin: "1"
+    wmax: "5"
+  nodestyle: 
+    "2": "shape=box style=\"filled\" fillcolor=\"#CCFFCC\""
+    "1": "shape=octagon style=filled fillcolor=\"#FFFFCC\""
+    default: "shape=circle style=filled fillcolor=\"#FFFFFF\""
+  edgestyle: 
+    - 
+      label: "isa"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1"
+      display: ""
+      penwidth: "off"
+    - 
+      label: "in"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1"
+      display: ""
+      penwidth: "off"
+    - 
+      label: "out"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1"
+      display: ""
+      penwidth: "off"
+    - 
+      label: "Art."
+      dot: "style=dotted color=\"#AA00FF\" constraint=true penwidth=3"
+      display: "label"
+      penwidth: "off"
+    - 
+      label: "default"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1"
+      display: "label"
+      penwidth: "off"
+    - 
+      label: "=="
+      dot: "style=dotted color=\"#AA00FF\" constraint=true penwidth=3"
+      display: "="
+      penwidth: "off"

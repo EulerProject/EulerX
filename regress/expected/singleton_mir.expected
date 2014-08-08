@@ -1,0 +1,6 @@
+1.a,1.c,inferred,<
+1.a,1.b,inferred,<
+1.a,1.d,input,<
+1.c,1.b,input,>
+1.c,1.d,inferred,{>, ><}
+1.b,1.d,input,><

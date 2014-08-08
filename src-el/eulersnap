@@ -1,0 +1,6 @@
+echo "##### Euler version:\n"
+hg summary
+echo "\n\n##### GraphViz version:\n"
+dot -V
+echo "\n\n##### DLV version:\n"
+dlv --version

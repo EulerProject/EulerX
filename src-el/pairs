@@ -1,0 +1,43 @@
+#! /usr/bin/env python
+
+import csv
+import sys
+import dictionary
+
+data = {}
+
+with sys.stdin as source:
+    lines = csv.reader(source)
+    next(lines, None) #skip header row
+    # categorize the lines based on the first 3 letters of the name
+    for line in lines:
+        if line[1][0:3] not in data:
+            data[line[1][0:3]]= []
+        data[line[1][0:3]].append(line)
+
+# compare the items in the list two by two
+with sys.stdout as dest:
+    writer = csv.writer(dest)
+    for d in data:
+        for i in data[d]:
+            art = []
+            isa = []
+            for j in data[d]:
+                if i!=j:
+                    if i[2]!=j[2]:
+                        art.append(j[0])
+                    else:
+                        if dictionary.rank2num.get(i[3],(0,0))[0] < dictionary.rank2num.get(j[3],(0,0))[0]:
+                            isa.append(j[0])
+            i.append(isa)
+            i.append(art)
+            writer.writerow(i)
+
+with open("pairs.txt", 'wb') as pairs:
+    pairs.write("Suggested Pairs \n \n")
+    for d in data:
+        for i in data[d]:
+            for p in i[4]:
+               pairs.write(i[0] + " " * (15 -len(i[0])) + p + "\n")
+            for a in i[5]:
+               pairs.write(i[0] + " " * (15 - len(i[0])) + a + "\n")

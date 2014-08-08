@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+#import os
+#import inspect
+#import imp
+#path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+#imp.load_source('parser', path + '/lib1.0/parser.py')
+#imp.load_source('runner', path + '/lib1.0/runner.py')
+#imp.load_source('generator', path + '/lib1.0/generator.py')
+from parser import *
+from runner import *
+from generator import *
+
+def main():
+
+    elParser = EulerParser.instance()
+    ctiParser = CtiParser.instance()
+    (options, args) = elParser.parse_args()
+    if options.verbose:
+      print options
+    if options.inputfile is None:
+      if options.generateCti is False:
+        print "Invalid input: -i/-g must be specified, please run euler -h for more information"
+        return None
+      else:
+        generator = CtiGenerator.instance()
+        generator.run(options)
+    else:
+      if options.generateCti is False:
+        if not reasoner.has_key(options.reasoner):
+          print "unknown reasoner "+options.reasoner#+", please choose one reasoner from "+reasoner.keys().toString()
+          return None
+        elRunner = EulerRunner.instance()
+        elRunner.run(options)
+      else:
+        print "Invalid input: -i/-g cannot be both specified, please run euler -h for more information"
+        return None
+
+if __name__ == '__main__':
+    main()

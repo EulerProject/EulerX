@@ -1,0 +1,152 @@
+#! /usr/bin/env python
+
+import sys
+import yaml
+import optparse
+from collections import defaultdict
+
+nodes = defaultdict(list)
+edges = defaultdict(list)
+wList = []
+
+# parse the stylesheet file
+def scale(value, dMin, dMax, sMin, sMax):
+    # Find how 'wide' each range is
+    dSpan = dMax - dMin
+    sSpan = sMax - sMin
+    # Convert the range in data file into a 0-1 range (float)
+    if dSpan != 0:
+    	scaledValue = float(value - dMin) / float(dSpan)
+    else:
+    	scaledValue = 0
+    # Convert the 0-1 range into a value in the stylesheet range
+    return sMin + (scaledValue * sSpan)
+def read_stylesheet(stylefile):
+    global styles
+    with open(stylefile) as style_file:    
+        styles = yaml.load(style_file)          
+def apply_style(data_file, f):
+    f.write("digraph{\n")
+    f.write(str(styles["graphstyle"]["graph"]) + "\n")
+    with data_file: 
+        data = yaml.load(data_file)
+    #separate nodes from edges
+        for key, value in data.iteritems():
+            if "group" in data[key]:
+                nodes[data[key]["group"]].append(value.items())
+            elif "label" in data[key]:
+                if "w" in data[key]:
+                    wList.append(data[key]["w"])
+                else:
+                    wList.append("1")
+                if value["label"] in ["==", "><", "!", ">" , "<"] or "OR" in value["label"]:
+                    edges["Art."].append(value.items())
+                elif value["label"] == "isa":
+                    # separate "isa" edges based on their group
+                    edges[value["s"].split(".")[0]].append(value.items())
+                elif not any(d["label"] == value["label"] for d in styles["edgestyle"]):
+                    edges["default"].append(value.items())
+                else:
+                    edges[data[key]["label"]].append(value.items())
+    glabel = '<TR> <TD COLSPAN="2"><font face="Arial Black"> Nodes</font></TD> </TR> \n'
+    mapp = ""
+    for g in nodes:
+        if (g!= "comb" and g!= "(+)"):
+            mapp = mapp + '<TR> <TD COLSPAN="2"><font face="Arial Black"> Taxonomy' + g + '</font></TD> </TR> \n'
+    # if the style is not defined use the default
+        if (styles["graphstyle"]["subgraph"] == "on" and g!="(+)"):
+            f.write("subgraph cluster" + g + '{ style=invis\n')
+        if g in styles["nodestyle"]:
+            group = g
+        else:
+            group = "default"
+        color = styles["nodestyle"][group].split("fillcolor=")[1]
+        glabel = glabel + "<TR> \n <TD bgcolor=" + color + ">" + g + "</TD> \n <TD>" + str(len(nodes[g])) + "</TD> \n </TR> \n"
+        f.write("node[" + styles["nodestyle"][group] + '] \n')
+        for n in nodes[g]:
+            if (g!= "comb" and g!= "(+)"):
+               f.write('"'+ g + "." + n[0][1]+ '"\n')
+               mapp = mapp + "<TR> \n <TD bgcolor=" + color + ">" + g + "." + n[0][1] + "</TD> \n <TD>" + n[2][1] + "</TD> \n </TR> \n"
+            else:
+                f.write('"'+ n[0][1] + '"')
+                if "+" in n[0][1]:
+                    f.write(' [label="+"]')
+                elif "-" in n[0][1]:
+                    f.write(' [label="-"]')
+                f.write("\n")
+        if (styles["graphstyle"]["subgraph"] == "on" and g != "(+)"):
+            f.write("}\n")
+    glabel = glabel + '<TR> <TD COLSPAN="2"><font face = "Arial Black"> Edges </font></TD> </TR> \n'
+    # source nodes in articulations
+    sources = set()
+    for e in edges["Art."]:
+        sources.update(e[0][1].split(".")[0])
+    for l in edges:
+        if l in nodes:
+            label = "isa"
+        else:
+            label = l
+        if not any(d["label"] == label for d in styles["edgestyle"]):
+            label = "default"
+        try:
+            style = (item for item in styles["edgestyle"] if item["label"] == label).next()
+        except StopIteration:
+            continue
+        f.write("edge["+ style["dot"] +"]\n")
+        color = style["dot"]. split ("color=")[1].split(" ")[0]
+        if l in nodes:
+            lbl = "isa_" + l
+        else:
+            lbl = l
+        glabel = glabel + "<TR> \n <TD><font color =" + color + ">" + lbl + "</font></TD> \n <TD>" + str(len(edges[l])) + "</TD> \n </TR> \n"
+        for e in edges[l]:
+            if (styles["graphstyle"]["face2face"] == "on" and l in sources) or (l=="out" and e[1][1].split(".")[0] in sources) or (l == "in" and e[0][1].split(".")[0] not in sources):
+                f.write('"' + e[1][1] + '" -> "' + e[0][1] + '"')
+                f.write(" [dir=back]")
+            else:
+               f.write('"' + e[0][1] + '" -> "' + e[1][1] + '"')
+            if any("w" in edge for edge in e):
+            # if w is defined in the input
+                w = e[2][1]
+            else:
+                w = 1
+            if styles["graphstyle"]["wmap"] == "on":
+                w = str(scale(int(w), int(min(wList)), int(max(wList)), int(styles["graphstyle"]["wmin"]), int(styles["graphstyle"]["wmax"])))
+            if style["display"] == "(w)display":
+                f.write(' [label="' + w + '"]')
+        # check options for displaying label
+            elif (style["display"] == "label"):
+                f.write(' [label="' + e[-1][1] + '"]')
+            elif style["display"] != "":
+                f.write(' [label="' + style["display"] + '"]')
+            if style["penwidth"] == "on":
+                f.write('[penwidth=' + str(w) + "]")
+            f.write("\n")
+    if styles["graphstyle"]["legend"] == "on":
+        f.write("node[shape=box] \n")
+        f.write('{rank=min Legend [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
+        f.write(glabel)
+        f.write("</TABLE> \n >] } \n")
+
+    if styles["graphstyle"]["mapping"] == "on":
+        f.write("node[shape=box] \n")
+        f.write('{rank=source Mapping [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
+        f.write(mapp)
+        f.write("</TABLE> \n >] } \n")       
+    f.write("}")            
+    f.close()
+def parse_options():
+	# parse options
+	parser = optparse.OptionParser(usage = "%prog [options]", version = "%prog 0.1")
+	parser.add_option("-s","--sfile",type="string",dest="sfile",
+					  default=None,
+					  help="file")
+	(options,args) = parser.parse_args()
+	return (options,args)
+# MAIN 
+if __name__ == '__main__':
+	(options,args) = parse_options()
+	if options.sfile == None:
+		options.sfile = "../example_stylesheet/inputstyle.yaml"
+	read_stylesheet(options.sfile)
+	apply_style(sys.stdin, sys.stdout)

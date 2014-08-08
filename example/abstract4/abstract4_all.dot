@@ -1,0 +1,210 @@
+digraph {
+
+rankdir = RL
+
+  node [shape=box style="filled" fillcolor="#CCFFCC"]
+  "1.C"
+  "1.A"
+  "1.C"
+  "1.A"
+  "1.A"
+  "1.A"
+  "1.A"
+  node [shape=octagon style="filled" fillcolor="#FFFFCC"]
+  "2.F"
+  "2.A"
+  "2.F"
+  "2.A"
+  "2.A"
+  "2.A"
+  "2.A"
+  node [shape=Msquare style="filled" fillcolor="#EEEEEE"]
+  "1.B\n2.B"
+  "1.E\n2.G"
+  "1.D\n2.D"
+  "1.D\n2.D"
+  "1.E\n2.G"
+  "1.B\n2.B"
+  "1.B\n2.B"
+  "1.E\n2.G"
+  "1.D\n2.D"
+  "1.B\n2.B"
+  "1.E\n2.G"
+  "1.D\n2.D"
+  node [shape=box style="filled" fillcolor="#CCFFCC"]
+  "1.C"
+  "1.A"
+  "1.E"
+  "1.A"
+  "1.A"
+  "1.A"
+  "1.A"
+  node [shape=octagon style="filled" fillcolor="#FFFFCC"]
+  "2.F"
+  "2.A"
+  "2.G"
+  "2.A"
+  "2.A"
+  "2.A"
+  "2.A"
+  node [shape=Msquare style="filled" fillcolor="#EEEEEE"]
+  "1.D\n2.D"
+  "1.B\n2.B"
+  "1.B\n2.B"
+  "1.D\n2.D"
+  "1.D\n2.D"
+  "1.B\n2.B"
+  "1.D\n2.D"
+  "1.B\n2.B"
+  node [shape=box style="filled" fillcolor="#CCFFCC"]
+  "1.C"
+  "1.A"
+  "1.E"
+  "1.A"
+  "1.A"
+  "1.A"
+  "1.A"
+  "1.A"
+  node [shape=octagon style="filled" fillcolor="#FFFFCC"]
+  "2.F"
+  "2.A"
+  "2.A"
+  "2.G"
+  "2.G"
+  "2.A"
+  "2.A"
+  "2.A"
+  node [shape=Msquare style="filled" fillcolor="#EEEEEE"]
+  "1.D\n2.D"
+  "1.B\n2.B"
+  "1.B\n2.B"
+  "1.D\n2.D"
+  "1.D\n2.D"
+  "1.B\n2.B"
+  "1.D\n2.D"
+  "1.B\n2.B"
+  node [shape=box style="filled" fillcolor="#CCFFCC"]
+  "1.C"
+  "1.A"
+  "1.E"
+  "1.A"
+  "1.C"
+  "1.A"
+  "1.A"
+  "1.A"
+  node [shape=octagon style="filled" fillcolor="#FFFFCC"]
+  "2.F"
+  "2.A"
+  "2.G"
+  "2.A"
+  "2.F"
+  "2.A"
+  "2.A"
+  "2.A"
+  node [shape=Msquare style="filled" fillcolor="#EEEEEE"]
+  "1.D\n2.D"
+  "1.B\n2.B"
+  "1.B\n2.B"
+  "1.D\n2.D"
+  "1.D\n2.D"
+  "1.B\n2.B"
+  "1.D\n2.D"
+  "1.B\n2.B"
+  node [shape=box style="filled" fillcolor="#CCFFCC"]
+  "1.C"
+  "1.A"
+  "1.E"
+  "1.A"
+  "1.A"
+  "1.A"
+  "1.A"
+  "1.A"
+  node [shape=octagon style="filled" fillcolor="#FFFFCC"]
+  "2.G"
+  "2.A"
+  "2.A"
+  "2.F"
+  "2.F"
+  "2.A"
+  "2.A"
+  "2.A"
+  node [shape=Msquare style="filled" fillcolor="#EEEEEE"]
+  "1.D\n2.D"
+  "1.B\n2.B"
+  "1.B\n2.B"
+  "1.D\n2.D"
+  "1.D\n2.D"
+  "1.B\n2.B"
+  "1.D\n2.D"
+  "1.B\n2.B"
+  node [shape=box style="filled" fillcolor="#CCFFCC"]
+  "1.C"
+  "1.E"
+  node [shape=octagon style="filled" fillcolor="#FFFFCC"]
+  "2.F"
+  "2.G"
+  node [shape=Msquare style="filled" fillcolor="#EEEEEE"]
+  "1.B\n2.B"
+  "1.A\n2.A"
+  "1.D\n2.D"
+  "1.D\n2.D"
+  "1.A\n2.A"
+  "1.B\n2.B"
+  "1.A\n2.A"
+  "1.A\n2.A"
+  "1.A\n2.A"
+  "1.A\n2.A"
+  "1.B\n2.B"
+  "1.A\n2.A"
+  "1.D\n2.D"
+  "1.A\n2.A"
+  node [shape=box style="filled" fillcolor="#CCFFCC"]
+  "1.E"
+  "1.A"
+  "1.C"
+  "1.A"
+  "1.A"
+  "1.A"
+  "1.A"
+  "1.C"
+  "1.A"
+  node [shape=octagon style="filled" fillcolor="#FFFFCC"]
+  "2.G"
+  "2.A"
+  "2.F"
+  "2.A"
+  "2.F"
+  "2.F"
+  "2.A"
+  "2.A"
+  "2.A"
+  node [shape=Msquare style="filled" fillcolor="#EEEEEE"]
+  "1.D\n2.D"
+  "1.B\n2.B"
+  "1.B\n2.B"
+  "1.D\n2.D"
+  "1.D\n2.D"
+  "1.B\n2.B"
+  "1.D\n2.D"
+  "1.B\n2.B"
+  "1.A" -> "2.A" [style=filled,label=6,penwidth=6,color="#67281d"];
+  "1.B\n2.B" -> "1.A" [style=filled,label=6,penwidth=6,color="#67281d"];
+  "1.B\n2.B" -> "1.A\n2.A" [style=filled,label=1,penwidth=1,color="#1b9356"];
+  "1.B\n2.B" -> "2.A" [style=filled,label=6,penwidth=6,color="#67281d"];
+  "1.C" -> "1.A" [style=filled,label=6,penwidth=6,color="#67281d"];
+  "1.C" -> "1.A\n2.A" [style=filled,label=1,penwidth=1,color="#1b9356"];
+  "1.C" -> "2.F" [style=filled,label=3,penwidth=3,color="#39683f"];
+  "1.D\n2.D" -> "1.A" [style=filled,label=6,penwidth=6,color="#67281d"];
+  "1.D\n2.D" -> "1.A\n2.A" [style=filled,label=1,penwidth=1,color="#1b9356"];
+  "1.D\n2.D" -> "2.A" [style=filled,label=6,penwidth=6,color="#67281d"];
+  "1.E" -> "1.A" [style=filled,label=5,penwidth=5,color="#583d29"];
+  "1.E" -> "1.A\n2.A" [style=filled,label=1,penwidth=1,color="#1b9356"];
+  "1.E\n2.G" -> "1.A" [style=filled,label=1,penwidth=1,color="#1b9356"];
+  "1.E\n2.G" -> "2.A" [style=filled,label=1,penwidth=1,color="#1b9356"];
+  "2.F" -> "1.A" [style=filled,label=2,penwidth=2,color="#2a7e4a"];
+  "2.F" -> "1.A\n2.A" [style=filled,label=1,penwidth=1,color="#1b9356"];
+  "2.F" -> "2.A" [style=filled,label=6,penwidth=6,color="#67281d"];
+  "2.G" -> "1.A" [style=filled,label=1,penwidth=1,color="#1b9356"];
+  "2.G" -> "1.A\n2.A" [style=filled,label=1,penwidth=1,color="#1b9356"];
+  "2.G" -> "2.A" [style=filled,label=5,penwidth=5,color="#583d29"];
+}
