@@ -17,10 +17,9 @@ class InputVisual:
     def __init__(self):
         self.artSymbol = ""
     
+    @Callable
     def instance():
         return InputVisual()
-    
-    instance = Callable(instance)
     
     #remove the duplicate string in list li
     def remove_duplicate_string(self,li):

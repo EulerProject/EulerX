@@ -6,7 +6,7 @@ if [[ -n "$(diff $1_mir.csv expected/$1_mir.expected)" ]]; then
   echo "There is new dif in $1.dif!"
   echo "$1 $2 Failed!"
 else
-  rm $1_mir.csv;
+  #rm $1_mir.csv;
   rm $1.out;
   echo "$1 $2 Passed!"
   rm *txt >& /dev/null

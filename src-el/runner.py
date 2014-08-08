@@ -9,10 +9,9 @@ class EulerRunner:
     def __init__(self):
         self.name = "Euler Runner"
 
+    @Callable
     def instance():
 	return EulerRunner()
-
-    instance = Callable(instance)
 
     def run(self, options):
         taxMap = TaxonomyMapping(options, True)
