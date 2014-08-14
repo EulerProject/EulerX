@@ -606,7 +606,6 @@ class TaxonomyMapping:
             if T1s[0] == self.firstTName:
                 tmpStr = T1 + tmpStr
             else:
-                self.secondTName = T1s[0]
                 tmpStr = tmpStr + T1
             if tmpStr[0:2] == "\\n": tmpStr = tmpStr[2:]
             if tmpStr[-2:] == "\\n": tmpStr = tmpStr[:-2]
@@ -714,7 +713,6 @@ class TaxonomyMapping:
                 if self.firstTName == T1s[0]:
                     taxa1 += "  \""+T1+"\"\n"               # used in old viz
                 else:
-                    self.secondTName = T1s[0]
                     taxa2 += "  \""+T1+"\"\n"
                 self.addRcgVizNode(T1s[1], T1s[0])          # used in stylesheet
             else:
@@ -726,7 +724,6 @@ class TaxonomyMapping:
                 if self.firstTName == T2s[0]:
                     taxa1 += "  \""+T2+"\"\n"
                 else:
-                    self.secondTName = T2s[0]
                     taxa2 += "  \""+T2+"\"\n"
                 self.addRcgVizNode(T2s[1], T2s[0])
             else:
@@ -1726,6 +1723,9 @@ class TaxonomyMapping:
 
                 if self.firstTName == "":
                     self.firstTName = taxonomy.abbrev
+                
+                if self.firstTName != "" and self.secondTName == "" and self.firstTName != taxonomy.abbrev:
+                    self.secondTName = taxonomy.abbrev
                   
                 self.taxonomies[taxonomy.abbrev] = taxonomy
                 flag = "taxonomy"
@@ -2232,6 +2232,31 @@ class TaxonomyMapping:
         fInputVizYaml.write(yaml.safe_dump(self.inputVizNodes, default_flow_style=False))
         fInputVizYaml.write(yaml.safe_dump(self.inputVizEdges, default_flow_style=False))
         fInputVizYaml.close()        
+        
+        # check whether stylesheet taxonomy names are in stylesheet
+        global styles
+        with open(self.stylesheetdir+"inputstyle.yaml") as inputStyleFileOld:
+            styles = yaml.load(inputStyleFileOld)
+                    
+        # if taxonomy names are not in stylesheet, rewrite styesheet
+        if self.firstTName not in styles["nodestyle"] and self.secondTName not in styles["nodestyle"]:
+            fOld = open(self.stylesheetdir+"inputstyle.yaml", "r")
+            contents = fOld.readlines()
+            fOld.close()
+            
+            for line in contents:
+                if "nodestyle" in line:
+                    index = contents.index(line)
+                    break
+                
+            value = '    "' + self.firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n    "' + self.secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n' 
+                                
+            contents.insert(index+1, value)
+
+            fNew = open(self.stylesheetdir+"inputstyle.yaml", "w")
+            contents = "".join(contents)
+            fNew.write(contents)
+            fNew.close()
         
         # apply the inputviz stylesheet
         commands.getoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"inputstyle.yaml" + ">" + self.iv2dot)
