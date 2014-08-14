@@ -13,7 +13,7 @@
 ./testcase.sh eqoldj dlv mnpw
 ./testcase.sh ltoldj dlv mnpw
 ./testcase.sh gtoldj dlv mnpw
-./testcase.sh gtltdj dlv mnpw
+#./testcase.sh gtltdj dlv mnpw (where is this example?)
 ./testcase.sh gtltoldj dlv mnpw
 ./testcase.sh singleton dlv vrpw
 ### TODO binary encoding for gringo may not be working well,
