@@ -1732,7 +1732,7 @@ class TaxonomyMapping:
                   
                 self.taxonomies[taxonomy.abbrev] = taxonomy
                 flag = "taxonomy"
-                groups = []     # used for input viz
+#                groups = []     # used for input viz
 
                 
             elif (re.match("location", line)):
@@ -1746,7 +1746,11 @@ class TaxonomyMapping:
             elif (re.match("\(.*\)", line)):
                 if flag == "taxonomy":
                     taxonomy.addTaxaWithList(self, line)
-                    groups.append(re.match("\((.*)\)", line).group(1).split(" "))
+                    if taxonomy.abbrev in group2concepts:
+                        group2concepts[taxonomy.abbrev].append(re.match("\((.*)\)", line).group(1).split(" "))
+                    else:
+                        group2concepts[taxonomy.abbrev] = [re.match("\((.*)\)", line).group(1).split(" ")]
+#                    groups.append(re.match("\((.*)\)", line).group(1).split(" "))
                 elif flag == "location":
                     self.addLocation(line)
                 elif flag == "temporal":
@@ -1755,7 +1759,7 @@ class TaxonomyMapping:
                     None
                     
             elif (re.match("articulation", line)):
-                group2concepts.update({taxonomy.abbrev : groups})
+#                group2concepts.update({taxonomy.abbrev : groups})
                 self.basetr = self.tr
                 self.basemir = self.mir
               
