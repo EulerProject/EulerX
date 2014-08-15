@@ -1754,10 +1754,8 @@ class TaxonomyMapping:
                 else:
                     None
                     
-            elif (re.match("\s", line)):
-                group2concepts.update({taxonomy.abbrev : groups})
-
             elif (re.match("articulation", line)):
+                group2concepts.update({taxonomy.abbrev : groups})
                 self.basetr = self.tr
                 self.basemir = self.mir
               
