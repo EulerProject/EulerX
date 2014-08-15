@@ -815,7 +815,7 @@ class TaxonomyMapping:
             styles = yaml.load(rcgStyleFileOld)
                     
         # if taxonomy names are not in stylesheet, rewrite styesheet
-        if self.firstTName not in styles["nodestyle"] and self.secondTName not in styles["nodestyle"]:
+        if self.firstTName not in styles["nodestyle"] or self.secondTName not in styles["nodestyle"]:
             fOld = open(self.stylesheetdir+"rcgstyle.yaml", "r")
             contents = fOld.readlines()
             fOld.close()
@@ -823,7 +823,10 @@ class TaxonomyMapping:
             for line in contents:
                 if "nodestyle" in line:
                     index = contents.index(line)
-                    break
+                if '"1":' in line:
+                    index2 = contents.index(line)
+            
+            del contents[index+1:index2]    # clean nodestyle previously added
                 
             value = '    "' + self.firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n    "' + self.secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n' 
                                 
@@ -2239,7 +2242,7 @@ class TaxonomyMapping:
             styles = yaml.load(inputStyleFileOld)
                     
         # if taxonomy names are not in stylesheet, rewrite styesheet
-        if self.firstTName not in styles["nodestyle"] and self.secondTName not in styles["nodestyle"]:
+        if self.firstTName not in styles["nodestyle"] or self.secondTName not in styles["nodestyle"]:
             fOld = open(self.stylesheetdir+"inputstyle.yaml", "r")
             contents = fOld.readlines()
             fOld.close()
@@ -2247,7 +2250,10 @@ class TaxonomyMapping:
             for line in contents:
                 if "nodestyle" in line:
                     index = contents.index(line)
-                    break
+                if '"1":' in line:
+                    index2 = contents.index(line)
+            
+            del contents[index+1:index2]    # clean nodestyle previously added
                 
             value = '    "' + self.firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n    "' + self.secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n' 
                                 
