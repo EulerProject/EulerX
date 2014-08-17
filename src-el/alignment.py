@@ -1242,7 +1242,6 @@ class TaxonomyMapping:
         self.npw = 0
         outputstr = ""
         lastpw = ""
-        print pws
         if self.options.cluster: pwobs = []
         for i in range(len(pws)):
             if pws[i].find("pp(") == -1: continue
