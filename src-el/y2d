@@ -125,7 +125,7 @@ def apply_style(data_file, f):
             f.write("\n")
     if styles["graphstyle"]["legend"] == "on":
         f.write("node[shape=box] \n")
-        f.write('{rank=min Legend [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
+        f.write('{rank=source Legend [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
         f.write(glabel)
         f.write("</TABLE> \n >] } \n")
 
