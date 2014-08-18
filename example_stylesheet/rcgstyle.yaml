@@ -11,8 +11,6 @@
     "2013": "shape=box style=filled fillcolor=\"#CCFFCC\""
     "2006": "shape=octagon style=filled fillcolor=\"#FFFFCC\""
     "1": "shape=box style=filled fillcolor=\"#CCFFCC\""
-    "": "shape=octagon style=filled fillcolor=\"#FFFFCC\""
-    "1": "shape=box style=filled fillcolor=\"#CCFFCC\""
     "2": "shape=octagon style=filled fillcolor=\"#FFFFCC\""
     "comb": "shape=Msquare style=filled fillcolor=\"#EEEEEE\""
     default: "shape=circle style=filled fillcolor=\"#FFFFFF\""
