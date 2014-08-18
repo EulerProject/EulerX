@@ -78,9 +78,10 @@ def apply_style(data_file, f):
             f.write("}\n")
     glabel = glabel + '<TR> <TD COLSPAN="2"><font face = "Arial Black"> Edges </font></TD> </TR> \n'
     # source nodes in articulations
-    sources = set()
+    sources = []
     for e in edges["Art."]:
-        sources.update(e[0][1].split(".")[0])
+        sources.append(e[0][1].split(".")[0])
+    sources = list(set(sources))
     for l in edges:
         if l in nodes:
             label = "isa"
