@@ -40,8 +40,6 @@ class CtiGenerator:
             nnodes = (options.nary**(options.depth+1) - 1)/(options.nary-1)
             self.mednodes = range((options.nary**options.depth - 1)/(options.nary-1) + 1,
                         (options.nary**options.depth - 1)/(options.nary-1) + options.nary + 1)
-            print "LALA"
-
 
         # Create a balanced tree
         elif options.nnodes != 0:
@@ -109,11 +107,9 @@ class CtiGenerator:
             if tmpd == 0:
                 options.nary += 1
 
+    @Callable
     def instance():
 	global inst
 	if inst is None:
 	    inst = CtiGenerator()
 	return inst
-
-    instance = Callable(instance)
-
