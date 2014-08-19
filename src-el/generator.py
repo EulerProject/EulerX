@@ -6,7 +6,6 @@ from relations import *
 
 class CtiGenerator:
 
-    global inst
     inst = None
 
     def __init__(self):
@@ -17,6 +16,8 @@ class CtiGenerator:
         self.mednodes = []
 	if options.projectname is None:
 	    options.projectname = "foo"
+        if options.outputdir is None:
+            options.outputdir = "./"
 	if not os.path.exists(options.outputdir):
 	    os.mkdir(options.outputdir)
 
@@ -109,7 +110,6 @@ class CtiGenerator:
 
     @Callable
     def instance():
-	global inst
-	if inst is None:
-	    inst = CtiGenerator()
-	return inst
+	if CtiGenerator.inst is None:
+	    CtiGenerator.inst = CtiGenerator()
+	return CtiGenerator.inst
