@@ -1876,7 +1876,7 @@ class TaxonomyMapping:
             return conc1.group(1) + "." + conc1.group(2) + "*"\
                   +conc2.group(1) + "." + conc2.group(2)
         else:
-            elems = re.match("c(.*)_(.*)", dlvName)
+            elems = re.match("c(.*?)_(.*)", dlvName)
             return elems.group(1) + "." + elems.group(2)
                      
     def addTMir(self, tName, parent, child):
