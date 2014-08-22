@@ -27,6 +27,7 @@ from helper import *
 from inputViz import *
 from random import randint
 from time import localtime, strftime
+from operator import itemgetter
 
 class TaxonomyMapping:
 
@@ -524,7 +525,7 @@ class TaxonomyMapping:
                     self.mirp[pairrel].append(i)
                 else:
                     self.mirp[pairrel] = [i]
-            self.adjustMirc(pair)
+                self.adjustMirc(pair)
             outputstr += "}\n"
             # RCG
             # Only generate the RCG when necessary
@@ -2039,30 +2040,40 @@ class TaxonomyMapping:
         pairs =      self.getAllTaxonPairs()\
                 if self.allPairsNeeded()\
                 else self.getAllArticulationPairs()
+        mirList = []
         for pair in pairs:
             pairkey = pair[0].dotName() + "," + pair[1].dotName()
+            pairkey1 = pair[0].dotName()
+            pairkey2 = pair[1].dotName()
             if self.options.verbose:
-		print pairkey
+                print pairkey
             if self.mir.has_key(pairkey) and self.mir[pairkey] != 0:
               if self.mir[pairkey] & relation["infer"]:
-                hint = ",inferred,"
+                hint = "inferred"
               else:
-                hint = ",input,"
+#                hint = "input"
+                hint = "deduced"
               if self.options.countOn:
                 for i in range(5):
                   if self.mirc[pairkey][i] != 0:
-                    fmir.write(pairkey+hint + findkey(relation, 1 << i)+","\
-                               +self.mirc[pairkey][i].__str__()+","+self.npw.__str__()+"\n")
+                      mirList.append([pairkey1, findkey(relation, 1 << i), pairkey2, hint, self.mirc[pairkey][i].__str__(), self.npw.__str__()])
+#                    fmir.write(pairkey+hint + findkey(relation, 1 << i)+","\
+#                               +self.mirc[pairkey][i].__str__()+","+self.npw.__str__()+"\n")
               else:
-                fmir.write(pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"])+"\n")
+#                fmir.write(pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"])+"\n")
+                mirList.append([pairkey1, findkey(relation, self.mir[pairkey] & ~relation["infer"]), pairkey2, hint])
                 if self.options.verbose:
                     print pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"])+"\n"
             else:
                 self.mir[pairkey] = self.getPairMir(pair)
                 rl = findkey(relation, self.mir[pairkey])
-                fmir.write(pairkey + ",inferred," + rl +"\n")
+#                fmir.write(pairkey + ",inferred," + rl +"\n")
+#                fmir.write(pairkey1 +"," + rl + "," + pairkey2 + ",inferred" +"\n")
+                mirList.append([pairkey1, rl, pairkey2, "inferred"])
                 if self.options.verbose:
                     print pairkey + ",inferred," + rl +"\n"
+        for pair in sorted(mirList, key=itemgetter(3,0,2)):
+            fmir.write(','.join(pair) + "\n")
         fmir.close()
 
     def removeMir(self, string):
