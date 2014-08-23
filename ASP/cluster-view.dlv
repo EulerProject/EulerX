@@ -1,0 +1,67 @@
+% Distance matrix (asymmetric: upper triangular values only)
+dist(w0,w1,5).
+dist(w0,w2,4).
+dist(w0,w3,3).
+dist(w0,w4,6).
+dist(w0,w5,6).
+dist(w0,w6,4).
+dist(w1,w2,1).
+dist(w1,w3,2).
+dist(w1,w4,1).
+dist(w1,w5,3).
+dist(w1,w6,3).
+dist(w2,w3,3).
+dist(w2,w4,2).
+dist(w2,w5,2).
+dist(w2,w6,4).
+dist(w3,w4,3).
+dist(w3,w5,5).
+dist(w3,w6,1).
+dist(w4,w5,2).
+dist(w4,w6,2).
+dist(w5,w6,4).
+
+% Symmetric closure: add lower triangular values
+dist(X,Y,D) :-
+	dist(Y,X,D).
+
+% What worlds are there?
+world(W) :- 
+	dist(W,_,_).
+
+% An edge can be reduced, if there is a 2-hop of equal length
+red(X,Y) :-
+	dist(X,Y,D),
+	hop2(X,Y,D).
+
+% Distance D of a 2-hop from X to Y:
+hop2(X,Y,D) :-
+	dist(X,Z,D1),
+	dist(Z,Y,D2),
+	D = D1 + D2.
+%	X != Z, Z != Y.  % Not needed since dist/3 is irreflexive!
+
+% Only non-reduced edges need to be drawn:
+draw(X,Y,D) :-
+	dist(X,Y,D),
+	not red(X,Y),
+	X < Y.        % break symmetry again: just 1 edge is enough
+
+
+% Find the total distance from each world to all other worlds
+tdist(W,S) :-
+	world(W),
+	#sum{ D,W2 : dist(W,W2,D), world(W2) } = S.
+
+% Find the world with minimum total distance 
+center(W) :-
+	tdist(W,T),
+	#min{ T1 : tdist(W1,T1) } = T.
+
+
+%%% BL: Control Run: 
+% $ dlv cv3.dlv -filter=tdist,center
+% DLV [build BEN/Dec 21 2011   gcc 4.2.1 (Apple Inc. build 5666) (dot 3)]
+% 
+% {tdist(w0,28), tdist(w1,15), tdist(w2,16), tdist(w3,17), tdist(w4,16), tdist(w5,22), tdist(w6,18), 
+%  center(w1)}

@@ -1,0 +1,97 @@
+digraph{
+rankdir=TB
+202 [label="All Other \nConsistent \nArticulations" color="#00FF00" style="dashed,rounded", shape=box];
+
+//MISs
+subgraph clusterA{
+rank=same;
+style = invis;
+1791 [shape=octagon color="#FF0000" style="filled" label="9,12"];
+2039 [shape=octagon color="#FF0000" style="filled" label="4.12"];
+1535 [shape=octagon color="#FF0000" style="filled" label="10,12"];
+}
+
+1791->202 [color=blue, arrowhead=none, label="2"];
+2039->202 [color=blue, arrowhead=none, label="2"];
+1535->202 [color=blue, arrowhead=none, label="2"];
+
+subgraph clusterB{
+rank=same;
+style = invis;
+3636 [shape=octagon color="#FF0000" style="filled" label="1,2,4,\n7,8,9"];
+3132 [shape=octagon color="#FF0000" style="filled" label="1,2,7,\n8,9,10"];
+}
+
+3636->202 [color=blue, arrowhead=none, label="6"];
+3132->202 [color=blue, arrowhead=none, label="6"];
+
+3636->1791[style=invis];
+3132->1791[style=invis];
+3636->2039[style=invis];
+3132->2039[style=invis];
+3636->1535[style=invis];
+3132->1535[style=invis];
+
+//MCS
+node [shape=box]
+subgraph clusterC{
+rank=same;
+style = invis;
+776 [color="#00FF00" style="rounded,filled" label="1,2,3,\n5,6,7,\n8,11,12"];
+2568 [color="#00FF00" style="rounded,filled" label="1,2,3,\n5,6,7,\n8,9,11"];
+}
+
+776->202 [color="#00FF00", style=dashed, label="9"];
+2568->202 [color="#00FF00", style=dashed, label="9"];
+
+776->3636[style=invis];
+776->3132[style=invis];
+2568->3636[style=invis];
+2568->3132[style=invis];
+
+subgraph clusterD{
+rank=same;
+style = invis;
+2049[color="#00FF00" style="rounded,filled" label="2,3,4,\n5,6,7,\n8,9,10,\n11"];
+2050 [color="#00FF00" style="rounded,filled" label="1,3,4,\n5,6,7,\n8,9,10,\n11"];
+2112 [color="#00FF00" style="rounded,filled" label="1,2,3,\n4,5,6,\n8,9,10,\n11"];
+2176 [color="#00FF00" style="rounded,filled" label="1,2,3,\n4,5,6,\n7,9,10,\n11"];
+2304 [color="#00FF00" style="rounded,filled" label="1,2,3,\n4,5,6,\n7,8,10,\n11"];
+}
+
+2049->202 [color="#00FF00", style=dashed, label="10"];
+2050->202 [color="#00FF00", style=dashed, label="10"];
+2112->202 [color="#00FF00", style=dashed, label="10"];
+2176->202 [color="#00FF00", style=dashed, label="10"];
+2304->202 [color="#00FF00", style=dashed, label="10"];
+
+2049->776 [style=invis];
+2050->776 [style=invis];
+2112->776 [style=invis];
+2176->776 [style=invis];
+2304->776 [style=invis];
+2049->2568 [style=invis];
+2050->2568 [style=invis];
+2112->2568 [style=invis];
+2176->2568 [style=invis];
+2304->2568 [style=invis];
+
+305 [shape=octagon, label="All Other \nInconsistent \nArticulations" color="#FF0000" style="dashed"];
+305->2049 [color=blue, arrowhead=none, label="2"];
+305->2050 [color=blue, arrowhead=none, label="2"];
+305->2112 [color=blue, arrowhead=none, label="2"];
+305->2176 [color=blue, arrowhead=none, label="2"];
+305->2304 [color=blue, arrowhead=none, label="2"];
+
+305->776 [color=blue, arrowhead=none, label="3"];
+305->2568 [color=blue, arrowhead=none, label="3"];
+
+305->3636 [dir=back, color="#FF0000", style=dashed, label="6"];
+305->3132 [dir=back, color="#FF0000", style=dashed, label="6"];
+
+305->1791 [dir=back, color="#FF0000", style=dashed, label="10"];
+305->2039 [dir=back, color="#FF0000", style=dashed, label="10"];
+305->1535 [dir=back, color="#FF0000", style=dashed, label="10"];
+
+
+}

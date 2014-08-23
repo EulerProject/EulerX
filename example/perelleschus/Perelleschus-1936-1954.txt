@@ -1,0 +1,12 @@
+taxonomy 1 Taxonomy1
+(1 2 1L)
+
+taxonomy 2 Taxonomy2
+(3 4 5 6)
+
+articulation pere perell
+[1.1 overlaps 2.3]
+[1.2 equals 2.4]
+[1.2 disjoint 2.5]
+[1.2 disjoint 2.6]
+[1.1L disjoint 2.3]

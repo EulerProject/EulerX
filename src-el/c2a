@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+from parser2 import *
+from encoder import *
+
+elParser = EulerParser.instance()
+(options, args) = elParser.parse_args()
+if options.verbose:
+    print options
+if options.inputfile is None:
+    print "Wrong input format"
+    return None
+if not encode.has_key(options.enc)\
+   or not query.has_key(options.query):
+    return None
+elEnc = EulerEncoder.instance()
+elEnc.run(options)

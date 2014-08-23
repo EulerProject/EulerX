@@ -1,0 +1,20 @@
+1.A,2.I,input,>
+1.A,2.E,input,=
+1.A,2.G,input,>
+1.A,2.F,input,>
+1.H,2.I,inferred,{<, !, ><}
+1.H,2.E,inferred,<
+1.H,2.G,inferred,{<, !, ><}
+1.H,2.F,input,!
+1.C,2.I,inferred,{>, ><}
+1.C,2.E,inferred,<
+1.C,2.G,input,><
+1.C,2.F,input,!
+1.B,2.I,input,!
+1.B,2.E,inferred,<
+1.B,2.G,input,!
+1.B,2.F,input,=
+1.D,2.I,inferred,!
+1.D,2.E,inferred,<
+1.D,2.G,input,<
+1.D,2.F,input,!
