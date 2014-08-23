@@ -53,7 +53,7 @@ class EulerParser:
             EulerParser.inst.add_option("--ieo", action="store_true", dest="ieo", default=False,\
                                                 help="white-box provenance")
             EulerParser.inst.add_option("--countmir", action="store_true", dest="countOn", default=False,\
-                                              help="count # of occurance for each of rcc5")
+                                              help="count # of occurrence for each of rcc5")
             EulerParser.inst.add_option("--rcgo", action="store_true", dest="rcgo", default=False,\
                                               help="Reduced containment graphs with overlaps")
             EulerParser.inst.add_option("--pwcluster", action="store_true", dest="cluster", default=False,\
@@ -63,7 +63,7 @@ class EulerParser:
             EulerParser.inst.add_option("-N", action="store_false", dest="output", default=True,\
                                               help="no output")
             EulerParser.inst.add_option("-g", action="store_true", dest="generateCti", default=False,\
-                                              help="artifitial example generator, cannot be used with -i option")
+                                              help="artificial example generator, cannot be used with -i option")
             EulerParser.inst.add_option("-n", dest="nary", type="int", default=0, help="N-nary, used with -g")
             EulerParser.inst.add_option("-m", dest="nnodes", type="int", default=0, help="#nodes, used with -g")
             EulerParser.inst.add_option("-d", dest="depth", type="int", default=2, help="depth, used with -g")
