@@ -28,6 +28,7 @@ from inputViz import *
 from random import randint
 from time import localtime, strftime
 from operator import itemgetter
+from shutil import copyfile
 
 class TaxonomyMapping:
 
@@ -86,6 +87,10 @@ class TaxonomyMapping:
             options.outputdir = os.path.join(options.inputdir, self.runningUser+"-"+self.runningHost+"-"+self.runningDate+"-"+self.name)
         if not os.path.exists(options.outputdir):
             os.mkdir(options.outputdir)
+        # copy input file to output dir
+        copyfile(os.path.join(self.options.inputdir, self.options.inputfile),\
+                 os.path.join(self.options.outputdir, self.options.inputfile))
+
         self.aspdir = os.path.join(options.outputdir, "asp")
         if not os.path.exists(self.aspdir):
             os.mkdir(self.aspdir)
@@ -1550,8 +1555,9 @@ class TaxonomyMapping:
 			#self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") " +coverage + ".\n\n"
 
 			# D
-			self.baseAsp += "%% sibling disjointness\n"
-			for i in range(len(t.children) - 1):
+                        if self.options.enableSD:
+			  self.baseAsp += "%% sibling disjointness\n"
+			  for i in range(len(t.children) - 1):
 			    for j in range(i+1, len(t.children)):
 				name1 = t.children[i].dlvName()
 				name2 = t.children[j].dlvName()

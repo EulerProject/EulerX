@@ -60,6 +60,8 @@ class EulerParser:
                                                 help="consistency check only")
             EulerParser.inst.add_option("--dc", action="store_false", dest="enableCov", default=True,\
                                                 help="disable coverage globally, or use \"nc\" to do it in some parent-child relation")
+            EulerParser.inst.add_option("--dd", action="store_false", dest="enableSD", default=True,\
+                                                help="disable sibling disjointness, can be used with vr encoding only")
             EulerParser.inst.add_option("--ur", action="store_true", dest="reduction", default=False,\
                                               help="turn on uncertainty reduction")
             EulerParser.inst.add_option("--ho", action="store_true", dest="hideOverlaps", default=False,\
