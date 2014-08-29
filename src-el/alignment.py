@@ -678,7 +678,8 @@ class TaxonomyMapping:
             #    if T == T1 or T == T2:
             tmpComLi.append(T)
             tmpCom += "  \""+T+"\"\n"
-            self.addRcgVizNode(T, "comb")      
+            newT = self.restructureCbNames(T)
+            self.addRcgVizNode(newT, "comb")
             
         # Duplicates
     	tmpTr = list(self.tr)
@@ -707,6 +708,17 @@ class TaxonomyMapping:
             print "Transitive reduction:"
             print self.tr
             
+        # restructure for cb visualization
+        for [T1, T2, P] in self.tr:
+            if (T1.find("*") != -1 or T1.find("\\\\") != -1):
+                newT1 = self.restructureCbNames(T1)
+                self.tr[self.tr.index([T1,T2,P])] = [newT1, T2, P]
+        
+        for [T1, T2, P] in self.tr:
+            if (T2.find("*") != -1 or T2.find("\\\\") != -1):
+                newT2 = self.restructureCbNames(T2)
+                self.tr[self.tr.index([T1,T2,P])] = [T1, newT2, P]
+        
         # Node Coloring (Creating dot file, will be replaced by stylesheet processor)
         for [T1, T2, P] in self.tr:
             if(T1.find("*") == -1 and T1.find("\\") == -1 and T1.find("\\n") == -1 and T1.find(".") != -1):
@@ -717,6 +729,8 @@ class TaxonomyMapping:
                     taxa2 += "  \""+T1+"\"\n"
                 self.addRcgVizNode(T1s[1], T1s[0])          # used in stylesheet
             else:
+#                newT1 = self.restructureCbNames(T1)
+#                self.tr[self.tr.index([T1,T2,P])] = [newT1, T2, P]
                 tmpComLi.append(T1)
                 tmpCom += "  \""+T1+"\"\n"
                 self.addRcgVizNode(T1, "comb")
@@ -728,6 +742,8 @@ class TaxonomyMapping:
                     taxa2 += "  \""+T2+"\"\n"
                 self.addRcgVizNode(T2s[1], T2s[0])
             else:
+#                newT2 = self.restructureCbNames(T2)
+#                self.tr[self.tr.index([T1,T2,P])] = [T1, newT2, P]
                 tmpComLi.append(T2)
                 tmpCom += "  \""+T2+"\"\n"
                 self.addRcgVizNode(T2, "comb")
@@ -776,11 +792,13 @@ class TaxonomyMapping:
                             break                            
 #                    fDot.write("     \"" + item.group(1) + "\" -> \"" + item.group(2) + "\"\n")
 #                    fDot.write("     \"" + replace1 + "\" -> \"" + replace2 + "\"\n")
-                    if "\\n" in replace1:
+                    if "\\n" in replace1 or "\\\\" in replace1:
+                        replace1 = self.restructureCbNames(replace1)
                         self.addRcgVizNode(replace1, "comb")
                     else:
                         self.addRcgVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1))
-                    if "\\n" in replace2:
+                    if "\\n" in replace2 or "\\\\" in replace2:
+                        replace2 = self.restructureCbNames(replace2)
                         self.addRcgVizNode(replace2, "comb")
                     else:
                         self.addRcgVizNode(re.match("(.*)\.(.*)", replace2).group(2), re.match("(.*)\.(.*)", replace2).group(1))
@@ -2293,3 +2311,37 @@ class TaxonomyMapping:
         edge.update({"t" : t})
         edge.update({"label" : label})
         self.rcgVizEdges.update({s + "_" + t : edge})
+    
+    def restructureCbNames(self, cbName):
+        if cbName.find("*") != -1 or cbName.find("\\\\") != -1:
+            newCbName = ""
+            cbs = cbName.split("\\n")
+            type1 = []              # individual input concepts
+            type2 = []              # union merge concepts
+            type3 = []              # unique regionss merge concepts
+            tmpFirstTs = []
+            tmpSecondTs = []
+
+            for cb in cbs:
+                if cb.find("\\\\") != -1:
+                    type3.append(cb)
+                elif cb.find("*") != -1:
+                    if cb.split(".")[0] == self.firstTName:
+                        type2.append(cb)
+                    else:
+                        tmpLi = cb.split("*")
+                        type2.append(tmpLi[1] + "*" + tmpLi[0])
+                else:
+                    if cb.split(".")[0] == self.firstTName:
+                        tmpFirstTs.append(cb)
+                    else:
+                        tmpSecondTs.append(cb)
+            tmpFirstTs.sort()
+            tmpSecondTs.sort()
+            type1.extend(tmpFirstTs + tmpSecondTs)
+            type2.sort()
+            type3.sort()
+            newCbName = "\\n".join(type1 + type2 + type3)
+            return newCbName
+        else:
+            return cbName
