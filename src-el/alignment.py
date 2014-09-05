@@ -19,6 +19,7 @@ import string
 import getpass
 import socket
 import fileinput
+import sys
 from taxonomy import * 
 from alignment import * 
 from redCon import *
@@ -37,7 +38,7 @@ class TaxonomyMapping:
     #    options - IN
     #    snap    - whether to take a snapshot of the software
     #
-    def __init__(self, options, snap = False):
+    def __init__(self, options):
         self.mir = {}                          # MIR
         self.mirc = {}                         # MIRC
         self.mirp = {}                         # MIR Provenance
@@ -100,17 +101,28 @@ class TaxonomyMapping:
         self.ixswitch = os.path.join(self.aspdir, self.name+"_ixswitch."+self.options.reasoner)
         # Log stdout and stderr
         self.stdoutfile = os.path.join(options.outputdir, self.name+".stdout")
+        fstdout = open(self.stdoutfile,"w")
+        fstdout.write("##### Executing command:\n")
+        argList = []
+        for arg in sys.argv:
+            argList.append(arg + " ")
+        fstdout.write(''.join(argList))
+        fstdout.write(commands.getoutput("eulersnap"))
+        fstdout.write("\n\n##### Running User, Host and Date:\n")
+        fstdout.write("User:\t"+self.runningUser+"\nHost:\t"+self.runningHost+"\nDate:\t"+self.runningDate)
+        fstdout.write("\n\n##### Euler Outputs:\n")
+        fstdout.close()
         sys.stdout = Logger(self.stdoutfile)
         self.stderrfile = os.path.join(options.outputdir, self.name+".stderr")
         sys.stderr = Logger(self.stderrfile)
         # Take a snapshot of the software
-        if snap:
-            self.snapfile = os.path.join(options.outputdir, "snap.out")
-            fsnap = open(self.snapfile, 'w')
-            fsnap.write(commands.getoutput("eulersnap"))
-            fsnap.write("\n\n##### Running User, Host and Date:\n")
-            fsnap.write("User:\t"+self.runningUser+"\nHost:\t"+self.runningHost+"\nDate:\t"+self.runningDate)
-            fsnap.close()
+#        if snap:
+#            self.snapfile = os.path.join(options.outputdir, "snap.out")
+#            fsnap = open(self.snapfile, 'w')
+#            fsnap.write(commands.getoutput("eulersnap"))
+#            fsnap.write("\n\n##### Running User, Host and Date:\n")
+#            fsnap.write("User:\t"+self.runningUser+"\nHost:\t"+self.runningHost+"\nDate:\t"+self.runningDate)
+#            fsnap.close()
         self.ivout = os.path.join(options.outputdir, self.name+"_iv.dot")
         self.cbout = os.path.join(options.outputdir, self.name+"_cb.txt")
         self.obout = os.path.join(options.outputdir, self.name+"_ob.txt")

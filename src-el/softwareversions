@@ -1,4 +1,4 @@
-echo "##### Euler version:\n"
+echo "\n\n##### Euler version:\n"
 hg summary
 echo "\n\n##### GraphViz version:\n"
 dot -V
