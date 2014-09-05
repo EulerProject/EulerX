@@ -107,7 +107,7 @@ class TaxonomyMapping:
         for arg in sys.argv:
             argList.append(arg + " ")
         fstdout.write(''.join(argList))
-        fstdout.write(commands.getoutput("eulersnap"))
+        fstdout.write(commands.getoutput("softwareversions"))
         fstdout.write("\n\n##### Running User, Host and Date:\n")
         fstdout.write("User:\t"+self.runningUser+"\nHost:\t"+self.runningHost+"\nDate:\t"+self.runningDate)
         fstdout.write("\n\n##### Euler Outputs:\n")
