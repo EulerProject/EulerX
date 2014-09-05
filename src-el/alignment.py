@@ -696,7 +696,11 @@ class TaxonomyMapping:
     	    if(P == 0):
     	        if(self.tr.count([T1, T2, 1]) > 0):
                     self.tr.remove([T1, T2, 1])
-
+        tmpTr = list(self.tr)
+        for [T1, T2, P] in tmpTr:
+            if T1 == T2:
+                self.tr.remove([T1, T2, P])
+            
     	# Reductions
     	tmpTr = list(self.tr)
         for [T1, T2, P1] in tmpTr:
