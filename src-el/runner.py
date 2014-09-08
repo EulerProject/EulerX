@@ -3,19 +3,18 @@ from taxonomy import *
 from alignment import *
 
 class EulerRunner:
-
+    
     inst = None
-
+    
     def __init__(self):
         self.name = "Euler Runner"
 
     @Callable
     def instance():
-	return EulerRunner()
-
+        return EulerRunner()
+    
     def run(self, options):
         taxMap = TaxonomyMapping(options)
         # Parse the cti file
         taxMap.readFile()
         taxMap.run()
-

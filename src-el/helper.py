@@ -9,7 +9,7 @@ def findkey(mapp, value):
 #    if tmplist is []:
 #        return None
 #    return tmplist[0]
-     return mapp.keys()[mapp.values().index(value)]
+    return mapp.keys()[mapp.values().index(value)]
 
 
 class Logger(object):
@@ -17,11 +17,10 @@ class Logger(object):
     def __init__(self, filename):
         self.terminal = sys.stdout
         self.log = open(filename, "a")
-
+        
     def __del__(self):
-        self.log.close()  
-
+        self.log.close()
+        
     def write(self, message):
         self.terminal.write(message)
-        self.log.write(message)  
-
+        self.log.write(message)
