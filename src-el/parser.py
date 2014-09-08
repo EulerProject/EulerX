@@ -14,9 +14,9 @@ class CtiParser:
 	return CtiParser.inst
 
 class EulerParser:
-
+    
     inst = None
-
+    
     @staticmethod
     def instance():
         if EulerParser.inst is None:
@@ -93,4 +93,4 @@ class EulerParser:
                                               help="input visualization")
             EulerParser.inst.add_option("--simpall", action="store_true", dest="simpAllView", default=False,\
                                   help="simplify the pw aggregate view")
-	return EulerParser.inst
+        return EulerParser.inst
