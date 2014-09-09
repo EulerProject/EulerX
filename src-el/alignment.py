@@ -780,7 +780,7 @@ class TaxonomyMapping:
         fAllDot.write(taxa1)
         fAllDot.write("  node [shape=octagon style=\"filled\" fillcolor=\"#FFFFCC\"]\n")
         fAllDot.write(taxa2)
-        fAllDot.write("  node [shape=Msquare style=\"filled\" fillcolor=\"#EEEEEE\"]\n")
+        fAllDot.write("  node [shape=box style=\"filled,rounded\" fillcolor=\"#EEEEEE\"]\n")
         fAllDot.write(tmpCom)
         fAllDot.close()
         
