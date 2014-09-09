@@ -10,7 +10,7 @@
   nodestyle: 
     "1": "shape=box style=filled fillcolor=\"#CCFFCC\""
     "2": "shape=octagon style=filled fillcolor=\"#FFFFCC\""
-    "comb": "shape=Msquare style=filled fillcolor=\"#EEEEEE\""
+    "comb": "shape=box style=\"filled,rounded\" fillcolor=\"#EEEEEE\""
     default: "shape=circle style=filled fillcolor=\"#FFFFFF\""
   edgestyle: 
     - 
@@ -25,7 +25,7 @@
       penwidth: "off"
     - 
       label: "overlaps"
-      dot: "arrowhead=none style=dotted color=\"#0000FF\" constraint=true penwidth=1"
+      dot: "arrowhead=none style=dotted color=\"#0000FF\" constraint=false penwidth=1"
       display: ""
       penwidth: "off"
     - 
