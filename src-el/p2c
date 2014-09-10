@@ -9,8 +9,9 @@ data = {}
 def p2c(inFile):
     with open(inFile) as inFile:
         reader = csv.reader(inFile)
+    	next(reader, None) #skip header row
         for line in reader:
-            i = line[1].split(".")[0]
+            i = line[0].split(".")[0]
             if i not in data:
                 data[i] = {}
             data[i] = line[1]
