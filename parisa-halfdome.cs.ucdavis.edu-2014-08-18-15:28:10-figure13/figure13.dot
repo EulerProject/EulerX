@@ -1,0 +1,116 @@
+digraph{
+rankdir=LR
+subgraph cluster2006{ style=invis
+node[shape=octagon style=filled fillcolor="#FFFFCC"] 
+"2006.Prectir"
+"2006.PcarPeve"
+"2006.PHYLLO"
+"2006.Pcarlud"
+"2006.PER"
+"2006.PHY"
+"2006.Pevelyn"
+}
+subgraph cluster2013{ style=invis
+node[shape=box style=filled fillcolor="#CCFFCC"] 
+"2013.PER"
+"2013.Psplend"
+"2013.PevePvar"
+"2013.PsalPspi"
+"2013.Pvariab"
+"2013.PHYLLO"
+"2013.Prectir"
+"2013.PHY"
+"2013.Pbivent"
+"2013.Psalpin"
+"2013.PevePspi"
+"2013.PcarPspi"
+"2013.nc"
+"2013.PbivPspi"
+"2013.Pspinot"
+"2013.Ppubico"
+"2013.Pcarlud"
+"2013.Psulcat"
+"2013.PcarPsul"
+"2013.Pevelyn"
+"2013.PHYsubcin"
+}
+edge[style=solid color="#000000" constraint=true penwidth=1]
+"2006.PcarPeve" -> "2006.PER"
+"2006.Pevelyn" -> "2006.PcarPeve"
+"2006.Pcarlud" -> "2006.PcarPeve"
+"2006.PHY" -> "2006.PHYLLO"
+"2006.PER" -> "2006.PHYLLO"
+"2006.Prectir" -> "2006.PER"
+edge[style=solid color="#000000" constraint=true penwidth=1]
+"2013.PER" -> "2013.PevePspi" [dir=back]
+"2013.PcarPsul" -> "2013.Pcarlud" [dir=back]
+"2013.PcarPspi" -> "2013.Ppubico" [dir=back]
+"2013.PcarPspi" -> "2013.PcarPsul" [dir=back]
+"2013.PHYLLO" -> "2013.PHY" [dir=back]
+"2013.PbivPspi" -> "2013.PcarPspi" [dir=back]
+"2013.PsalPspi" -> "2013.Pspinot" [dir=back]
+"2013.PHY" -> "2013.PHYsubcin" [dir=back]
+"2013.PcarPsul" -> "2013.Psulcat" [dir=back]
+"2013.PevePspi" -> "2013.PevePvar" [dir=back]
+"2013.PbivPspi" -> "2013.Psplend" [dir=back]
+"2013.PER" -> "2013.Prectir" [dir=back]
+"2013.PcarPspi" -> "2013.PsalPspi" [dir=back]
+"2013.PevePvar" -> "2013.Pevelyn" [dir=back]
+"2013.PHY" -> "2013.nc" [dir=back]
+"2013.PHYLLO" -> "2013.PER" [dir=back]
+"2013.PbivPspi" -> "2013.Pbivent" [dir=back]
+"2013.PevePspi" -> "2013.PbivPspi" [dir=back]
+"2013.PevePvar" -> "2013.Pvariab" [dir=back]
+"2013.PsalPspi" -> "2013.Psalpin" [dir=back]
+edge[style=dotted color="#AA00FF" constraint=true penwidth=3]
+"2013.Prectir" -> "2006.Prectir" [label="=="]
+"2013.Psalpin" -> "2006.PcarPeve" [label="!"]
+"2013.PevePvar" -> "2006.PER" [label="><"]
+"2013.PcarPspi" -> "2006.PcarPeve" [label="><"]
+"2013.Psulcat" -> "2006.PcarPeve" [label="!"]
+"2013.PHYLLO" -> "2006.PHYLLO" [label=">"]
+"2013.PsalPspi" -> "2006.PcarPeve" [label="!"]
+"2013.PHY" -> "2006.PHY" [label="=="]
+"2013.PevePspi" -> "2006.PER" [label="><"]
+"2013.Psplend" -> "2006.PcarPeve" [label="!"]
+"2013.Pcarlud" -> "2006.Pcarlud" [label="=="]
+"2013.PevePvar" -> "2006.PcarPeve" [label="><"]
+"2013.Pvariab" -> "2006.PcarPeve" [label="!"]
+"2013.Pbivent" -> "2006.PcarPeve" [label="!"]
+"2013.Pspinot" -> "2006.PcarPeve" [label="!"]
+"2013.PbivPspi" -> "2006.PER" [label="><"]
+"2013.PHYsubcin" -> "2006.PHY" [label="<"]
+"2013.PevePspi" -> "2006.PcarPeve" [label=">"]
+"2013.Pevelyn" -> "2006.Pevelyn" [label="=="]
+"2013.PbivPspi" -> "2006.PcarPeve" [label="><"]
+"2013.PcarPsul" -> "2006.PcarPeve" [label="><"]
+"2013.Ppubico" -> "2006.PcarPeve" [label="!"]
+"2013.PER" -> "2006.PER" [label=">"]
+node[shape=box] 
+{rank=min Legend [fillcolor= white margin=0 label=< 
+ <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> 
+<TR> <TD COLSPAN="2"><font face="Arial Black"> Nodes</font></TD> </TR> 
+<TR> 
+ <TD bgcolor="#FFFFCC">2006</TD> 
+ <TD>7</TD> 
+ </TR> 
+<TR> 
+ <TD bgcolor="#CCFFCC">2013</TD> 
+ <TD>21</TD> 
+ </TR> 
+<TR> <TD COLSPAN="2"><font face = "Arial Black"> Edges </font></TD> </TR> 
+<TR> 
+ <TD><font color ="#000000">isa_2006</font></TD> 
+ <TD>6</TD> 
+ </TR> 
+<TR> 
+ <TD><font color ="#000000">isa_2013</font></TD> 
+ <TD>20</TD> 
+ </TR> 
+<TR> 
+ <TD><font color ="#AA00FF">Art.</font></TD> 
+ <TD>23</TD> 
+ </TR> 
+</TABLE> 
+ >] } 
+}
