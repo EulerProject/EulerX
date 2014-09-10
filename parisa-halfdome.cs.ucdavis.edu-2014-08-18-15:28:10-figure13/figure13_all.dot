@@ -1,0 +1,145 @@
+digraph {
+
+rankdir = RL
+
+  node [shape=box style="filled" fillcolor="#CCFFCC"]
+  "2013.PER"
+  "2013.PHYLLO"
+  "2013.PevePspi"
+  "2013.PER"
+  "2013.PevePvar"
+  "2013.PevePspi"
+  "2013.PbivPspi"
+  "2013.PevePspi"
+  "2013.Pvariab"
+  "2013.PevePvar"
+  "2013.Pbivent"
+  "2013.PbivPspi"
+  "2013.Psplend"
+  "2013.PbivPspi"
+  "2013.PcarPspi"
+  "2013.PbivPspi"
+  "2013.PcarPsul"
+  "2013.PcarPspi"
+  "2013.Ppubico"
+  "2013.PcarPspi"
+  "2013.PsalPspi"
+  "2013.PcarPspi"
+  "2013.Psulcat"
+  "2013.PcarPsul"
+  "2013.Psalpin"
+  "2013.PsalPspi"
+  "2013.Pspinot"
+  "2013.PsalPspi"
+  "2013.PHYLLO"
+  "2013.PER"
+  "2013.PevePspi"
+  "2013.PevePvar"
+  "2013.ncPHY"
+  "2013.PHYsubcin"
+  "2013.PcarPsul"
+  "2013.PER"
+  "2013.PHYLLO"
+  "2013.PevePspi"
+  "2013.PER"
+  "2013.PHYLLO"
+  "2013.PHYLLO"
+  "2013.PER"
+  "2013.PHYLLO"
+  "2013.PevePspi"
+  "2013.PbivPspi"
+  "2013.PcarPspi"
+  node [shape=octagon style="filled" fillcolor="#FFFFCC"]
+  "2006.PER"
+  "2006.PHYLLO"
+  "2006.PcarPeve"
+  "2006.PER"
+  "2006.PHYLLO"
+  "2006.PER"
+  "2006.PcarPeve"
+  "2006.PER"
+  "2006.PcarPeve"
+  "2006.PHYLLO"
+  "2006.PcarPeve"
+  "2006.PHYLLO"
+  "2006.PER"
+  "2006.PHYLLO"
+  "2006.PHYLLO"
+  "2006.PER"
+  node [shape=Msquare style="filled" fillcolor="#EEEEEE"]
+  "2013.Prectir\n2006.Prectir"
+  "2013.Pevelyn\n2006.Pevelyn"
+  "2013.PHY\n2006.PHY"
+  "2013.Pcarlud\n2006.Pcarlud"
+  "2013.Pcarlud\n2006.Pcarlud"
+  "2013.Pevelyn\n2006.Pevelyn"
+  "2013.PHY\n2006.PHY"
+  "2013.Prectir\n2006.Prectir"
+  "2013.Prectir\n2006.Prectir"
+  "2013.Pevelyn\n2006.Pevelyn"
+  "2013.Pevelyn\n2006.Pevelyn"
+  "2013.PHY\n2006.PHY"
+  "2013.PHY\n2006.PHY"
+  "2013.PHY\n2006.PHY"
+  "2013.Pcarlud\n2006.Pcarlud"
+  "2013.Pcarlud\n2006.Pcarlud"
+  "2013.Prectir\n2006.Prectir"
+  "2013.Prectir\n2006.Prectir"
+  "2013.Prectir\n2006.Prectir"
+  "2013.Pevelyn\n2006.Pevelyn"
+  "2013.Pevelyn\n2006.Pevelyn"
+  "2013.Pevelyn\n2006.Pevelyn"
+  "2013.Pevelyn\n2006.Pevelyn"
+  "2013.Pevelyn\n2006.Pevelyn"
+  "2013.PHY\n2006.PHY"
+  "2013.Pcarlud\n2006.Pcarlud"
+  "2013.Pcarlud\n2006.Pcarlud"
+  "2013.Pcarlud\n2006.Pcarlud"
+  "2013.Pcarlud\n2006.Pcarlud"
+  "2013.Pcarlud\n2006.Pcarlud"
+  "2013.Pcarlud\n2006.Pcarlud"
+  "2013.Pcarlud\n2006.Pcarlud"
+  "2006.PER" -> "2006.PHYLLO" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2006.PER" -> "2013.PER" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2006.PHYLLO" -> "2013.PHYLLO" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2006.PcarPeve" -> "2006.PER" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2006.PcarPeve" -> "2013.PevePspi" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.PER" -> "2013.PHYLLO" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.PHY\n2006.PHY" -> "2006.PHYLLO" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.PHY\n2006.PHY" -> "2013.PHYLLO" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.PHYsubcin" -> "2013.PHY\n2006.PHY" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.PbivPspi" -> "2013.PevePspi" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pbivent" -> "2013.PbivPspi" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.PcarPspi" -> "2013.PbivPspi" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.PcarPsul" -> "2013.PcarPspi" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pcarlud\n2006.Pcarlud" -> "2006.PER" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pcarlud\n2006.Pcarlud" -> "2006.PHYLLO" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pcarlud\n2006.Pcarlud" -> "2006.PcarPeve" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pcarlud\n2006.Pcarlud" -> "2013.PER" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pcarlud\n2006.Pcarlud" -> "2013.PHYLLO" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pcarlud\n2006.Pcarlud" -> "2013.PbivPspi" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pcarlud\n2006.Pcarlud" -> "2013.PcarPspi" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pcarlud\n2006.Pcarlud" -> "2013.PcarPsul" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pcarlud\n2006.Pcarlud" -> "2013.PevePspi" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.PevePspi" -> "2013.PER" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.PevePvar" -> "2013.PevePspi" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pevelyn\n2006.Pevelyn" -> "2006.PER" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pevelyn\n2006.Pevelyn" -> "2006.PHYLLO" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pevelyn\n2006.Pevelyn" -> "2006.PcarPeve" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pevelyn\n2006.Pevelyn" -> "2013.PER" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pevelyn\n2006.Pevelyn" -> "2013.PHYLLO" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pevelyn\n2006.Pevelyn" -> "2013.PevePspi" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pevelyn\n2006.Pevelyn" -> "2013.PevePvar" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Ppubico" -> "2013.PcarPspi" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Prectir\n2006.Prectir" -> "2006.PER" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Prectir\n2006.Prectir" -> "2006.PHYLLO" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Prectir\n2006.Prectir" -> "2013.PER" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Prectir\n2006.Prectir" -> "2013.PHYLLO" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.PsalPspi" -> "2013.PcarPspi" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Psalpin" -> "2013.PsalPspi" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pspinot" -> "2013.PsalPspi" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Psplend" -> "2013.PbivPspi" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Psulcat" -> "2013.PcarPsul" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.Pvariab" -> "2013.PevePvar" [style=filled,label=1,penwidth=1,color="#761212"];
+  "2013.ncPHY" -> "2013.PHY\n2006.PHY" [style=filled,label=1,penwidth=1,color="#761212"];
+}
