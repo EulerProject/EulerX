@@ -261,42 +261,42 @@ class TaxonomyMapping:
             frsnr.write("irs(X) :- out(" + vn1 + ",X), in(" + vn2 + ",X).\n")
             frsnr.write("irs(X) :- in(" + vn1 + ",X), out(" + vn2 + ",X).\n")
             frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
-	    frsnr.write("in(" + vn1 + ",X) :- in(" + vn2 + ",X).\n")
-	    frsnr.write("in(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
-	    frsnr.write("out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n") 
-	    frsnr.write("out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n")
+            frsnr.write("in(" + vn1 + ",X) :- in(" + vn2 + ",X).\n")
+            frsnr.write("in(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
+            frsnr.write("out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n") 
+            frsnr.write("out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n")
         elif rel == "includes":
             frsnr.write("irs(X) :- out(" + vn1 + ",X), in(" + vn2 + ",X).\n")
             frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), out(" + vn2 + ",X)} = 0.\n")
             frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
-	    frsnr.write("in(" + vn1 + ",X) :- in(" + vn2 + ",X).\n") 
-	    frsnr.write("out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n") 
-	    frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n")
-	    frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- in(" + vn1 + ",X).\n") 
+            frsnr.write("in(" + vn1 + ",X) :- in(" + vn2 + ",X).\n")
+            frsnr.write("out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n")
+            frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n")
+            frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
         elif rel == "is_included_in":
             frsnr.write(":- #count{X: vrs(X), out(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
             frsnr.write("irs(X) :- in(" + vn1 + ",X), out(" + vn2 + ",X).\n")
             frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
-	    frsnr.write("in(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
-	    frsnr.write("out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n") 
-	    frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- in(" + vn2 + ",X).\n") 
-	    frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n") 
+            frsnr.write("in(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
+            frsnr.write("out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n")
+            frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- in(" + vn2 + ",X).\n")
+            frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n")
         elif rel == "disjoint":
             frsnr.write(":- #count{X: vrs(X), out(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
             frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), out(" + vn2 + ",X)} = 0.\n")
             frsnr.write("irs(X) :- in(" + vn1 + ",X), in(" + vn2 + ",X).\n")
-	    frsnr.write("out(" + vn1 + ",X) :- in(" + vn2 + ",X).\n")
-	    frsnr.write("out(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
-	    frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n")
-	    frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n")
+            frsnr.write("out(" + vn1 + ",X) :- in(" + vn2 + ",X).\n")
+            frsnr.write("out(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
+            frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n")
+            frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n")
         elif rel == "overlaps":
             frsnr.write(":- #count{X: vrs(X), out(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
             frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), out(" + vn2 + ",X)} = 0.\n")
             frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
-	    frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- in(" + vn2 + ",X).\n")
-	    frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n") 
-	    frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n") 
-	    frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
+            frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- in(" + vn2 + ",X).\n")
+            frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n")
+            frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n")
+            frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
         frsnr.close()
         com = "dlv -silent -filter=rel -n=1 "+rsnrfile+" "+self.pwfile+" "+self.pwswitch
         if commands.getoutput(com) == "":
@@ -335,40 +335,40 @@ class TaxonomyMapping:
             tmpmap = {}
             diagraw = sets.Set()
             for i in range(len(ies)):
-              if ies[i].find("ie(prod") != -1:
-                keylist = re.findall('[\d]+', ies[i])
-                tmpmap[keylist.__str__()] = sets.Set(keylist)
-              else:
-                item = re.findall('[\d]+', ies[i])
-                key = item[0]+","+item[len(item)-1]
-                item = item[0:len(item)-1]
-                value = sets.Set()
-                if key in tmpmap.keys():
-                  value = sets.Set(tmpmap[key])
-                tmpmap[key] = value.union(sets.Set(item))
-                #print key,tmpmap[key]
+                if ies[i].find("ie(prod") != -1:
+                    keylist = re.findall('[\d]+', ies[i])
+                    tmpmap[keylist.__str__()] = sets.Set(keylist)
+                else:
+                    item = re.findall('[\d]+', ies[i])
+                    key = item[0]+","+item[len(item)-1]
+                    item = item[0:len(item)-1]
+                    value = sets.Set()
+                    if key in tmpmap.keys():
+                        value = sets.Set(tmpmap[key])
+                    tmpmap[key] = value.union(sets.Set(item))
+                    #print key,tmpmap[key]
 
             # If white box approach, not need to invoke HST algorithm
             if not self.options.ieo:
-               for key in tmpmap.keys():
-                 #tmpset = sets.Set()
-                 tmpset = tmpmap[key]
-                 
-                 addor  = True
-                 for i in range(len(diagraw)):
-                   if tmpset.issubset(list(diagraw)[i]):
-                     a = []
-                     a = list(diagraw)
-                     a.pop(i)
-                     a.insert(i,tmpset)
-                     diagraw = sets.Set(a)
-                   elif tmpset.issuperset(list(diagraw)[i]):
-                     addor = False
-                 if addor:
-                     diagraw.add(tmpset)
-               self.getDiag(diagraw)
-               #print "Min inconsistent subsets: "
-               #print diag
+                for key in tmpmap.keys():
+                    #tmpset = sets.Set()
+                    tmpset = tmpmap[key]
+                    
+                    addor  = True
+                    for i in range(len(diagraw)):
+                        if tmpset.issubset(list(diagraw)[i]):
+                            a = []
+                            a = list(diagraw)
+                            a.pop(i)
+                            a.insert(i,tmpset)
+                            diagraw = sets.Set(a)
+                        elif tmpset.issuperset(list(diagraw)[i]):
+                            addor = False
+                    if addor:
+                        diagraw.add(tmpset)
+                self.getDiag(diagraw)
+                #print "Min inconsistent subsets: "
+                #print diag
                 
             fie = open(self.iefile, 'w')
             fie.write("strict digraph "+self.name+"_ie {\n\nrankdir = LR\n\n")
@@ -396,7 +396,7 @@ class TaxonomyMapping:
         rs = sets.Set()
         print raw
         for i in range(rawl):
-           rs = rs.union(raw.pop())
+            rs = rs.union(raw.pop())
         print rs
         artSet = self.getArtSetFromN(rs)
         self.allJustifications(artSet)
@@ -475,7 +475,7 @@ class TaxonomyMapping:
         elif reasoner[self.options.reasoner] == reasoner["dlv"]:
             raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
             if raw != "":
-              pws = raw.split("\n")
+                pws = raw.split("\n")
         else:
             raise Exception("Reasoner:", self.options.reasoner, " is not supported !!")
         self.npw = len(pws)
@@ -499,13 +499,13 @@ class TaxonomyMapping:
                 pwTm.firstRcg = False
             if self.enc & encode["cb"]:
                 if self.options.hideOverlaps:
-                  pwTm.tr = []
-                  pwTm.mir = {}
+                    pwTm.tr = []
+                    pwTm.mir = {}
                 # if not hiding orignal concepts, basetr is useful
                 else:
-                  pwTm.tr = pwTm.basetr
-                  pwTm.mir = pwTm.basemir
-
+                    pwTm.tr = pwTm.basetr
+                    pwTm.mir = pwTm.basemir
+                    
             outputstr += "\nPossible world "+i.__str__()+":\n{"
             if self.options.verbose: print pws[i]+"#"
             items = pws[i].split(";")
@@ -662,24 +662,24 @@ class TaxonomyMapping:
                 tmpTr = list(self.tr)
                 for [T3, T4, P] in tmpTr:
                     if(T1 == T3 or T2 == T3):
-                      if self.tr.count([T3, T4, P]) > 0:
-                        self.tr.remove([T3, T4, P])
-                        self.tr.append([tmpStr, T4, 0])
+                        if self.tr.count([T3, T4, P]) > 0:
+                            self.tr.remove([T3, T4, P])
+                            self.tr.append([tmpStr, T4, 0])
                     elif(T1 == T4 or T2 == T4):
-                      if self.tr.count([T3, T4, P]) > 0:
-                        self.tr.remove([T3, T4, P])
-                        self.tr.append([T3, tmpStr, 0])
+                        if self.tr.count([T3, T4, P]) > 0:
+                            self.tr.remove([T3, T4, P])
+                            self.tr.append([T3, tmpStr, 0])
                     for T5 in self.eqConLi:
-#                        if(T5 == T3 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
+                        #if(T5 == T3 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
                         if(T3 != T5 and set(T3.split("\\n")).issubset(set(T5.split("\\n")))):
-                          if self.tr.count([T3, T4, P]) > 0:
-                            self.tr.remove([T3, T4, P])
-                            self.tr.append([T5,T4,0])
+                            if self.tr.count([T3, T4, P]) > 0:
+                                self.tr.remove([T3, T4, P])
+                                self.tr.append([T5,T4,0])
                         elif(T4 != T5 and set(T4.split("\\n")).issubset(set(T5.split("\\n")))):
-#                        elif(T5 == T4 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
-                          if self.tr.count([T3, T4, P]) > 0:
-                            self.tr.remove([T3, T4, P])
-                            self.tr.append([T3,T5,0])
+                        #elif(T5 == T4 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
+                            if self.tr.count([T3, T4, P]) > 0:
+                                self.tr.remove([T3, T4, P])
+                                self.tr.append([T3,T5,0])
         tmpeqConLi = []
 #        print "self.eqConLi=", self.eqConLi
         for T in self.eqConLi:
@@ -986,7 +986,7 @@ class TaxonomyMapping:
         tmpmir = copy.deepcopy(self.mir)
         tmptr = copy.deepcopy(self.tr)
         tmpeq = copy.deepcopy(self.eq)
-	if len(artSet) == 0:
+        if len(artSet) == 0:
             return True
         self.articulations = []
         self.mir = copy.deepcopy(self.basemir)
@@ -1018,7 +1018,7 @@ class TaxonomyMapping:
     def printArtRuleN(self, artSet, prefix):
         print prefix+"= ",
         for i in range(len(artSet)):
-          print list(artSet)[i].ruleNum,
+            print list(artSet)[i].ruleNum,
         print ""
 
     # s is consistent, f is inconsistent
@@ -1164,29 +1164,29 @@ class TaxonomyMapping:
                 # Reduce pws
                 tmpppw = sets.Set()
                 for i in range(5):
-                  rel = 1 << i
-                  if self.mir[pair] & rel and pair+","+rel.__str__() in self.mirp.keys():
-                    for pw in self.mirp[pair+","+rel.__str__()]:
-                        if pw not in ppw: continue
-                        tmpppw.add(pw)
-                        # Adjust mir
-                        for tmppair in self.mir.keys():
-                          for j in range(5):
-                            relj = 1 << j
-                            if tmppair+","+relj.__str__() in self.mirp.keys() and\
-                               pw in self.mirp[tmppair+","+relj.__str__()]:
-                              if len(tmpppw) ==1:
-                                self.mir[tmppair] = relj
-                              else:
-                                self.mir[tmppair] |= relj
+                    rel = 1 << i
+                    if self.mir[pair] & rel and pair+","+rel.__str__() in self.mirp.keys():
+                        for pw in self.mirp[pair+","+rel.__str__()]:
+                            if pw not in ppw: continue
+                            tmpppw.add(pw)
+                            # Adjust mir
+                            for tmppair in self.mir.keys():
+                                for j in range(5):
+                                    relj = 1 << j
+                                    if tmppair+","+relj.__str__() in self.mirp.keys() and\
+                                        pw in self.mirp[tmppair+","+relj.__str__()]:
+                                        if len(tmpppw) ==1:
+                                            self.mir[tmppair] = relj
+                                        else:
+                                            self.mir[tmppair] |= relj
                 if len(tmpppw) != 0:
-                  #if len(ppw) == len(pws):
+                    #if len(ppw) == len(pws):
                     ppw = tmpppw
-                  #else:
-                  #  ppw = ppw.intersection(tmpppw)
+                    #else:
+                    #  ppw = ppw.intersection(tmpppw)
                 else:
-                  print "Inconsistent again !!"
-                  ppw = tmpppw
+                    print "Inconsistent again !!"
+                    ppw = tmpppw
         outputstr = ""
         for i in ppw:
             if self.options.cluster: pwmirs.append({})
@@ -1398,15 +1398,15 @@ class TaxonomyMapping:
                         p1 = t1.dotName()+","+t2.dotName()
                         p2 = t2.dotName()+","+t1.dotName()
                         if self.mir.has_key(p1) and self.mir[p1] & rcc5["overlaps"] or\
-                           self.mir.has_key(p2) and self.mir[p2] & rcc5["overlaps"]:
-	                    self.baseCb += "newcon(" + t1.dlvName() + "_not_" + t2.dlvName() + ", "\
-	           	                + t1.dlvName() + ", " + t2.dlvName()  + ", 0).\n"
-	                    self.baseCb += "newcon(" + t1.dlvName() + "__" + t2.dlvName() + ", "\
-	           	                + t1.dlvName() + ", " + t2.dlvName()  + ", 1).\n"
-	                    self.baseCb += "newcon(not_" + t1.dlvName() + "__" + t2.dlvName() + ", "\
-	           	                + t1.dlvName() + ", " + t2.dlvName()  + ", 2).\n"
-	           		        #+ "concept2(" + t1.dlvName() + ", _), "\
-	           		        #+ "concept2(" + t2.dlvName() + ", _).\n"
+                            self.mir.has_key(p2) and self.mir[p2] & rcc5["overlaps"]:
+                            self.baseCb += "newcon(" + t1.dlvName() + "_not_" + t2.dlvName() + ", "\
+                                        + t1.dlvName() + ", " + t2.dlvName()  + ", 0).\n"
+                            self.baseCb += "newcon(" + t1.dlvName() + "__" + t2.dlvName() + ", "\
+                                        + t1.dlvName() + ", " + t2.dlvName()  + ", 1).\n"
+                            self.baseCb += "newcon(not_" + t1.dlvName() + "__" + t2.dlvName() + ", "\
+                                        + t1.dlvName() + ", " + t2.dlvName()  + ", 2).\n"
+                                        #+ "concept2(" + t1.dlvName() + ", _), "\
+                                        #+ "concept2(" + t2.dlvName() + ", _).\n"
         # add more template rules to the input file
         self.baseCb += template.getAspCbCon()
 
@@ -1445,17 +1445,17 @@ class TaxonomyMapping:
             prod = prod*cou + prod + cou
             if self.options.verbose:
                 print "count: ",cou,", product: ",prod
-
+                
         if self.enc & encode["dl"]:
             maxint = int(self.options.dl)*num
-	    self.baseAsp  = "%%% Max Number of Euler Regions\n"
-	    self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
-	    self.baseAsp += "%%% Euler Regions\n"
-	    self.baseAsp += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
-
-	    self.baseAsp += con
-	    self.baseAsp += "%%% Euler Bit\n"
-	    self.baseAsp += "bit(M, V):-r(M),#mod(M," + int(num).__str__() + ",V).\n\n"
+            self.baseAsp  = "%%% Max Number of Euler Regions\n"
+            self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
+            self.baseAsp += "%%% Euler Regions\n"
+            self.baseAsp += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
+            
+            self.baseAsp += con
+            self.baseAsp += "%%% Euler Bit\n"
+            self.baseAsp += "bit(M, V):-r(M),#mod(M," + int(num).__str__() + ",V).\n\n"
             self.baseAsp += template.getAspDlCon()
         elif self.enc & encode["mn"]:
             if len(self.taxonomies) == 1:
@@ -1463,52 +1463,52 @@ class TaxonomyMapping:
                                 " please use binary encoding for singleton example: eg. vrpw, vrve !!")
             maxint = prod
             if reasoner[self.options.reasoner] == reasoner["dlv"]:
-	        self.baseAsp  = "%%% Max Number of Euler Regions\n"
-	        self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
-	        self.baseAsp += "%%% Euler Regions\n"
-	        self.baseAsp += "r(M):- #int(M),M>=1,M<=#maxint.\n\n"
-
-	        self.baseAsp += con
-
-	        self.baseAsp += "\n%%% Euler Bit\n"
+                self.baseAsp  = "%%% Max Number of Euler Regions\n"
+                self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
+                self.baseAsp += "%%% Euler Regions\n"
+                self.baseAsp += "r(M):- #int(M),M>=1,M<=#maxint.\n\n"
+                
+                self.baseAsp += con
+                
+                self.baseAsp += "\n%%% Euler Bit\n"
                 for i in range(len(couArray)):
-	            self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n"
-
+                    self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n"
+                    
             elif reasoner[self.options.reasoner] == reasoner["gringo"]:
-	        self.baseAsp  = "%%% Euler regions\n"
-	        self.baseAsp += "r(1.."+maxint.__str__()+").\n\n"
-	        self.baseAsp += con
-
-	        self.baseAsp += "%%% Euler Bit\n"
+                self.baseAsp  = "%%% Euler regions\n"
+                self.baseAsp += "r(1.."+maxint.__str__()+").\n\n"
+                self.baseAsp += con
+                
+                self.baseAsp += "%%% Euler Bit\n"
                 for i in range(len(couArray)):
-	            self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", V = M1 #mod " + couArray[i].__str__() + ".\n"
+                    self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", V = M1 #mod " + couArray[i].__str__() + ".\n"
             self.baseAsp += template.getAspMnCon()
-
+            
         elif self.enc & encode["vr"]:
             maxint = int(2**num)
             if reasoner[self.options.reasoner] == reasoner["dlv"]:
-	        self.baseAsp = "#maxint=" + maxint.__str__() + ".\n\n"
-	        self.baseAsp += "%%% regions\n"
-	        self.baseAsp += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
-	        self.baseAsp += "%%% count of concepts\n"
-	        self.baseAsp += "count(N):- #int(N),N>=0,N<"+num.__str__()+".\n\n"
-	        self.baseAsp += "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P,#mod(M1,2,0).\n"
-	        self.baseAsp += con
+                self.baseAsp = "#maxint=" + maxint.__str__() + ".\n\n"
+                self.baseAsp += "%%% regions\n"
+                self.baseAsp += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
+                self.baseAsp += "%%% count of concepts\n"
+                self.baseAsp += "count(N):- #int(N),N>=0,N<"+num.__str__()+".\n\n"
+                self.baseAsp += "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P,#mod(M1,2,0).\n"
+                self.baseAsp += con
             elif reasoner[self.options.reasoner] == reasoner["gringo"]:
                 # TODO vrpw may not be working for gringo, gringo 4 may be needed
                 # raise Exception("Reasoner: vrpw is not supported for gringo !!")
-	        self.baseAsp  = "%%% Euler regions\n"
-	        self.baseAsp += "r(0.."+(maxint-1).__str__()+").\n\n"
-	        self.baseAsp += "%%% count of concepts\n"
-	        self.baseAsp += "count(0.."+(num-1).__str__()+").\n\n"
-	        self.baseAsp += "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P, 0 = M1 #mod 2.\n"
-	        self.baseAsp += con
+                self.baseAsp  = "%%% Euler regions\n"
+                self.baseAsp += "r(0.."+(maxint-1).__str__()+").\n\n"
+                self.baseAsp += "%%% count of concepts\n"
+                self.baseAsp += "count(0.."+(num-1).__str__()+").\n\n"
+                self.baseAsp += "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P, 0 = M1 #mod 2.\n"
+                self.baseAsp += con
             self.baseAsp += template.getAspVrCon()
-
+                
         elif self.enc & encode["direct"]:
             self.baseAsp  = con
             self.baseAsp += template.getAspDrCon()
-
+            
         else:
             print "EXCEPTION: encode ",self.options.encode," not defined!!"
 
@@ -1522,91 +1522,91 @@ class TaxonomyMapping:
                 t = queue.pop(0)
                 # This is a nc flag
                 if t.abbrev == "nc":
-	            self.baseAsp += "ncf(" + t.dlvName() + ").\n"
+                    self.baseAsp += "ncf(" + t.dlvName() + ").\n"
                 if t.hasChildren():
                     if self.options.verbose:
                         print "PC: ",t.dlvName()
                     if self.enc & encode["vr"] or self.enc & encode["dl"] or self.enc & encode["mn"]:
-			# ISA
-			self.baseAsp += "%% ISA\n"
-			coverage = ":- in(" + t.dlvName() + ", X)"
-			coverin = ""
+                        # ISA
+                        self.baseAsp += "%% ISA\n"
+                        coverage = ":- in(" + t.dlvName() + ", X)"
+                        coverin = ""
                         coverout = ""
-			for t1 in t.children:
+                        for t1 in t.children:
                             queue.append(t1)
-			    self.baseAsp += "% " + t1.dlvName() + " isa " + t.dlvName() + "\n"
+                            self.baseAsp += "% " + t1.dlvName() + " isa " + t.dlvName() + "\n"
                             ruleNum = len(self.rules)
-			    self.rules["r" + ruleNum.__str__()] = t1.dotName() + " isa " + t.dotName()
-			    #self.baseAsp += "in(" + t.dlvName() + ", X) :- in(" + t1.dlvName() + ", X).\n"
-			    #self.baseAsp += "out(" + t1.dlvName() + ", X) :- out(" + t.dlvName() + ", X).\n"
-			    #self.baseAsp += "in(" + t1.dlvName() + ", X) v out(" + t1.dlvName() + ", X) :- in(" + t.dlvName() + ", X).\n"
-			    #self.baseAsp += "in(" + t.dlvName() + ", X) v out(" + t.dlvName() + ", X) :- out(" + t1.dlvName() + ", X).\n"
-			    self.baseAsp += "ir(X, r" + ruleNum.__str__() +") :- in(" + t1.dlvName() + ", X), out(" + t.dlvName() + ", X), pw.\n"
-		            self.baseAsp += "ir(X, prod(r" + ruleNum.__str__() + ",R)) :- in(" + t1.dlvName() + ",X), out3(" + t.dlvName() + ", X, R), ix.\n" 
+                            self.rules["r" + ruleNum.__str__()] = t1.dotName() + " isa " + t.dotName()
+                            #self.baseAsp += "in(" + t.dlvName() + ", X) :- in(" + t1.dlvName() + ", X).\n"
+                            #self.baseAsp += "out(" + t1.dlvName() + ", X) :- out(" + t.dlvName() + ", X).\n"
+                            #self.baseAsp += "in(" + t1.dlvName() + ", X) v out(" + t1.dlvName() + ", X) :- in(" + t.dlvName() + ", X).\n"
+                            #self.baseAsp += "in(" + t.dlvName() + ", X) v out(" + t.dlvName() + ", X) :- out(" + t1.dlvName() + ", X).\n"
+                            self.baseAsp += "ir(X, r" + ruleNum.__str__() +") :- in(" + t1.dlvName() + ", X), out(" + t.dlvName() + ", X), pw.\n"
+                            self.baseAsp += "ir(X, prod(r" + ruleNum.__str__() + ",R)) :- in(" + t1.dlvName() + ",X), out3(" + t.dlvName() + ", X, R), ix.\n" 
                             if t1.abbrev.find("nc") == -1:
-                              if reasoner[self.options.reasoner] == reasoner["dlv"]:
-			          self.baseAsp += ":- #count{X: vrs(X), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0, pw.\n"
-                              elif reasoner[self.options.reasoner] == reasoner["gringo"]:
-			          self.baseAsp += ":- [vrs(X): in(" + t1.dlvName() + ", X): in(" + t.dlvName() + ", X)]0.\n"
-			      self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n"
-			      self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n\n"
-			    coverage += ",out(" + t1.dlvName() + ", X)"
+                                if reasoner[self.options.reasoner] == reasoner["dlv"]:
+                                    self.baseAsp += ":- #count{X: vrs(X), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0, pw.\n"
+                                elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+                                    self.baseAsp += ":- [vrs(X): in(" + t1.dlvName() + ", X): in(" + t.dlvName() + ", X)]0.\n"
+                                self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n"
+                                self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n\n"
+                            coverage += ",out(" + t1.dlvName() + ", X)"
                             if coverin != "":
                                 coverin += " v "
                                 coverout += ", "
                             coverin += "in(" + t1.dlvName() + ", X)"
                             coverout += "out(" + t1.dlvName() + ", X)"
-			# C
-			self.baseAsp += "%% coverage\n"
+                        # C
+                        self.baseAsp += "%% coverage\n"
                         ruleNum = len(self.rules)
-		        self.rules["r" + ruleNum.__str__()] = t.dotName() + " coverage"
-			#self.baseAsp += coverin + " :- in(" + t.dlvName() + ", X).\n"
+                        self.rules["r" + ruleNum.__str__()] = t.dotName() + " coverage"
+                        #self.baseAsp += coverin + " :- in(" + t.dlvName() + ", X).\n"
                         if self.options.enableCov:
-			    coverout3 = "out3(" + t.dlvName() + ", X, r" + ruleNum.__str__() + ") :- " + coverout
-			    coverout = "out(" + t.dlvName() + ", X) :- " + coverout
-			    self.baseAsp += coverout3 + ", ix.\n"
+                            coverout3 = "out3(" + t.dlvName() + ", X, r" + ruleNum.__str__() + ") :- " + coverout
+                            coverout = "out(" + t.dlvName() + ", X) :- " + coverout
+                            self.baseAsp += coverout3 + ", ix.\n"
                         else:
-			    coverout = "in(" + t.dlvName() + ",X) v out(" + t.dlvName() + ", X) :- " + coverout
-			self.baseAsp += coverout + ", pw.\n"
-			#self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") " +coverage + ".\n\n"
-
-			# D
-                        if self.options.enableSD:
-			  self.baseAsp += "%% sibling disjointness\n"
-			  for i in range(len(t.children) - 1):
-			    for j in range(i+1, len(t.children)):
-				name1 = t.children[i].dlvName()
-				name2 = t.children[j].dlvName()
-                                ruleNum = len(self.rules)
-		                self.rules["r" + ruleNum.__str__()] = t.children[i].dotName() + " disjoint " + t.children[j].dotName()
-				self.baseAsp += "% " + name1 + " ! " + name2+ "\n"
-				#self.baseAsp += "out(" + name1 + ", X) :- in(" + name2+ ", X).\n"
-				#self.baseAsp += "out(" + name2 + ", X) :- in(" + name1+ ", X).\n"
-			        #self.baseAsp += "in(" + name1 + ", X) v out(" + name1 + ", X) :- out(" + name2 + ", X).\n"
-			        #self.baseAsp += "in(" + name2 + ", X) v out(" + name2 + ", X) :- out(" + name1 + ", X).\n"
-				self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") :- in(" + name1 + ", X), in(" + name2+ ", X).\n"
-                                if reasoner[self.options.reasoner] == reasoner["dlv"]:
-                                  if t.children[i].abbrev.find("nc") == -1:
-				    self.baseAsp += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2+ ", X)} = 0, pw.\n"
-                                  if t.children[j].abbrev.find("nc") == -1:
-				    self.baseAsp += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2+ ", X)} = 0, pw.\n"
-                                elif reasoner[self.options.reasoner] == reasoner["gringo"]:
-                                  if t.children[i].abbrev.find("nc") == -1:
-				    self.baseAsp += ":- [vrs(X): in(" + name1 + ", X): out(" + name2+ ", X)]0, pw.\n"
-                                  if t.children[j].abbrev.find("nc") == -1:
-				    self.baseAsp += ":- [vrs(X): out(" + name1 + ", X): in(" + name2+ ", X)]0, pw.\n"
-                                if t.children[i].abbrev.find("nc") == -1:
-			            self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
-			            self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
-                                if t.children[j].abbrev.find("nc") == -1:
-			            self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 2) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
-			            self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 2) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
-                    elif self.enc & encode["direct"]:
-			# ISA
-			# C
-			self.baseAsp += "\n%% ISA\n"
+                            coverout = "in(" + t.dlvName() + ",X) v out(" + t.dlvName() + ", X) :- " + coverout
+                        self.baseAsp += coverout + ", pw.\n"
+                        #self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") " +coverage + ".\n\n"
                         
-			coverage = "irs(X) :- in(" + t.dlvName() + ", X)"
+                        # D
+                        if self.options.enableSD:
+                            self.baseAsp += "%% sibling disjointness\n"
+                            for i in range(len(t.children) - 1):
+                                for j in range(i+1, len(t.children)):
+                                    name1 = t.children[i].dlvName()
+                                    name2 = t.children[j].dlvName()
+                                    ruleNum = len(self.rules)
+                                    self.rules["r" + ruleNum.__str__()] = t.children[i].dotName() + " disjoint " + t.children[j].dotName()
+                                    self.baseAsp += "% " + name1 + " ! " + name2+ "\n"
+                                    #self.baseAsp += "out(" + name1 + ", X) :- in(" + name2+ ", X).\n"
+                                    #self.baseAsp += "out(" + name2 + ", X) :- in(" + name1+ ", X).\n"
+                                    #self.baseAsp += "in(" + name1 + ", X) v out(" + name1 + ", X) :- out(" + name2 + ", X).\n"
+                                    #self.baseAsp += "in(" + name2 + ", X) v out(" + name2 + ", X) :- out(" + name1 + ", X).\n"
+                                    self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") :- in(" + name1 + ", X), in(" + name2+ ", X).\n"
+                                    if reasoner[self.options.reasoner] == reasoner["dlv"]:
+                                        if t.children[i].abbrev.find("nc") == -1:
+                                            self.baseAsp += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2+ ", X)} = 0, pw.\n"
+                                        if t.children[j].abbrev.find("nc") == -1:
+                                            self.baseAsp += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2+ ", X)} = 0, pw.\n"
+                                    elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+                                        if t.children[i].abbrev.find("nc") == -1:
+                                            self.baseAsp += ":- [vrs(X): in(" + name1 + ", X): out(" + name2+ ", X)]0, pw.\n"
+                                        if t.children[j].abbrev.find("nc") == -1:
+                                            self.baseAsp += ":- [vrs(X): out(" + name1 + ", X): in(" + name2+ ", X)]0, pw.\n"
+                                    if t.children[i].abbrev.find("nc") == -1:
+                                        self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
+                                        self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
+                                    if t.children[j].abbrev.find("nc") == -1:
+                                        self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 2) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
+                                        self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 2) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
+                    elif self.enc & encode["direct"]:
+                        # ISA
+                        # C
+                        self.baseAsp += "\n%% ISA\n"
+                        
+                        coverage = "irs(X) :- in(" + t.dlvName() + ", X)"
                         numkids = len(t.children)
                         if numkids == 1:
                             self.baseAsp += "label(" + t.dlvName() + "," + t.children[0] + ", eq).\n"
@@ -1614,34 +1614,34 @@ class TaxonomyMapping:
                             prefix ="label(" + t.dlvName() + ", "
                             pre = t.dlvName()
                             coverage = ""
-			    for t1 in range(numkids - 2):
+                            for t1 in range(numkids - 2):
                                 t1name = t.children[t1].dlvName()
-				self.baseAsp += "% " + t1name + " isa " + t.dlvName() + "\n"
+                                self.baseAsp += "% " + t1name + " isa " + t.dlvName() + "\n"
                                 self.baseAsp += prefix + t1name + ", eq) v "
                                 self.baseAsp += prefix + t1name + ", in).\n"
                                 nex = t.dlvName() + t1.__str__()
-				coverage += "sum(" + pre + "," + t1name + "," + nex + ").\n"
+                                coverage += "sum(" + pre + "," + t1name + "," + nex + ").\n"
                                 pre = nex
-		            self.baseAsp += "% " + t.children[numkids - 2].dlvName() + " isa " + t.dlvName() + "\n"
+                            self.baseAsp += "% " + t.children[numkids - 2].dlvName() + " isa " + t.dlvName() + "\n"
                             self.baseAsp += prefix + t.children[numkids - 2].dlvName() + ", eq) v "
                             self.baseAsp += prefix + t.children[numkids - 2].dlvName() + ", in).\n\n"
-		            self.baseAsp += "% " + t.children[numkids - 1].dlvName() + " isa " + t.dlvName() + "\n"
+                            self.baseAsp += "% " + t.children[numkids - 1].dlvName() + " isa " + t.dlvName() + "\n"
                             self.baseAsp += prefix + t.children[numkids - 1].dlvName() + ", eq) v "
                             self.baseAsp += prefix + t.children[numkids - 1].dlvName() + ", in).\n\n"
-		            coverage += "sum(" + pre + "," + t.children[numkids - 2].dlvName() + "," + t.children[numkids - 1].dlvName() + ").\n"
+                            coverage += "sum(" + pre + "," + t.children[numkids - 2].dlvName() + "," + t.children[numkids - 1].dlvName() + ").\n"
                             
-			    self.baseAsp += "\n%% coverage\n"
-			    self.baseAsp += coverage + "\n\n"
-			# D
-			self.baseAsp += "%% sibling disjointness\n"
-			for i in range(len(t.children) - 1):
-			    for j in range(i+1, len(t.children)):
-				name1 = t.children[i].dlvName()
-				name2 = t.children[j].dlvName()
-				self.baseAsp += "% " + name1 + " ! " + name2+ "\n"
-				self.baseAsp += "label(" + name1 + ", " + name2+ ", ds).\n"
-
-
+                            self.baseAsp += "\n%% coverage\n"
+                            self.baseAsp += coverage + "\n\n"
+                        # D
+                        self.baseAsp += "%% sibling disjointness\n"
+                        for i in range(len(t.children) - 1):
+                            for j in range(i+1, len(t.children)):
+                                name1 = t.children[i].dlvName()
+                                name2 = t.children[j].dlvName()
+                                self.baseAsp += "% " + name1 + " ! " + name2+ "\n"
+                                self.baseAsp += "label(" + name1 + ", " + name2+ ", ds).\n"
+                                
+    
     def genAspAr(self):
         self.baseAsp += "\n%%% Articulations\n"
         for i in range(len(self.articulations)):
@@ -1709,30 +1709,30 @@ class TaxonomyMapping:
                 
         if self.obslen == 2:
             appendd = ""
-	    self.baseAsp += "pp(X, Y) :- pinout(X, in, R), pinout(Y, in, R), X < Y.\n"
+            self.baseAsp += "pp(X, Y) :- pinout(X, in, R), pinout(Y, in, R), X < Y.\n"
         elif self.obslen == 3:
             appendd = ", Y"
-	    self.baseAsp += "pp(X, Y, Z) :- pinout(X, in, R, Z), pinout(Y, in, R, Z), X < Y.\n"
+            self.baseAsp += "pp(X, Y, Z) :- pinout(X, in, R, Z), pinout(Y, in, R, Z), X < Y.\n"
         elif self.obslen == 4:
             appendd = ", Y, Z"
-	    self.baseAsp += "pp(X, Y, Z, T) :- pinout(X, in, R, Z, T), pinout(Y, in, R, Z, T), X < Y.\n"
+            self.baseAsp += "pp(X, Y, Z, T) :- pinout(X, in, R, Z, T), pinout(Y, in, R, Z, T), X < Y.\n"
         else:
             print "Syntax error in observation portion of input file!!"
         for i in range(len(self.obs)):
             tmp = ""
             for j in range(len(self.obs[i][0])):
                 if self.obs[i][0][j][1] == "Y":
-                  pre = "in"
+                    pre = "in"
                 else:
-                  pre = "out"
+                    pre = "out"
                 if tmp != "": tmp += self.connector
                 cpt = self.obs[i][0][j][0]
                 tmp += pre + "(" + cpt + ", X)"
             pair = ""
-	    if self.obslen > 2:
+            if self.obslen > 2:
                 pair += ", " + self.obs[i][2]
-	        if self.obslen > 3:
-                    pair += ", " + self.obs[i][3]
+            if self.obslen > 3:
+                pair += ", " + self.obs[i][3]
             if self.obs[i][1] == "N":
                 self.baseAsp += ":- present(X" + pair + ")," + tmp + ".\n" 
             else:
@@ -1740,10 +1740,10 @@ class TaxonomyMapping:
                     self.baseAsp += ":- #count{X: present(X" + pair + "), " + tmp + "} = 0.\n"
                 elif reasoner[self.options.reasoner] == reasoner["gringo"]:
                     self.baseAsp += ":- [present(X" + pair + "): " + tmp + "]0.\n"
-	self.baseAsp += "pinout(C, in, X" + appendd + ") :- present(X" + appendd + "), concept(C, _, N), in(C, X).\n"
-	self.baseAsp += "pinout(C, out, X" + appendd + ") :- present(X" + appendd + "), concept(C, _, N), out(C, X).\n"
-            
-
+        self.baseAsp += "pinout(C, in, X" + appendd + ") :- present(X" + appendd + "), concept(C, _, N), in(C, X).\n"
+        self.baseAsp += "pinout(C, out, X" + appendd + ") :- present(X" + appendd + "), concept(C, _, N), out(C, X).\n"
+        
+    
     def readFile(self):
         file = open(os.path.join(self.options.inputdir, self.options.inputfile), 'r')
         lines = file.readlines()
@@ -1838,16 +1838,16 @@ class TaxonomyMapping:
             
         # used for input viz
         self.inputVisualization(group2concepts, art)
-                           
-        return True              
-
+        
+        return True
+    
     def addArticulation(self, artStr):
         self.articulations += [Articulation(artStr, self)]
-	if artStr.find("{") != -1:
-	    r = re.match("(.*) \{(.*)\} (.*)", artStr)
-	    self.addPMir(r.group(1), r.group(3), r.group(2).replace(" ",","), 0)
-	else:
-	    self.addAMir(artStr, 0)
+        if artStr.find("{") != -1:
+            r = re.match("(.*) \{(.*)\} (.*)", artStr)
+            self.addPMir(r.group(1), r.group(3), r.group(2).replace(" ",","), 0)
+        else:
+            self.addAMir(artStr, 0)
 
     def addLocation(self, line):
         self.exploc = True
@@ -1919,11 +1919,11 @@ class TaxonomyMapping:
         else:
             elems = re.match("c(.*?)_(.*)", dlvName)
             return elems.group(1) + "." + elems.group(2)
-                     
+
     def addTMir(self, tName, parent, child):
-	self.mir[tName + "." +parent +"," + tName + "." + child] = rcc5["includes"]
-	self.tr.append([tName + "." + child, tName + "." + parent, 0])
-	self.addIMir(tName + "." + parent, tName + "." + child, 0)
+        self.mir[tName + "." +parent +"," + tName + "." + child] = rcc5["includes"]
+        self.tr.append([tName + "." + child, tName + "." + parent, 0])
+        self.addIMir(tName + "." + parent, tName + "." + child, 0)
 
     def addEqMap(self, T1, T2):
         if not self.eq.has_key(T1):
@@ -1934,19 +1934,19 @@ class TaxonomyMapping:
         self.eq[T2].add(T1)
 
     def addAMir(self, astring, provenance):
-    	r = astring.split(" ")
+        r = astring.split(" ")
         if(self.options.verbose):
             print "Articulations: ",astring
-	if (r[1] == "includes"):
-	    self.addIMir(r[0], r[2], provenance)
-	    self.tr.append([r[2], r[0], provenance])
-	elif (r[1] == "is_included_in"):
-	    self.addIMir(r[2], r[0], provenance)
-	    self.tr.append([r[0], r[2], provenance])
-	elif (r[1] == "equals"):
-	    self.addEMir(r[0], r[2])
+        if (r[1] == "includes"):
+            self.addIMir(r[0], r[2], provenance)
+            self.tr.append([r[2], r[0], provenance])
+        elif (r[1] == "is_included_in"):
+            self.addIMir(r[2], r[0], provenance)
+            self.tr.append([r[0], r[2], provenance])
+        elif (r[1] == "equals"):
+            self.addEMir(r[0], r[2])
             self.addEqMap(r[0], r[2])
-	elif (len(r) == 4):
+        elif (len(r) == 4):
             if (r[2] == "lsum"):
                 self.addIMir(r[3], r[0], provenance)
                 self.addIMir(r[3], r[1], provenance)
@@ -2024,55 +2024,55 @@ class TaxonomyMapping:
                 self.tr.append([r[3],r[0], provenance])
                 self.tr.append([r[4],r[0], provenance])
                 self.tr.append([r[5],r[0], provenance])
-                return None 
+                return None
         if rcc5.has_key(r[1]):
-	    self.mir[r[0] + "," + r[2]] = rcc5[r[1]]
- 
+            self.mir[r[0] + "," + r[2]] = rcc5[r[1]]
+
     def addDMir(self, tName, child, sibling):
-	self.mir[tName + "." + child + "," + tName + "." + sibling] = rcc5["disjoint"]
-	self.mir[tName + "." + sibling + "," + tName + "." + child] = rcc5["disjoint"]
+        self.mir[tName + "." + child + "," + tName + "." + sibling] = rcc5["disjoint"]
+        self.mir[tName + "." + sibling + "," + tName + "." + child] = rcc5["disjoint"]
 
     def addPMir(self, t1, t2, r, provenance):
-    	if(self.mir.has_key(t1 + "," + t2)):
-	    return None
-	else:
-	    r=r.rstrip()
-	    #print t1+" "+r+" "+t2
-	    #self.articulationSet.addArticulationWithList(t1+" "+r+" "+t2, self)
-	    tmpStr=r.replace("{", "")
-	    tmpStr=tmpStr.replace("}", "")
-	    tmpStr=tmpStr.replace(" ", ",")
-	    self.addAMir(t1+" "+tmpStr+" "+t2, provenance)
-
-
+        if(self.mir.has_key(t1 + "," + t2)):
+            return None
+        else:
+            r=r.rstrip()
+            #print t1+" "+r+" "+t2
+            #self.articulationSet.addArticulationWithList(t1+" "+r+" "+t2, self)
+            tmpStr=r.replace("{", "")
+            tmpStr=tmpStr.replace("}", "")
+            tmpStr=tmpStr.replace(" ", ",")
+            self.addAMir(t1+" "+tmpStr+" "+t2, provenance)
+    
+    
     # Equality mir
     def addEMir(self, parent, child):
-	for pair in self.mir.keys():
-	    if (pair.find(parent+",") == 0):
-		newPair = pair.replace(parent+",", child+",")
-		self.mir[newPair] = self.mir[pair]
-	    elif (pair.find(child+",") == 0):
-		newPair = pair.replace(child+",", parent+",")
-	    	self.mir[newPair] = self.mir[pair]
-	    elif (pair.find(","+parent) == len(pair)-len(parent)-1):
-		newPair = pair.replace(","+parent, ","+child)
-		self.mir[newPair] = self.mir[pair]
-	    elif (pair.find(","+child) == len(pair)-len(child)-1):
-		newPair = pair.replace(","+child, ","+parent)
-	    	self.mir[newPair] = self.mir[pair]
-
- 
+        for pair in self.mir.keys():
+            if (pair.find(parent+",") == 0):
+                newPair = pair.replace(parent+",", child+",")
+                self.mir[newPair] = self.mir[pair]
+            elif (pair.find(child+",") == 0):
+                newPair = pair.replace(child+",", parent+",")
+                self.mir[newPair] = self.mir[pair]
+            elif (pair.find(","+parent) == len(pair)-len(parent)-1):
+                newPair = pair.replace(","+parent, ","+child)
+                self.mir[newPair] = self.mir[pair]
+            elif (pair.find(","+child) == len(pair)-len(child)-1):
+                newPair = pair.replace(","+child, ","+parent)
+                self.mir[newPair] = self.mir[pair]
+    
+    
     # isa
     def addIMir(self, parent, child, provenance):
-	for pair in self.mir.keys():
-	    if (self.mir[pair] == rcc5["includes"]):
-	        if (pair.find("," + parent) == len(pair) - len(parent) - 1):
-		    newPair = pair.replace("," + parent, "," + child)
-		    self.mir[newPair] = rcc5["includes"]
-		elif (pair.find(child + ",") == 0):
-		    newPair = pair.replace(child + ",", parent + ",")
-	    	    self.mir[newPair] = rcc5["includes"]
-
+        for pair in self.mir.keys():
+            if (self.mir[pair] == rcc5["includes"]):
+                if (pair.find("," + parent) == len(pair) - len(parent) - 1):
+                    newPair = pair.replace("," + parent, "," + child)
+                    self.mir[newPair] = rcc5["includes"]
+                elif (pair.find(child + ",") == 0):
+                    newPair = pair.replace(child + ",", parent + ",")
+                    self.mir[newPair] = rcc5["includes"]
+                    
     # Output all the mir relations in the csv file
     def genMir(self):       
         fmir = open(self.mirfile, 'w')
@@ -2088,22 +2088,22 @@ class TaxonomyMapping:
             if self.options.verbose:
                 print pairkey
             if self.mir.has_key(pairkey) and self.mir[pairkey] != 0:
-              if self.mir[pairkey] & relation["infer"]:
-                hint = "inferred"
-              else:
-#                hint = "input"
-                hint = "deduced"
-              if self.options.countOn:
-                for i in range(5):
-                  if self.mirc[pairkey][i] != 0:
-                      mirList.append([pairkey1, findkey(relation, 1 << i), pairkey2, hint, self.mirc[pairkey][i].__str__(), self.npw.__str__()])
-#                    fmir.write(pairkey+hint + findkey(relation, 1 << i)+","\
-#                               +self.mirc[pairkey][i].__str__()+","+self.npw.__str__()+"\n")
-              else:
+                if self.mir[pairkey] & relation["infer"]:
+                    hint = "inferred"
+                else:
+#                   hint = "input"
+                    hint = "deduced"
+                if self.options.countOn:
+                    for i in range(5):
+                        if self.mirc[pairkey][i] != 0:
+                            mirList.append([pairkey1, findkey(relation, 1 << i), pairkey2, hint, self.mirc[pairkey][i].__str__(), self.npw.__str__()])
+#                           fmir.write(pairkey+hint + findkey(relation, 1 << i)+","\
+#                                +self.mirc[pairkey][i].__str__()+","+self.npw.__str__()+"\n")
+                else:
 #                fmir.write(pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"])+"\n")
-                mirList.append([pairkey1, findkey(relation, self.mir[pairkey] & ~relation["infer"]), pairkey2, hint])
-                if self.options.verbose:
-                    print pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"])+"\n"
+                    mirList.append([pairkey1, findkey(relation, self.mir[pairkey] & ~relation["infer"]), pairkey2, hint])
+                    if self.options.verbose:
+                        print pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"])+"\n"
             else:
                 self.mir[pairkey] = self.getPairMir(pair)
                 rl = findkey(relation, self.mir[pairkey])
@@ -2118,26 +2118,26 @@ class TaxonomyMapping:
 
     def removeMir(self, string):
         r = string.split(" ")
-	self.mir[r[0] + "," + r[len(r)-1]] = 0
-	if(self.tr.count([r[0], r[len(r)-1], 0]) > 0):
-	    self.tr.remove([r[0], r[len(r)-1], 0])
-	elif(self.tr.count([r[len(r)-1], r[0], 0]) > 0):
-	    self.tr.remove([r[len(r)-1], r[0], 0])
-	if(self.eq.has_key(r[0]) and r[len(r)-1] in self.eq[r[0]]):
-	    del self.eq[r[0]]
-	if(self.eq.has_key(r[len(r)-1]) and r[0] in self.eq[r[len(r)-1]]):
-	    del self.eq[r[len(r)-1]]
-	if len(r) > 3:
-	    if r[len(r)-2] == "+=":
-	        self.mir[r[1] + "," + r[3]] = 0
-		if(self.tr.count([r[1], r[3], 0]) > 0):
-	    	    self.tr.remove([r[1], r[3], 0])
-	    elif r[1] == "=+":
-	        self.mir[r[0] + "," + r[2]] = 0
-		if(self.tr.count([r[2], r[0], 0]) > 0):
-	    	    self.tr.remove([r[2], r[0], 0])
+        self.mir[r[0] + "," + r[len(r)-1]] = 0
+        if(self.tr.count([r[0], r[len(r)-1], 0]) > 0):
+            self.tr.remove([r[0], r[len(r)-1], 0])
+        elif(self.tr.count([r[len(r)-1], r[0], 0]) > 0):
+            self.tr.remove([r[len(r)-1], r[0], 0])
+        if(self.eq.has_key(r[0]) and r[len(r)-1] in self.eq[r[0]]):
+            del self.eq[r[0]]
+        if(self.eq.has_key(r[len(r)-1]) and r[0] in self.eq[r[len(r)-1]]):
+            del self.eq[r[len(r)-1]]
+        if len(r) > 3:
+            if r[len(r)-2] == "+=":
+                self.mir[r[1] + "," + r[3]] = 0
+                if(self.tr.count([r[1], r[3], 0]) > 0):
+                    self.tr.remove([r[1], r[3], 0])
+            elif r[1] == "=+":
+                self.mir[r[0] + "," + r[2]] = 0
+                if(self.tr.count([r[2], r[0], 0]) > 0):
+                    self.tr.remove([r[2], r[0], 0])
 
- 
+
     def getPairMir(self, pair):
         result = 0
         threads = []
