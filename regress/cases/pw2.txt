@@ -1,0 +1,19 @@
+taxonomy 1 Taxonomy1
+(A B C D H)
+
+taxonomy 2 Taxonomy2
+(E F G I)
+
+articulation pw2 pw2
+[1.A equals 2.E]
+[1.B equals 2.F]
+[1.C overlaps 2.G]
+[1.D is_included_in 2.G]
+
+observation
+<1.A P>
+<1.B N>
+<1.C*2.G P>
+<1.D N>
+<2.E P>
+<2.F N>

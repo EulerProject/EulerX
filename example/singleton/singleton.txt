@@ -1,0 +1,16 @@
+#
+#    WARNING:
+#        Singleton example can only be run using binary encoding
+#        such as vrpw, vrve
+#
+taxonomy 1 Taxonomy1
+(a)
+(b)
+(c)
+(d)
+
+articulation tw1 tw1
+[1.a {is_included_in equals} 1.b]
+[1.c includes 1.b]
+[1.a is_included_in 1.d]
+[1.b overlaps 1.d]

@@ -1,0 +1,13 @@
+taxonomy 1 Taxonomy1
+(a b c d e)
+
+taxonomy 2 Taxonomy2
+(a b d f g)
+
+articulation synthetic example
+[1.a {is_included_in equals} 2.a]
+[1.b equals 2.b]
+[1.c {is_included_in overlaps} 2.f]
+[1.d equals 2.d]
+[1.e {equals overlaps} 2.g]
+#[1.d includes 2.a]

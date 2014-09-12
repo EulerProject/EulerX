@@ -1,0 +1,7 @@
+echo "\n\n##### Euler version:\n"
+euler=$(which euler)
+(cd $(dirname $euler);hg summary)
+echo "\n\n##### GraphViz version:\n"
+dot -V
+echo "\n\n##### DLV version:\n"
+dlv --version
