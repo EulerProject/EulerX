@@ -84,13 +84,17 @@ class TaxonomyMapping:
         self.runningUser = getpass.getuser()   # get the current username
         self.runningHost = socket.gethostname()# get the current host
         self.runningDate = strftime("%Y-%m-%d-%H:%M:%S", localtime())
+        if options.workingdir is None:
+            options.workingdir = os.path.join(options.inputdir, self.runningUser+"-"+self.runningHost)
+        if not os.path.exists(options.workingdir):
+            os.mkdir(options.workingdir)
         if options.outputdir is None:
-            options.outputdir = os.path.join(options.inputdir, self.runningUser+"-"+self.runningHost+"-"+self.runningDate+"-"+self.name)
+            options.outputdir = os.path.join(options.workingdir, self.runningDate+"-"+self.name)
         if not os.path.exists(options.outputdir):
             os.mkdir(options.outputdir)
         # copy input file to output dir
         copyfile(os.path.join(self.options.inputdir, self.options.inputfile),\
-                 os.path.join(self.options.outputdir, self.options.inputfile))
+                 os.path.join(self.options.outputdir, self.name+".txt"))
 
         self.aspdir = os.path.join(options.outputdir, "asp")
         if not os.path.exists(self.aspdir):
@@ -138,7 +142,11 @@ class TaxonomyMapping:
         self.iv2dot = os.path.join(options.outputdir, self.name+".dot")
         self.iv2pdf = os.path.join(options.outputdir, self.name+".pdf")
         self.path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-        self.stylesheetdir = self.path + "/../example_stylesheet/"
+        self.stylesheetdir = os.path.join(options.inputdir, "stylesheets/")
+        if not os.path.exists(self.stylesheetdir):
+            self.stylesheetdir = self.path + "/../default_stylesheet/"
+        elif not os.listdir(self.stylesheetdir):
+            self.stylesheetdir = self.path + "/../default_stylesheet/"
         if reasoner[self.options.reasoner] == reasoner["gringo"]:
             # possible world command
             self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0 | "+self.path+"/muniq -u"

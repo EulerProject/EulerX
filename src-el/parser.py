@@ -28,6 +28,8 @@ class EulerParser:
             EulerParser.inst.add_option("-i", dest="inputfile", help="input file")
             EulerParser.inst.add_option("-r", dest="inputdir", default="",\
                                          help="input directory, by default ./")
+            EulerParser.inst.add_option("-w", dest="workingdir", default=None,\
+                                         help="working directory, by default ./")
             EulerParser.inst.add_option("-o", dest="outputdir", default=None,\
                                               help="output directory, by default ./")
             EulerParser.inst.add_option("-e", dest="encode", default=0, \
