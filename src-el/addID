@@ -1,6 +1,7 @@
 #! /usr/bin/env python
-# Author ... 
-# ... see also: http://stackoverflow.com/questions/1523427/python-what-is-the-common-header-format
+# __author__ = "Parisa Kianmajd"
+#__version__ = "1.0.1"
+
 import csv
 import taxon_dictionary
 import sys
@@ -9,27 +10,33 @@ data = {} # a nested dictionary to store the taxonomies
 
 with sys.stdin as source:
     reader = csv.reader(source)
-    next(reader, None)             # skip header row BL: this erases the header => instead keep and output? 
+    header = next(reader, None)             # save the header row
 # Build a nested dictionary
-# BL: add somewhere *above* from here, an exception handler that gracefully terminates if the file format isn't correct
-    for name, author, rank in reader:  
-        if author not in data:
-            data[author]={}
-        if rank not in data[author]:
-            data[author][rank]=[]
-        data[author][rank].append(name)     #  
+    try:
+        for name, author, rank in reader:  
+            if author not in data:
+                data[author]={}
+            if rank not in data[author]:
+                data[author][rank]=[]
+            data[author][rank].append(name)
+    except ValueError, e:
+        print "Error in the input file:" , e
+
 with sys.stdout as dest:
     writer = csv.writer(dest)
-    writer.writerow(["id", "Name_Simple", "According_To", "Rank"]) # BL: output whatever the header was .. 
+    header.insert(0,"Id")
+    writer.writerow(header) 
 # Assign identifiers to each entity
     j = 0
+    # group elements based on author column
     for author, value in data.iteritems():
         j += 1
         i = 1
         numRanks = []
+        # mapp ranks to numerical value using taxon_dictionary
         for rank in value.keys():
             numRanks.append(taxon_dictionary.rank2num.get(rank,(0,0))[0])
-        for rank in [ k[0] for k in sorted( zip(value.keys(), numRanks), key=lambda l: l[1] ) ]:
+        for rank in [k[0] for k in sorted(zip(value.keys(), numRanks), key=lambda l: l[1] ) ]:
             for name in sorted(value[rank]):
                 writer.writerow((str(j) + "." + str(taxon_dictionary.rank2num.get(rank,(0,0))[1]) + str(i), name, author, rank))
                 i += 1
