@@ -25,7 +25,7 @@ def remove_duplicate_string(li):
 def removeBracPri(s):
     return s.replace("[","").replace("]","").replace("'","")
 
-fileName = sys.argv[1]+".txt"
+fileName = sys.argv[1]
 misArts = []
 arts = []
 f = open("output.txt","r")
@@ -207,7 +207,8 @@ for mac in macList:
     solidGreenWs.append(solidGreenW[:-1])
 
 # get full lattice
-fileDot = sys.argv[1]+"_fulllat.dot"
+fileDot = sys.argv[1].split(".")[0]+"_fulllat.dot"
+filePdf = sys.argv[1].split(".")[0]+"_fulllat.pdf"
 fIn = open("up.dlv","r")
 line = fIn.readline()
 ups = line[1:-2].split(", ")
@@ -241,8 +242,12 @@ fOut.write("}")
 fIn.close()
 fOut.close()
 
+com = "dot -Tpdf " + fileDot + " -o " + filePdf
+call(com, shell=True)
+
 # get reduced lattice
-fileDot = sys.argv[1]+"_lat.dot"
+fileDot = sys.argv[1].split(".")[0]+"_lat.dot"
+filePdf = sys.argv[1].split(".")[0]+"_lat.pdf"
 f = open(fileDot,"w")
 f.write("digraph{\n")
 f.write('node[fontname="Helvetica-Narrow"]\n')
@@ -274,3 +279,6 @@ for mcs in macList:
 
 f.write("}")
 f.close()
+
+com = "dot -Tpdf " + fileDot + " -o " + filePdf
+call(com, shell=True)
