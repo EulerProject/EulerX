@@ -1,7 +1,7 @@
 from subprocess import call
 import sys
 
-fileName = sys.argv[1]+".txt"
+fileName = sys.argv[1]
 arts = []
 
 f = open(fileName, "r")
