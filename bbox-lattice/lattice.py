@@ -211,7 +211,7 @@ fileDot = sys.argv[1].split(".")[0]+"_fulllat.dot"
 filePdf = sys.argv[1].split(".")[0]+"_fulllat.pdf"
 fIn = open("up.dlv","r")
 line = fIn.readline()
-ups = line[1:-2].split(", ")
+ups = line[1:-1].split(", ")
 fOut = open(fileDot,"w")
 fOut.write("digraph{\n")
 fOut.write('node[fontname="Helvetica-Narrow"]\n')
@@ -242,8 +242,8 @@ fOut.write("}")
 fIn.close()
 fOut.close()
 
-com = "dot -Tpdf " + fileDot + " -o " + filePdf
-call(com, shell=True)
+#com = "dot -Tpdf " + fileDot + " -o " + filePdf
+#call(com, shell=True)
 
 # get reduced lattice
 fileDot = sys.argv[1].split(".")[0]+"_lat.dot"
@@ -280,5 +280,5 @@ for mcs in macList:
 f.write("}")
 f.close()
 
-com = "dot -Tpdf " + fileDot + " -o " + filePdf
-call(com, shell=True)
+#com = "dot -Tpdf " + fileDot + " -o " + filePdf
+#call(com, shell=True)

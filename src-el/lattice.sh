@@ -7,11 +7,11 @@ cd bbox-lattice
 input=$curdir/$1
 
 echo "preprocessing..."
+echo "creating the lattice without color...";
 python preprocess.py $input;
 echo "saving all worlds...";
 python awf.py -filter=i,o expWorlds.asp;
-echo "creating the lattice without color...";
-dlv -silent -filter=up  wexp-up.asp expWorlds_aw.asp > up.dlv;
+#dlv -silent -filter=up  wexp-up.asp expWorlds_aw.asp > up.dlv;
 echo "running euler to get MIS...";
 euler -i $input -e mnpw --repair=HST > output.txt;
 echo "from MIS to MAC and get lattice..."

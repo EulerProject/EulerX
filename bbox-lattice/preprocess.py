@@ -18,3 +18,6 @@ f.write("% every element is either in or out\n")
 f.write("i(X) :- u(X), not o(X).\n")
 f.write("o(X) :- u(X), not i(X).\n")
 f.close()
+
+com = "python powerset.py " + len(arts).__str__()
+call(com, shell=True)
