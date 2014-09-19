@@ -26,6 +26,8 @@ def removeBracPri(s):
     return s.replace("[","").replace("]","").replace("'","")
 
 fileName = sys.argv[1]
+fileFullDot = sys.argv[1].split(".")[0]+"_fulllat.dot"
+fileDot = sys.argv[1].split(".")[0]+"_lat.dot"
 misArts = []
 arts = []
 f = open("output.txt","r")
@@ -207,12 +209,10 @@ for mac in macList:
     solidGreenWs.append(solidGreenW[:-1])
 
 # get full lattice
-fileDot = sys.argv[1].split(".")[0]+"_fulllat.dot"
-filePdf = sys.argv[1].split(".")[0]+"_fulllat.pdf"
 fIn = open("up.dlv","r")
 line = fIn.readline()
 ups = line[1:-1].split(", ")
-fOut = open(fileDot,"w")
+fOut = open(fileFullDot,"w")
 fOut.write("digraph{\n")
 fOut.write('node[fontname="Helvetica-Narrow"]\n')
 fOut.write("rankdir=TB\n")
@@ -238,6 +238,16 @@ for up in ups:
     if up.split(",")[0][3:] in anyGreenW and up.split(",")[1][:-1] in anyRedW:
         fOut.write(up.split(",")[1][:-1] + '->' + up.split(",")[0][3:] + '[arrowhead=none color="#0000FF" style=filled];\n')
 
+# Add legend
+artsLabels = ""
+for art in arts:
+    artsLabels += "<TR> \n <TD>" + str(arts.index(art)+1) + "</TD> \n <TD>" + art + "</TD> \n </TR> \n"
+fOut.write("node[shape=box] \n")
+fOut.write('{rank=sink Legend [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
+fOut.write(artsLabels)
+fOut.write("</TABLE> \n >] } \n")
+
+
 fOut.write("}")
 fIn.close()
 fOut.close()
@@ -246,14 +256,12 @@ fOut.close()
 #call(com, shell=True)
 
 # get reduced lattice
-fileDot = sys.argv[1].split(".")[0]+"_lat.dot"
-filePdf = sys.argv[1].split(".")[0]+"_lat.pdf"
 f = open(fileDot,"w")
 f.write("digraph{\n")
 f.write('node[fontname="Helvetica-Narrow"]\n')
 f.write("rankdir=TB\n")
 if len(misList) != 1:
-    f.write('"AllOtherRed" [shape=octagon fillcolor="#FFB0B0" style=dashed]\n')
+    f.write('"AllOtherRed" [shape=octagon color="#FFB0B0" style=dashed]\n')
 if len(macList) != 1:
     f.write('"AllOtherGreen" [shape=box color="#006400" style="rounded,dashed"]\n')
 for mcs in macList:
@@ -277,6 +285,11 @@ for mcs in macList:
         elif set(mis).issubset(set(mcs[1:])):
             f.write('"' + removeBracPri(str(mcs[1:])) + '" -> "' + removeBracPri(str(mis)) + '" [color=blue, arrowhead=none, label=1];\n')
 
+# Add legend
+f.write("node[shape=box] \n")
+f.write('{rank=sink Legend [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
+f.write(artsLabels)
+f.write("</TABLE> \n >] } \n")
 f.write("}")
 f.close()
 
