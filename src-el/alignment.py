@@ -701,9 +701,9 @@ class TaxonomyMapping:
         for T in self.eqConLi:
             #for [T1, T2, P] in tmpTr:
             #    if T == T1 or T == T2:
-            tmpComLi.append(T)
-            tmpCom += "  \""+T+"\"\n"
             newT = self.restructureCbNames(T)
+            tmpComLi.append(newT)
+            tmpCom += "  \""+newT+"\"\n"
             self.addRcgVizNode(newT, "comb")
             
         # Duplicates
