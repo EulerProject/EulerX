@@ -64,7 +64,8 @@ def apply_style(data_file, f):
             group = "default"
         color = styles["nodestyle"][group].split("fillcolor=")[1]
         glabel = glabel + "<TR> \n <TD bgcolor=" + color + ">" + g + "</TD> \n <TD>" + str(len(nodes[g])) + "</TD> \n </TR> \n"
-        f.write("node[" + styles["nodestyle"]["all"] + '] \n')
+        if "all" in styles["nodestyle"]:
+        	f.write("node[" + styles["nodestyle"]["all"] + '] \n')
         f.write("node[" + styles["nodestyle"][group] + '] \n')
         for n in nodes[g]:
             if (g!= "comb" and g!= "(+)"):
@@ -96,7 +97,8 @@ def apply_style(data_file, f):
             style = (item for item in styles["edgestyle"] if item["label"] == label).next()
         except StopIteration:
             continue
-        allStyle = (item for item in styles["edgestyle"] if item["label"] == "all").next()
+        if any(d["label"] == "all" for d in styles["edgestyle"]):
+        	allStyle = (item for item in styles["edgestyle"] if item["label"] == "all").next()
         f.write("edge["+ allStyle["dot"] +"]\n")
         f.write("edge["+ style["dot"] +"]\n")
         color = style["dot"]. split ("color=")[1].split(" ")[0]
