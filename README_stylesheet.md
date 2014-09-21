@@ -38,7 +38,7 @@ Graph attributes for dot file. Example:
     subgraph: "on"
   If the value of subgraph is “on”, nodes will be clustered based on their “group” in the output dot file. Anything other than “on” (e.g. “off”) means no subgraph in the output. 
   legend: a switch similar to subgraph
-   If the value of legend is "on", a table showing the number of nodes an edges will be added to the output dot file. 
+   If the value of legend is not "off", a table showing the number of nodes an edges will be added to the output dot file. The placement of this table depends on the value of legend: "source" places it before the first node in the output and "sink" place it after the last node
 wmap: a switch for penwidth scaling. The value "on" here means the penwidths in the input graph get mapped to the speified range in the stylesheet.
 wmin, wmax: range of penwidth
 
@@ -46,7 +46,7 @@ Note: penwidth ("w") in the input graph is an optional key so if penwidth is not
 2- nodestyle:
 Maps each “group” to a dot string. Example:
     '1': "shape=box style=\"filled,rounded\" color=black fillcolor=\"#CCFFCC\""
-
+"all" style is applied to all of the nodes but it can be overwritten by the style defined for each node group.
 3- edgestyle:
 Maps each “label” to a dot string. 
 There are 3 options for showing label that are defined by assigning the following values to "display" key in edgestyle 
@@ -62,4 +62,5 @@ Example:
       
 Also, "(w)display" means apply the penwidth value
 “default” style will be applied if no style is defined for a node group or edge label. 
+"all" style is applied to all of the edges but it can be overwritten by the style defined for each label.
 
