@@ -2,7 +2,7 @@
     graph: "rankdir=RL"
     face2face: "off"
     subgraph: "off"
-    legend: "on"
+    legend: "source"
     mapping: "off"
     wmap: "off"
     wmin: "1"
