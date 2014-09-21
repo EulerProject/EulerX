@@ -2,7 +2,7 @@
     graph: "rankdir=LR"
     face2face: "on"
     subgraph: "on"
-    legend: "on"
+    legend: "source"
     mapping: "off"
     wmap: "off"
     wmin: "1"
@@ -11,6 +11,7 @@
     "1": "shape=box style=filled fillcolor=\"#CCFFCC\""
     "2": "shape=octagon style=filled fillcolor=\"#FFFFCC\""
     default: "shape=circle style=filled fillcolor=\"#FFFFFF\""
+    all: "shape=circle style=filled fillcolor=\"#FFFFFF\""
   edgestyle: 
     - 
       label: "isa"
@@ -41,4 +42,9 @@
       label: "=="
       dot: "style=dotted color=\"#AA00FF\" constraint=true penwidth=3"
       display: "="
+      penwidth: "off"
+    - 
+      label: "all"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1"
+      display: "label"
       penwidth: "off"
