@@ -64,6 +64,7 @@ def apply_style(data_file, f):
             group = "default"
         color = styles["nodestyle"][group].split("fillcolor=")[1]
         glabel = glabel + "<TR> \n <TD bgcolor=" + color + ">" + g + "</TD> \n <TD>" + str(len(nodes[g])) + "</TD> \n </TR> \n"
+        f.write("node[" + styles["nodestyle"]["all"] + '] \n')
         f.write("node[" + styles["nodestyle"][group] + '] \n')
         for n in nodes[g]:
             if (g!= "comb" and g!= "(+)"):
@@ -95,6 +96,8 @@ def apply_style(data_file, f):
             style = (item for item in styles["edgestyle"] if item["label"] == label).next()
         except StopIteration:
             continue
+        allStyle = (item for item in styles["edgestyle"] if item["label"] == "all").next()
+        f.write("edge["+ allStyle["dot"] +"]\n")
         f.write("edge["+ style["dot"] +"]\n")
         color = style["dot"]. split ("color=")[1].split(" ")[0]
         if l in nodes:
@@ -125,15 +128,15 @@ def apply_style(data_file, f):
             if style["penwidth"] == "on":
                 f.write('[penwidth=' + str(w) + "]")
             f.write("\n")
-    if styles["graphstyle"]["legend"] == "on":
+    if styles["graphstyle"]["legend"] != "off":
         f.write("node[shape=box] \n")
-        f.write('{rank=source Legend [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
+        f.write('{rank=' + styles["graphstyle"]["legend"] + ' Legend [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
         f.write(glabel)
         f.write("</TABLE> \n >] } \n")
 
-    if styles["graphstyle"]["mapping"] == "on":
+    if styles["graphstyle"]["mapping"] != "off":
         f.write("node[shape=box] \n")
-        f.write('{rank=source Mapping [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
+        f.write('{rank=' + styles["graphstyle"]["legend"] + ' Mapping [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
         f.write(mapp)
         f.write("</TABLE> \n >] } \n")       
     f.write("}")            
