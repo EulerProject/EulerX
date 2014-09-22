@@ -100,9 +100,9 @@ def apply_style(data_file, f):
         if any(d["label"] == "all" for d in styles["edgestyle"]):
             try:
                 allStyle = (item for item in styles["edgestyle"] if item["label"] == "all").next()
+        	f.write("edge["+ allStyle["dot"] +"]\n")
             except StopIteration:
                 continue
-        f.write("edge["+ allStyle["dot"] +"]\n")
         f.write("edge["+ style["dot"] +"]\n")
         color = style["dot"]. split ("color=")[1].split(" ")[0]
         if l in nodes:
