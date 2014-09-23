@@ -11,6 +11,7 @@ class Articulation:
         self.numTaxon = 2
         self.confidence = 2
         self.relations = 0
+        self.sumLabel = False
         if (initInput == ""):
             self.taxon1 = Taxon()
             self.taxon2 = Taxon()
@@ -24,7 +25,13 @@ class Articulation:
             elements = re.match("(.*) confidence=(.*)", initInput)
             initInput = elements.group(1)
             self.confidence = int(elements.group(2))
-        if (initInput.find("sum") != -1 or initInput.find("diff") != -1):
+        if (initInput.find("lsum ") != -1 or initInput.find("l3sum ") != -1 or\
+            initInput.find("l4sum ") != -1 or initInput.find("rsum ") != -1 or\
+            initInput.find("r3sum ") != -1 or initInput.find("r4sum ") != -1 or\
+            initInput.find("ldiff ") != -1 or initInput.find("rdiff ") != -1 or
+            initInput.find("e4sum") != -1 or initInput.find("i4sum") != -1):
+            self.sumLabel = True
+        if self.sumLabel:
             if (initInput.find("lsum") != -1):
                 self.relations = relation["+="]
                 elements = re.match("(.*)\.(.*) (.*)\.(.*) lsum (.*)\.(.*)", initInput)
@@ -55,6 +62,8 @@ class Articulation:
             elif (initInput.find("i4sum") != -1):
                 self.relations = 0 #[relationDict["+<=+"]]
                 elements = re.match("(.*)\.(.*) (.*)\.(.*) i4sum (.*)\.(.*) (.*)\.(.*)", initInput)
+            print "initinput", initInput
+            print "elements", elements
             taxon1taxonomy = elements.group(1)
             taxon1taxon = elements.group(2)
             taxon2taxonomy = elements.group(3)
