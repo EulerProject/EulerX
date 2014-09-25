@@ -14,23 +14,23 @@ def main():
 
 	elParser = EulerParser.instance()
 	ctiParser = CtiParser.instance()
-	(options, args) = elParser.parse_args()
-	if options.verbose:
-		print options
-	if options.inputfile is None:
-		if options.generateCti is False:
+	args = elParser.parse_args()
+	if args.verbose:
+		print args
+	if args.inputfile is None:
+		if args.generateCti is False:
 			print "Invalid input: -i/-g must be specified, please run euler -h for more information"
 			return None
 		else:
 			generator = CtiGenerator.instance()
-			generator.run(options)
+			generator.run(args)
 	else:
-		if options.generateCti is False:
-			if not reasoner.has_key(options.reasoner):
-				print "unknown reasoner "+options.reasoner#+", please choose one reasoner from "+reasoner.keys().toString()
+		if args.generateCti is False:
+			if not reasoner.has_key(args.reasoner):
+				print "unknown reasoner "+args.reasoner#+", please choose one reasoner from "+reasoner.keys().toString()
 				return None
 			elRunner = EulerRunner.instance()
-			elRunner.run(options)
+			elRunner.run(args)
 		else:
 			print "Invalid input: -i/-g cannot be both specified, please run euler -h for more information"
 			return None

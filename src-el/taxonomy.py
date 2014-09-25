@@ -66,7 +66,7 @@ class Taxonomy:
             
             thisChild.parent = thisParent
             # the special case that parent = its only child
-            if onlyOne and taxaMap.options.enableCov:
+            if onlyOne and taxaMap.args.enableCov:
                 taxaMap.addEMir(thisParent.dotName(), thisChild.dotName())
                 taxaMap.addEqMap(thisParent.dotName(), thisChild.dotName())
             else:
