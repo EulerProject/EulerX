@@ -110,14 +110,16 @@ class TaxonomyMapping:
         self.stdoutfile = os.path.join(args.outputdir, self.name+".stdout")
         fstdout = open(self.stdoutfile,"w")
         fstdout.write("##### Executing command:\n")
+        fstdout.write("\n")
         argList = []
         for arg in sys.argv:
             argList.append(arg + " ")
         fstdout.write(''.join(argList))
+        fstdout.write("\n")
         fstdout.write(commands.getoutput("softwareversions"))
         fstdout.write("\n\n##### Running User, Host and Date:\n")
-        fstdout.write("User:\t"+self.runningUser+"\nHost:\t"+self.runningHost+"\nDate:\t"+self.runningDate)
-        fstdout.write("\n\n##### Euler Outputs:\n")
+        fstdout.write("User:\t"+self.runningUser+"\nHost:\t"+self.runningHost+"\nDate:\t"+self.runningDate+"\n")
+        fstdout.write("\n\n##### Execution time:\n")
         fstdout.close()
         sys.stdout = Logger(self.stdoutfile)
         self.stderrfile = os.path.join(args.outputdir, self.name+".stderr")
@@ -200,6 +202,7 @@ class TaxonomyMapping:
         return taxa
 
     def run(self):
+        start_time = time.time()
         if self.args.inputViz:
             inputVisualizer = InputVisual.instance()
             inputVisualizer.run(self.args.inputdir, self.args.inputfile, self.ivout)
@@ -238,6 +241,12 @@ class TaxonomyMapping:
         else:
             self.pwflag = False
             self.genPW()
+        
+        # record the execution time
+        fstdout = open(self.stdoutfile,"a")
+        fstdout.write("\n" + (time.time() - start_time).__str__() + " seconds\n")
+        fstdout.write("\n\n##### Euler Outputs:\n")
+        fstdout.close()
 
     def decodeDlv(self):
         lines = StringIO.StringIO(self.pw).readlines()
