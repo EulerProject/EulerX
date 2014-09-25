@@ -35,10 +35,10 @@ class TaxonomyMapping:
 
     # Constructor
     #
-    #    options - IN
+    #    args - IN
     #    snap    - whether to take a snapshot of the software
     #
-    def __init__(self, options):
+    def __init__(self, args):
         self.mir = {}                          # MIR
         self.mirc = {}                         # MIRC
         self.mirp = {}                         # MIR Provenance
@@ -68,14 +68,17 @@ class TaxonomyMapping:
         self.inputVizEdges = {}                # edges for input visualization in stylesheet
         self.rcgVizNodes = {}                  # nodes for rcg visualization in stylesheet
         self.rcgVizEdges = {}                  # edges for rcg visualization in stylesheet
-        self.options = options
-        if self.options.ieo:
-            self.options.ie = True
+        self.args = args
+        if self.args.ieo:
+            self.args.ie = True
         # If not input visualization, change the default valude of encode to "mnpw"
-        if not self.options.inputViz and not self.options.encode:
-            self.options.encode = "mnpw"
-        self.enc = encode[options.encode]      # encoding
-        self.name = os.path.splitext(os.path.basename(options.inputfile))[0]
+        if not self.args.inputViz and not self.args.encode:
+            self.args.encode = "mnpw"
+        self.enc = encode[args.encode]      # encoding
+        self.name = ""
+        for i in range(len(args.inputfile)):
+            self.name += os.path.splitext(os.path.basename(args.inputfile[i]))[0]
+        #self.name = os.path.splitext(os.path.basename(args.inputfile[0]))[0]
         self.firstTName = ""                   # The abbrev name of the first taxonomy
         self.secondTName = ""                  # The abbrev name of the second taxonomy
         self.firstRcg = False
@@ -84,27 +87,27 @@ class TaxonomyMapping:
         self.runningUser = getpass.getuser()   # get the current username
         self.runningHost = socket.gethostname()# get the current host
         self.runningDate = strftime("%Y-%m-%d-%H:%M:%S", localtime())
-        if options.workingdir is None:
-            options.workingdir = os.path.join(options.inputdir, self.runningUser+"-"+self.runningHost)
-        if not os.path.exists(options.workingdir):
-            os.mkdir(options.workingdir)
-        if options.outputdir is None:
-            options.outputdir = os.path.join(options.workingdir, self.runningDate+"-"+self.name)
-        if not os.path.exists(options.outputdir):
-            os.mkdir(options.outputdir)
+        if args.workingdir is None:
+            args.workingdir = os.path.join(args.inputdir, self.runningUser+"-"+self.runningHost)
+        if not os.path.exists(args.workingdir):
+            os.mkdir(args.workingdir)
+        if args.outputdir is None:
+            args.outputdir = os.path.join(args.workingdir, self.runningDate+"-"+self.name)
+        if not os.path.exists(args.outputdir):
+            os.mkdir(args.outputdir)
         # copy input file to output dir
-        copyfile(os.path.join(self.options.inputdir, self.options.inputfile),\
-                 os.path.join(self.options.outputdir, self.name+".txt"))
+        copyfile(os.path.join(self.args.inputdir, self.args.inputfile[0]),\
+                 os.path.join(self.args.outputdir, self.name+".txt"))
 
-        self.aspdir = os.path.join(options.outputdir, "asp")
+        self.aspdir = os.path.join(args.outputdir, "asp")
         if not os.path.exists(self.aspdir):
             os.mkdir(self.aspdir)
-        self.pwfile = os.path.join(self.aspdir, self.name+"_pw."+self.options.reasoner)
-        self.cbfile = os.path.join(self.aspdir, self.name+"_cb."+self.options.reasoner)
-        self.pwswitch = os.path.join(self.aspdir, self.name+"_pwswitch."+self.options.reasoner)
-        self.ixswitch = os.path.join(self.aspdir, self.name+"_ixswitch."+self.options.reasoner)
+        self.pwfile = os.path.join(self.aspdir, self.name+"_pw."+self.args.reasoner)
+        self.cbfile = os.path.join(self.aspdir, self.name+"_cb."+self.args.reasoner)
+        self.pwswitch = os.path.join(self.aspdir, self.name+"_pwswitch."+self.args.reasoner)
+        self.ixswitch = os.path.join(self.aspdir, self.name+"_ixswitch."+self.args.reasoner)
         # Log stdout and stderr
-        self.stdoutfile = os.path.join(options.outputdir, self.name+".stdout")
+        self.stdoutfile = os.path.join(args.outputdir, self.name+".stdout")
         fstdout = open(self.stdoutfile,"w")
         fstdout.write("##### Executing command:\n")
         argList = []
@@ -117,59 +120,59 @@ class TaxonomyMapping:
         fstdout.write("\n\n##### Euler Outputs:\n")
         fstdout.close()
         sys.stdout = Logger(self.stdoutfile)
-        self.stderrfile = os.path.join(options.outputdir, self.name+".stderr")
+        self.stderrfile = os.path.join(args.outputdir, self.name+".stderr")
         sys.stderr = Logger(self.stderrfile)
         # Take a snapshot of the software
 #        if snap:
-#            self.snapfile = os.path.join(options.outputdir, "snap.out")
+#            self.snapfile = os.path.join(args.outputdir, "snap.out")
 #            fsnap = open(self.snapfile, 'w')
 #            fsnap.write(commands.getoutput("eulersnap"))
 #            fsnap.write("\n\n##### Running User, Host and Date:\n")
 #            fsnap.write("User:\t"+self.runningUser+"\nHost:\t"+self.runningHost+"\nDate:\t"+self.runningDate)
 #            fsnap.close()
-        self.ivout = os.path.join(options.outputdir, self.name+"_iv.dot")
-        self.cbout = os.path.join(options.outputdir, self.name+"_cb.txt")
-        self.obout = os.path.join(options.outputdir, self.name+"_ob.txt")
-        self.mirfile = os.path.join(options.outputdir, self.name+"_mir.csv")
-        self.pwoutputfile = os.path.join(options.outputdir, self.name+".pw")
-        self.clfile = os.path.join(options.outputdir, self.name+"_cl.csv")
-        self.cldot = os.path.join(options.outputdir, self.name+"_cl.dot")
-        self.cldotpdf = os.path.join(options.outputdir, self.name+"_cl_dot.pdf")
-        self.clneatopdf = os.path.join(options.outputdir, self.name+"_cl_neato.pdf")
-        self.iefile = os.path.join(options.outputdir, self.name+"_ie.dot")
-        self.iepdf = os.path.join(options.outputdir, self.name+"_ie.pdf")
-        self.ivpdf = os.path.join(options.outputdir, self.name+"_iv.pdf")
-        self.iv2dot = os.path.join(options.outputdir, self.name+".dot")
-        self.iv2pdf = os.path.join(options.outputdir, self.name+".pdf")
+        self.ivout = os.path.join(args.outputdir, self.name+"_iv.dot")
+        self.cbout = os.path.join(args.outputdir, self.name+"_cb.txt")
+        self.obout = os.path.join(args.outputdir, self.name+"_ob.txt")
+        self.mirfile = os.path.join(args.outputdir, self.name+"_mir.csv")
+        self.pwoutputfile = os.path.join(args.outputdir, self.name+".pw")
+        self.clfile = os.path.join(args.outputdir, self.name+"_cl.csv")
+        self.cldot = os.path.join(args.outputdir, self.name+"_cl.dot")
+        self.cldotpdf = os.path.join(args.outputdir, self.name+"_cl_dot.pdf")
+        self.clneatopdf = os.path.join(args.outputdir, self.name+"_cl_neato.pdf")
+        self.iefile = os.path.join(args.outputdir, self.name+"_ie.dot")
+        self.iepdf = os.path.join(args.outputdir, self.name+"_ie.pdf")
+        self.ivpdf = os.path.join(args.outputdir, self.name+"_iv.pdf")
+        self.iv2dot = os.path.join(args.outputdir, self.name+".dot")
+        self.iv2pdf = os.path.join(args.outputdir, self.name+".pdf")
         self.path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-        self.stylesheetdir = os.path.join(options.inputdir, "stylesheets/")
+        self.stylesheetdir = os.path.join(args.inputdir, "stylesheets/")
         if not os.path.exists(self.stylesheetdir):
             self.stylesheetdir = self.path + "/../default_stylesheet/"
         elif not os.listdir(self.stylesheetdir):
             self.stylesheetdir = self.path + "/../default_stylesheet/"
-        if reasoner[self.options.reasoner] == reasoner["gringo"]:
+        if reasoner[self.args.reasoner] == reasoner["gringo"]:
             # possible world command
             self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0 | "+self.path+"/muniq -u"
             # consistency command
             self.con = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD --eq=1"
-        elif reasoner[self.options.reasoner] == reasoner["dlv"]:
+        elif reasoner[self.args.reasoner] == reasoner["dlv"]:
             # possible world command
             self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+self.path+"/muniq -u"
             # consistency command
             self.con = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+ self.pwswitch
         else:
-            raise Exception("Reasoner:", self.options.reasoner, " is not supported !!")
+            raise Exception("Reasoner:", self.args.reasoner, " is not supported !!")
 
 
     def getTaxon(self, taxonomyName="", taxonName=""):
-        if(self.options.verbose):
+        if(self.args.verbose):
             print self.taxonomies, taxonomyName, taxonName
         taxonomy = self.taxonomies[taxonomyName]
         taxon = taxonomy.getTaxon(taxonName)
         return taxon
 
     def allPairsNeeded(self):
-        return self.options.allRelations or len(self.taxonomies) == 1
+        return self.args.allRelations or len(self.taxonomies) == 1
 
     def getAllArticulationPairs(self):
         taxa = []
@@ -197,21 +200,21 @@ class TaxonomyMapping:
         return taxa
 
     def run(self):
-        if self.options.inputViz:
+        if self.args.inputViz:
             inputVisualizer = InputVisual.instance()
-            inputVisualizer.run(self.options.inputdir, self.options.inputfile, self.ivout)
+            inputVisualizer.run(self.args.inputdir, self.args.inputfile, self.ivout)
             commands.getoutput("dot -Tpdf "+self.ivout+" -o "+self.ivpdf)
         if not self.enc:
             return
         print "******* You are running example", self.name, "*******"
         self.genASP()
-        if self.options.consCheck:
+        if self.args.consCheck:
             if not self.testConsistency():
                 print "Input is inconsistent o_O"
             else:
                 print "Input is consistent ^_^"
             return
-        if self.options.ie:
+        if self.args.ie:
             if not self.testConsistency():
                 print "Input is inconsistent!!"
                 self.inconsistencyExplanation()
@@ -313,7 +316,7 @@ class TaxonomyMapping:
 ## NF ends
 
     def testConsistency(self):
-        if reasoner[self.options.reasoner] == reasoner["gringo"]:
+        if reasoner[self.args.reasoner] == reasoner["gringo"]:
             com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 1"
             if commands.getoutput(com).find("Models     : 0") != -1:
                 return False
@@ -324,7 +327,7 @@ class TaxonomyMapping:
         return True
 
     def inconsistencyExplanation(self):
-        if reasoner[self.options.reasoner] == reasoner["gringo"]:
+        if reasoner[self.args.reasoner] == reasoner["gringo"]:
             com = "gringo "+self.pwfile+" "+ self.ixswitch+ " | claspD 1"
             ie = commands.getoutput(com)
             ie.replace(" ", ", ")
@@ -357,7 +360,7 @@ class TaxonomyMapping:
                     #print key,tmpmap[key]
 
             # If white box approach, not need to invoke HST algorithm
-            if not self.options.ieo:
+            if not self.args.ieo:
                 for key in tmpmap.keys():
                     #tmpset = sets.Set()
                     tmpset = tmpmap[key]
@@ -425,9 +428,9 @@ class TaxonomyMapping:
         self.npw = len(pws)
         outputstr = ""
         # mirs for each pw
-        if self.options.cluster: pwmirs = []
+        if self.args.cluster: pwmirs = []
         for i in range(len(pws)):
-            if self.options.cluster: pwmirs.append({})
+            if self.args.cluster: pwmirs.append({})
 
             # pwTm is the possible world taxonomy mapping, used for RCG
             pwTm = copy.deepcopy(self)
@@ -447,19 +450,19 @@ class TaxonomyMapping:
         return self.isNone(self.cb)
 
     def isNone(self, output):
-        if reasoner[self.options.reasoner] == reasoner["gringo"]:
+        if reasoner[self.args.reasoner] == reasoner["gringo"]:
             return output.find("Models     : 0 ") != -1
-        elif reasoner[self.options.reasoner] == reasoner["dlv"]:
+        elif reasoner[self.args.reasoner] == reasoner["dlv"]:
             return output.strip() == ""
         else:
-            raise Exception("Reasoner:", self.options.reasoner, " is not supported !!")
+            raise Exception("Reasoner:", self.args.reasoner, " is not supported !!")
 
     def genPW(self):
         self.pw = commands.getoutput(self.com)
         if self.isPwNone():
             print "************************************"
             print "Input is inconsistent"
-            if self.options.ie:
+            if self.args.ie:
                 self.inconsistencyExplanation()
             self.remedy()
             return
@@ -474,30 +477,30 @@ class TaxonomyMapping:
     #
     def intOutPw(self, name, pwflag):
         pws = []
-        if reasoner[self.options.reasoner] == reasoner["gringo"]:
+        if reasoner[self.args.reasoner] == reasoner["gringo"]:
             raw = self.pw.split("\n")
             ## Filter out those trash in the gringo output
             for i in range(2, len(raw) - 2):
                 if raw[i].find("rel") == -1: continue
                 pws.append(raw[i].strip().replace(") ",");"))
-        elif reasoner[self.options.reasoner] == reasoner["dlv"]:
+        elif reasoner[self.args.reasoner] == reasoner["dlv"]:
             raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
             if raw != "":
                 pws = raw.split("\n")
         else:
-            raise Exception("Reasoner:", self.options.reasoner, " is not supported !!")
+            raise Exception("Reasoner:", self.args.reasoner, " is not supported !!")
         self.npw = len(pws)
         self.outPW(name, pws, pwflag, "rel")
 
     def outPW(self, name, pws, pwflag, ss):
         outputstr = ""
         # mirs for each pw
-        if self.options.cluster: pwmirs = []
-        rcgAllDotFile = os.path.join(self.options.outputdir, self.name+"_all.dot")
-        rcgAllPdfFile = os.path.join(self.options.outputdir, self.name+"_all.pdf")
+        if self.args.cluster: pwmirs = []
+        rcgAllDotFile = os.path.join(self.args.outputdir, self.name+"_all.dot")
+        rcgAllPdfFile = os.path.join(self.args.outputdir, self.name+"_all.pdf")
         fAllDot = open(rcgAllDotFile, 'w')
         for i in range(len(pws)):
-            if self.options.cluster: pwmirs.append({})
+            if self.args.cluster: pwmirs.append({})
 
             # pwTm is the possible world taxonomy mapping, used for RCG
             pwTm = copy.deepcopy(self)
@@ -506,7 +509,7 @@ class TaxonomyMapping:
             else:
                 pwTm.firstRcg = False
             if self.enc & encode["cb"]:
-                if self.options.hideOverlaps:
+                if self.args.hideOverlaps:
                     pwTm.tr = []
                     pwTm.mir = {}
                 # if not hiding orignal concepts, basetr is useful
@@ -515,19 +518,19 @@ class TaxonomyMapping:
                     pwTm.mir = pwTm.basemir
                     
             outputstr += "\nPossible world "+i.__str__()+":\n{"
-            if self.options.verbose: print pws[i]+"#"
+            if self.args.verbose: print pws[i]+"#"
             items = pws[i].split(";")
-            if self.options.verbose: print len(items),items
+            if self.args.verbose: print len(items),items
             for j in range(len(items)):
                 rel = items[j].replace(ss+"(","").replace(")","").split(",")
-                if self.options.verbose: print items[j],rel
+                if self.args.verbose: print items[j],rel
                 dotc1 = self.dlvName2dot(rel[0])
                 dotc2 = self.dlvName2dot(rel[1])
-                if self.options.verbose: print dotc1,rel[2],dotc2
+                if self.args.verbose: print dotc1,rel[2],dotc2
                 if j != 0: outputstr += ", "
                 outputstr += dotc1+rel[2]+dotc2
                 pair = dotc1+","+dotc2
-                if self.options.cluster: pwmirs[i][pair] = rcc5[rel[2]]
+                if self.args.cluster: pwmirs[i][pair] = rcc5[rel[2]]
                 # RCG
                 pwTm.mir[pair] = rcc5[rel[2]]
                 if rcc5[rel[2]] == rcc5["is_included_in"]:
@@ -557,22 +560,22 @@ class TaxonomyMapping:
             # for example, if mncb, genPW() is called for intermediate usage
             if self.enc & encode["pw"] and ss == "rel" or\
                self.enc & encode["cb"] and ss == "relout":
-                pwTm.genPwRcg(name + "_" + i.__str__() + "_" + self.options.encode)
+                pwTm.genPwRcg(name + "_" + i.__str__() + "_" + self.args.encode)
                 #pwTm.genPwCb(name + "_" + i.__str__())
                 for e in pwTm.tr:
                     self.trlist.append(e)
         self.genAllPwRcg(len(pws))
         fAllDot.close()
         commands.getoutput("dot -Tpdf "+rcgAllDotFile+" -o "+rcgAllPdfFile)
-        if self.options.reduction:
+        if self.args.reduction:
             outputstr = self.uncReduction(pws)
         if pwflag:
-            if self.options.output: print outputstr
-#        fpw = open(self.options.outputdir+name+".pw", 'w')
+            if self.args.output: print outputstr
+#        fpw = open(self.args.outputdir+name+".pw", 'w')
         fpw = open(self.pwoutputfile, 'w')
         fpw.write(outputstr)
         fpw.close()
-        if self.options.cluster: self.genPwCluster(pwmirs, False)
+        if self.args.cluster: self.genPwCluster(pwmirs, False)
 
     def genPwCb(self, fileName):
         self.name = fileName
@@ -584,9 +587,9 @@ class TaxonomyMapping:
         self.genCB()
 
     def genPwRcg(self, fileName):
-#        fDot = open(self.options.outputdir+fileName+".dot", 'w')
-#        fAllDot = open(self.options.outputdir+self.name+"_all.dot", 'a')
-        rcgAllFile = os.path.join(self.options.outputdir, self.name+"_all.dot")
+#        fDot = open(self.args.outputdir+fileName+".dot", 'w')
+#        fAllDot = open(self.args.outputdir+self.name+"_all.dot", 'a')
+        rcgAllFile = os.path.join(self.args.outputdir, self.name+"_all.dot")
         fAllDot = open(rcgAllFile, 'a')
 #        fDot.write("digraph {\n\nrankdir = RL\n\n")
         if self.firstRcg:
@@ -733,7 +736,7 @@ class TaxonomyMapping:
                         self.tr.remove([T1, T4, 1])
                         #self.tr.append([T1, T4, 3])
 
-        if self.options.verbose:
+        if self.args.verbose:
             print "Transitive reduction:"
             print self.tr
             
@@ -803,7 +806,7 @@ class TaxonomyMapping:
                 if False:
 #                    fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
                     self.addRcgVizEdge(T1, T2, "redundant")
-        if self.options.rcgo:
+        if self.args.rcgo:
 #            fDot.write("  subgraph ig {\nedge [dir=none, style=dashed, color=blue, constraint=false]\n\n")
             oskiplist = []
             for key in self.mir.keys():
@@ -844,12 +847,12 @@ class TaxonomyMapping:
         #fDot.write("  }\n")
 #        fDot.write("}\n")
 #        fDot.close()
-#        commands.getoutput("dot -Tpdf "+self.options.outputdir+fileName+".dot -o "+self.options.outputdir+fileName+".pdf")
+#        commands.getoutput("dot -Tpdf "+self.args.outputdir+fileName+".dot -o "+self.args.outputdir+fileName+".pdf")
         
         # create the yaml file
-        rcgYamlFile = os.path.join(self.options.outputdir, fileName+".yaml")
-        rcgDotFile = os.path.join(self.options.outputdir, fileName+".dot")
-        rcgPdfFile = os.path.join(self.options.outputdir, fileName+".pdf")
+        rcgYamlFile = os.path.join(self.args.outputdir, fileName+".yaml")
+        rcgDotFile = os.path.join(self.args.outputdir, fileName+".dot")
+        rcgPdfFile = os.path.join(self.args.outputdir, fileName+".pdf")
         fRcgVizYaml = open(rcgYamlFile, 'w')
         if self.rcgVizNodes:
             fRcgVizYaml.write(yaml.safe_dump(self.rcgVizNodes, default_flow_style=False))
@@ -887,7 +890,7 @@ class TaxonomyMapping:
         
         
         # apply the rcgviz stylesheet
-#        commands.getoutput("cat "+self.options.outputdir+fileName+".yaml"+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + self.options.outputdir+fileName+".dot")
+#        commands.getoutput("cat "+self.args.outputdir+fileName+".yaml"+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + self.args.outputdir+fileName+".dot")
         commands.getoutput("cat "+rcgYamlFile+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + rcgDotFile)
         commands.getoutput("dot -Tpdf "+rcgDotFile+" -o "+rcgPdfFile)
 
@@ -1130,13 +1133,13 @@ class TaxonomyMapping:
 
     def remedy(self):
         # Begin repairing
-        if self.options.repair == "simple":
+        if self.args.repair == "simple":
             self.simpleRemedy()
-        elif self.options.repair == "bottomup":
+        elif self.args.repair == "bottomup":
             self.bottomupRemedy()
-        elif self.options.repair == "minIncSubset":
+        elif self.args.repair == "minIncSubset":
             self.minInconsRemedy()
-        elif self.options.repair == "HST":
+        elif self.args.repair == "HST":
             self.allJustifications(sets.Set(self.articulations))
         # By default, we use top down remedy to repair
         else:
@@ -1197,7 +1200,7 @@ class TaxonomyMapping:
                     ppw = tmpppw
         outputstr = ""
         for i in ppw:
-            if self.options.cluster: pwmirs.append({})
+            if self.args.cluster: pwmirs.append({})
             outputstr += "Possible world "+i.__str__()+": {"
             items = pws[i].split(";")
             for j in range(len(items)):
@@ -1247,11 +1250,11 @@ class TaxonomyMapping:
                             d += 1
                 fcl.write(d.__str__()+" ")
                 dmatrix[i].append(d)
-                if i != j and not self.options.simpCluster:
+                if i != j and not self.args.simpCluster:
                     fcldot.write("\"pw"+i.__str__()+"\" -- \"pw"+j.__str__()+\
                             "\" [label=\""+d.__str__()+"; "+s+"\",len="+d.__str__()+"]\n")
             fcl.write("\n")
-        if self.options.simpCluster:
+        if self.args.simpCluster:
             for i in range(self.npw):
                 for j in range(i):
                     reduced = False
@@ -1280,22 +1283,22 @@ class TaxonomyMapping:
 
     def genOB(self):
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-        if reasoner[self.options.reasoner] == reasoner["dlv"]:
+        if reasoner[self.args.reasoner] == reasoner["dlv"]:
             com = "dlv -silent -filter=pp "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
             raw = commands.getoutput(com).replace("{","").replace("}","").replace(" ","").replace("),",");")
-        elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+        elif reasoner[self.args.reasoner] == reasoner["gringo"]:
             com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=no"
             raw = commands.getoutput(com)
         pws = raw.split("\n")
         self.npw = 0
         outputstr = ""
         lastpw = ""
-        if self.options.cluster: pwobs = []
+        if self.args.cluster: pwobs = []
         for i in range(len(pws)):
             if pws[i].find("pp(") == -1: continue
-            if reasoner[self.options.reasoner] == reasoner["dlv"]:
+            if reasoner[self.args.reasoner] == reasoner["dlv"]:
                 items = pws[i].split(";")
-            elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+            elif reasoner[self.args.reasoner] == reasoner["gringo"]:
                 items = pws[i].split(" ")
             pw = ""
             for j in range(len(items)):
@@ -1314,23 +1317,23 @@ class TaxonomyMapping:
                 outputstr += "Possible world "+self.npw.__str__()+": {"
                 outputstr += pw + "}\n"
                 self.npw += 1
-        if self.options.output:
+        if self.args.output:
             print outputstr
         fob = open(self.obout, 'w')
         fob.write(outputstr)
         fob.close()
-        if self.options.cluster: self.genPwCluster(pwobs, True)
+        if self.args.cluster: self.genPwCluster(pwobs, True)
             
 
     def genVE(self):
         com = "dlv -silent -filter=vr "+self.pwfile+" "+self.pwswitch
         self.ve = commands.getoutput(com)
-        if self.options.output:
+        if self.args.output:
             print self.ve
 
     def genCB(self):
         pws = []
-        if reasoner[self.options.reasoner] == reasoner["gringo"]:
+        if reasoner[self.args.reasoner] == reasoner["gringo"]:
             self.com = "gringo "+self.cbfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
             self.cb = commands.getoutput(self.com)
             if self.isCbNone():
@@ -1339,12 +1342,12 @@ class TaxonomyMapping:
                 print self.cb
                 raise Exception(template.getEncErrMsg())
             raw = self.cb.split("\n")
-            if self.options.verbose: print raw
+            if self.args.verbose: print raw
             ## Filter out those trash in the gringo output
             for i in range(2, len(raw) - 2, 2):
                 pws.append(raw[i].strip().replace(") ",");"))
-                if self.options.verbose: print pws
-        elif reasoner[self.options.reasoner] == reasoner["dlv"]:
+                if self.args.verbose: print pws
+        elif reasoner[self.args.reasoner] == reasoner["dlv"]:
             path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
             self.com = "dlv -silent -filter=relout "+self.cbfile+" "+ self.pwswitch + " | "+path+"/muniq -u"
             self.cb = commands.getoutput(self.com)
@@ -1358,9 +1361,9 @@ class TaxonomyMapping:
             if raw != "":
               pws = raw.split("\n")
         else:
-            raise Exception("Reasoner:", self.options.reasoner, " is not supported !!")
+            raise Exception("Reasoner:", self.args.reasoner, " is not supported !!")
         self.npw = len(pws)
-        self.outPW(self.name, pws, self.options.output, "relout")
+        self.outPW(self.name, pws, self.args.output, "relout")
  
     def genASP(self):
         self.genAspConcept()
@@ -1377,11 +1380,11 @@ class TaxonomyMapping:
         idlv = open(self.ixswitch, 'w')
         pdlv.write(self.basePw)
         pdlv.write("pw.")
-        if self.options.hideOverlaps:
+        if self.args.hideOverlaps:
             pdlv.write("\nhide.")
         pdlv.write(self.baseIx)
         idlv.write("ix.")
-        if reasoner[self.options.reasoner] == reasoner["gringo"]:
+        if reasoner[self.args.reasoner] == reasoner["gringo"]:
             if self.enc & encode["ob"]:
                 pdlv.write("\n#hide.\n#show pp/" + self.obslen.__str__() + ".")
             elif self.enc & encode["pw"]:
@@ -1436,7 +1439,7 @@ class TaxonomyMapping:
             for taxon in self.taxonomies[key].taxa.keys():
                 t = self.taxonomies[key].taxa[taxon]
                 if (self.enc & encode["dl"] or self.enc & encode["mn"]) and\
-                    t.hasChildren(): #and self.options.enableCov:
+                    t.hasChildren(): #and self.args.enableCov:
                     con += "concept2(" + t.dlvName() + "," + n.__str__() + ").\n"
                 else:
                     fl = num + cou
@@ -1451,11 +1454,11 @@ class TaxonomyMapping:
             proArray.append(pro)
             pro *= (cou+1)
             prod = prod*cou + prod + cou
-            if self.options.verbose:
+            if self.args.verbose:
                 print "count: ",cou,", product: ",prod
                 
         if self.enc & encode["dl"]:
-            maxint = int(self.options.dl)*num
+            maxint = int(self.args.dl)*num
             self.baseAsp  = "%%% Max Number of Euler Regions\n"
             self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
             self.baseAsp += "%%% Euler Regions\n"
@@ -1470,7 +1473,7 @@ class TaxonomyMapping:
                 raise Exception("Polynomial encoding is not applicable for singleton taxonomy" +\
                                 " please use binary encoding for singleton example: eg. vrpw, vrve !!")
             maxint = prod
-            if reasoner[self.options.reasoner] == reasoner["dlv"]:
+            if reasoner[self.args.reasoner] == reasoner["dlv"]:
                 self.baseAsp  = "%%% Max Number of Euler Regions\n"
                 self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
                 self.baseAsp += "%%% Euler Regions\n"
@@ -1482,7 +1485,7 @@ class TaxonomyMapping:
                 for i in range(len(couArray)):
                     self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n"
                     
-            elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+            elif reasoner[self.args.reasoner] == reasoner["gringo"]:
                 self.baseAsp  = "%%% Euler regions\n"
                 self.baseAsp += "r(1.."+maxint.__str__()+").\n\n"
                 self.baseAsp += con
@@ -1494,7 +1497,7 @@ class TaxonomyMapping:
             
         elif self.enc & encode["vr"]:
             maxint = int(2**num)
-            if reasoner[self.options.reasoner] == reasoner["dlv"]:
+            if reasoner[self.args.reasoner] == reasoner["dlv"]:
                 self.baseAsp = "#maxint=" + maxint.__str__() + ".\n\n"
                 self.baseAsp += "%%% regions\n"
                 self.baseAsp += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
@@ -1502,7 +1505,7 @@ class TaxonomyMapping:
                 self.baseAsp += "count(N):- #int(N),N>=0,N<"+num.__str__()+".\n\n"
                 self.baseAsp += "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P,#mod(M1,2,0).\n"
                 self.baseAsp += con
-            elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+            elif reasoner[self.args.reasoner] == reasoner["gringo"]:
                 # TODO vrpw may not be working for gringo, gringo 4 may be needed
                 # raise Exception("Reasoner: vrpw is not supported for gringo !!")
                 self.baseAsp  = "%%% Euler regions\n"
@@ -1518,21 +1521,21 @@ class TaxonomyMapping:
             self.baseAsp += template.getAspDrCon()
             
         else:
-            print "EXCEPTION: encode ",self.options.encode," not defined!!"
+            print "EXCEPTION: encode ",self.args.encode," not defined!!"
 
     def genAspPC(self):
         self.baseAsp += "\n%%% Parent-Child relations\n"
         for key in self.taxonomies.keys():
             queue = copy.deepcopy(self.taxonomies[key].roots)
             while len(queue) != 0:
-                if self.options.verbose:
+                if self.args.verbose:
                     print "PC: ",queue
                 t = queue.pop(0)
                 # This is a nc flag
                 if t.abbrev == "nc":
                     self.baseAsp += "ncf(" + t.dlvName() + ").\n"
                 if t.hasChildren():
-                    if self.options.verbose:
+                    if self.args.verbose:
                         print "PC: ",t.dlvName()
                     if self.enc & encode["vr"] or self.enc & encode["dl"] or self.enc & encode["mn"]:
                         # ISA
@@ -1552,9 +1555,9 @@ class TaxonomyMapping:
                             self.baseAsp += "ir(X, r" + ruleNum.__str__() +") :- in(" + t1.dlvName() + ", X), out(" + t.dlvName() + ", X), pw.\n"
                             self.baseAsp += "ir(X, prod(r" + ruleNum.__str__() + ",R)) :- in(" + t1.dlvName() + ",X), out3(" + t.dlvName() + ", X, R), ix.\n" 
                             if t1.abbrev.find("nc") == -1:
-                                if reasoner[self.options.reasoner] == reasoner["dlv"]:
+                                if reasoner[self.args.reasoner] == reasoner["dlv"]:
                                     self.baseAsp += ":- #count{X: vrs(X), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0, pw.\n"
-                                elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+                                elif reasoner[self.args.reasoner] == reasoner["gringo"]:
                                     self.baseAsp += ":- [vrs(X): in(" + t1.dlvName() + ", X): in(" + t.dlvName() + ", X)]0.\n"
                                 self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n"
                                 self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n\n"
@@ -1569,7 +1572,7 @@ class TaxonomyMapping:
                         ruleNum = len(self.rules)
                         self.rules["r" + ruleNum.__str__()] = t.dotName() + " coverage"
                         #self.baseAsp += coverin + " :- in(" + t.dlvName() + ", X).\n"
-                        if self.options.enableCov:
+                        if self.args.enableCov:
                             coverout3 = "out3(" + t.dlvName() + ", X, r" + ruleNum.__str__() + ") :- " + coverout
                             coverout = "out(" + t.dlvName() + ", X) :- " + coverout
                             self.baseAsp += coverout3 + ", ix.\n"
@@ -1579,7 +1582,7 @@ class TaxonomyMapping:
                         #self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") " +coverage + ".\n\n"
                         
                         # D
-                        if self.options.enableSD:
+                        if self.args.enableSD:
                             self.baseAsp += "%% sibling disjointness\n"
                             for i in range(len(t.children) - 1):
                                 for j in range(i+1, len(t.children)):
@@ -1593,12 +1596,12 @@ class TaxonomyMapping:
                                     #self.baseAsp += "in(" + name1 + ", X) v out(" + name1 + ", X) :- out(" + name2 + ", X).\n"
                                     #self.baseAsp += "in(" + name2 + ", X) v out(" + name2 + ", X) :- out(" + name1 + ", X).\n"
                                     self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") :- in(" + name1 + ", X), in(" + name2+ ", X).\n"
-                                    if reasoner[self.options.reasoner] == reasoner["dlv"]:
+                                    if reasoner[self.args.reasoner] == reasoner["dlv"]:
                                         if t.children[i].abbrev.find("nc") == -1:
                                             self.baseAsp += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2+ ", X)} = 0, pw.\n"
                                         if t.children[j].abbrev.find("nc") == -1:
                                             self.baseAsp += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2+ ", X)} = 0, pw.\n"
-                                    elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+                                    elif reasoner[self.args.reasoner] == reasoner["gringo"]:
                                         if t.children[i].abbrev.find("nc") == -1:
                                             self.baseAsp += ":- [vrs(X): in(" + name1 + ", X): out(" + name2+ ", X)]0, pw.\n"
                                         if t.children[j].abbrev.find("nc") == -1:
@@ -1657,7 +1660,7 @@ class TaxonomyMapping:
             ruleNum = len(self.rules)
             self.articulations[i].ruleNum = ruleNum
             self.rules["r" + ruleNum.__str__()] = self.articulations[i].string
-            self.baseAsp += self.articulations[i].toASP(self.options.encode, self.options.reasoner, self)+ "\n"
+            self.baseAsp += self.articulations[i].toASP(self.args.encode, self.args.reasoner, self)+ "\n"
 
     def genAspDc(self):
         self.baseCb  += self.baseAsp
@@ -1669,10 +1672,10 @@ class TaxonomyMapping:
 
     def genAspObs(self):
         self.baseAsp += "%% Observation Information\n\n"
-        if reasoner[self.options.reasoner] == reasoner["dlv"]:
+        if reasoner[self.args.reasoner] == reasoner["dlv"]:
             self.seperator = "v"
             self.connector = ", "
-        elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+        elif reasoner[self.args.reasoner] == reasoner["gringo"]:
             self.seperator = "|"
             self.connector = ": "
         if self.location == []:
@@ -1744,17 +1747,20 @@ class TaxonomyMapping:
             if self.obs[i][1] == "N":
                 self.baseAsp += ":- present(X" + pair + ")," + tmp + ".\n" 
             else:
-                if reasoner[self.options.reasoner] == reasoner["dlv"]:
+                if reasoner[self.args.reasoner] == reasoner["dlv"]:
                     self.baseAsp += ":- #count{X: present(X" + pair + "), " + tmp + "} = 0.\n"
-                elif reasoner[self.options.reasoner] == reasoner["gringo"]:
+                elif reasoner[self.args.reasoner] == reasoner["gringo"]:
                     self.baseAsp += ":- [present(X" + pair + "): " + tmp + "]0.\n"
         self.baseAsp += "pinout(C, in, X" + appendd + ") :- present(X" + appendd + "), concept(C, _, N), in(C, X).\n"
         self.baseAsp += "pinout(C, out, X" + appendd + ") :- present(X" + appendd + "), concept(C, _, N), out(C, X).\n"
         
     
     def readFile(self):
-        file = open(os.path.join(self.options.inputdir, self.options.inputfile), 'r')
-        lines = file.readlines()
+        lines = []
+        for i in range(len(self.args.inputfile)):
+            file = open(os.path.join(self.args.inputdir, self.args.inputfile[i]), 'r')
+            alines = file.readlines()
+            lines.extend(alines)
         flag = ""
         
         # used for input viz
@@ -1943,7 +1949,7 @@ class TaxonomyMapping:
 
     def addAMir(self, astring, provenance):
         r = astring.split(" ")
-        if(self.options.verbose):
+        if(self.args.verbose):
             print "Articulations: ",astring
         if (r[1] == "includes"):
             self.addIMir(r[0], r[2], provenance)
@@ -2093,7 +2099,7 @@ class TaxonomyMapping:
             pairkey = pair[0].dotName() + "," + pair[1].dotName()
             pairkey1 = pair[0].dotName()
             pairkey2 = pair[1].dotName()
-            if self.options.verbose:
+            if self.args.verbose:
                 print pairkey
             if self.mir.has_key(pairkey) and self.mir[pairkey] != 0:
                 if self.mir[pairkey] & relation["infer"]:
@@ -2101,7 +2107,7 @@ class TaxonomyMapping:
                 else:
 #                   hint = "input"
                     hint = "deduced"
-                if self.options.countOn:
+                if self.args.countOn:
                     for i in range(5):
                         if self.mirc[pairkey][i] != 0:
                             mirList.append([pairkey1, findkey(relation, 1 << i), pairkey2, hint, self.mirc[pairkey][i].__str__(), self.npw.__str__()])
@@ -2110,7 +2116,7 @@ class TaxonomyMapping:
                 else:
 #                fmir.write(pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"])+"\n")
                     mirList.append([pairkey1, findkey(relation, self.mir[pairkey] & ~relation["infer"]), pairkey2, hint])
-                    if self.options.verbose:
+                    if self.args.verbose:
                         print pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"])+"\n"
             else:
                 self.mir[pairkey] = self.getPairMir(pair)
@@ -2118,7 +2124,7 @@ class TaxonomyMapping:
 #                fmir.write(pairkey + ",inferred," + rl +"\n")
 #                fmir.write(pairkey1 +"," + rl + "," + pairkey2 + ",inferred" +"\n")
                 mirList.append([pairkey1, rl, pairkey2, "inferred"])
-                if self.options.verbose:
+                if self.args.verbose:
                     print pairkey + ",inferred," + rl +"\n"
         for pair in sorted(mirList, key=itemgetter(3,0,2)):
             fmir.write(','.join(pair) + "\n")
@@ -2161,7 +2167,7 @@ class TaxonomyMapping:
                     break
                 sleept += 5
                 time.sleep(4)
-                if self.options.verbose:
+                if self.args.verbose:
                     print "Sleept ",sleept," seconds!"
             if t.isAlive():
                 t.join(1)
@@ -2201,10 +2207,10 @@ class TaxonomyMapping:
             newColor = "#" + str(hex(int(newPointDec[0])))[2:] + str(hex(int(newPointDec[1])))[2:] + str(hex(int(newPointDec[2])))[2:]
             rels[i][3] = newColor
         # write to dot file
-        rcgAllFile = os.path.join(self.options.outputdir, self.name+"_all.dot")
-#        fAllDot = open(self.options.outputdir+self.name+"_all.dot", 'a')
+        rcgAllFile = os.path.join(self.args.outputdir, self.name+"_all.dot")
+#        fAllDot = open(self.args.outputdir+self.name+"_all.dot", 'a')
         fAllDot = open(rcgAllFile, 'a')
-        if self.options.simpAllView:
+        if self.args.simpAllView:
             for [T1, T2, cnt, color] in rels:
                 if cnt == numOfPws:
                     fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",color=\"#FF0000\"];\n")
@@ -2287,9 +2293,9 @@ class TaxonomyMapping:
                     self.addInputVizEdge(a.split(" ")[0], a.split(" ")[2], art2symbol.get(a.split(" ")[1], a.split(" ")[1]))
                 
         # create the yaml file
-        inputYamlFile = os.path.join(self.options.outputdir, self.name+".yaml")
-        inputDotFile = os.path.join(self.options.outputdir, self.name+".dot")
-        inputPdfFile = os.path.join(self.options.outputdir, self.name+".pdf")
+        inputYamlFile = os.path.join(self.args.outputdir, self.name+".yaml")
+        inputDotFile = os.path.join(self.args.outputdir, self.name+".dot")
+        inputPdfFile = os.path.join(self.args.outputdir, self.name+".pdf")
         
         fInputVizYaml = open(inputYamlFile, 'w')
         fInputVizYaml.write(yaml.safe_dump(self.inputVizNodes, default_flow_style=False))

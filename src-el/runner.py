@@ -13,8 +13,8 @@ class EulerRunner:
     def instance():
         return EulerRunner()
     
-    def run(self, options):
-        taxMap = TaxonomyMapping(options)
+    def run(self, args):
+        taxMap = TaxonomyMapping(args)
         # Parse the cti file
         taxMap.readFile()
         taxMap.run()
