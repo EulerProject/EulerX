@@ -77,7 +77,8 @@ class TaxonomyMapping:
         self.enc = encode[args.encode]      # encoding
         self.name = ""
         for i in range(len(args.inputfile)):
-            self.name += os.path.splitext(os.path.basename(args.inputfile[i]))[0]
+            self.name += os.path.splitext(os.path.basename(args.inputfile[i]))[0] + "-"
+        self.name = self.name[:-1]
         #self.name = os.path.splitext(os.path.basename(args.inputfile[0]))[0]
         self.firstTName = ""                   # The abbrev name of the first taxonomy
         self.secondTName = ""                  # The abbrev name of the second taxonomy
@@ -91,6 +92,7 @@ class TaxonomyMapping:
             args.workingdir = os.path.join(args.inputdir, self.runningUser+"-"+self.runningHost)
         if not os.path.exists(args.workingdir):
             os.mkdir(args.workingdir)
+        self.reportfile = os.path.join(args.workingdir, "report.txt")
         if args.outputdir is None:
             args.outputdir = os.path.join(args.workingdir, self.runningDate+"-"+self.name)
         if not os.path.exists(args.outputdir):
@@ -247,6 +249,7 @@ class TaxonomyMapping:
         fstdout.write("\n" + (time.time() - start_time).__str__() + " seconds\n")
         fstdout.write("\n\n##### Euler Outputs:\n")
         fstdout.close()
+        
 
     def decodeDlv(self):
         lines = StringIO.StringIO(self.pw).readlines()
@@ -473,6 +476,7 @@ class TaxonomyMapping:
             print "Input is inconsistent"
             if self.args.ie:
                 self.inconsistencyExplanation()
+            self.updateReportFile(self.reportfile)
             self.remedy()
             return
         if self.pw.lower().find("error") != -1:
@@ -480,6 +484,7 @@ class TaxonomyMapping:
         #if not self.pwflag: return None
         self.intOutPw(self.name, self.pwflag)
         self.genMir()
+        self.updateReportFile(self.reportfile)
 
     #
     # Internal routine with several callers
@@ -1339,6 +1344,7 @@ class TaxonomyMapping:
         self.ve = commands.getoutput(com)
         if self.args.output:
             print self.ve
+        self.updateReportFile(self.reportfile)
 
     def genCB(self):
         pws = []
@@ -2390,3 +2396,10 @@ class TaxonomyMapping:
             return newCbName
         else:
             return cbName
+    
+    def updateReportFile(self, fileName):
+        f = open(fileName, "a")
+        f.write("Time: " + self.runningDate.__str__() + ";\t")
+        f.write("Example: " + self.name + ";\t")
+        f.write("# of PWs: " + self.npw.__str__() + "\n")
+        f.close()
