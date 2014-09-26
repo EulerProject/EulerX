@@ -36,4 +36,7 @@ def main():
 			return None
 
 if __name__ == '__main__':
+	start_time = time.time()
 	main()
+	print "\n===> Execution time: " + (time.time() - start_time).__str__() + " seconds\n"
+	
