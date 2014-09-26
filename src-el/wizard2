@@ -37,12 +37,10 @@ for d in data:
         # add an extra field for parent's information.
         #  This will be used to check if the element is already claimed as a child or not
         i.append(" ")
-    for i in range(len(data[d])):
+    for taxa1 in data[d]:
         isa = []
-        taxa1 = data[d][i]
         rank1 = taxa1[3]
-        for j in range(i+1, len(data[d])):
-            taxa2 = data[d][j]
+        for taxa2 in data[d]:
             rank2 = taxa2[3]
             g1 = taxa1[0].split(".")[0]
             g2 = taxa2[0].split(".")[0]
@@ -58,12 +56,10 @@ for d in data:
 for d in data:
     # articulations are defined from leaves to root
     data[d] = sorted(data[d], key=itemgetter(3), reverse=True)
-    for i in range(len(data[d])):
+    for taxa1 in data[d]:
         art = []
-        taxa1 = data[d][i]
         rank1 = taxa1[3]
-        for j in range(i+1, len(data[d])):
-            taxa2 = data[d][j]
+        for taxa2 in data[d]:
             rank2 = taxa2[3]
             g1 = taxa1[0].split(".")[0]
             g2 = taxa2[0].split(".")[0]
@@ -113,7 +109,7 @@ with sys.stdout as oFile:
             artMate = artMap.get(i[0],[])
         # if the element is at the lowest rank and yet has no suggested articulation,
         #  ask user to define the articulation for it
-            if i[0] == source and artMate == [] and i[3] == leavesRank:
+            if i[0].split(".")[0] == source and artMate == [] and i[3] == leavesRank:
                 writer.writerow([i[0], i[1], " ", "?", "?"])
             else:
                 for a in artMate:
