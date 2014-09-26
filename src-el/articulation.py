@@ -62,6 +62,9 @@ class Articulation:
             elif (initInput.find("i4sum") != -1):
                 self.relations = 0 #[relationDict["+<=+"]]
                 elements = re.match("(.*)\.(.*) (.*)\.(.*) i4sum (.*)\.(.*) (.*)\.(.*)", initInput)
+            else:
+                raise Exception("Syntax error in \""+initInput+"\"!!")
+                
             taxon1taxonomy = elements.group(1)
             taxon1taxon = elements.group(2)
             taxon2taxonomy = elements.group(3)
