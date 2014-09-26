@@ -505,6 +505,13 @@ class TaxonomyMapping:
         rcgAllDotFile = os.path.join(self.args.outputdir, self.name+"_all.dot")
         rcgAllPdfFile = os.path.join(self.args.outputdir, self.name+"_all.pdf")
         fAllDot = open(rcgAllDotFile, 'w')
+        
+        rcgAll2YamlFile = os.path.join(self.args.outputdir, self.name+"_all2.yaml")
+        rcgAll2DotFile = os.path.join(self.args.outputdir, self.name+"_all2.dot")
+        rcgAll2PdfFile = os.path.join(self.args.outputdir, self.name+"_all2.pdf")
+        allRcgNodesDict = {}
+        allRcgEdgesDict = {}
+
         for i in range(len(pws)):
             if self.args.cluster: pwmirs.append({})
 
@@ -566,13 +573,22 @@ class TaxonomyMapping:
             # for example, if mncb, genPW() is called for intermediate usage
             if self.enc & encode["pw"] and ss == "rel" or\
                self.enc & encode["cb"] and ss == "relout":
-                pwTm.genPwRcg(name + "_" + i.__str__() + "_" + self.args.encode)
+                pwTm.genPwRcg(name + "_" + i.__str__() + "_" + self.args.encode, allRcgNodesDict)
                 #pwTm.genPwCb(name + "_" + i.__str__())
                 for e in pwTm.tr:
                     self.trlist.append(e)
-        self.genAllPwRcg(len(pws))
+        self.genAllPwRcg(len(pws), allRcgEdgesDict)
         fAllDot.close()
         commands.getoutput("dot -Tpdf "+rcgAllDotFile+" -o "+rcgAllPdfFile)
+        
+        fRcgAllVizYaml = open(rcgAll2YamlFile, 'w')
+        if allRcgNodesDict:
+            fRcgAllVizYaml.write(yaml.safe_dump(allRcgNodesDict, default_flow_style=False))
+        if allRcgEdgesDict:
+            fRcgAllVizYaml.write(yaml.safe_dump(allRcgEdgesDict, default_flow_style=False))
+        fRcgAllVizYaml.close()
+
+        
         if self.args.reduction:
             outputstr = self.uncReduction(pws)
         if pwflag:
@@ -592,7 +608,7 @@ class TaxonomyMapping:
         fcb.close()
         self.genCB()
 
-    def genPwRcg(self, fileName):
+    def genPwRcg(self, fileName, allRcgNodesDict):
 #        fDot = open(self.args.outputdir+fileName+".dot", 'w')
 #        fAllDot = open(self.args.outputdir+self.name+"_all.dot", 'a')
         rcgAllFile = os.path.join(self.args.outputdir, self.name+"_all.dot")
@@ -714,6 +730,7 @@ class TaxonomyMapping:
             tmpComLi.append(newT)
             tmpCom += "  \""+newT+"\"\n"
             self.addRcgVizNode(newT, "comb")
+            self.addRcgAllVizNode(newT, "comb", allRcgNodesDict)
             
         # Duplicates
     	tmpTr = list(self.tr)
@@ -766,12 +783,14 @@ class TaxonomyMapping:
                 else:
                     taxa2 += "  \""+T1+"\"\n"
                 self.addRcgVizNode(T1s[1], T1s[0])          # used in stylesheet
+                self.addRcgAllVizNode(T1s[1], T1s[0], allRcgNodesDict)
             else:
 #                newT1 = self.restructureCbNames(T1)
 #                self.tr[self.tr.index([T1,T2,P])] = [newT1, T2, P]
                 tmpComLi.append(T1)
                 tmpCom += "  \""+T1+"\"\n"
                 self.addRcgVizNode(T1, "comb")
+                self.addRcgAllVizNode(T1, "comb", allRcgNodesDict)
             if(T2.find("*") == -1 and T2.find("\\") == -1 and T2.find("\\n") == -1 and T2.find(".") != -1):
                 T2s = T2.split(".")
                 if self.firstTName == T2s[0]:
@@ -779,12 +798,14 @@ class TaxonomyMapping:
                 else:
                     taxa2 += "  \""+T2+"\"\n"
                 self.addRcgVizNode(T2s[1], T2s[0])
+                self.addRcgAllVizNode(T2s[1], T2s[0], allRcgNodesDict)
             else:
 #                newT2 = self.restructureCbNames(T2)
 #                self.tr[self.tr.index([T1,T2,P])] = [T1, newT2, P]
                 tmpComLi.append(T2)
                 tmpCom += "  \""+T2+"\"\n"
                 self.addRcgVizNode(T2, "comb")
+                self.addRcgAllVizNode(T2, "comb", allRcgNodesDict)
                 
         # Dot drawing used for old viz
 #        fDot.write("  node [shape=box style=\"filled\" fillcolor=\"#CCFFCC\"]\n")
@@ -833,13 +854,17 @@ class TaxonomyMapping:
                     if "\\n" in replace1 or "\\\\" in replace1:
                         replace1 = self.restructureCbNames(replace1)
                         self.addRcgVizNode(replace1, "comb")
+                        self.addRcgAllVizNode(replace1, "comb", allRcgNodesDict)
                     else:
                         self.addRcgVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1))
+                        self.addRcgAllVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1), allRcgNodesDict)
                     if "\\n" in replace2 or "\\\\" in replace2:
                         replace2 = self.restructureCbNames(replace2)
                         self.addRcgVizNode(replace2, "comb")
+                        self.addRcgAllVizNode(replace2, "comb", allRcgNodesDict)
                     else:
                         self.addRcgVizNode(re.match("(.*)\.(.*)", replace2).group(2), re.match("(.*)\.(.*)", replace2).group(1))
+                        self.addRcgAllVizNode(re.match("(.*)\.(.*)", replace2).group(2), re.match("(.*)\.(.*)", replace2).group(1), allRcgNodesDict)
                     self.addRcgVizEdge(replace1, replace2, "overlaps")
                     # Skip the reverse pair for redundant edges
                     oskiplist.append(item.group(2)+","+item.group(1))
@@ -2194,7 +2219,7 @@ class TaxonomyMapping:
                 else:
                     last = li[i]
 
-    def genAllPwRcg(self, numOfPws):
+    def genAllPwRcg(self, numOfPws, allRcgEdgesDict):
         rels = []
         for [T1, T2, P] in self.trlist:
             cnt = 0
@@ -2226,6 +2251,7 @@ class TaxonomyMapping:
         else:
             for [T1, T2, cnt, color] in rels:
                 fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",penwidth=" + str(cnt) + ",color=\"" + color + "\"];\n")
+                self.addRcgAllVizEdge(T1, T2, cnt, allRcgEdgesDict)
         fAllDot.write("}\n")
         fAllDot.close()
         
@@ -2354,6 +2380,20 @@ class TaxonomyMapping:
         edge.update({"t" : t})
         edge.update({"label" : label})
         self.rcgVizEdges.update({s + "_" + t : edge})
+        
+    def addRcgAllVizNode(self, concept, group, allRcgNodesDict):
+        node = {}
+        node.update({"concept": concept})
+        node.update({"group": group})
+        node.update({"name": "test" + str(randint(0,100))})
+        allRcgNodesDict.update({group + "." + concept: node})
+
+    def addRcgAllVizEdge(self, s, t, label, allRcgEdgesDict): #here label is the frequency of the edge among all PWs
+        edge = {}
+        edge.update({"s" : s})
+        edge.update({"t" : t})
+        edge.update({"label" : label})
+        allRcgEdgesDict.update({s + "_" + t : edge})
     
     def restructureCbNames(self, cbName):
         if cbName.find("*") != -1 or cbName.find("\\\\") != -1:
