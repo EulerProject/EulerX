@@ -8,24 +8,22 @@ import sys
             
 data = {} # a nested dictionary to store the taxonomies
 
-with sys.stdin as source:
-    reader = csv.reader(source)
-    header = next(reader, None)             # save the header row
-# Build a nested dictionary
-    try:
-        for name, author, rank in reader:  
-            if author not in data:
-                data[author]={}
-            if rank not in data[author]:
-                data[author][rank]=[]
-            data[author][rank].append(name)
-    except ValueError, e:
-        print "Error in the input file:" , e
-
-with sys.stdout as dest:
-    writer = csv.writer(dest)
-    header.insert(0,"Id")
-    writer.writerow(header) 
+inputData = csv.DictReader(sys.stdin) 
+try:
+    for row in inputData:
+        author = row["Author"]
+        rank = row["Rank"]
+        if author not in data:
+            data[author] = {}
+        if rank not in data[author]:
+            data[author][rank] = []
+        data[author][rank].append(row["Name"])
+except ValueError, e:
+    print "Error in the input file:", e
+        
+with sys.stdout as oFile:
+    writer = csv.writer(oFile)
+    writer.writerow(["ID", "Name", "Author", "Rank"]) 
 # Assign identifiers to each entity
     j = 0
     # group elements based on author column
