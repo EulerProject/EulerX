@@ -6,9 +6,11 @@ import csv
 import taxon_dictionary
 import sys
             
+inputData = []            
 data = {} # a nested dictionary to store the taxonomies
+for n in sys.argv[1:]:
+	inputData += csv.DictReader(open(n)) 
 
-inputData = csv.DictReader(sys.stdin) 
 try:
     for row in inputData:
         author = row["Author"]
