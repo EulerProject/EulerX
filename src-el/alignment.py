@@ -97,19 +97,45 @@ class TaxonomyMapping:
             args.outputdir = os.path.join(args.workingdir, self.runningDate+"-"+self.name)
         if not os.path.exists(args.outputdir):
             os.mkdir(args.outputdir)
-        # copy input file to output dir
-        copyfile(os.path.join(self.args.inputdir, self.args.inputfile[0]),\
-                 os.path.join(self.args.outputdir, self.name+".txt"))
-
-        self.aspdir = os.path.join(args.outputdir, "asp")
+            
+        # construct the folder directories
+        self.inputfilesdir = os.path.join(args.outputdir, "0-input") 
+        if not os.path.exists(self.inputfilesdir):
+            os.mkdir(self.inputfilesdir)
+        self.aspdir = os.path.join(args.outputdir, "1-ASP-input-code")
         if not os.path.exists(self.aspdir):
             os.mkdir(self.aspdir)
+        self.pwoutputfiledir = os.path.join(args.outputdir, "2-ASP-output")
+        if not os.path.exists(self.pwoutputfiledir):
+            os.mkdir(self.pwoutputfiledir)
+        self.mirfiledir = os.path.join(args.outputdir, "3-MIR")
+        if not os.path.exists(self.mirfiledir):
+            os.mkdir(self.mirfiledir)
+        self.pwsyamldir = os.path.join(args.outputdir, "4-PWs-yaml")
+        if not os.path.exists(self.pwsyamldir):
+            os.mkdir(self.pwsyamldir)
+        self.pwsdotdir = os.path.join(args.outputdir, "5-PWs-dot")
+        if not os.path.exists(self.pwsdotdir):
+            os.mkdir(self.pwsdotdir)
+        self.pwspdfdir = os.path.join(args.outputdir, "6-PWs-pdf")
+        if not os.path.exists(self.pwspdfdir):
+            os.mkdir(self.pwspdfdir)
+        self.pwsaggregatedir = os.path.join(args.outputdir, "7-PWs-aggregate")
+        if not os.path.exists(self.pwsaggregatedir):
+            os.mkdir(self.pwsaggregatedir)
+        self.logsdir = os.path.join(args.outputdir, "logs")
+        if not os.path.exists(self.logsdir):
+            os.mkdir(self.logsdir)
+
+        # copy input file to output dir
+        copyfile(os.path.join(self.args.inputdir, self.args.inputfile[0]),\
+                 os.path.join(self.inputfilesdir, self.name+".txt"))        
         self.pwfile = os.path.join(self.aspdir, self.name+"_pw."+self.args.reasoner)
         self.cbfile = os.path.join(self.aspdir, self.name+"_cb."+self.args.reasoner)
         self.pwswitch = os.path.join(self.aspdir, self.name+"_pwswitch."+self.args.reasoner)
         self.ixswitch = os.path.join(self.aspdir, self.name+"_ixswitch."+self.args.reasoner)
         # Log stdout and stderr
-        self.stdoutfile = os.path.join(args.outputdir, self.name+".stdout")
+        self.stdoutfile = os.path.join(self.logsdir, self.name+".stdout")
         fstdout = open(self.stdoutfile,"w")
         fstdout.write("##### Executing command:\n")
         fstdout.write("\n")
@@ -124,7 +150,7 @@ class TaxonomyMapping:
         fstdout.write("\n\n##### Euler Outputs:\n")
         fstdout.close()
         sys.stdout = Logger(self.stdoutfile)
-        self.stderrfile = os.path.join(args.outputdir, self.name+".stderr")
+        self.stderrfile = os.path.join(self.logsdir, self.name+".stderr")
         sys.stderr = Logger(self.stderrfile)
         # Take a snapshot of the software
 #        if snap:
@@ -134,20 +160,26 @@ class TaxonomyMapping:
 #            fsnap.write("\n\n##### Running User, Host and Date:\n")
 #            fsnap.write("User:\t"+self.runningUser+"\nHost:\t"+self.runningHost+"\nDate:\t"+self.runningDate)
 #            fsnap.close()
-        self.ivout = os.path.join(args.outputdir, self.name+"_iv.dot")
+        #self.ivout = os.path.join(args.outputdir, self.name+"_iv.dot")
         self.cbout = os.path.join(args.outputdir, self.name+"_cb.txt")
-        self.obout = os.path.join(args.outputdir, self.name+"_ob.txt")
-        self.mirfile = os.path.join(args.outputdir, self.name+"_mir.csv")
-        self.pwoutputfile = os.path.join(args.outputdir, self.name+".pw")
-        self.clfile = os.path.join(args.outputdir, self.name+"_cl.csv")
-        self.cldot = os.path.join(args.outputdir, self.name+"_cl.dot")
-        self.cldotpdf = os.path.join(args.outputdir, self.name+"_cl_dot.pdf")
-        self.clneatopdf = os.path.join(args.outputdir, self.name+"_cl_neato.pdf")
-        self.iefile = os.path.join(args.outputdir, self.name+"_ie.dot")
-        self.iepdf = os.path.join(args.outputdir, self.name+"_ie.pdf")
-        self.ivpdf = os.path.join(args.outputdir, self.name+"_iv.pdf")
-        self.iv2dot = os.path.join(args.outputdir, self.name+".dot")
-        self.iv2pdf = os.path.join(args.outputdir, self.name+".pdf")
+        if self.enc & encode["ob"]:
+            self.obsdir = os.path.join(args.outputdir, "obs")
+            if not os.path.exists(self.obsdir):
+                os.mkdir(self.obsdir)
+            self.obout = os.path.join(self.obsdir, self.name+"_ob.txt")
+        self.mirfile = os.path.join(self.mirfiledir, self.name+"_mir.csv")
+        self.pwoutputfile = os.path.join(self.pwoutputfiledir, self.name+".pw")
+        if self.args.cluster:
+            self.pwsclusterdir = os.path.join(args.outputdir, "8-PWs-cluster")
+            if not os.path.exists(self.pwsclusterdir):
+                os.mkdir(self.pwsclusterdir)
+            self.clfile = os.path.join(self.pwsclusterdir, self.name+"_cl.csv")
+            self.cldot = os.path.join(self.pwsclusterdir, self.name+"_cl.dot")
+            self.cldotpdf = os.path.join(self.pwsclusterdir, self.name+"_cl_dot.pdf")
+            self.clneatopdf = os.path.join(self.pwsclusterdir, self.name+"_cl_neato.pdf")
+        self.iefile = os.path.join(self.pwsdotdir, self.name+"_ie.dot")
+        self.iepdf = os.path.join(self.pwspdfdir, self.name+"_ie.pdf")
+        #self.ivpdf = os.path.join(self.pwspdfdir, self.name+"_iv.pdf")
         self.path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         self.stylesheetdir = os.path.join(args.inputdir, "stylesheets/")
         if not os.path.exists(self.stylesheetdir):
@@ -204,10 +236,10 @@ class TaxonomyMapping:
         return taxa
 
     def run(self):
-        if self.args.inputViz:
-            inputVisualizer = InputVisual.instance()
-            inputVisualizer.run(self.args.inputdir, self.args.inputfile, self.ivout)
-            commands.getoutput("dot -Tpdf "+self.ivout+" -o "+self.ivpdf)
+        #if self.args.inputViz:
+        #    inputVisualizer = InputVisual.instance()
+        #    inputVisualizer.run(self.args.inputdir, self.args.inputfile, self.ivout)
+        #    commands.getoutput("dot -Tpdf "+self.ivout+" -o "+self.ivpdf)
         if not self.enc:
             return
         print "******* You are running example", self.name, "*******"
@@ -502,13 +534,13 @@ class TaxonomyMapping:
         outputstr = ""
         # mirs for each pw
         if self.args.cluster: pwmirs = []
-        rcgAllDotFile = os.path.join(self.args.outputdir, self.name+"_all.dot")
-        rcgAllPdfFile = os.path.join(self.args.outputdir, self.name+"_all.pdf")
+        rcgAllDotFile = os.path.join(self.pwsaggregatedir, self.name+"_all.dot")
+        rcgAllPdfFile = os.path.join(self.pwsaggregatedir, self.name+"_all.pdf")
         fAllDot = open(rcgAllDotFile, 'w')
         
-        rcgAll2YamlFile = os.path.join(self.args.outputdir, self.name+"_all2.yaml")
-        rcgAll2DotFile = os.path.join(self.args.outputdir, self.name+"_all2.dot")
-        rcgAll2PdfFile = os.path.join(self.args.outputdir, self.name+"_all2.pdf")
+        rcgAll2YamlFile = os.path.join(self.pwsaggregatedir, self.name+"_all2.yaml")
+        rcgAll2DotFile = os.path.join(self.pwsaggregatedir, self.name+"_all2.dot")
+        rcgAll2PdfFile = os.path.join(self.pwsaggregatedir, self.name+"_all2.pdf")
         allRcgNodesDict = {}
         allRcgEdgesDict = {}
 
@@ -611,7 +643,7 @@ class TaxonomyMapping:
     def genPwRcg(self, fileName, allRcgNodesDict):
 #        fDot = open(self.args.outputdir+fileName+".dot", 'w')
 #        fAllDot = open(self.args.outputdir+self.name+"_all.dot", 'a')
-        rcgAllFile = os.path.join(self.args.outputdir, self.name+"_all.dot")
+        rcgAllFile = os.path.join(self.pwsaggregatedir, self.name+"_all.dot")
         fAllDot = open(rcgAllFile, 'a')
 #        fDot.write("digraph {\n\nrankdir = RL\n\n")
         if self.firstRcg:
@@ -881,9 +913,9 @@ class TaxonomyMapping:
 #        commands.getoutput("dot -Tpdf "+self.args.outputdir+fileName+".dot -o "+self.args.outputdir+fileName+".pdf")
         
         # create the yaml file
-        rcgYamlFile = os.path.join(self.args.outputdir, fileName+".yaml")
-        rcgDotFile = os.path.join(self.args.outputdir, fileName+".dot")
-        rcgPdfFile = os.path.join(self.args.outputdir, fileName+".pdf")
+        rcgYamlFile = os.path.join(self.pwsyamldir, fileName+".yaml")
+        rcgDotFile = os.path.join(self.pwsdotdir, fileName+".dot")
+        rcgPdfFile = os.path.join(self.pwspdfdir, fileName+".pdf")
         fRcgVizYaml = open(rcgYamlFile, 'w')
         if self.rcgVizNodes:
             fRcgVizYaml.write(yaml.safe_dump(self.rcgVizNodes, default_flow_style=False))
@@ -2239,7 +2271,7 @@ class TaxonomyMapping:
             newColor = "#" + str(hex(int(newPointDec[0])))[2:] + str(hex(int(newPointDec[1])))[2:] + str(hex(int(newPointDec[2])))[2:]
             rels[i][3] = newColor
         # write to dot file
-        rcgAllFile = os.path.join(self.args.outputdir, self.name+"_all.dot")
+        rcgAllFile = os.path.join(self.pwsaggregatedir, self.name+"_all.dot")
 #        fAllDot = open(self.args.outputdir+self.name+"_all.dot", 'a')
         fAllDot = open(rcgAllFile, 'a')
         if self.args.simpAllView:
@@ -2326,9 +2358,9 @@ class TaxonomyMapping:
                     self.addInputVizEdge(a.split(" ")[0], a.split(" ")[2], art2symbol.get(a.split(" ")[1], a.split(" ")[1]))
                 
         # create the yaml file
-        inputYamlFile = os.path.join(self.args.outputdir, self.name+".yaml")
-        inputDotFile = os.path.join(self.args.outputdir, self.name+".dot")
-        inputPdfFile = os.path.join(self.args.outputdir, self.name+".pdf")
+        inputYamlFile = os.path.join(self.inputfilesdir, self.name+".yaml")
+        inputDotFile = os.path.join(self.inputfilesdir, self.name+".dot")
+        inputPdfFile = os.path.join(self.inputfilesdir, self.name+".pdf")
         
         fInputVizYaml = open(inputYamlFile, 'w')
         fInputVizYaml.write(yaml.safe_dump(self.inputVizNodes, default_flow_style=False))
@@ -2364,8 +2396,8 @@ class TaxonomyMapping:
             fNew.close()
         
         # apply the inputviz stylesheet
-        commands.getoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"inputstyle.yaml" + ">" + self.iv2dot)
-        commands.getoutput("dot -Tpdf "+self.iv2dot+" -o "+self.iv2pdf)
+        commands.getoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"inputstyle.yaml" + ">" + inputDotFile)
+        commands.getoutput("dot -Tpdf "+inputDotFile+" -o "+inputPdfFile)
 
     def addRcgVizNode(self, concept, group):
         node = {}
