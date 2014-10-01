@@ -20,6 +20,7 @@ import getpass
 import socket
 import fileinput
 import sys
+import csv
 from taxonomy import * 
 from alignment import * 
 from redCon import *
@@ -87,12 +88,18 @@ class TaxonomyMapping:
         self.eqConLi = []                      # list of concepts that are equal
         self.runningUser = getpass.getuser()   # get the current username
         self.runningHost = socket.gethostname()# get the current host
+        self.startTime = time.time()
         self.runningDate = strftime("%Y-%m-%d-%H:%M:%S", localtime())
         if args.workingdir is None:
             args.workingdir = os.path.join(args.inputdir, self.runningUser+"-"+self.runningHost)
         if not os.path.exists(args.workingdir):
             os.mkdir(args.workingdir)
-        self.reportfile = os.path.join(args.workingdir, "report.txt")
+        self.reportfile = os.path.join(args.workingdir, "report.csv")
+        if not os.path.isfile(self.reportfile):
+            f = open(self.reportfile, "w")
+            writer = csv.writer(f, delimiter='\t')
+            writer.writerow(['START_TIME','END_TIME','DURATION','INPUT-FILE','#PWs'])
+            f.close()
         if args.outputdir is None:
             args.outputdir = os.path.join(args.workingdir, self.runningDate+"-"+self.name)
         if not os.path.exists(args.outputdir):
@@ -2463,7 +2470,9 @@ class TaxonomyMapping:
     
     def updateReportFile(self, fileName):
         f = open(fileName, "a")
-        f.write("Time: " + self.runningDate.__str__() + ";\t")
-        f.write("Example: " + self.name + ";\t")
-        f.write("# of PWs: " + self.npw.__str__() + "\n")
+        writer = csv.writer(f, delimiter='\t')
+        writer.writerow([self.runningDate, strftime("%Y-%m-%d-%H:%M:%S", localtime()), (time.time()-self.startTime).__str__(),\
+                         self.name, self.npw.__str__()])
+        #f.write(self.runningDate + "\t\t" + strftime("%Y-%m-%d-%H:%M:%S", localtime()) + "\t\t"\
+         #       + (time.time()-self.startTime).__str__() + "\t" + self.name + "\t" + self.npw.__str__() + "\n")
         f.close()
