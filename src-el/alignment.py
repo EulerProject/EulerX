@@ -69,6 +69,8 @@ class TaxonomyMapping:
         self.inputVizEdges = {}                # edges for input visualization in stylesheet
         self.rcgVizNodes = {}                  # nodes for rcg visualization in stylesheet
         self.rcgVizEdges = {}                  # edges for rcg visualization in stylesheet
+        self.clusterVizNodes = {}              # nodes for cluster visualization in stylesheet
+        self.clusterVizEdges = {}              # edges for cluster visualization in stylesheet
         self.args = args
         if self.args.ieo:
             self.args.ie = True
@@ -182,6 +184,7 @@ class TaxonomyMapping:
                 os.mkdir(self.pwsclusterdir)
             self.clfile = os.path.join(self.pwsclusterdir, self.name+"_cl.csv")
             self.cldot = os.path.join(self.pwsclusterdir, self.name+"_cl.dot")
+            self.clyaml = os.path.join(self.pwsclusterdir, self.name+"_cl.yaml")
             self.cldotpdf = os.path.join(self.pwsclusterdir, self.name+"_cl_dot.pdf")
             self.clneatopdf = os.path.join(self.pwsclusterdir, self.name+"_cl_neato.pdf")
         self.iefile = os.path.join(self.pwsdotdir, self.name+"_ie.dot")
@@ -1323,6 +1326,9 @@ class TaxonomyMapping:
                 if i != j and not self.args.simpCluster:
                     fcldot.write("\"pw"+i.__str__()+"\" -- \"pw"+j.__str__()+\
                             "\" [label=\""+d.__str__()+"; "+s+"\",len="+d.__str__()+"]\n")
+                    self.addClusterVizNode('pw' + i.__str__())
+                    self.addClusterVizNode('pw' + j.__str__())
+                    self.addClusterVizEdge('pw' + i.__str__(), 'pw' + j.__str__(), d.__str__()+"; "+s)
             fcl.write("\n")
         if self.args.simpCluster:
             for i in range(self.npw):
@@ -1345,9 +1351,20 @@ class TaxonomyMapping:
                     if not reduced:
                         fcldot.write("\"pw"+i.__str__()+"\" -- \"pw"+j.__str__()+\
                             "\" [label="+dmatrix[i][j].__str__()+",len="+dmatrix[i][j].__str__()+"]\n")
+                        self.addClusterVizNode('pw' + i.__str__())
+                        self.addClusterVizNode('pw' + j.__str__())
+                        self.addClusterVizEdge('pw' + i.__str__(), 'pw' + j.__str__(), dmatrix[i][j].__str__())
         fcldot.write("}")
         fcl.close()
         fcldot.close()
+        
+        fclyaml = open(self.clyaml, 'w')
+        if self.clusterVizNodes:
+            fclyaml.write(yaml.safe_dump(self.clusterVizNodes, default_flow_style=False))
+        if self.clusterVizEdges:
+            fclyaml.write(yaml.safe_dump(self.clusterVizEdges, default_flow_style=False))
+        fclyaml.close()
+        
         commands.getoutput("dot -Tpdf "+self.cldot+" -o "+self.cldotpdf)
         commands.getoutput("neato -Tpdf "+self.cldot+" -o "+self.clneatopdf)
 
@@ -2433,6 +2450,19 @@ class TaxonomyMapping:
         edge.update({"t" : t})
         edge.update({"label" : label})
         allRcgEdgesDict.update({s + "_" + t : edge})
+
+    def addClusterVizNode(self, concept):
+        node = {}
+        node.update({"concept": concept})
+        node.update({"name": "test" + str(randint(0,100))})
+        self.clusterVizNodes.update({concept: node})
+
+    def addClusterVizEdge(self, s, t, label):
+        edge = {}
+        edge.update({"s" : s})
+        edge.update({"t" : t})
+        edge.update({"label" : label})
+        self.clusterVizEdges.update({s + "_" + t : edge})
     
     def restructureCbNames(self, cbName):
         if cbName.find("*") != -1 or cbName.find("\\\\") != -1:
