@@ -5,38 +5,59 @@
 import csv
 import taxon_dictionary
 import sys
-            
-inputData = []            
-data = {} # a nested dictionary to store the taxonomies
-for n in sys.argv[1:]:
-	inputData += csv.DictReader(open(n)) 
+import optparse
+import os
 
-try:
-    for row in inputData:
-        author = row["Author"]
-        rank = row["Rank"]
-        if author not in data:
-            data[author] = {}
-        if rank not in data[author]:
-            data[author][rank] = []
-        data[author][rank].append(row["Name"])
-except ValueError, e:
-    print "Error in the input file:", e
-        
-with sys.stdout as oFile:
-    writer = csv.writer(oFile)
-    writer.writerow(["ID", "Name", "Author", "Rank"]) 
-# Assign identifiers to each entity
-    j = 0
-    # group elements based on author column
-    for author, value in data.iteritems():
-        j += 1
-        i = 1
-        numRanks = []
-        # mapp ranks to numerical value using taxon_dictionary
-        for rank in value.keys():
-            numRanks.append(taxon_dictionary.rank2num.get(rank,(0,0))[0])
-        for rank in [k[0] for k in sorted(zip(value.keys(), numRanks), key=lambda l: l[1] ) ]:
-            for name in sorted(value[rank]):
-                writer.writerow((str(j) + "." + str(taxon_dictionary.rank2num.get(rank,(0,0))[1]) + str(i), name, author, rank))
-                i += 1
+def main (startNum):           
+    inputData = []            
+    data = {} # a nested dictionary to store the taxonomies
+    for n in sys.argv[1:]:
+		if os.path.isfile(n): 
+			inputData += csv.DictReader(open(n)) 
+
+    try:
+        for row in inputData:
+            author = row["Author"]
+            rank = row["Rank"]
+            if author not in data:
+                data[author] = {}
+            if rank not in data[author]:
+                data[author][rank] = []
+            data[author][rank].append(row["Name"])
+    except ValueError, e:
+        print "Error in the input file:", e
+            
+    with sys.stdout as oFile:
+        writer = csv.writer(oFile)
+        writer.writerow(["ID", "Name", "Author", "Rank"]) 
+    # Assign identifiers to each entity
+        j = int(startNum) - 1
+        # group elements based on author column
+        for author, value in data.iteritems():
+            j += 1
+            i = 1
+            numRanks = []
+            # mapp ranks to numerical value using taxon_dictionary
+            for rank in value.keys():
+                numRanks.append(taxon_dictionary.rank2num.get(rank,(0,0))[0])
+            for rank in [k[0] for k in sorted(zip(value.keys(), numRanks), key=lambda l: l[1] ) ]:
+                for name in sorted(value[rank]):
+                    writer.writerow((str(j) + "." + str(taxon_dictionary.rank2num.get(rank,(0,0))[1]) + str(i), name, author, rank))
+                    i += 1
+
+
+def parse_options():
+# parse options
+    parser = optparse.OptionParser(usage = "%prog [options]", version = "%prog 0.1")
+    parser.add_option("-s","--snum",type="string",dest="num", default= None)
+    (options, args) = parser.parse_args()
+    return options, args
+
+
+# MAIN
+if __name__ == '__main__':
+    (options,args) = parse_options()
+    #print "options.num", options.num, type(options.num)
+    if options.num == None:
+        options.num = "2"
+    main(options.num)
