@@ -1,19 +1,23 @@
 #! /usr/bin/env python
 # __author__ = "Parisa Kianmajd"
 #__version__ = "1.0.1"
+# input: a csv file with three column <Name, Author, Rank>
+# output: the input file with one additional column, ID with format of groupID. rankID running number
+
+
 
 import csv
-import taxon_dictionary
 import sys
-import optparse
-import os
+import argparse
+import taxon_dictionary
 
-def main (startNum):           
+def main (iFile, startNum):           
     inputData = []            
     data = {} # a nested dictionary to store the taxonomies
-    for n in sys.argv[1:]:
-		if os.path.isfile(n): 
-			inputData += csv.DictReader(open(n)) 
+
+
+    for n in iFile:
+        inputData += csv.DictReader(open(n)) 
 
     try:
         for row in inputData:
@@ -31,33 +35,30 @@ def main (startNum):
         writer = csv.writer(oFile)
         writer.writerow(["ID", "Name", "Author", "Rank"]) 
     # Assign identifiers to each entity
-        j = int(startNum) - 1
-        # group elements based on author column
+        j = startNum - 1
+        # group elements based on Author column
         for author, value in data.iteritems():
             j += 1
             i = 1
             numRanks = []
-            # mapp ranks to numerical value using taxon_dictionary
+            # map ranks to numerical value using taxon_dictionary
             for rank in value.keys():
                 numRanks.append(taxon_dictionary.rank2num.get(rank,(0,0))[0])
+            # sort elements based on rank number and alphabetically inside each rank group
             for rank in [k[0] for k in sorted(zip(value.keys(), numRanks), key=lambda l: l[1] ) ]:
                 for name in sorted(value[rank]):
                     writer.writerow((str(j) + "." + str(taxon_dictionary.rank2num.get(rank,(0,0))[1]) + str(i), name, author, rank))
                     i += 1
 
 
-def parse_options():
-# parse options
-    parser = optparse.OptionParser(usage = "%prog [options]", version = "%prog 0.1")
-    parser.add_option("-s","--snum",type="string",dest="num", default= None)
-    (options, args) = parser.parse_args()
-    return options, args
-
-
 # MAIN
 if __name__ == '__main__':
-    (options,args) = parse_options()
-    #print "options.num", options.num, type(options.num)
-    if options.num == None:
-        options.num = "2"
-    main(options.num)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i","--iFile", action= "append")
+    parser.add_argument("-s","--sNum")
+    args = parser.parse_args()
+    if args.iFile == None:
+        args.iFile = "in.csv"
+    if args.sNum == None:
+        args.sNum = 1
+    main(args.iFile, int(args.sNum))
