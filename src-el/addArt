@@ -7,9 +7,9 @@
 
 import sys
 import csv
-import taxon_dictionary
 from operator import itemgetter
-import argparse
+import taxon_dictionary
+import wizardParser
 
 # global variables
 dict_data = {}
@@ -114,12 +114,4 @@ def main(isaFile, inFile):
 
 # MAIN
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-i","--iFile", action= "append")
-    parser.add_argument("-t","--tFile", action= "append")
-    args = parser.parse_args()
-    if args.tFile == None:
-        args.tFile = ""
-    if args.iFile == None:
-        args.iFile = "out.csv"
-    main(args.tFile, args.iFile)
+    main(wizardParser.args.tFile, wizardParser.args.iFile)

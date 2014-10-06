@@ -1,21 +1,20 @@
 #! /usr/bin/env python
 # __author__ = "Parisa Kianmajd"
 #__version__ = "1.0.1"
-# input: a csv file with three column <Name, Author, Rank>
-# output: the input file with one additional column, ID with format of groupID. rankID running number
-
+# input: a csv file with three columns <Name, Author, Rank>
+# output: the input file with one additional column, ID, with format of <groupID>.<rankID><number>
 
 
 import csv
 import sys
-import argparse
+import wizardParser
 import taxon_dictionary
 
 def main (iFile, startNum):           
     inputData = []            
     data = {} # a nested dictionary to store the taxonomies
 
-
+    
     for n in iFile:
         inputData += csv.DictReader(open(n)) 
 
@@ -53,12 +52,4 @@ def main (iFile, startNum):
 
 # MAIN
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-i","--iFile", action= "append")
-    parser.add_argument("-s","--sNum")
-    args = parser.parse_args()
-    if args.iFile == None:
-        args.iFile = "in.csv"
-    if args.sNum == None:
-        args.sNum = 1
-    main(args.iFile, int(args.sNum))
+    main(wizardParser.args.iFile, int(wizardParser.args.sNum))
