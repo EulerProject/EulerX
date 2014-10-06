@@ -5,7 +5,7 @@
 
 import csv
 import sys
-import optparse
+import wizardParser
 
 # Global variables
 isa = {}
@@ -13,17 +13,18 @@ art = []
 data = {}
 
 
-def p2c(infile):
+def main(tfile):
     # build a dictionary that maps taxonomy ids to According_To column in the original input file
-    with open(infile) as infile:
-        reader = csv.reader(infile)
-        #skip header row
-        next(reader, None)
-        for line in reader:
-            i = line[0].split(".")[0]
-            if i not in data:
-                data[i] = {}
-            data[i] = line[1]
+    if tfile != " ":
+        with open(tfile) as infile:
+            reader = csv.reader(infile)
+            #skip header row
+            next(reader, None)
+            for line in reader:
+                i = line[0].split(".")[0]
+                if i not in data:
+                    data[i] = {}
+                data[i] = line[1]
     with sys.stdin as source:
         lines = csv.reader(source)
         #skip header row
@@ -41,7 +42,11 @@ def p2c(infile):
                     art.append([line[0],line[5],line[6]])
     with sys.stdout as cFile:
         for d in isa:
-            cFile.write("taxonomy " + d + " " + data[d] + "\n")
+            if tfile != " ":
+                name = data[d]
+            else:
+                name = "Taxonomy" + d
+            cFile.write("taxonomy " + d + " " + name + "\n")
             for i in isa[d]:
                 line = "(" + i + " "
                 for j in isa[d][i]:
@@ -49,22 +54,12 @@ def p2c(infile):
                 line = line [:-1] + ")" + "\n"
                 cFile.write(line)
             cFile.write("\n")
-        cFile.write("articulation" + "\n")
-        for a in art:
-            cFile.write("[" + a[0] + " " + a[1] + " " + a[2] + "]" + "\n")
-
-
-def parse_options():
-# parse options
-    parser = optparse.OptionParser(usage = "%prog [options]", version = "%prog 0.1")
-    parser.add_option("-i","--ifile",type="string",dest="ifile", default=None, help="file")
-    (options, args) = parser.parse_args()
-    return options, args
+        if len(art) != 0:
+            cFile.write("articulation" + "\n")
+            for a in art:
+                cFile.write("[" + a[0] + " " + a[1] + " " + a[2] + "]" + "\n")
 
 
 # MAIN
 if __name__ == '__main__':
-    (options,args) = parse_options()
-    if options.ifile == None:
-        options.ifile = "in.csv"
-p2c(options.ifile)
+    main(wizardParser.args.tFile)

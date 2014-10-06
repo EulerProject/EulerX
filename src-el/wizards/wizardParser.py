@@ -8,7 +8,7 @@ parser.add_argument("-s","--sNum")
 args = parser.parse_args()
 if args.iFile == None:
     args.iFile = "in.csv"
-if args.iFile == None:
-    args.iFile = " "
+if args.tFile == None:
+    args.tFile = " "
 if args.sNum == None:
     args.sNum = 1
