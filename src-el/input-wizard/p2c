@@ -20,7 +20,7 @@ def main(iFile,tFile):
         for f in tFile:
             reader += csv.DictReader(open(f))
         for line in reader:
-            i = line("ID").split(".")[0]
+            i = line["ID"].split(".")[0]
             if i not in data:
                 data[i] = {}
             data[i] = line["Author"]
