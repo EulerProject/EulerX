@@ -22,9 +22,10 @@ data = {}
 def main(isaFile, inFile):
     isa = []
     inputData = []
-    for f in isaFile:
-        isa += csv.DictReader(open(f))
-    if isaFile != "":
+
+    if isaFile != " ":
+        for f in isaFile:
+            isa += csv.DictReader(open(f))
         for line in isa:
             parent = line["ID2"]
             child = line ["ID1"]
