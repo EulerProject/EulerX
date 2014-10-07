@@ -12,34 +12,32 @@ isa = {}
 art = []
 data = {}
 
-
 def main(iFile,tFile):
+    reader = []
+    lines = []
     # build a dictionary that maps taxonomy ids to According_To column in the original input file
     if tFile != " ":
-        with open(tFile) as inFile:
-            reader = csv.reader(inFile)
-            #skip header row
-            next(reader, None)
-            for line in reader:
-                i = line[0].split(".")[0]
-                if i not in data:
-                    data[i] = {}
-                data[i] = line[1]
-    with open(iFile[0]) as source:
-        lines = csv.reader(source)
-        #skip header row
-        next(lines, None)
-        for line in lines:
-            if "ISA" in line:
-                index = line[-5].split(".")[0]
-                if index not in isa:
-                    isa[index] = {}
-                if line[-5] not in isa[index]:
-                    isa[index][line[-5]]= []
-                isa[index][line[-5]].append(line[0])
-            else:
-                if len(line) > 1:
-                    art.append([line[0],line[5],line[6]])
+        for f in tFile:
+            reader += csv.DictReader(open(f))
+        for line in reader:
+            i = line("ID").split(".")[0]
+            if i not in data:
+                data[i] = {}
+            data[i] = line["Author"]
+    for f in iFile:
+        lines += csv.DictReader(open(f))
+    for line in lines:
+        if line["Relation"] == "ISA":
+            index = line["ID2"].split(".")[0]
+            if index not in isa:
+                isa[index] = {}
+            if line["ID2"] not in isa[index]:
+                isa[index][line["ID2"]]= []
+            isa[index][line["ID2"]].append(line["ID1"])
+        else:
+            if len(line) > 1:
+                art.append([line["ID1"],line["Relation"],line["ID2"]])
+    
     with sys.stdout as cFile:
         for d in isa:
             if tFile != " ":
