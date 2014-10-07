@@ -4,7 +4,6 @@
 # This is a new version of Euler Wizard code that when suggesting articulation pairs,
 #  takes ISA relationships into account
 
-
 import sys
 import csv
 import taxon_dictionary
