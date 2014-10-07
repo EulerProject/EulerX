@@ -13,11 +13,11 @@ art = []
 data = {}
 
 
-def main(tfile):
+def main(iFile,tFile):
     # build a dictionary that maps taxonomy ids to According_To column in the original input file
-    if tfile != " ":
-        with open(tfile) as infile:
-            reader = csv.reader(infile)
+    if tFile != " ":
+        with open(tFile) as inFile:
+            reader = csv.reader(inFile)
             #skip header row
             next(reader, None)
             for line in reader:
@@ -25,7 +25,7 @@ def main(tfile):
                 if i not in data:
                     data[i] = {}
                 data[i] = line[1]
-    with sys.stdin as source:
+    with open(iFile[0]) as source:
         lines = csv.reader(source)
         #skip header row
         next(lines, None)
@@ -42,7 +42,7 @@ def main(tfile):
                     art.append([line[0],line[5],line[6]])
     with sys.stdout as cFile:
         for d in isa:
-            if tfile != " ":
+            if tFile != " ":
                 name = data[d]
             else:
                 name = "Taxonomy" + d
@@ -62,4 +62,4 @@ def main(tfile):
 
 # MAIN
 if __name__ == '__main__':
-    main(wizardParser.args.tFile)
+    main(wizardParser.args.iFile, wizardParser.args.tFile)
