@@ -50,7 +50,7 @@ class EulerParser:
             EulerParser.inst.add_argument("-b", dest="dl", default=2, help="dl encoding spare parameter")
             EulerParser.inst.add_argument("--reasoner", dest="reasoner", type=str, default="dlv",\
                                               help="choose a reasoner between dlv and gringo, by deafult using dlv")
-            EulerParser.inst.add_argument("--repair", dest="repair", type=str, default="topdown",\
+            EulerParser.inst.add_argument("--repair", dest="repair", type=str, default=None,\
                                               help="""
 													choose a repairing approach in case of inconsistency:
 													topdown, fix and output possible worlds

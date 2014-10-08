@@ -511,7 +511,8 @@ class TaxonomyMapping:
             if self.args.ie:
                 self.inconsistencyExplanation()
             self.updateReportFile(self.reportfile)
-            self.remedy()
+            if self.args.repair:
+                self.remedy()
             return
         if self.pw.lower().find("error") != -1:
             raise Exception(template.getEncErrMsg())
