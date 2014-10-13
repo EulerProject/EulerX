@@ -2194,8 +2194,8 @@ class TaxonomyMapping:
                 if self.mir[pairkey] & relation["infer"]:
                     hint = "inferred"
                 else:
-#                   hint = "input"
-                    hint = "deduced"
+                    hint = "input"
+#                    hint = "deduced"
                 if self.args.countOn:
                     for i in range(5):
                         if self.mirc[pairkey][i] != 0:
