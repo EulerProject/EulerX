@@ -1,0 +1,22 @@
+#Franz, N.M. et al. 2014. Reasoning over Taxonomic Change: Exploring Alignments for the Perelleschus Use Case. PONE-D-14-14848.
+#Input dataset for abstract example, Figure 2.
+#Euler/X run command, Figure 2D: euler -i figure2.txt --iv
+#Euler/X run command, Figure 2E: euler -i figure2.txt -e mnpw --rcgo
+#Euler/X run command, Figure 2F: euler -i figure2.txt -e mncb
+taxonomy 2 Taxonomy2 
+(A B F)
+(B CD G)
+(F E H I)
+
+taxonomy 1 Taxonomy1 
+(A B F)
+(B C D E)
+(F G H I)
+
+articulation figure2
+[2.A equals 1.A]
+[2.CD rsum 1.C 1.D]
+[2.E equals 1.E]
+[2.G equals 1.G]
+[2.H equals 1.H]
+[2.I equals 1.I]
