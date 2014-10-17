@@ -5,6 +5,7 @@
 import subprocess
 from subprocess import call
 import sys
+import os
 
 def removeRed(originList,removeList):
     delNodes = []
@@ -25,9 +26,10 @@ def remove_duplicate_string(li):
 def removeBracPri(s):
     return s.replace("[","").replace("]","").replace("'","")
 
+fileName = os.path.splitext(os.path.basename(sys.argv[1]))[0]
+fileFullDot = sys.argv[2]+"/"+fileName+"_fulllat.dot"
+fileDot = sys.argv[2]+"/"+fileName+"_lat.dot"
 fileName = sys.argv[1]
-fileFullDot = sys.argv[1].split(".")[0]+"_fulllat.dot"
-fileDot = sys.argv[1].split(".")[0]+"_lat.dot"
 misArts = []
 arts = []
 f = open("output.txt","r")
