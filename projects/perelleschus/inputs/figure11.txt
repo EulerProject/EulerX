@@ -1,0 +1,37 @@
+#Franz, N.M. et al. 2014. Reasoning over Taxonomic Change: Exploring Alignments for the Perelleschus Use Case. PONE-D-14-14848.
+#Input dataset for Alignment 4, ostensive reading, Figure 11.
+#Euler/X run command, Figure 11A: euler -i figure11.txt -e mnpw --rcgo
+#Euler/X run command, Figure 11B: euler -i figure11.txt -e mncb
+taxonomy 2006 Franz
+(PHYLLO PHY PER)
+(PER Prectir PcarPeve)
+(PcarPeve Pcarlud Pevelyn)
+
+taxonomy 2001 FranzOBrien 
+(DER PHY PER)
+(PHY PHYsubcin nc)
+(PER Prectir PevePsul)
+(PevePsul PevePvar PbivPsul)
+(PevePvar Pevelyn Pvariab)
+(PbivPsul Pbivent Psplend PpubPsul)
+(PpubPsul Ppubico PcarPsul)
+(PcarPsul Pcarlud Psulcat)
+
+articulation figure 11
+[2006.PHYLLO is_included_in 2001.DER]
+[2006.PHY equals 2001.PHY]
+[2006.PHY includes 2001.PHYsubcin]
+[2006.PER is_included_in 2001.PER]
+[2006.Prectir equals 2001.Prectir]
+[2006.PcarPeve is_included_in 2001.PevePsul]
+[2006.PcarPeve overlaps 2001.PevePvar]
+[2006.PcarPeve disjoint 2001.Pvariab]
+[2006.PcarPeve overlaps 2001.PbivPsul]
+[2006.PcarPeve disjoint 2001.Pbivent]
+[2006.PcarPeve disjoint 2001.Psplend]
+[2006.PcarPeve overlaps 2001.PpubPsul]
+[2006.PcarPeve disjoint 2001.Ppubico]
+[2006.PcarPeve overlaps 2001.PcarPsul]
+[2006.PcarPeve disjoint 2001.Psulcat]
+[2006.Pcarlud equals 2001.Pcarlud]
+[2006.Pevelyn equals 2001.Pevelyn]
