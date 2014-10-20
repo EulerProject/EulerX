@@ -118,9 +118,10 @@ with sys.stdout as oFile:
             artMate = artMap.get(i[0],[])
         # if the element is at the lowest rank and yet has no suggested articulation,
         #  ask user to define the articulation for it
-            if i[0].split(".")[0] == source and artMate == [] and i[3] == leavesRank:
-                writer.writerow([i[0], i[1], " ", "?", "?"])
-            else:
-                for a in artMate:
-                    writer.writerow([i[0], i[0].split(".")[0], i[0].split(".")[1][0], i[0].split(".")[1][1:], i[1], "?",
-                                     a[0], a[0].split(".")[0], a[0].split(".")[1][0], a[0].split(".")[1][1:], a[1]])
+            if i[0].split(".")[0] == source:
+                if artMate == [] and i[3] == leavesRank:
+                    writer.writerow([i[0], i[1], " ", "?", "?"])
+                else:
+                    for a in artMate:
+                        writer.writerow([i[0], i[0].split(".")[0], i[0].split(".")[1][0], i[0].split(".")[1][1:], i[1], "?",
+                                         a[0], a[0].split(".")[0], a[0].split(".")[1][0], a[0].split(".")[1][1:], a[1]])
