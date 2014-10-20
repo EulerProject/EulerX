@@ -110,8 +110,9 @@ def main(isaFile, inFile):
                     writer.writerow([i[0], i[1], " ", "?", "?"])
                 else:
                     for a in artMate:
-                        writer.writerow([i[0], i[0].split(".")[0], i[0].split(".")[1][0], i[0].split(".")[1][1:], i[1], "?",
-                                         a[0], a[0].split(".")[0], a[0].split(".")[1][0], a[0].split(".")[1][1:], a[1]])
+	                if i[0].split(".")[0] == source.split(".")[0]:
+                            writer.writerow([i[0], i[0].split(".")[0], i[0].split(".")[1][0], i[0].split(".")[1][1:], i[1], "?",
+                                             a[0], a[0].split(".")[0], a[0].split(".")[1][0], a[0].split(".")[1][1:], a[1]])
 
 # MAIN
 if __name__ == '__main__':
