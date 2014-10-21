@@ -582,8 +582,6 @@ class TaxonomyMapping:
                 if self.args.verbose: print items[j],rel
                 dotc1 = self.dlvName2dot(rel[0])
                 dotc2 = self.dlvName2dot(rel[1])
-                print "rel[1]=", rel[1]
-                print "dotc2=", dotc2
                 if self.args.verbose: print dotc1,rel[2],dotc2
                 if j != 0: outputstr += ", "
                 outputstr += dotc1+rel[2]+dotc2
