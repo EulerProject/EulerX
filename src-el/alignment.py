@@ -582,6 +582,8 @@ class TaxonomyMapping:
                 if self.args.verbose: print items[j],rel
                 dotc1 = self.dlvName2dot(rel[0])
                 dotc2 = self.dlvName2dot(rel[1])
+                print "rel[1]=", rel[1]
+                print "dotc2=", dotc2
                 if self.args.verbose: print dotc1,rel[2],dotc2
                 if j != 0: outputstr += ", "
                 outputstr += dotc1+rel[2]+dotc2
@@ -2003,20 +2005,20 @@ class TaxonomyMapping:
     def dlvName2dot(self, dlvName):
         if(dlvName.find("_not_") != -1):
             elems = re.match("(.*)_not_(.*)", dlvName)
-            conc1 = re.match("c(.*)_(.*)", elems.group(1))
-            conc2 = re.match("c(.*)_(.*)", elems.group(2))
+            conc1 = re.match("c(.*?)_(.*)", elems.group(1))
+            conc2 = re.match("c(.*?)_(.*)", elems.group(2))
             return conc1.group(1) + "." + conc1.group(2) + "\\\\"\
                   +conc2.group(1) + "." + conc2.group(2)
         elif(dlvName.find("not_") != -1):
             elems = re.match("not_(.*)__(.*)", dlvName)
-            conc1 = re.match("c(.*)_(.*)", elems.group(1))
-            conc2 = re.match("c(.*)_(.*)", elems.group(2))
+            conc1 = re.match("c(.*?)_(.*)", elems.group(1))
+            conc2 = re.match("c(.*?)_(.*)", elems.group(2))
             return conc2.group(1) + "." + conc2.group(2) + "\\\\"\
                   +conc1.group(1) + "." + conc1.group(2)
         elif(dlvName.find("__") != -1):
             elems = re.match("(.*)__(.*)", dlvName)
-            conc1 = re.match("c(.*)_(.*)", elems.group(1))
-            conc2 = re.match("c(.*)_(.*)", elems.group(2))
+            conc1 = re.match("c(.*?)_(.*)", elems.group(1))
+            conc2 = re.match("c(.*?)_(.*)", elems.group(2))
             return conc1.group(1) + "." + conc1.group(2) + "*"\
                   +conc2.group(1) + "." + conc2.group(2)
         else:
