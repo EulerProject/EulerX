@@ -97,5 +97,12 @@ class EulerParser:
                                               help="input visualization")
             EulerParser.inst.add_argument("--simpall", action="store_true", dest="simpAllView", default=False,\
                                   help="simplify the pw aggregate view")
+            EulerParser.inst.add_argument("--diaglat", dest="diaglat", help="diagnostic lattice for inconsistent example")
+            EulerParser.inst.add_argument("--addID", nargs="*", dest="addID", help="input wizard, addID")
+            EulerParser.inst.add_argument("--addIsa", dest="addIsa", help="input wizard, addIsa")
+            EulerParser.inst.add_argument("--p2c", dest="p2c", help="input wizard, p2c")
+            EulerParser.inst.add_argument("--p2ct", nargs="*", dest="p2ct", help="input wizard, p2c -t")
+            EulerParser.inst.add_argument("--addArt", dest="addArt", help="input wizard, addArt")
+            EulerParser.inst.add_argument("--addArtT", nargs="*", dest="addArtT", help="input wizard, addArt -t")
             EulerParser.inst.add_argument('--version', action='version', version='<the version>')
         return EulerParser.inst

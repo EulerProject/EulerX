@@ -15,5 +15,5 @@ python awf.py -filter=i,o expWorlds.asp;
 echo "running euler to get MIS...";
 euler -i $input -e mnpw --repair=HST > output.txt;
 echo "from MIS to MAC and get lattice..."
-python lattice.py $input;
+python lattice.py $input $curdir;
 echo "finish";

@@ -9,21 +9,39 @@
 from parser import *
 from runner import *
 from generator import *
+from externaltools import *
 
 def main():
 
 	elParser = EulerParser.instance()
-	ctiParser = CtiParser.instance()
+	#ctiParser = CtiParser.instance()
 	args = elParser.parse_args()
 	if args.verbose:
 		print args
 	if args.inputfile is None:
-		if args.generateCti is False:
-			print "Invalid input: -i/-g must be specified, please run euler -h for more information"
-			return None
-		else:
+		# artificial example generator
+		if args.generateCti:
 			generator = CtiGenerator.instance()
 			generator.run(args)
+		# input wizard
+		elif args.diaglat:
+			runLattice(args.diaglat)
+		elif args.addID:
+			runAddID(args.addID)
+		elif args.addIsa:
+			runAddIsa(args.addIsa)
+		elif args.p2c:
+			runP2C(args.p2c)
+		elif args.p2ct:
+			runP2CT(args.p2ct)
+		elif args.addArt:
+			runAddArt(args.addArt)
+		elif args.addArtT:
+			runAddArtT(args.addArtT)				
+		# wrong argument
+		else:
+			print "Invalid input: -i/-g must be specified, please run euler -h for more information"
+			return None
 	else:
 		if args.generateCti is False:
 			if not reasoner.has_key(args.reasoner):
@@ -36,7 +54,7 @@ def main():
 			return None
 
 if __name__ == '__main__':
-	start_time = time.time()
+	#start_time = time.time()
 	main()
-	print "\n===> Execution time: " + (time.time() - start_time).__str__() + " seconds\n"
+	#print "\n===> Execution time: " + (time.time() - start_time).__str__() + " seconds\n"
 	
