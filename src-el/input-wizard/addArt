@@ -56,6 +56,7 @@ def main(isaFile, inFile):
             
     # look for possible articulation pairs
     for d in data:
+        leavesRank = max(i[3] for i in data[d])
         # articulations are defined from leaves to root
         data[d] = sorted(data[d], key=itemgetter(3), reverse=True)
         for taxa1 in data[d]:
@@ -72,10 +73,10 @@ def main(isaFile, inFile):
                         art.append([taxa2[0],taxa2[1],taxa2[3]])
                         # keep the source group; this will be needed in CleanTax script,
                         # where all articulations have the same source node
-                        source = i
+                        source = taxa2[0].split(".")[0]
                     elif art == [] and rank1 - rank2 >= 1:
                         art.append([taxa2[0], taxa2[1], taxa2[3]])
-                        source = i
+                        source = taxa2[0].split(".")[0]
                     # if the two elements are on the same rank and no articulation is defined between their children
                     elif isaFile != "" and rank1 == rank2:
                         if taxa1[0] in isaMap:
@@ -110,7 +111,7 @@ def main(isaFile, inFile):
                     writer.writerow([i[0], i[1], " ", "?", "?"])
                 else:
                     for a in artMate:
-	                if i[0].split(".")[0] == source.split(".")[0]:
+	                if i[0].split(".")[0] == source:
                             writer.writerow([i[0], i[0].split(".")[0], i[0].split(".")[1][0], i[0].split(".")[1][1:], i[1], "?",
                                              a[0], a[0].split(".")[0], a[0].split(".")[1][0], a[0].split(".")[1][1:], a[1]])
 
