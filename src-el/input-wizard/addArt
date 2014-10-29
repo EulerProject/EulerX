@@ -16,7 +16,7 @@ dict_data = {}
 isaMap = {}
 artMap = {}
 data = {}
-
+inv_taxon_dictionary = {v: k for k, v in taxon_dictionary.rank2num.items()}
 
 
 def main(isaFile, inFile):
@@ -56,7 +56,6 @@ def main(isaFile, inFile):
             
     # look for possible articulation pairs
     for d in data:
-        leavesRank = max(i[3] for i in data[d])
         # articulations are defined from leaves to root
         data[d] = sorted(data[d], key=itemgetter(3), reverse=True)
         for taxa1 in data[d]:
@@ -69,8 +68,13 @@ def main(isaFile, inFile):
                  #if the two elements belong to the same taxonomy groups look for potential articulations
                 if g1 != g2:
                     # if they are both at species rank and the first 3 letters on their epithets is the same
-                    if rank1 == 74 and rank2 == 74 and taxa1[1].split(" ")[1][0:3] == taxa2[1].split(" ")[1][0:3]:
-                        art.append([taxa2[0],taxa2[1],taxa2[3]])
+                    if rank1 == 74 and rank2 == 74:
+                        if len(taxa1) >= 3:
+                            if taxa1[1].replace("_"," ").split(" ")[1][0:3] == taxa2[1].replace("_"," ").split(" ")[1][0:3]:
+                                art.append([taxa2[0],taxa2[1],taxa2[3]])
+                        else:
+                            if taxa1[1].replace("_"," ").split(" ")[1][-2:] == taxa2[1].replace("_"," ").split(" ")[1][-2:]:
+                                art.append([taxa2[0],taxa2[1],taxa2[3]])
                         # keep the source group; this will be needed in CleanTax script,
                         # where all articulations have the same source node
                         source = taxa2[0].split(".")[0]
@@ -100,20 +104,25 @@ def main(isaFile, inFile):
                 artMap.update({taxa1[0]: art})
     with sys.stdout as oFile:
         writer = csv.writer(oFile)
-        writer.writerow(["ID1", "Taxonomy1", "TaxId1", "Rank1", "SciName1", "Relation", "ID2", "Taxonomy2", "TaxId2", "Rank2",
+        writer.writerow(["ID1", "Taxonomy1", "Rank1", "TaxId1", "SciName1", "Relation", "ID2", "Taxonomy2","Rank2", "TaxId2",
                          "SciName2"])
         for d in data:
             for i in data[d]:
                 artMate = artMap.get(i[0],[])
             # if the element is at the lowest rank and yet has no suggested articulation,
             #  ask user to define the articulation for it
-                if i[0].split(".")[0] == source and artMate == [] and i[3] == leavesRank:
+                if i[0].split(".")[0] == source and artMate == [] and i[3] == 74:
                     writer.writerow([i[0], i[1], " ", "?", "?"])
                 else:
                     for a in artMate:
+                        for k in inv_taxon_dictionary:
+                            if k[1] == i[0].split(".")[1][0]:
+                                rank1 = inv_taxon_dictionary[k]
+                            if k[1] == a[0].split(".")[1][0]:
+                                rank2 = inv_taxon_dictionary[k]
 	                if i[0].split(".")[0] == source:
-                            writer.writerow([i[0], i[0].split(".")[0], i[0].split(".")[1][0], i[0].split(".")[1][1:], i[1], "?",
-                                             a[0], a[0].split(".")[0], a[0].split(".")[1][0], a[0].split(".")[1][1:], a[1]])
+                            writer.writerow([i[0], i[0].split(".")[0], rank1, i[0].split(".")[1][1:], i[1], "?",
+                                             a[0], a[0].split(".")[0], rank2, a[0].split(".")[1][1:], a[1]])
 
 # MAIN
 if __name__ == '__main__':
