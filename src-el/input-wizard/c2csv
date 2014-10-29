@@ -1,0 +1,49 @@
+#! /usr/bin/env python
+# __author__ = "Parisa Kianmajd"
+#__version__ = "1.0.1"
+# input: a text file in CleanTax format
+# output: a csv file with three columns <Name, Author, Rank>
+
+
+import sys
+import csv
+import itertools
+
+
+def findRank(e):
+    if len(e.split("_")) == 3:
+           return "Subspecies"
+    if len(e.split("_")) == 2:
+        return "Species"
+    if len(e.split("_")) == 1:
+        if e.endswith("ini"):
+            return "Tribe"
+        elif e.endswith("inae"):
+            return "Subfamily"
+        elif e.endswith("idae"):
+            return "Family"
+        elif e.endswith("oidea"):
+            return "Superfamily"
+        else:
+            return "Genus"
+    return "Undefined"
+    
+outData = []
+with sys.stdin as iFile:
+        for line in iFile.readlines():
+            if line.startswith("taxonomy"):
+                author = line.split("taxonomy ")[1]
+            if line.startswith("("):
+                elements = line[1:-2]. strip(")").split(" ")
+                for e in elements:
+                    rank = findRank(e)
+                    outData.append([e, author[:-1], rank])
+            if line.startswith("articulation"):
+                exit
+outData.sort()
+outData = list(outData for outData,_ in itertools.groupby(outData))
+with sys.stdout as oFile:
+        writer = csv.writer(oFile)
+        writer.writerow(["Name", "Author", "Rank"])
+        for d in outData:
+            writer.writerow(d)
