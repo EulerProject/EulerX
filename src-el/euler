@@ -37,7 +37,9 @@ def main():
 		elif args.addArt:
 			runAddArt(args.addArt)
 		elif args.addArtT:
-			runAddArtT(args.addArtT)				
+			runAddArtT(args.addArtT)	
+		elif args.c2csv:
+			runC2CSV(args.c2csv)				
 		# wrong argument
 		else:
 			print "Invalid input: -i/-g must be specified, please run euler -h for more information"
