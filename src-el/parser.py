@@ -103,6 +103,7 @@ class EulerParser:
             EulerParser.inst.add_argument("--p2c", dest="p2c", help="input wizard, p2c")
             EulerParser.inst.add_argument("--p2ct", nargs="*", dest="p2ct", help="input wizard, p2c -t")
             EulerParser.inst.add_argument("--addArt", dest="addArt", help="input wizard, addArt")
+            EulerParser.inst.add_argument("--c2csv", dest="c2csv", help="input wizard, c2csv")
             EulerParser.inst.add_argument("--addArtT", nargs="*", dest="addArtT", help="input wizard, addArt -t")
             EulerParser.inst.add_argument('--version', action='version', version='<the version>')
         return EulerParser.inst
