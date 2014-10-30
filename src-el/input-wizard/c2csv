@@ -8,6 +8,7 @@
 import sys
 import csv
 import itertools
+import wizardParser
 
 
 def findRank(e):
@@ -27,23 +28,31 @@ def findRank(e):
         else:
             return "Genus"
     return "Undefined"
-    
-outData = []
-with sys.stdin as iFile:
-        for line in iFile.readlines():
-            if line.startswith("taxonomy"):
-                author = line.split("taxonomy ")[1]
-            if line.startswith("("):
-                elements = line[1:-2]. strip(")").split(" ")
-                for e in elements:
-                    rank = findRank(e)
-                    outData.append([e, author[:-1], rank])
-            if line.startswith("articulation"):
-                exit
-outData.sort()
-outData = list(outData for outData,_ in itertools.groupby(outData))
-with sys.stdout as oFile:
-        writer = csv.writer(oFile)
-        writer.writerow(["Name", "Author", "Rank"])
-        for d in outData:
-            writer.writerow(d)
+
+def main(iFile):
+    outData = []
+    inputData = []
+    for n in iFile:
+        inputData += open(n).readlines() 
+    for line in inputData:
+        if line.startswith("taxonomy"):
+            author = line.split("taxonomy ")[1]
+        if line.startswith("("):
+            elements = line[1:-2]. strip(")").split(" ")
+            for e in elements:
+                rank = findRank(e)
+                outData.append([e, author[:-1], rank])
+        if line.startswith("articulation"):
+            exit
+    outData.sort()
+    outData = list(outData for outData,_ in itertools.groupby(outData))
+    with sys.stdout as oFile:
+            writer = csv.writer(oFile)
+            writer.writerow(["Name", "Author", "Rank"])
+            for d in outData:
+                writer.writerow(d)
+
+
+# MAIN
+if __name__ == '__main__':
+    main(wizardParser.args.iFile)
