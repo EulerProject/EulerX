@@ -15,9 +15,12 @@ def main(files):
     inputData = []
     data = {}
     isDict = {}
+    inputName = ""
 
     for n in files:
             inputData += csv.DictReader(open(n)) 
+            inputName += n[:-4]
+
 
     try:
         for row in inputData:
@@ -65,7 +68,7 @@ def main(files):
         isaMap[k.split(".")[0]].update({k:isDict[k]})
    
     for g in isaMap:
-        with open("isa" + g + ".csv",  'w+') as oFile:
+        with open(inputName + "_isa" + g + ".csv",  'w+') as oFile:
             writer = csv.writer(oFile)
             writer.writerow(["ID1","Taxonomy1", "TaxId1", "Rank1", "SciName1", "Relation", "ID2", "Taxonomy2", "TaxId2", "Rank2",
                              "SciName2"])
