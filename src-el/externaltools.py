@@ -26,5 +26,5 @@ def runAddArtT(fileName):
     for i in range(1, len(fileName)):
         s = s + " -t " + fileName[i]
     call("input-wizard/addArt -i " + fileName[0] + s, shell=True)
-def runc2csv(fileName):
+def runC2CSV(fileName):
     call("input-wizard/c2csv -i " + fileName, shell=True)
