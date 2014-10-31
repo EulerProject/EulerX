@@ -7,24 +7,25 @@ def runAddID(fileName):
     s = ""
     for i in range(len(fileName)):
         s = s + " -i " + fileName[i]
-    call("input-wizard/addID" + s, shell=True)
+    call("addID" + s, shell=True)
     
 def runAddIsa(fileName):
-    call("input-wizard/addIsa -i " + fileName, shell=True)
+    call("addIsa -i " + fileName, shell=True)
 
 def runP2C(fileName):
-    call("input-wizard/p2c -i " + fileName, shell=True)
+    call("p2c -i " + fileName, shell=True)
 
 def runP2CT(fileName):
-    call("input-wizard/p2c -i " + fileName[0] + " -t " + fileName[1], shell=True)
+    call("p2c -i " + fileName[0] + " -t " + fileName[1], shell=True)
 
 def runAddArt(fileName):
-    call("input-wizard/addArt -i " + fileName, shell=True)
+    call("addArt -i " + fileName, shell=True)
 
 def runAddArtT(fileName):
     s = ""
     for i in range(1, len(fileName)):
         s = s + " -t " + fileName[i]
-    call("input-wizard/addArt -i " + fileName[0] + s, shell=True)
+    call("addArt -i " + fileName[0] + s, shell=True)
+
 def runC2CSV(fileName):
-    call("input-wizard/c2csv -i " + fileName, shell=True)
+    call("c2csv -i " + fileName, shell=True)
