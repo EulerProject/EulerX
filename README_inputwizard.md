@@ -9,7 +9,9 @@ addIsa - takes one (or more) input files, groups them based on groupID outputs f
 
 addArt - takes one (or more) input files, and optionally one (or more) files of suggested ISA pairs, and outputs a set of suggested articulation pairs between the groups elements
 
-p2c - generate a txt file with CleanTax syntax from pairs csv file
+p2c - generates a txt file with CleanTax syntax from pairs csv file
+
+c2csv - generates a 3 column csv file from a cleanTax file
 
 SYNOPSIS
 ./addID -i csv_file -i csv_file .... > csv_file
@@ -19,6 +21,8 @@ SYNOPSIS
 ./addArt -i csv_file -i csv_file ....  -t isa1_csv_file -t -t isa2_csv_file > csv_file
 
 ./p2c  csv_file -i  csv_file> cleanTax_file 
+
+./c2csv  -i  cleanTax_file > csv_file 
 
 DESCRIPTION
  addID
@@ -41,3 +45,7 @@ the user is then asked to revise these relations and replace the ? with appropri
 
  p2c
 Receives a csv file of revised articulation or ISA pairs, or both as well as the input file with the name of each taxonomic group, and converts it to standard cleanTax format.  
+
+c2csv
+Receives a cleanTax file as input and returns a 3 column <Name, Author, Rank> csv file that can be used as an input for input wizard. 
+The goal is to reverse engineer cleanTax files and compared the suggested articulation pairs by input wizard with the correct ones to gauge its efficiency.
