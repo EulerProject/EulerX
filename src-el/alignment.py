@@ -2053,27 +2053,27 @@ class TaxonomyMapping:
             if (r[2] == "lsum"):
                 self.addIMir(r[3], r[0], provenance)
                 self.addIMir(r[3], r[1], provenance)
-                self.mir[r[0] + "," + r[3]] = rcc5["is_included_in"]
-                self.mir[r[1] + "," + r[3]] = rcc5["is_included_in"]
+                self.mir[r[0] + "," + r[3]] = rcc5["is_included_in"] | relation["input"] 
+                self.mir[r[1] + "," + r[3]] = rcc5["is_included_in"] | relation["input"]
                 self.tr.append([r[0],r[3], provenance])
                 self.tr.append([r[1],r[3], provenance])
                 return None
             elif (r[1] == "rsum"):
                 self.addIMir(r[0], r[2], provenance)
                 self.addIMir(r[0], r[3], provenance)
-                self.mir[r[0] + "," + r[2]] = rcc5["includes"]
-                self.mir[r[0] + "," + r[3]] = rcc5["includes"]
+                self.mir[r[0] + "," + r[2]] = rcc5["includes"] | relation["input"]
+                self.mir[r[0] + "," + r[3]] = rcc5["includes"] | relation["input"]
                 self.tr.append([r[2], r[0], provenance])
                 self.tr.append([r[3], r[0], provenance])
                 return None
             elif (r[2] == "ldiff"):
                 self.addIMir(r[0], r[3], provenance)
-                self.mir[r[0] + "," + r[3]] = rcc5["includes"]
+                self.mir[r[0] + "," + r[3]] = rcc5["includes"] | relation["input"]
                 self.tr.append([r[3], r[0], provenance])
                 return None
             elif (r[1] == "rdiff"):
                 self.addIMir(r[3], r[0], provenance)
-                self.mir[r[3] + "," + r[0]] = rcc5["is_included_in"]
+                self.mir[r[3] + "," + r[0]] = rcc5["is_included_in"] | relation["input"]
                 self.tr.append([r[3], r[0], provenance])
                 return None
         elif (len(r) == 5):
@@ -2081,9 +2081,9 @@ class TaxonomyMapping:
                 self.addIMir(r[4], r[0], provenance)
                 self.addIMir(r[4], r[1], provenance)
                 self.addIMir(r[4], r[2], provenance)
-                self.mir[r[0] + "," + r[4]] = rcc5["is_included_in"]
-                self.mir[r[1] + "," + r[4]] = rcc5["is_included_in"]
-                self.mir[r[2] + "," + r[4]] = rcc5["is_included_in"]
+                self.mir[r[0] + "," + r[4]] = rcc5["is_included_in"] | relation["input"]
+                self.mir[r[1] + "," + r[4]] = rcc5["is_included_in"] | relation["input"]
+                self.mir[r[2] + "," + r[4]] = rcc5["is_included_in"] | relation["input"]
                 self.tr.append([r[0],r[4], provenance])
                 self.tr.append([r[1],r[4], provenance])
                 self.tr.append([r[2],r[4], provenance])
@@ -2092,9 +2092,9 @@ class TaxonomyMapping:
                 self.addIMir(r[0], r[2], provenance)
                 self.addIMir(r[0], r[3], provenance)
                 self.addIMir(r[0], r[4], provenance)
-                self.mir[r[0] + "," + r[2]] = rcc5["includes"]
-                self.mir[r[0] + "," + r[3]] = rcc5["includes"]
-                self.mir[r[0] + "," + r[4]] = rcc5["includes"]
+                self.mir[r[0] + "," + r[2]] = rcc5["includes"] | relation["input"]
+                self.mir[r[0] + "," + r[3]] = rcc5["includes"] | relation["input"]
+                self.mir[r[0] + "," + r[4]] = rcc5["includes"] | relation["input"]
                 self.tr.append([r[2], r[0], provenance])
                 self.tr.append([r[3], r[0], provenance])
                 self.tr.append([r[4], r[0], provenance])
@@ -2105,10 +2105,10 @@ class TaxonomyMapping:
                 self.addIMir(r[5], r[1], provenance)
                 self.addIMir(r[5], r[2], provenance)
                 self.addIMir(r[5], r[3], provenance)
-                self.mir[r[0] + "," + r[5]] = rcc5["is_included_in"]
-                self.mir[r[1] + "," + r[5]] = rcc5["is_included_in"]
-                self.mir[r[2] + "," + r[5]] = rcc5["is_included_in"]
-                self.mir[r[3] + "," + r[5]] = rcc5["is_included_in"]
+                self.mir[r[0] + "," + r[5]] = rcc5["is_included_in"] | relation["input"]
+                self.mir[r[1] + "," + r[5]] = rcc5["is_included_in"] | relation["input"]
+                self.mir[r[2] + "," + r[5]] = rcc5["is_included_in"] | relation["input"]
+                self.mir[r[3] + "," + r[5]] = rcc5["is_included_in"] | relation["input"]
                 self.tr.append([r[0],r[5], provenance])
                 self.tr.append([r[1],r[5], provenance])
                 self.tr.append([r[2],r[5], provenance])
@@ -2119,17 +2119,17 @@ class TaxonomyMapping:
                 self.addIMir(r[0], r[3], provenance)
                 self.addIMir(r[0], r[4], provenance)
                 self.addIMir(r[0], r[5], provenance)
-                self.mir[r[0] + "," + r[2]] = rcc5["includes"]
-                self.mir[r[0] + "," + r[3]] = rcc5["includes"]
-                self.mir[r[0] + "," + r[4]] = rcc5["includes"]
-                self.mir[r[0] + "," + r[5]] = rcc5["includes"]
+                self.mir[r[0] + "," + r[2]] = rcc5["includes"] | relation["input"]
+                self.mir[r[0] + "," + r[3]] = rcc5["includes"] | relation["input"]
+                self.mir[r[0] + "," + r[4]] = rcc5["includes"] | relation["input"]
+                self.mir[r[0] + "," + r[5]] = rcc5["includes"] | relation["input"]
                 self.tr.append([r[2],r[0], provenance])
                 self.tr.append([r[3],r[0], provenance])
                 self.tr.append([r[4],r[0], provenance])
                 self.tr.append([r[5],r[0], provenance])
                 return None
         if rcc5.has_key(r[1]):
-            self.mir[r[0] + "," + r[2]] = rcc5[r[1]]
+            self.mir[r[0] + "," + r[2]] = rcc5[r[1]] | relation["input"]            
 
     def addDMir(self, tName, child, sibling):
         self.mir[tName + "." + child + "," + tName + "." + sibling] = rcc5["disjoint"]
@@ -2193,8 +2193,10 @@ class TaxonomyMapping:
             if self.mir.has_key(pairkey) and self.mir[pairkey] != 0:
                 if self.mir[pairkey] & relation["infer"]:
                     hint = "inferred"
-                else:
+                elif self.mir[pairkey] & relation["input"]:
                     hint = "input"
+                else:
+                    hint = "deduced"
 #                    hint = "deduced"
                 if self.args.countOn:
                     for i in range(5):
@@ -2204,9 +2206,9 @@ class TaxonomyMapping:
 #                                +self.mirc[pairkey][i].__str__()+","+self.npw.__str__()+"\n")
                 else:
 #                fmir.write(pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"])+"\n")
-                    mirList.append([pairkey1, findkey(relation, self.mir[pairkey] & ~relation["infer"]), pairkey2, hint])
+                    mirList.append([pairkey1, findkey(relation, self.mir[pairkey] & ~relation["infer"] & ~relation["input"]), pairkey2, hint])
                     if self.args.verbose:
-                        print pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"])+"\n"
+                        print pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"] & ~relation["input"])+"\n"
             else:
                 self.mir[pairkey] = self.getPairMir(pair)
                 rl = findkey(relation, self.mir[pairkey])

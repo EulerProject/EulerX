@@ -26,7 +26,8 @@ relation["!"] = 1 << 3
 #relation["<>"] = 1 << 3
 relation["><"] = 1 << 4
 # Imfer bit
-relation["infer"] = 1 << 5
+relation["input"] = 1 << 5
+relation["infer"] = 1 << 6
 relation["{=, >}"] = 1 << 0 | 1 << 1
 relation["{=, <}"] = 1 << 0 | 1 << 2
 relation["{=, !}"] = 1 << 0 | 1 << 3
@@ -53,13 +54,13 @@ relation["{=, >, !, ><}"] = 1 << 0 | 1 << 1 | 1 << 3 | 1 << 4
 relation["{=, <, !, ><}"] = 1 << 0 | 1 << 2 | 1 << 3 | 1 << 4
 relation["{>, <, !, ><}"] = 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4
 relation["{=, >, <, !, ><}"] = 1 << 0 | 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4
-relation["+="] = 1 << 5 #lsum
-relation["=+"] = (1 << 5) + 1 #rsum
-relation["+3="] = 1 << 6 #l3sum
-relation["=3+"] = (1 << 6) + 1 #r3sum
-relation["+4="] = 1 << 7 #l4sum
-relation["-="] = 1 << 8 #ldiff
-relation["=-"] = (1 << 8) + 1 #rdiff
+relation["+="] = 1 << 7 #lsum
+relation["=+"] = (1 << 7) + 1 #rsum
+relation["+3="] = 1 << 8 #l3sum
+relation["=3+"] = (1 << 8) + 1 #r3sum
+relation["+4="] = 1 << 9 #l4sum
+relation["-="] = 1 << 10 #ldiff
+relation["=-"] = (1 << 10) + 1 #rdiff
 
 relstr={}
 relstr[0] = "equals"
