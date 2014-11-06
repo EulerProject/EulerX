@@ -378,7 +378,7 @@ class TaxonomyMapping:
             ie = commands.getoutput(com)
             ie.replace(" ", ", ")
         else:
-            com = "dlv -silent -filter=ie -n=1 "+self.pwfile+" "+self.ixswitch
+            com = "dlv -silent -filter=ie "+self.pwfile+" "+self.ixswitch
             ie = commands.getoutput(com)
             ie.replace("{", "").replace("}", "")
         self.postProcessIE(ie);
@@ -426,7 +426,7 @@ class TaxonomyMapping:
                 self.getDiag(diagraw)
                 #print "Min inconsistent subsets: "
                 #print diag
-                
+            
             fie = open(self.iefile, 'w')
             fie.write("strict digraph "+self.name+"_ie {\n\nrankdir = LR\n\n")
             #fie.write("subgraph rules {\n")
@@ -440,10 +440,17 @@ class TaxonomyMapping:
             for key in tmpmap.keys():
                 for value in tmpmap[key]:
                     fie.write("\""+value+"\" -> \"inconsistency="+key.__str__()+":"+tmpmap[key].__str__()+"\" \n")
+            # Add legend
             label=""
             for key in self.rules.keys():
-                label += key+" : "+self.rules[key]+"\t"
-            fie.write("graph [label=\""+label+"\"]\n")
+                #label += key+" : "+self.rules[key]+"\t"
+                label += "<TR> \n <TD>" + key + "</TD> \n <TD>" + self.rules[key] + "</TD> \n </TR> \n"
+            #fie.write("graph [label=\""+label+"\"]\n")
+            #fie.write("}")
+            fie.write("node[shape=box] \n")
+            fie.write('{rank=sink Legend [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
+            fie.write(label)
+            fie.write("</TABLE> \n >] } \n")
             fie.write("}")
             fie.close()
             commands.getoutput("dot -Tpdf "+self.iefile+" -o "+self.iepdf)
