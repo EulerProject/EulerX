@@ -41,7 +41,7 @@ def apply_style(data_file, f):
                     wList.append(data[key]["w"])
                 else:
                     wList.append("1")
-                if value["label"] in ["==", "><", "!", ">" , "<"] or "OR" in value["label"]:
+                if value["label"] in ["==", "><", "!", ">" , "<"] or "OR" in str(value["label"]):
                     edges["Art."].append(value.items())
                 elif value["label"] == "isa":
                     # separate "isa" edges based on their group
@@ -127,7 +127,7 @@ def apply_style(data_file, f):
                 f.write(' [label="' + w + '"]')
         # check options for displaying label
             elif (style["display"] == "label"):
-                f.write(' [label="' + e[-1][1] + '"]')
+                f.write(' [label="' + str(e[-1][1]) + '"]')
             elif style["display"] != "":
                 f.write(' [label="' + style["display"] + '"]')
             if style["penwidth"] == "on":
