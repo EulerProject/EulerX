@@ -18,7 +18,7 @@
     - 
       label: "input"
       dot: "arrowhead=normal style=solid color=\"#000000\" constraint=true penwidth=1"
-      display: ""
+      display: "(w)display"
       penwidth: "off"
     - 
       label: "inferred"
@@ -32,6 +32,11 @@
       penwidth: "off"
     - 
       label: "redundant"
+      dot: "arrowhead=normal style=dotted color=\"#000000\" constraint=true penwidth=1"
+      display: ""
+      penwidth: "off"
+    - 
+      label: "default"
       dot: "arrowhead=normal style=dotted color=\"#000000\" constraint=true penwidth=1"
       display: ""
       penwidth: "off"
