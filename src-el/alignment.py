@@ -511,7 +511,7 @@ class TaxonomyMapping:
             raise Exception("Reasoner:", self.args.reasoner, " is not supported !!")
 
     def genPW(self):
-        self.pw = commands.getoutput(self.com)
+        self.pw = commands.getoutput(self.com) 
         if self.isPwNone():
             print "************************************"
             print "Input is inconsistent"
@@ -586,12 +586,15 @@ class TaxonomyMapping:
             if self.args.verbose: print len(items),items
             for j in range(len(items)):
                 rel = items[j].replace(ss+"(","").replace(")","").split(",")
-                if self.args.verbose: print items[j],rel
+                if self.args.verbose: print items[j],rel 
                 dotc1 = self.dlvName2dot(rel[0])
                 dotc2 = self.dlvName2dot(rel[1])
                 if self.args.verbose: print dotc1,rel[2],dotc2
                 if j != 0: outputstr += ", "
-                outputstr += dotc1+rel[2]+dotc2
+                if dotc1.split(".")[0] == self.firstTName:
+                    outputstr += dotc1+rel[2]+dotc2
+                else:
+                    outputstr += dotc2+rel[2]+dotc1
                 pair = dotc1+","+dotc2
                 if self.args.cluster: pwmirs[i][pair] = rcc5[rel[2]]
                 # RCG
@@ -2184,12 +2187,18 @@ class TaxonomyMapping:
                     self.mir[newPair] = rcc5["includes"]
                     
     # Output all the mir relations in the csv file
-    def genMir(self):       
+    def genMir(self):
+        self.completeMir(self.mir)
         fmir = open(self.mirfile, 'w')
         # Get the pairs as needed
         pairs =      self.getAllTaxonPairs()\
                 if self.allPairsNeeded()\
                 else self.getAllArticulationPairs()
+        if pairs[0][0].dotName().split(".")[0] != self.firstTName:
+            tmp = []
+            for pair in pairs:
+                tmp.append((pair[1], pair[0]))
+            pairs = tmp
         mirList = []
         for pair in pairs:
             pairkey = pair[0].dotName() + "," + pair[1].dotName()
@@ -2274,6 +2283,23 @@ class TaxonomyMapping:
                 return 0
             result = result | t.result
         return result
+    
+    def completeMir(self, mir):
+        revmir = {}
+        for pair,rel in mir.iteritems():
+            revpair = pair.split(",")[1] + "," + pair.split(",")[0]
+            revrel = rel
+            if revpair not in mir:
+                if rel & relation[">"] != 0 and rel & relation["<"] != 0:
+                    pass
+                elif rel & relation[">"] != 0:
+                    revrel = rel | relation["<"]
+                    revrel = revrel & (relation["{=, <, !, ><}"] | relation["input"] | relation["infer"])
+                elif rel & relation["<"] != 0:
+                    revrel = rel | relation[">"]
+                    revrel = revrel & (relation["{=, >, !, ><}"] | relation["input"] | relation["infer"])
+                revmir[revpair] = revrel
+        mir = mir.update(revmir)
                     
     def remove_duplicate_string(self,li):
         if li:
