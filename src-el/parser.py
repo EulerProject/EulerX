@@ -82,6 +82,8 @@ class EulerParser:
                                               help="output the distance between possible worlds")
             EulerParser.inst.add_argument("--simpcluster", action="store_true", dest="simpCluster", default=False,\
                                               help="simplify the possible world cluster, by default switch off")
+            EulerParser.inst.add_argument("--hierarchy", action="store_true", dest="hierarchy", default=False,\
+                                              help="hierarchical aggregate view, by default switch off")
             EulerParser.inst.add_argument("-N", action="store_false", dest="output", default=True,\
                                               help="no output")
             EulerParser.inst.add_argument("-g", action="store_true", dest="generateCti", default=False,\
