@@ -2482,9 +2482,10 @@ class TaxonomyMapping:
 
     def addRcgAllVizEdge(self, s, t, label, allRcgEdgesDict): #here label is the frequency of the edge among all PWs
         edge = {}
+        edge.update({"label" : label})
         edge.update({"s" : s})
         edge.update({"t" : t})
-        edge.update({"label" : label})
+        edge.update({"w" : label})
         allRcgEdgesDict.update({s + "_" + t : edge})
 
     def addClusterVizNode(self, concept):
