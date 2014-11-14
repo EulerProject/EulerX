@@ -1,4 +1,5 @@
 import sys
+import commands
 
 class Callable:
     def __init__(self, callable):
@@ -24,3 +25,11 @@ class Logger(object):
     def write(self, message):
         self.terminal.write(message)
         self.log.write(message)
+
+def newgetoutput(cmd):
+    result = commands.getstatusoutput(cmd)
+    if result[0] != 0:
+        print "exit status: ", result[0]
+        return
+    else:
+        return result[1]
