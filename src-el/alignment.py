@@ -187,6 +187,11 @@ class TaxonomyMapping:
             self.clyaml = os.path.join(self.pwsclusterdir, self.name+"_cl.yaml")
             self.cldotpdf = os.path.join(self.pwsclusterdir, self.name+"_cl_dot.pdf")
             self.clneatopdf = os.path.join(self.pwsclusterdir, self.name+"_cl_neato.pdf")
+        if self.args.hierarchy:
+            self.hierarchydir = os.path.join(args.outputdir, "9-PWs-hierarchy")
+            if not os.path.exists(self.hierarchydir):
+                os.mkdir(self.hierarchydir)
+            self.hrdot = os.path.join(self.hierarchydir, self.name+"_hr.dot")
         self.iefile = os.path.join(self.pwsdotdir, self.name+"_ie.dot")
         self.iepdf = os.path.join(self.pwspdfdir, self.name+"_ie.pdf")
         #self.ivpdf = os.path.join(self.pwspdfdir, self.name+"_iv.pdf")
@@ -631,6 +636,7 @@ class TaxonomyMapping:
                 for e in pwTm.tr:
                     self.trlist.append(e)
         self.genAllPwRcg(len(pws), allRcgEdgesDict)
+        self.genColor(len(pws), 6) # will be used in y2d?? use 6 for example 
         fAllDot.close()
         commands.getoutput("dot -Tpdf "+rcgAllDotFile+" -o "+rcgAllPdfFile)
         
@@ -2342,10 +2348,37 @@ class TaxonomyMapping:
                     fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",color=\"#00FF00\"];\n")
         else:
             for [T1, T2, cnt, color] in rels:
-                fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",penwidth=" + str(cnt) + ",color=\"" + color + "\"];\n")
+                #fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",penwidth=" + str(cnt) + ",color=\"" + color + "\"];\n")
+                fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",penwidth=" + "1" + ",color=\"" + color + "\"];\n")
                 self.addRcgAllVizEdge(T1, T2, cnt, allRcgEdgesDict)
+            if self.args.hierarchy:
+                self.genHierarchyView(rels)
         fAllDot.write("}\n")
         fAllDot.close()
+        
+    def genColor(self, numOfPws, penwidth):
+        rels = []
+        for [T1, T2, P] in self.trlist:
+            cnt = 0
+            for [T3, T4, P] in self.trlist:
+                if T1 == T3 and T2 == T4:
+                    cnt = cnt + 1
+            rels.append([T1, T2, cnt,""])
+        self.remove_duplicate_string(rels)
+        pointDG = (12,169,97) #dark green
+        pointDR = (118,18,18) #dark red
+        distR = pointDR[0] - pointDG[0]
+        distG = pointDR[1] - pointDG[1]
+        distB = pointDR[2] - pointDG[2]
+        for i in range(len(rels)):
+            relra = float(rels[i][2]) / float(numOfPws)
+            newPointDec = (round(pointDG[0] + distR*relra), round(pointDG[1] + distG*relra), round(pointDG[2] + distB*relra))
+            newColor = "#" + str(hex(int(newPointDec[0])))[2:] + str(hex(int(newPointDec[1])))[2:] + str(hex(int(newPointDec[2])))[2:]
+            rels[i][3] = newColor
+        for i in range(len(rels)):
+            if rels[i][2] == penwidth:
+                return rels[i][3]
+        
         
     def addInputVizNode(self, concept, group):
         node = {}
@@ -2500,6 +2533,87 @@ class TaxonomyMapping:
         edge.update({"t" : t})
         edge.update({"label" : label})
         self.clusterVizEdges.update({s + "_" + t : edge})
+        
+    def genHierarchyView(self, rels):
+        paths = []
+        mergedNodes = []
+        for rel in rels:
+            if len(paths) == 0:
+                paths.append([rel[0], rel[1]])
+            else:
+                update = []
+                for path in paths:
+                    if rel[0] in path:
+                        tmp = path[0:path.index(rel[0])+1]
+                        tmp.append(rel[1])
+                        update.append(tmp)
+                    if rel[1] in path:
+                        tmp = path[path.index(rel[1]):len(path)]
+                        tmp.insert(0,rel[0])
+                        update.append(tmp)
+                    if rel[0] not in path and rel[1] not in path:
+                        update.append([rel[0], rel[1]])
+                paths.extend(update)
+                self.remove_duplicate_string(paths)
+        cycles = []
+        for path in paths:
+            if path[0] == path[len(path)-1]:
+                cycles.append(path)
+        for cycle1 in cycles:
+            mergedNode = cycle1
+            for cycle2 in cycles:
+                if cycle1 != cycle2 and set(cycle1) & set(cycle2):
+                    mergedNode.extend(cycle2)
+                    mergedNode = list(set(mergedNode))
+            mergedNodes.append(sorted(mergedNode))
+        self.remove_duplicate_string(mergedNodes)
+        self.genHierarchyDot(rels, mergedNodes)
+    
+    def genHierarchyDot(self, rels, mergedNodes):
+        supernodes = []
+        nodes = []
+        for rel in rels:
+            for mergedNode in mergedNodes:
+                if rel[0] in mergedNode:
+                    newName = self.getCollapsedNode(mergedNode)
+                    rel[0] = newName
+                    supernodes.append(rel[0])
+                if rel[1] in mergedNode:
+                    newName = self.getCollapsedNode(mergedNode)
+                    rel[1] = newName
+                    supernodes.append(rel[1])
+        self.remove_duplicate_string(supernodes)
+        for rel in rels:
+            if rel[0] not in supernodes:
+                nodes.append(rel[0])
+            if rel[1] not in supernodes:
+                nodes.append(rel[1])
+        self.remove_duplicate_string(nodes)
+        
+        # write to dot file
+        fDot = open(self.hrdot, 'w')
+        fDot.write("digraph {\n\nrankdir = RL\n\n")
+        for node in nodes:
+            if(node.find("*") == -1 and node.find("\\") == -1 and node.find("\\n") == -1 and node.find(".") != -1):
+                if node.split(".")[0] == self.firstTName:
+                    fDot.write('"' + node + '" [shape=box style="filled" fillcolor="#CCFFCC"]\n')
+                else:
+                    fDot.write('"' + node + '" [shape=octagon style="filled" fillcolor="#FFFFCC"]\n')
+            else:
+                fDot.write('"' + node + '" [shape=box style="filled,rounded" fillcolor="#EEEEEE"]\n')
+        for supernode in supernodes:
+            fDot.write('"' + supernode + '" [shape=oval style="filled,rounded" fillcolor="#00BFFF"]\n')
+        for rel in rels:
+            if rel[0] != rel[1]:
+                fDot.write("\"" + rel[0] + "\" -> \"" + rel[1] + "\" [style=filled,label=" + str(rel[2]) + ",color=\"" + rel[3] + "\"];\n")                     
+        fDot.write("}\n")
+        fDot.close()
+    
+    def getCollapsedNode(self, mergedNode):
+        name = ""
+        for singleNode in mergedNode:
+            name += singleNode + "\\n\\n"
+        return name
     
     def restructureCbNames(self, cbName):
         if cbName.find("*") != -1 or cbName.find("\\\\") != -1:
