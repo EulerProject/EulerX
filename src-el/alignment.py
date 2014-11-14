@@ -516,7 +516,8 @@ class TaxonomyMapping:
             raise Exception("Reasoner:", self.args.reasoner, " is not supported !!")
 
     def genPW(self):
-        self.pw = commands.getoutput(self.com) 
+        #self.pw = commands.getoutput(self.com)
+        self.pw = newgetoutput(self.com) 
         if self.isPwNone():
             print "************************************"
             print "Input is inconsistent"
