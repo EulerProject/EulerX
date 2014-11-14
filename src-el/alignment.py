@@ -2350,7 +2350,7 @@ class TaxonomyMapping:
             for [T1, T2, cnt, color] in rels:
                 #fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",penwidth=" + str(cnt) + ",color=\"" + color + "\"];\n")
                 fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",penwidth=" + "1" + ",color=\"" + color + "\"];\n")
-                self.addRcgAllVizEdge(T1, T2, cnt, allRcgEdgesDict)
+                self.addRcgAllVizEdge(T1, T2, cnt, numOfPws, allRcgEdgesDict)
             if self.args.hierarchy:
                 self.genHierarchyView(rels)
         fAllDot.write("}\n")
@@ -2513,9 +2513,9 @@ class TaxonomyMapping:
         node.update({"name": "test" + str(randint(0,100))})
         allRcgNodesDict.update({group + "." + concept: node})
 
-    def addRcgAllVizEdge(self, s, t, label, allRcgEdgesDict): #here label is the frequency of the edge among all PWs
+    def addRcgAllVizEdge(self, s, t, label, numOfPws, allRcgEdgesDict): #here label is the frequency of the edge among all PWs
         edge = {}
-        edge.update({"label" : label})
+        edge.update({"label" : numOfPws.__str__() + "PW"})
         edge.update({"s" : s})
         edge.update({"t" : t})
         edge.update({"w" : label})
