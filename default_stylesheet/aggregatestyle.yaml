@@ -1,0 +1,20 @@
+  graphstyle: 
+    graph: "rankdir=RL"
+    face2face: "off"
+    subgraph: "off"
+    legend: "sink"
+    mapping: "off"
+    wmap: "off"
+    wmin: "1"
+    wmax: "5"
+  nodestyle: 
+    "1": "shape=box style=filled fillcolor=\"#CCFFCC\""
+    "2": "shape=octagon style=filled fillcolor=\"#FFFFCC\""
+    "comb": "shape=box style=\"filled,rounded\" fillcolor=\"#EEEEEE\""
+    default: "shape=circle style=filled fillcolor=\"#FFFFFF\""
+  edgestyle: 
+    - 
+      label: "default"
+      dot: "arrowhead=normal style=solid color=\"#000000\" constraint=true "
+      display: "(w)display"
+      penwidth: "on"
