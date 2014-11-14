@@ -109,7 +109,8 @@ def apply_style(data_file, f):
             lbl = "isa_" + l
         else:
             lbl = l
-        glabel = glabel + "<TR> \n <TD><font color =" + color + ">" + lbl + "</font></TD> \n <TD>" + str(len(edges[l])) + "</TD> \n </TR> \n"
+        if len(edges[l]) > 0:
+            glabel = glabel + "<TR> \n <TD><font color =" + color + ">" + lbl + "</font></TD> \n <TD>" + str(len(edges[l])) + "</TD> \n </TR> \n"
         for e in edges[l]:
             if (styles["graphstyle"]["face2face"] == "on" and l in sources) or (l=="out" and e[1][1].split(".")[0] in sources) or (l == "in" and e[0][1].split(".")[0] not in sources):
                 f.write('"' + e[1][1] + '" -> "' + e[0][1] + '"')
@@ -124,7 +125,7 @@ def apply_style(data_file, f):
             if styles["graphstyle"]["wmap"] == "on":
                 w = str(scale(int(w), int(min(wList)), int(max(wList)), int(styles["graphstyle"]["wmin"]), int(styles["graphstyle"]["wmax"])))
             if style["display"] == "(w)display":
-                f.write(' [label="' + w + '"]')
+                f.write(' [label="' + str(w) + '"]')
         # check options for displaying label
             elif (style["display"] == "label"):
                 f.write(' [label="' + str(e[-1][1]) + '"]')
