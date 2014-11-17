@@ -6,7 +6,7 @@ import sys
 import yaml
 import optparse
 from collections import defaultdict
-from alignment import *
+
 
 
 nodes = defaultdict(list)
@@ -36,8 +36,6 @@ def apply_style(data_file, f):
         data = yaml.load(data_file)
     #separate nodes from edges
         for key, value in data.iteritems():
-            if key == "Graph":
-                Gdict = data[key]
             if "group" in data[key]:
                 nodes[data[key]["group"]].append(value.items())
             elif "label" in data[key]:
@@ -130,8 +128,6 @@ def apply_style(data_file, f):
                 w = str(scale(int(w), int(min(wList)), int(max(wList)), int(styles["graphstyle"]["wmin"]), int(styles["graphstyle"]["wmax"])))
             if style["display"] == "(w)display":
                 f.write(' [label="' + str(w) + '"]')
-                taxMap = TaxonomyMapping(" ")
-                print(taxMap(w))
         # check options for displaying label
             elif (style["display"] == "label"):
                 f.write(' [label="' + str(e[-1][1]) + '"]')
