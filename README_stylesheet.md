@@ -27,6 +27,11 @@ Edges are defined using 4 keys: label, s (source), t (target), w (penwidth). w i
   t: 2.B
   w: '1'
   
+3- Graph:
+Currently we are using only one graph property (PW: number of possible worlds). New properties can be added as the need comes
+Graph:
+  PW: 6
+  
 YAML/Json Stylesheet Format
 --------------------------
 
