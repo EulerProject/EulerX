@@ -13,6 +13,18 @@ nodes = defaultdict(list)
 edges = defaultdict(list)
 wList = []
 
+# convert penwidths to colors
+def genColor(numOfPws, penwidth):
+    pointDG = (12,169,97) #dark green
+    pointDR = (118,18,18) #dark red
+    distR = pointDR[0] - pointDG[0]
+    distG = pointDR[1] - pointDG[1]
+    distB = pointDR[2] - pointDG[2]
+    relra = float(penwidth) / float(numOfPws)
+    newPointDec = (round(pointDG[0] + distR*relra), round(pointDG[1] + distG*relra), round(pointDG[2] + distB*relra))
+    newColor = "#" + str(hex(int(newPointDec[0])))[2:] + str(hex(int(newPointDec[1])))[2:] + str(hex(int(newPointDec[2])))[2:]
+    return newColor
+
 # parse the stylesheet file
 def scale(value, dMin, dMax, sMin, sMax):
     # Find how 'wide' each range is
@@ -36,6 +48,8 @@ def apply_style(data_file, f):
         data = yaml.load(data_file)
     #separate nodes from edges
         for key, value in data.iteritems():
+            if key == "Graph":
+                Gdict = data[key]
             if "group" in data[key]:
                 nodes[data[key]["group"]].append(value.items())
             elif "label" in data[key]:
@@ -134,6 +148,7 @@ def apply_style(data_file, f):
             elif style["display"] != "":
                 f.write(' [label="' + style["display"] + '"]')
             if style["penwidth"] == "on":
+                f.write('[color="' + genColor(Gdict["PW"],w) + '"]')
                 f.write('[penwidth=' + str(w) + "]")
             f.write("\n")
     if styles["graphstyle"]["legend"] != "off":
