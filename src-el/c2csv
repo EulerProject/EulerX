@@ -32,16 +32,21 @@ def findRank(e):
 def main(iFile):
     outData = []
     inputData = []
+    isaDict = {}
     for n in iFile:
         inputData += open(n).readlines() 
     for line in inputData:
         if line.startswith("taxonomy"):
-            author = line.split("taxonomy ")[1]
+            author = line.split(" ")[1]
+            isa = {}
         if line.startswith("("):
             elements = line[1:-2]. strip(")").split(" ")
+            isa.update({elements[0] : elements[1:]})
             for e in elements:
                 rank = findRank(e)
-                outData.append([e, author[:-1], rank])
+                outData.append([e, author, rank])
+        if line == "\n":
+            isaDict.update({author: isa})
         if line.startswith("articulation"):
             exit
     outData.sort()
@@ -51,7 +56,13 @@ def main(iFile):
             writer.writerow(["Name", "Author", "Rank"])
             for d in outData:
                 writer.writerow(d)
-
+    for a in isaDict:
+        with open(a + "_isa" + ".csv",  'w+') as isaFile:
+            writer = csv.writer(isaFile)
+            writer.writerow(["Name1", "Relation", "Name2"])
+            for p in isaDict[a]:
+                for c in isaDict[a][p]:
+                    writer.writerow([c, "ISA", p])
 
 # MAIN
 if __name__ == '__main__':
