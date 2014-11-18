@@ -2518,7 +2518,7 @@ class TaxonomyMapping:
 
     def addRcgAllVizEdge(self, s, t, label, numOfPws, allRcgEdgesDict): #here label is the frequency of the edge among all PWs
         edge = {}
-        edge.update({"label" : numOfPws.__str__() + "PW"})
+        edge.update({"label" : label})
         edge.update({"s" : s})
         edge.update({"t" : t})
         edge.update({"w" : label})
