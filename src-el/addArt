@@ -17,21 +17,28 @@ isaMap = {}
 artMap = {}
 data = {}
 inv_taxon_dictionary = {v: k for k, v in taxon_dictionary.rank2num.items()}
+newIsa = []
 
-
+def findRank(e):
+    if len(e.split("_")) == 3:
+           return "Subspecies"
+    if len(e.split("_")) == 2:
+        return "Species"
+    if len(e.split("_")) == 1:
+        if e.endswith("ini"):
+            return "Tribe"
+        elif e.endswith("inae"):
+            return "Subfamily"
+        elif e.endswith("idae"):
+            return "Family"
+        elif e.endswith("oidea"):
+            return "Superfamily"
+        else:
+            return "Genus"
+    return "Undefined"
 def main(isaFile, inFile):
     isa = []
     inputData = []
-
-    if isaFile != " ":
-        for f in isaFile:
-            isa += csv.DictReader(open(f))
-        for line in isa:
-            parent = line["ID2"]
-            child = line ["ID1"]
-            if parent not in isaMap:
-                isaMap[parent] = []
-            isaMap[parent].append(child)
 
     for f in inFile:
         inputData += csv.DictReader(open(f))
@@ -47,7 +54,37 @@ def main(isaFile, inFile):
             dict_data[name[0:4]].append(row)
     except ValueError, e:
         print "Error in the input file:", e
-
+    if isaFile != " ":
+        for f in isaFile:
+            newIsa = []
+            for line in csv.DictReader(open(f)):
+                if "ID1" in line.values():
+                    parent = line["ID2"]
+                    child = line ["ID1"]
+                else:
+                    try:
+                        for d in dict_data:
+                            for l in dict_data[d]:
+                                if l["Name"] == line ["Name1"] and l["Author"] == f.split("_")[0]:
+                                    child = l["ID"]
+                                    namec =  line["Name1"]
+                                    rankc = findRank(namec)
+                                elif l["Name"] == line ["Name2"] and l["Author"] == f.split("_")[0]:
+                                    parent = l["ID"]
+                                    namep =  line["Name2"]
+                                    rankp = findRank(namep)
+                        newIsa.append([child, child.split(".")[0], rankc, child.split(".")[1][1:], namec, "ISA", parent, parent.split(".")[0], rankp, parent.split(".")[1][1:],namep])
+                        with open("new" + f, "w") as fNew:
+                            writer = csv.writer(fNew)
+                            writer.writerow(["ID1","Taxonomy1", "TaxId1", "Rank1", "SciName1", "Relation", "ID2", "Taxonomy2", "TaxId2", "Rank2",
+                             "SciName2"])
+                            for i in newIsa:
+                                writer.writerow(i)
+                    except ValueError, e:
+                        print "Error in ISA file:", e
+            if parent not in isaMap:
+                isaMap[parent] = []
+            isaMap[parent].append(child)
     for d in dict_data:
         for i in dict_data[d]:
             if d not in data:
@@ -112,7 +149,10 @@ def main(isaFile, inFile):
             # if the element is at the lowest rank and yet has no suggested articulation,
             #  ask user to define the articulation for it
                 if i[0].split(".")[0] == source and artMate == [] and i[3] == 74:
-                    writer.writerow([i[0], i[1], " ", "?", "?"])
+                    for k in inv_taxon_dictionary:
+                        if k[1] == i[3]:
+                            rank = inv_taxon_dictionary[k]
+                    writer.writerow([i[0], i[0].split(".")[0], rank, i[0].split(".")[1][1:], i[1] , "?", "?", "?", "?", "?", "?"])
                 else:
                     for a in artMate:
                         for k in inv_taxon_dictionary:
