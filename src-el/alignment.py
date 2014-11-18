@@ -567,6 +567,7 @@ class TaxonomyMapping:
         rcgAll2PdfFile = os.path.join(self.pwsaggregatedir, self.name+"_all2.pdf")
         allRcgNodesDict = {}
         allRcgEdgesDict = {}
+        allRcgNumOfPwsDict = {}
 
         for i in range(len(pws)):
             if self.args.cluster: pwmirs.append({})
@@ -2354,6 +2355,7 @@ class TaxonomyMapping:
                 self.addRcgAllVizEdge(T1, T2, cnt, numOfPws, allRcgEdgesDict)
             if self.args.hierarchy:
                 self.genHierarchyView(rels)
+        self.addRcgAllVizNumOfPws(numOfPws, allRcgEdgesDict)
         fAllDot.write("}\n")
         fAllDot.close()
         
@@ -2521,7 +2523,12 @@ class TaxonomyMapping:
         edge.update({"t" : t})
         edge.update({"w" : label})
         allRcgEdgesDict.update({s + "_" + t : edge})
-
+    
+    def addRcgAllVizNumOfPws(self, numOfPws, allRcgEdgesDict):
+        pw = {}
+        pw.update({"PW" : numOfPws})
+        allRcgEdgesDict.update({"Graph" : pw})
+        
     def addClusterVizNode(self, concept):
         node = {}
         node.update({"concept": concept})
