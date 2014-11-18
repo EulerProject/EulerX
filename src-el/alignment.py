@@ -638,7 +638,7 @@ class TaxonomyMapping:
                 for e in pwTm.tr:
                     self.trlist.append(e)
         self.genAllPwRcg(len(pws), allRcgEdgesDict)
-        self.genColor(len(pws), 6) # will be used in y2d?? use 6 for example 
+        #print self.genColor(len(pws),1) # will be used in y2d?? use 6 for example 
         fAllDot.close()
         commands.getoutput("dot -Tpdf "+rcgAllDotFile+" -o "+rcgAllPdfFile)
         
@@ -2360,27 +2360,31 @@ class TaxonomyMapping:
         fAllDot.close()
         
     def genColor(self, numOfPws, penwidth):
-        rels = []
-        for [T1, T2, P] in self.trlist:
-            cnt = 0
-            for [T3, T4, P] in self.trlist:
-                if T1 == T3 and T2 == T4:
-                    cnt = cnt + 1
-            rels.append([T1, T2, cnt,""])
-        self.remove_duplicate_string(rels)
+        #rels = []
+        #for [T1, T2, P] in self.trlist:
+        #    cnt = 0
+        #    for [T3, T4, P] in self.trlist:
+        #        if T1 == T3 and T2 == T4:
+        #            cnt = cnt + 1
+        #    rels.append([T1, T2, cnt,""])
+        #self.remove_duplicate_string(rels)
         pointDG = (12,169,97) #dark green
         pointDR = (118,18,18) #dark red
         distR = pointDR[0] - pointDG[0]
         distG = pointDR[1] - pointDG[1]
         distB = pointDR[2] - pointDG[2]
-        for i in range(len(rels)):
-            relra = float(rels[i][2]) / float(numOfPws)
-            newPointDec = (round(pointDG[0] + distR*relra), round(pointDG[1] + distG*relra), round(pointDG[2] + distB*relra))
-            newColor = "#" + str(hex(int(newPointDec[0])))[2:] + str(hex(int(newPointDec[1])))[2:] + str(hex(int(newPointDec[2])))[2:]
-            rels[i][3] = newColor
-        for i in range(len(rels)):
-            if rels[i][2] == penwidth:
-                return rels[i][3]
+        #for i in range(len(rels)):
+        #    relra = float(rels[i][2]) / float(numOfPws)
+        #    newPointDec = (round(pointDG[0] + distR*relra), round(pointDG[1] + distG*relra), round(pointDG[2] + distB*relra))
+        #    newColor = "#" + str(hex(int(newPointDec[0])))[2:] + str(hex(int(newPointDec[1])))[2:] + str(hex(int(newPointDec[2])))[2:]
+        #    rels[i][3] = newColor
+        relra = float(penwidth) / float(numOfPws)
+        newPointDec = (round(pointDG[0] + distR*relra), round(pointDG[1] + distG*relra), round(pointDG[2] + distB*relra))
+        newColor = "#" + str(hex(int(newPointDec[0])))[2:] + str(hex(int(newPointDec[1])))[2:] + str(hex(int(newPointDec[2])))[2:]
+        return newColor
+        #for i in range(len(rels)):
+        #    if rels[i][2] == penwidth:
+        #        return rels[i][3]
         
         
     def addInputVizNode(self, concept, group):
