@@ -5,6 +5,7 @@
     legend: "source"
     mapping: "off"
     wmap: "off"
+    wcolor: "off"
     wmin: "1"
     wmax: "5"
   nodestyle: 

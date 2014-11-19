@@ -148,8 +148,9 @@ def apply_style(data_file, f):
             elif style["display"] != "":
                 f.write(' [label="' + style["display"] + '"]')
             if style["penwidth"] == "on":
-                f.write('[color="' + genColor(Gdict["PW"],w) + '"]')
                 f.write('[penwidth=' + str(w) + "]")
+            if styles["graphstyle"]["wcolor"] == "on":
+                f.write('[color="' + genColor(Gdict["PW"],w) + '"]')
             f.write("\n")
     if styles["graphstyle"]["legend"] != "off":
         f.write("node[shape=box] \n")

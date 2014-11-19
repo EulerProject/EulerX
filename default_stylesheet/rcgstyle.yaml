@@ -4,6 +4,7 @@
     subgraph: "off"
     legend: "sink"
     mapping: "off"
+    wcolor: "off"
     wmap: "off"
     wmin: "1"
     wmax: "5"
