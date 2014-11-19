@@ -44,6 +44,7 @@ Graph attributes for dot file. Example:
   If the value of subgraph is “on”, nodes will be clustered based on their “group” in the output dot file. Anything other than “on” (e.g. “off”) means no subgraph in the output. 
   legend: a switch similar to subgraph
    If the value of legend is not "off", a table showing the number of nodes an edges will be added to the output dot file. The placement of this table depends on the value of legend: "source" places it before the first node in the output and "sink" place it after the last node
+wcolor: a switch for converting penwidth to edge color using PW (number of possible worlds)
 wmap: a switch for penwidth scaling. The value "on" here means the penwidths in the input graph get mapped to the speified range in the stylesheet.
 wmin, wmax: range of penwidth
 
