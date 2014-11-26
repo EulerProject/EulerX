@@ -2536,6 +2536,7 @@ class TaxonomyMapping:
     def addClusterVizNode(self, concept):
         node = {}
         node.update({"concept": concept})
+        node.update({"group": "cluster"})
         node.update({"name": "test" + str(randint(0,100))})
         self.clusterVizNodes.update({concept: node})
 
@@ -2544,6 +2545,7 @@ class TaxonomyMapping:
         edge.update({"s" : s})
         edge.update({"t" : t})
         edge.update({"label" : label})
+        edge.update({"dist" : int(label)})
         self.clusterVizEdges.update({s + "_" + t : edge})
         
     def genHierarchyView(self, rels):
