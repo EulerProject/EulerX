@@ -1,0 +1,24 @@
+  graphstyle: 
+    graph: "rankdir=TB"
+    face2face: "off"
+    subgraph: "off"
+    legend: "source"
+    mapping: "off"
+    len: "on" 
+    wmap: "off"
+    wcolor: "off"
+    wmin: "1"
+    wmax: "5"
+  nodestyle: 
+    "cluster": "shape=box style=\"filled, rounded\" fillcolor=\"#FFFFCC\""
+  edgestyle: 
+    - 
+      label: "Art."
+      dot: "style=dotted color=\"#AA00FF\" constraint=true penwidth=3"
+      display: "label"
+      penwidth: "off"
+    - 
+      label: "default"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1"
+      display: "label"
+      penwidth: "off"

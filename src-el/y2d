@@ -94,7 +94,7 @@ def apply_style(data_file, f):
                 elif "-" in n[0][1]:
                     f.write(' [label="-"]')
                 f.write("\n")
-        if (styles["graphstyle"]["subgraph"] == "on" and g != "(+)"):
+        if (styles["graphstyle"]["subgraph"] == "on" and g != "(+)" and g != "cluster"):
             f.write("}\n")
     glabel = glabel + '<TR> <TD COLSPAN="2"><font face = "Arial Black"> Edges </font></TD> </TR> \n'
     # source nodes in articulations
@@ -132,7 +132,16 @@ def apply_style(data_file, f):
                 f.write('"' + e[1][1] + '" -> "' + e[0][1] + '"')
                 f.write(" [dir=back]")
             else:
-               f.write('"' + e[0][1] + '" -> "' + e[1][1] + '"')
+                for i in xrange(len(e)):
+                    if e[i][0] == 's':
+                        s = e[i][1]
+                    elif e[i][0] == 't':
+                        t = e[i][1]
+                    elif  e[i][0] == 'label':
+                        l =  e[i][1]
+                    elif  e[i][0] == 'dist':
+                        dist =  e[i][1]
+                f.write('"' + s + '" -> "' + t + '"')
             if any("w" in edge for edge in e):
             # if w is defined in the input
                 w = e[2][1]
@@ -144,9 +153,13 @@ def apply_style(data_file, f):
                 f.write(' [label="' + str(w) + '"]')
         # check options for displaying label
             elif (style["display"] == "label"):
-                f.write(' [label="' + str(e[-1][1]) + '"]')
+                labelstyle = ' [label="' + str(e[-1][1] + '"')
             elif style["display"] != "":
-                f.write(' [label="' + style["display"] + '"]')
+                labelstyle = ' [label="' + style["display"] + + '"'
+            if styles["graphstyle"]["len"] == "on":
+                labelstyle +=', len =' + str(l) 
+            labelstyle += "]"
+            f.write(labelstyle)
             if style["penwidth"] == "on":
                 f.write('[color="' + genColor(Gdict["PW"],w) + '"]')
                 f.write('[penwidth=' + str(w) + "]")
