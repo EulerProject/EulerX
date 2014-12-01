@@ -150,16 +150,19 @@ def apply_style(data_file, f):
             if styles["graphstyle"]["wmap"] == "on":
                 w = str(scale(int(w), int(min(wList)), int(max(wList)), int(styles["graphstyle"]["wmin"]), int(styles["graphstyle"]["wmax"])))
             if style["display"] == "(w)display":
-                f.write(' [label="' + str(w) + '"]')
+                labelstyle = ' [label="' + str(w) 
         # check options for displaying label
             elif (style["display"] == "label"):
                 labelstyle = ' [label="' + str(e[-1][1] + '"')
+            if "len" in styles["graphstyle"]:
+                if styles["graphstyle"]["len"] == "on":
+                    labelstyle +=', len = "' + str(l)
             elif style["display"] != "":
-                labelstyle = ' [label="' + style["display"] + + '"'
-                if "len" in styles["graphstyle"]:
-                    if styles["graphstyle"]["len"] == "on":
-                        labelstyle +=', len =' + str(l)
-                labelstyle += "]"
+                labelstyle = ' [label="' + style["display"] + '"'
+            if "len" in styles["graphstyle"]:
+                if styles["graphstyle"]["len"] == "on":
+                    labelstyle +=', len =' + str(l)
+                labelstyle += '"]'
                 f.write(labelstyle)
             if style["penwidth"] == "on":
                 f.write('[color="' + genColor(Gdict["PW"],w) + '"]')
