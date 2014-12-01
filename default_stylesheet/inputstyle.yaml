@@ -9,6 +9,8 @@
     wmin: "1"
     wmax: "5"
   nodestyle: 
+    "2013": "shape=box style=filled fillcolor=\"#CCFFCC\""
+    "2010": "shape=octagon style=filled fillcolor=\"#FFFFCC\""
     "1": "shape=box style=filled fillcolor=\"#CCFFCC\""
     "2": "shape=octagon style=filled fillcolor=\"#FFFFCC\""
     default: "shape=circle style=filled fillcolor=\"#FFFFFF\""
