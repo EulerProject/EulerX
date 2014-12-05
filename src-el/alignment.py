@@ -1315,10 +1315,10 @@ class TaxonomyMapping:
 
     def genPwCluster(self, pws, obs):
         fcl = open(self.clfile, 'w')
-        fcldot = open(self.cldot, 'w')
-        fcldot.write("graph "+self.name+"_cluster {\n"+\
-                     "overlap=false\nsplines=true\n")
-        fcldot.write("  node [shape=box style=\"filled, rounded\" fillcolor=\"#FFFFCC\"]\n")
+        #fcldot = open(self.cldot, 'w')
+        #fcldot.write("graph "+self.name+"_cluster {\n"+\
+        #             "overlap=false\nsplines=true\n")
+        #fcldot.write("  node [shape=box style=\"filled, rounded\" fillcolor=\"#FFFFCC\"]\n")
         dmatrix = []
         for i in range(self.npw):
             dmatrix.append([])
@@ -1343,8 +1343,8 @@ class TaxonomyMapping:
                 fcl.write(d.__str__()+" ")
                 dmatrix[i].append(d)
                 if i != j and not self.args.simpCluster:
-                    fcldot.write("\"pw"+i.__str__()+"\" -- \"pw"+j.__str__()+\
-                            "\" [label=\""+d.__str__()+"; "+s+"\",len="+d.__str__()+"]\n")
+                    #fcldot.write("\"pw"+i.__str__()+"\" -- \"pw"+j.__str__()+\
+                    #        "\" [label=\""+d.__str__()+"; "+s+"\",len="+d.__str__()+"]\n")
                     self.addClusterVizNode('pw' + i.__str__())
                     self.addClusterVizNode('pw' + j.__str__())
                     self.addClusterVizEdge('pw' + i.__str__(), 'pw' + j.__str__(), d.__str__()+"; "+s)
@@ -1368,14 +1368,14 @@ class TaxonomyMapping:
                                 reduced = True
                                 break
                     if not reduced:
-                        fcldot.write("\"pw"+i.__str__()+"\" -- \"pw"+j.__str__()+\
-                            "\" [label="+dmatrix[i][j].__str__()+",len="+dmatrix[i][j].__str__()+"]\n")
+                        #fcldot.write("\"pw"+i.__str__()+"\" -- \"pw"+j.__str__()+\
+                        #    "\" [label="+dmatrix[i][j].__str__()+",len="+dmatrix[i][j].__str__()+"]\n")
                         self.addClusterVizNode('pw' + i.__str__())
                         self.addClusterVizNode('pw' + j.__str__())
                         self.addClusterVizEdge('pw' + i.__str__(), 'pw' + j.__str__(), dmatrix[i][j].__str__())
-        fcldot.write("}")
+        #fcldot.write("}")
         fcl.close()
-        fcldot.close()
+        #fcldot.close()
         
         fclyaml = open(self.clyaml, 'w')
         if self.clusterVizNodes:
@@ -1384,6 +1384,7 @@ class TaxonomyMapping:
             fclyaml.write(yaml.safe_dump(self.clusterVizEdges, default_flow_style=False))
         fclyaml.close()
         
+        commands.getoutput("cat "+self.clyaml+" | y2d -s "+self.stylesheetdir+"clusterstyle.yaml" + ">" + self.cldot)
         commands.getoutput("dot -Tpdf "+self.cldot+" -o "+self.cldotpdf)
         commands.getoutput("neato -Tpdf "+self.cldot+" -o "+self.clneatopdf)
 
