@@ -1,0 +1,45 @@
+#! /usr/bin/env python
+# __author__ = "Parisa Kianmajd"
+#__version__ = "1.0.1"
+# input: a MIR csv file
+# output: a csv file with three columns <Name, Author, Rank>
+
+import csv
+import sys
+genus = list()
+
+def findRank(e):
+    if len(e.split('_')) == 3:
+           return 'Subspecies'
+    if len(e.split('_')) == 2:
+        return 'Species'
+    if len(e.split('_')) == 1:
+        if e.endswith('inae'):
+            return 'Subfamily'
+        if e.endswith('idae'):
+            return 'Family'
+        if e.endswith('oidea'):
+            return 'Superfamily'
+        if e in genus:
+            return 'Genus'
+        return '?'
+ 
+if __name__ == '__main__':
+    data = dict()
+    inputData = csv.reader(sys.stdin)
+    for line in inputData:
+        for a in [line[0],line[2]]:
+            g = a.split(".")[0]
+            e = a.split(".")[1]
+            if g not in data:
+                data[g] = list()
+            if e not in data[g]:
+                data[g].append(e)
+                if "_" in e:
+                    genus.append(e.split("_")[0])
+    writer = csv.writer(sys.stdout)
+    writer.writerow(['Name', 'Year', 'Rank']) 
+    for g in data:
+        for e in data[g]:
+            rank = findRank(e)
+            writer.writerow([g, e ,rank]) 
