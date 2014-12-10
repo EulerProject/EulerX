@@ -42,4 +42,4 @@ if __name__ == '__main__':
     for g in data:
         for e in data[g]:
             rank = findRank(e)
-            writer.writerow([g, e ,rank]) 
+            writer.writerow([e, g ,rank]) 
