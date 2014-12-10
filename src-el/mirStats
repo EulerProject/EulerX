@@ -12,7 +12,7 @@ def main(inFile, rankFile):
                   'disjoint':'!'}
     elements = {}
     table = dict()
-    ranks = ['Species', 'Genus', 'Subfamily', 'Family', 'Superfamily', 'Order', 'Suborder','Infraorder', 'Parvorder']
+    ranks = ['Species', 'Genus', 'Subfamily', 'Family', 'Superfamily', 'Order', 'Suborder','Infraorder', 'Parvorder','?']
     for rank in ranks:
         table.update({rank:{'Totals':0}})
         
@@ -21,13 +21,19 @@ def main(inFile, rankFile):
     next(rankData, None) #skip header row
     rankDict = dict()
     for d in rankData:
-        y = d[1].split("(")[1].split(")")[0]
+        if "(" in d[1]:
+            y =d[1].split("(")[1].split(")")[0]
+        else:
+            y = d[1]
         rankDict.update({y + "." + d[0].replace(" ", "_") : d[2]})
         
     inputData = csv.reader(open(inFile))
     for line in inputData:
         #second half of the table
-        col = art2symbol[line[1]] + " / "
+        if line[1] in art2symbol:
+            col = art2symbol[line[1]] + " / "
+        else:
+            col = line[1] + " / "
         name1 = line[0].split(".")[1]
         name2 = line[2].split(".")[1]
         if name1 == name2:
