@@ -503,6 +503,9 @@ class TaxonomyMapping:
 
     def isPwNone(self):
         return self.isNone(self.pw)
+    
+    def isPwUnique(self):
+        return self.isUnique(self.pw)
 
     def isCbNone(self):
         return self.isNone(self.cb)
@@ -514,10 +517,24 @@ class TaxonomyMapping:
             return output.strip() == ""
         else:
             raise Exception("Reasoner:", self.args.reasoner, " is not supported !!")
+        
+    def isUnique(self, output):
+        if reasoner[self.args.reasoner] == reasoner["gringo"]:
+            return output.find("Models     : 1") != -1 and output.find("Models     : 1+") == -1
+        elif reasoner[self.args.reasoner] == reasoner["dlv"]:
+            return output.strip() != "" and output.strip().count("{") == 1
+        else:
+            raise Exception("Reasoner:", self.args.reasoner, " is not supported !!")    
 
     def genPW(self):
         #self.pw = commands.getoutput(self.com)
-        self.pw = newgetoutput(self.com) 
+        self.pw = newgetoutput(self.com)
+        if self.isPwUnique():
+            if self.args.artRem:
+                print "************************************"
+                print "UNIQUE POSSIBLE WORLD"
+                self.allMinimalArtSubsets(sets.Set(self.articulations))
+                return
         if self.isPwNone():
             print "************************************"
             print "Input is inconsistent"
@@ -1112,10 +1129,83 @@ class TaxonomyMapping:
             return True
         return False
 
+    # compute all Minimal Articulation Subsets (MAS) that have the unique PW
+    def allMinimalArtSubsets(self, artSet):
+        s = sets.Set()
+        curpath = sets.Set()
+        allpaths = sets.Set()
+        self.computeAllMAS(artSet, s, curpath, allpaths)
+        
+    def computeAllMAS(self, artSet, justSet, curpath, allpaths):
+        for path in allpaths:
+            if path.issubset(curpath):
+                return
+        if not self.isResultUnique(artSet):
+            allpaths.add(curpath)
+            return
+        j = sets.Set()
+        for s in justSet:
+            if len(s.intersection(curpath)) == 0:
+                j = s
+        if len(j) == 0:
+            j = self.computeOneMAS(artSet)
+            if len(j) != 0:
+                lj = list(j)
+                print "************************************"
+                print "Min articulation subset that makes unique PW ",self.fixedCnt,": [",
+                for i in range(len(lj)):
+                    if i != 0: print ",",
+                    print lj[i].ruleNum,":",lj[i].string,
+                print "]"
+                print "************************************"
+                self.fixedCnt += 1
+        if len(j) != 0:
+            justSet.add(j)
+        for a in j:
+            tmpcur = copy.copy(curpath)
+            tmpcur.add(a)
+            tmpart = copy.copy(artSet)
+            tmpart.remove(a)
+            self.computeAllMAS(tmpart, justSet, tmpcur, allpaths)
+
+    def isResultUnique(self, artSet):
+        tmpart1 = copy.copy(self.articulations)
+        tmpmir = copy.deepcopy(self.mir)
+        tmptr = copy.deepcopy(self.tr)
+        tmpeq = copy.deepcopy(self.eq)
+        if len(artSet) == 0:
+            return True
+        self.articulations = []
+        self.mir = copy.deepcopy(self.basemir)
+        self.tr = copy.deepcopy(self.basetr)
+        self.eq = {}
+        tmpart = copy.copy(artSet)
+        for i in range(len(artSet)):
+            self.addArticulation(tmpart.pop().string)
+        # Now refresh the input file
+        self.genASP()
+        # Run the reasoner again
+        self.pw = commands.getoutput(self.com)
+
+        self.articulations = tmpart1
+        self.mir = tmpmir
+        self.tr = tmptr
+        self.eq = tmpeq
+
+        if self.isPwUnique():
+            return True
+        return False
+
+
     def computeOneJust(self, artSet):
         if self.isConsistent(artSet):
             return sets.Set()
         return self.computeJust(sets.Set(), artSet)
+
+    def computeOneMAS(self, artSet):
+        if not self.isResultUnique(artSet):
+            return sets.Set()
+        return self.computeMAS(sets.Set(), artSet)
 
     # TODO move to generic header
     def printArtRuleN(self, artSet, prefix):
@@ -1138,6 +1228,22 @@ class TaxonomyMapping:
             return self.computeJust(s, f2)
         sl = self.computeJust(s.union(f1), f2)
         sr = self.computeJust(s.union(sl), f1)
+        return sl.union(sr)
+
+    # s is non-unique, f is unique
+    def computeMAS(self, s, f):
+        if len(f) <= 1:
+            return f
+        f1 = copy.copy(f)
+        f2 = sets.Set()
+        for i in range(len(f) /2):
+            f2.add(f1.pop())
+        if self.isResultUnique(s.union(f1)):
+            return self.computeMAS(s, f1)
+        if self.isResultUnique(s.union(f2)):
+            return self.computeMAS(s, f2)
+        sl = self.computeMAS(s.union(f1), f2)
+        sr = self.computeMAS(s.union(sl), f1)
         return sl.union(sr)
 
     def minInconsRemedy(self):
