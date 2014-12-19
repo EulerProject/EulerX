@@ -101,6 +101,8 @@ class EulerParser:
                                               help="simplify the pw aggregate view")
             EulerParser.inst.add_argument("--artRem", action="store_true", dest="artRem", default=False,\
                                               help="articulation remover")
+            EulerParser.inst.add_argument("--xia", action="store_true", dest="xia", default=False,\
+                                              help="extract input articulations")
             EulerParser.inst.add_argument("--diaglat", dest="diaglat", help="diagnostic lattice for inconsistent example")
             EulerParser.inst.add_argument("--addID", nargs="*", dest="addID", help="input wizard, addID")
             EulerParser.inst.add_argument("--addIsa", dest="addIsa", help="input wizard, addIsa")

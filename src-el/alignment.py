@@ -71,6 +71,8 @@ class TaxonomyMapping:
         self.rcgVizEdges = {}                  # edges for rcg visualization in stylesheet
         self.clusterVizNodes = {}              # nodes for cluster visualization in stylesheet
         self.clusterVizEdges = {}              # edges for cluster visualization in stylesheet
+        self.leafConcepts = []                 # concepts from input that are leaf nodes
+        self.nonleafConcepts = []              # concepts from input that are not leaf nodes
         self.args = args
         if self.args.ieo:
             self.args.ie = True
@@ -587,6 +589,7 @@ class TaxonomyMapping:
         allRcgNumOfPwsDict = {}
 
         for i in range(len(pws)):
+            tmpLeafRels = []
             if self.args.cluster: pwmirs.append({})
 
             # pwTm is the possible world taxonomy mapping, used for RCG
@@ -617,8 +620,14 @@ class TaxonomyMapping:
                 if j != 0: outputstr += ", "
                 if dotc1.split(".")[0] == self.firstTName:
                     outputstr += dotc1+rel[2]+dotc2
+                    if self.args.xia:
+                        if dotc1 in self.leafConcepts and dotc2 in self.leafConcepts:
+                            tmpLeafRels.append([dotc1,rel[2],dotc2])
                 else:
                     outputstr += dotc2+rel[2]+dotc1
+                    if self.args.xia:
+                        if dotc1 in self.leafConcepts and dotc2 in self.leafConcepts:
+                            tmpLeafRels.append([dotc2,rel[2],dotc1])
                 pair = dotc1+","+dotc2
                 if self.args.cluster: pwmirs[i][pair] = rcc5[rel[2]]
                 # RCG
@@ -654,6 +663,11 @@ class TaxonomyMapping:
                 #pwTm.genPwCb(name + "_" + i.__str__())
                 for e in pwTm.tr:
                     self.trlist.append(e)
+            
+            # generate alternative input files
+            if self.args.xia:
+                self.genAltInputFile(i, tmpLeafRels)
+            
         self.genAllPwRcg(len(pws), allRcgEdgesDict)
         #print self.genColor(len(pws),1) # will be used in y2d?? use 6 for example 
         fAllDot.close()
@@ -676,7 +690,7 @@ class TaxonomyMapping:
         fpw.write(outputstr)
         fpw.close()
         if self.args.cluster: self.genPwCluster(pwmirs, False)
-
+        
     def genPwCb(self, fileName):
         self.name = fileName
         self.cbfile = os.path.join(self.aspdir, self.name+"_cb.asp")
@@ -2014,6 +2028,17 @@ class TaxonomyMapping:
             elif (re.match("\(.*\)", line)):
                 if flag == "taxonomy":
                     taxonomy.addTaxaWithList(self, line)
+                    
+                    # if enable extract input articulation, divide concepts to leaf, non-leaf nodes
+                    if self.args.xia:
+                        conceptLine = re.match("\((.*)\)", line).group(1)
+                        concepts = re.split("\s", conceptLine)
+                        for concept in concepts:
+                            self.leafConcepts.append(taxonomy.abbrev+"."+concept)
+                            if concepts.index(concept) == 0:
+                                self.nonleafConcepts.append(taxonomy.abbrev+"."+concept)
+            
+                    # input visualization
                     if taxonomy.abbrev in group2concepts:
                         group2concepts[taxonomy.abbrev].append(re.match("\((.*)\)", line).group(1).split(" "))
                     else:
@@ -2067,6 +2092,9 @@ class TaxonomyMapping:
         # used for input viz
         self.inputVisualization(group2concepts, art)
         
+        # update leaf concepts
+        self.leafConcepts = list(set(self.leafConcepts).difference(self.nonleafConcepts))
+
         return True
     
     def addArticulation(self, artStr):
@@ -2778,3 +2806,19 @@ class TaxonomyMapping:
         #f.write(self.runningDate + "\t\t" + strftime("%Y-%m-%d-%H:%M:%S", localtime()) + "\t\t"\
          #       + (time.time()-self.startTime).__str__() + "\t" + self.name + "\t" + self.npw.__str__() + "\n")
         f.close()
+        
+        
+    def genAltInputFile(self, pwIndex, leafRels):
+        fileName = os.path.join(self.inputfilesdir, self.name+"-alt"+pwIndex.__str__()+".txt")
+        copyfile(os.path.join(self.args.inputdir, self.args.inputfile[0]), fileName)
+        f = open(fileName, "r")
+        lines = f.readlines()
+        f.close()
+        f = open(fileName, "w")
+        for line in lines:
+            if line.find("[") == -1:
+                f.write(line)
+        for leafRel in leafRels:
+            f.write("[" + leafRel[0] + " " + relstr[relation[leafRel[1].strip('"')]] + " " + leafRel[2] + "]\n")
+        f.close()
+        
