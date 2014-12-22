@@ -86,6 +86,8 @@ def apply_style(data_file, f):
         for n in nodes[g]:
             if (g!= "comb" and g!= "(+)" and g!="cluster"):
                f.write('"'+ g + "." + n[0][1]+ '"\n')
+               if len(n) < 3:
+                   n.append(('name','test'))
                mapp = mapp + "<TR> \n <TD bgcolor=" + color + ">" + g + "." + n[0][1] + "</TD> \n <TD>" + n[2][1] + "</TD> \n </TR> \n"
             else:
                 f.write('"'+ n[0][1] + '"')
