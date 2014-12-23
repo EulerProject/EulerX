@@ -1,0 +1,73 @@
+#! /usr/bin/env python
+# __author__ = "Parisa Kianmajd"
+#__version__ = "1.0.0"
+
+import yaml
+import argparse
+import sys
+
+
+edges = dict()
+nodes = dict()
+def add_edge(s,t,label):
+        edge = {}
+        edge.update({"s" : s})
+        edge.update({"t" : t})
+        edge.update({"label" : label})
+        edges.update({s + "_" + t : edge})
+
+        
+def add_node(concept, group):
+        node = {}
+        node.update({"concept": concept})
+        node.update({"group": group})
+        if group!="(+)":
+            nodes.update({group + "." + concept: node})
+        else:
+            nodes.update({concept: node})
+
+            
+def travserse(t,g, parent):
+        for k in t:
+                add_node(str(k),str(g))
+                if parent != None:
+                        add_edge(str(g) + "." + str(k),  str(g) + "." + str(parent), 'isa')
+                for v in t[k]:
+                        if isinstance(v,dict):
+                                travserse(v,g, k)
+                        else:
+                                add_node(str(v),str(g))
+                                add_edge(str(g) + "." + str(v),  str(g) + "." + str(k), 'isa')
+                               
+def main(inFile):
+        data = dict()
+        dicts = list()
+        for f in inFile:
+                dicts.append(yaml.load(open(f)))
+        for d in dicts:
+                for k, v in d.iteritems():
+                        data.setdefault(k, []).append(v)
+        for k in data:
+                data[k] = [item for sublist in data[k] for item in sublist]
+        for v in data['Taxonomy']:
+                if 'Id' in v:
+                        g = v['Id']
+                if 'Tree' in v:
+                        tree = v['Tree']
+                        travserse(tree[0],g, None)
+        for a in data['Articulations']:
+                art = a.split()
+                add_edge(art[0],art[2],art[1])
+                
+        with sys.stdout as outfile:
+           outfile.write(yaml.safe_dump(nodes, default_flow_style=False))
+           outfile.write(yaml.safe_dump(edges, default_flow_style=False))
+
+           
+if __name__ == '__main__':
+        parser = argparse.ArgumentParser()
+        parser.add_argument("-i","--iFile", action= "append")
+        args = parser.parse_args()
+        if args.iFile == None:
+            args.iFile = "in.yaml"
+        main(args.iFile)
