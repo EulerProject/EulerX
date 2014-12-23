@@ -1,0 +1,63 @@
+#! /usr/bin/env python
+# __author__ = "Parisa Kianmajd"
+#__version__ = "1.0.0"
+
+import yaml
+import sys
+
+def main():
+        art2symbol = {"equals":"==",
+                  "is_included_in":"<",
+                  "includes":">",
+                  "overlaps":"><",
+              "disjoint":"!"}
+        f = sys.stdin
+        groups = dict()
+        arts = list()
+        children = list()
+        for line in f.readlines():
+            if line.startswith("taxonomy"):
+               g = int(line.split(" ")[1])
+               author = line.strip().split(" ")[2]
+               tree = list()
+               dics = list()
+            if line.startswith("("):
+                nodes = map(int, line.strip()[1:-1].split())
+                parent = nodes[0]
+                children = nodes[1:]
+                dics.append({parent:children})
+            if line == "\n":
+                    remove = list()
+                    dics.reverse()
+                    for i in xrange(len(dics)):
+                            for j in xrange(i+1,len(dics)):
+                                    if dics[i].keys()[0] in dics[j].values()[0]:
+                                            v = dics[j].values()[0]
+                                            k = dics[j].keys()[0]
+                                            v.append(dics[i])
+                                            v.remove(dics[i].keys()[0])
+                                            dics[j][k] = v
+                                            remove.append(dics[i])
+                                            
+                    for d in dics:
+                            if d not in remove:
+                                    tree.append(d)
+                    groups.update({(g,author) : tree})
+            if line.startswith("["):
+                 l = line.strip()[1:-1].split()
+                 arts.append(l[0] + " " + art2symbol[l[1]] + " " + l[2])
+# create the yaml output
+        output = dict()
+        out = list()
+        for k in groups:
+                out.append({'Name':k[1]})
+                out.append({'Id':k[0]})
+                out.append({'Tree':groups[k]})
+        output.update({'Taxonomy': out})
+        output.update({'Articulations': arts})
+        with sys.stdout as outfile:
+           outfile.write(yaml.safe_dump({'Taxonomy' : output['Taxonomy']}, default_flow_style=False))
+           outfile.write(yaml.safe_dump({'Articulations': output['Articulations']}, default_flow_style=False))
+
+if __name__ == '__main__':
+                      main()
