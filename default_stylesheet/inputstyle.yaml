@@ -1,7 +1,7 @@
   graphstyle: 
     graph: "rankdir=LR"
     face2face: "on"
-    subgraph: "on"
+    subgraph: "off"
     legend: "source"
     mapping: "off"
     wmap: "off"
