@@ -185,7 +185,7 @@ class TaxonomyMapping:
             if not os.path.exists(self.pwsclusterdir):
                 os.mkdir(self.pwsclusterdir)
             self.clfile = os.path.join(self.pwsclusterdir, self.name+"_cl.csv")
-            self.cldot = os.path.join(self.pwsclusterdir, self.name+"_cl.dot")
+            self.cldot = os.path.join(self.pwsclusterdir, self.name+"_cl.gv")
             self.clyaml = os.path.join(self.pwsclusterdir, self.name+"_cl.yaml")
             self.cldotpdf = os.path.join(self.pwsclusterdir, self.name+"_cl_dot.pdf")
             self.clneatopdf = os.path.join(self.pwsclusterdir, self.name+"_cl_neato.pdf")
@@ -193,8 +193,8 @@ class TaxonomyMapping:
             self.hierarchydir = os.path.join(args.outputdir, "9-PWs-hierarchy")
             if not os.path.exists(self.hierarchydir):
                 os.mkdir(self.hierarchydir)
-            self.hrdot = os.path.join(self.hierarchydir, self.name+"_hr.dot")
-        self.iefile = os.path.join(self.pwsdotdir, self.name+"_ie.dot")
+            self.hrdot = os.path.join(self.hierarchydir, self.name+"_hr.gv")
+        self.iefile = os.path.join(self.pwsdotdir, self.name+"_ie.gv")
         self.iepdf = os.path.join(self.pwspdfdir, self.name+"_ie.pdf")
         #self.ivpdf = os.path.join(self.pwspdfdir, self.name+"_iv.pdf")
         self.path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -577,12 +577,12 @@ class TaxonomyMapping:
         outputstr = ""
         # mirs for each pw
         if self.args.cluster: pwmirs = []
-        rcgAllDotFile = os.path.join(self.pwsaggregatedir, self.name+"_all.dot")
+        rcgAllDotFile = os.path.join(self.pwsaggregatedir, self.name+"_all.gv")
         rcgAllPdfFile = os.path.join(self.pwsaggregatedir, self.name+"_all.pdf")
         fAllDot = open(rcgAllDotFile, 'w')
         
         rcgAll2YamlFile = os.path.join(self.pwsaggregatedir, self.name+"_all2.yaml")
-        rcgAll2DotFile = os.path.join(self.pwsaggregatedir, self.name+"_all2.dot")
+        rcgAll2DotFile = os.path.join(self.pwsaggregatedir, self.name+"_all2.gv")
         rcgAll2PdfFile = os.path.join(self.pwsaggregatedir, self.name+"_all2.pdf")
         allRcgNodesDict = {}
         allRcgEdgesDict = {}
@@ -703,7 +703,7 @@ class TaxonomyMapping:
     def genPwRcg(self, fileName, allRcgNodesDict):
 #        fDot = open(self.args.outputdir+fileName+".dot", 'w')
 #        fAllDot = open(self.args.outputdir+self.name+"_all.dot", 'a')
-        rcgAllFile = os.path.join(self.pwsaggregatedir, self.name+"_all.dot")
+        rcgAllFile = os.path.join(self.pwsaggregatedir, self.name+"_all.gv")
         fAllDot = open(rcgAllFile, 'a')
 #        fDot.write("digraph {\n\nrankdir = RL\n\n")
         if self.firstRcg:
@@ -974,7 +974,7 @@ class TaxonomyMapping:
         
         # create the yaml file
         rcgYamlFile = os.path.join(self.pwsyamldir, fileName+".yaml")
-        rcgDotFile = os.path.join(self.pwsdotdir, fileName+".dot")
+        rcgDotFile = os.path.join(self.pwsdotdir, fileName+".gv")
         rcgPdfFile = os.path.join(self.pwspdfdir, fileName+".pdf")
         fRcgVizYaml = open(rcgYamlFile, 'w')
         if self.rcgVizNodes:
@@ -2474,7 +2474,7 @@ class TaxonomyMapping:
             newColor = "#" + str(hex(int(newPointDec[0])))[2:] + str(hex(int(newPointDec[1])))[2:] + str(hex(int(newPointDec[2])))[2:]
             rels[i][3] = newColor
         # write to dot file
-        rcgAllFile = os.path.join(self.pwsaggregatedir, self.name+"_all.dot")
+        rcgAllFile = os.path.join(self.pwsaggregatedir, self.name+"_all.gv")
 #        fAllDot = open(self.args.outputdir+self.name+"_all.dot", 'a')
         fAllDot = open(rcgAllFile, 'a')
         if self.args.simpAllView:
@@ -2594,7 +2594,7 @@ class TaxonomyMapping:
                 
         # create the yaml file
         inputYamlFile = os.path.join(self.inputfilesdir, self.name+".yaml")
-        inputDotFile = os.path.join(self.inputfilesdir, self.name+".dot")
+        inputDotFile = os.path.join(self.inputfilesdir, self.name+".gv")
         inputPdfFile = os.path.join(self.inputfilesdir, self.name+".pdf")
         
         fInputVizYaml = open(inputYamlFile, 'w')
