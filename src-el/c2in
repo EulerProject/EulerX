@@ -11,22 +11,22 @@ def main():
                   "includes":">",
                   "overlaps":"><",
               "disjoint":"!"}
-        f = sys.stdin
         groups = dict()
         arts = list()
-        children = list()
-        for line in f.readlines():
+        for line in sys.stdin.readlines():
             if line.startswith("taxonomy"):
-               g = int(line.split(" ")[1])
-               author = line.strip().split(" ")[2]
-               tree = list()
-               dics = list()
+                l = line.strip().split(" ")
+                g = int(l[1])
+                author = l[2]
+                dics = list()   # a dict to map parents to their children
+                tree = list()   # a nested dict of parents and children
             if line.startswith("("):
                 nodes = map(int, line.strip()[1:-1].split())
                 parent = nodes[0]
                 children = nodes[1:]
                 dics.append({parent:children})
             if line == "\n":
+                    # create a nested dict of parents and children
                     remove = list()
                     dics.reverse()
                     for i in xrange(len(dics)):
@@ -38,7 +38,6 @@ def main():
                                             v.remove(dics[i].keys()[0])
                                             dics[j][k] = v
                                             remove.append(dics[i])
-                                            
                     for d in dics:
                             if d not in remove:
                                     tree.append(d)
@@ -56,8 +55,8 @@ def main():
         output.update({'Taxonomy': out})
         output.update({'Articulations': arts})
         with sys.stdout as outfile:
-           outfile.write(yaml.safe_dump({'Taxonomy' : output['Taxonomy']}, default_flow_style=False))
-           outfile.write(yaml.safe_dump({'Articulations': output['Articulations']}, default_flow_style=False))
+           outfile.write(yaml.safe_dump({'Taxonomy' : output['Taxonomy']}, default_flow_style = False))
+           outfile.write(yaml.safe_dump({'Articulations': output['Articulations']}, default_flow_style = False))
 
 if __name__ == '__main__':
                       main()
