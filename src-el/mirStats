@@ -10,16 +10,16 @@ def main(inFile, rankFile):
                       'includes':'>',
                       'overlaps':'><',
                   'disjoint':'!'}
-    elements = {}
+    elements = dict()
     table = dict()
     ranks = ['Species', 'Genus', 'Subfamily', 'Family', 'Superfamily', 'Order', 'Suborder','Infraorder', 'Parvorder','?']
     for rank in ranks:
         table.update({rank:{'Totals':0}})
         
-
     rankData = csv.reader(open(rankFile,'rU'))
     next(rankData, None) #skip header row
     rankDict = dict()
+    # extract the year from author's name
     for d in rankData:
         if "(" in d[1]:
             y =d[1].split("(")[1].split(")")[0]
@@ -40,6 +40,7 @@ def main(inFile, rankFile):
             col += "="
         else:
             col += "<>"
+        # if there is a "_" in name, the rank is species, otherwise refer to rank file to get the rank information
         if "_" in line[0]:
             rank1 = 'Species'
         else:

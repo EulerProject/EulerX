@@ -85,8 +85,8 @@ def main(inFile, rankFile):
                 total += table[k][v]
             table[k]["Totals"] = total
     table.update({'Totals':dict()})
-    values.insert(0,'2005')
-    values.insert(1,'1993')
+    values.insert(0,g1)
+    values.insert(1,g2)
     for v in values:
         t = 0
         for r in ranks:
@@ -94,9 +94,8 @@ def main(inFile, rankFile):
                 t += table[r][v]
         table['Totals'][v] = t
     tTotals = 0
-    values.remove('2005')
-    values.remove('1993')
-
+    values.remove(g1)
+    values.remove(g2)
     for v in values:
         tTotals += table['Totals'][v]
     table['Totals']['Totals'] = tTotals
@@ -125,7 +124,7 @@ def main(inFile, rankFile):
     oFile.write('\\documentclass{report}\n\\usepackage{titlesec}\n\\usepackage[english]{babel}\n\\usepackage{array}\n\\setlength\\extrarowheight{3.5pt} \n\\begin{document}')
     oFile.write('\\begin{tabular}{l|cc|ccccc|c }\n')
     oFile.write('\\hline\n')
-    row = ['Rank', '2005', '1993', '== / =', '== / <>', '> / =', '< / =' , '>< / =', 'Totals']
+    row = ['Rank', g1, g2, '== / =', '== / <>', '> / =', '< / =' , '>< / =', 'Totals']
     r = " & ".join(row)
     for key in latexSym:
         r = r.replace(key,latexSym[key]) 
@@ -150,15 +149,15 @@ def main(inFile, rankFile):
     table1_ranks = ['Order','Suborder','Infraorder','Parvorder','Superfamily','Family','Subfamily','Genus','Species']
     oFile.write('\\begin{tabular}{lccc}\n')
     oFile.write('\\hline\n')
-    oFile.write('Taxonomic Rank & 1993 & 2005 & Differential\\\\\n')
+    oFile.write('Taxonomic Rank & ' + g1 +  "&" +  g2 + '& Differential\\\\\n')
     oFile.write('\\hline\n')
     for r in table1_ranks:
-        if '1993' in table[r]:
-            v1 = table[r]['1993']
+        if g2 in table[r]:
+            v1 = table[r][g2]
         else:
             v1 = 0
-        if '2005' in table[r]:
-            v2 = table[r]['2005']
+        if g1 in table[r]:
+            v2 = table[r][g1]
         else:
             v2 = 0   
         diff = v2 - v1
