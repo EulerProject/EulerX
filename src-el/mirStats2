@@ -34,7 +34,6 @@ def main(inFile, rankFile):
         else:
             y = d[1]
         rankDict.update({y + "." + d[0].replace(" ", "_") : d[2]})
-        
     inputData = csv.reader(open(inFile))
     for line in inputData:
         #second half of the table
@@ -151,20 +150,31 @@ def main(inFile, rankFile):
     oFile.write('\\hline\n')
     oFile.write('Taxonomic Rank & ' + g1 +  "&" +  g2 + '& Differential\\\\\n')
     oFile.write('\\hline\n')
+    stat = dict()
+    for d in rankDict:
+        g = d.split(".")[0]
+        if g not in stat:
+            stat.update({g : {'Total':0}})
+        if rankDict[d] not in stat[g]:
+            stat[g].update({rankDict[d]:0})
+        stat[g][rankDict[d]] +=1
+        stat[g]['Total'] += 1
+    totalW = 0
     for r in table1_ranks:
-        if g2 in table[r]:
-            v1 = table[r][g2]
+        if r in stat[g1]:
+            v1 = stat[g1][r]
         else:
             v1 = 0
-        if g1 in table[r]:
-            v2 = table[r][g1]
+        if r in stat[g2]:           
+            v2 = stat[g2][r]
         else:
             v2 = 0   
-        diff = v2 - v1
+        diff = v1 - v2
+        totalW += diff
         if v1 == 0:
             v1 = "-"
 	if v2 == 0:
-            v2 = "-"        
+            v2 = "-"       
         w = r + "&" + str(v1) + "&" + str(v2) + "&"
         if diff != 0:
             if diff > 0:
@@ -175,9 +185,14 @@ def main(inFile, rankFile):
             w += "-"
         oFile.write(w + '\\\\\n')
     oFile.write('\\hline\n')
+    str_totalW = str(totalW)
+    if totalW > 0:
+    	str_totalW = "+" + str_totalW
+    oFile.write('Total &' + str(stat[g1]['Total']) + "&" + str(stat[g2]['Total']) + "&" + str_totalW +  '\\\\\n')
+    oFile.write('\\hline\n')
     oFile.write('\\end{tabular}')   
     oFile.write('\\end{document}')
-    
+
       
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
