@@ -1,5 +1,4 @@
-Thank you for using Euler toolkit.
-====================
+EulerX Toolkit Overview
 
 ![Alt text](http://euler.cs.ucdavis.edu/_/rsrc/1366832610901/home/logo_small.png)
 
