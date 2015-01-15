@@ -1,4 +1,3 @@
-Thank you for using Euler toolkit.
 ====================
 
 ![Alt text](http://euler.cs.ucdavis.edu/_/rsrc/1366832610901/home/logo_small.png)
