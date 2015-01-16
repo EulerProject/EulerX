@@ -5,13 +5,13 @@ EulerX Toolkit Overview
 
 On this page:
 
-* [Introduction](https://bitbucket.org/eulerx/euler-project/overview#markdown-header-introduction)
-* [Structure of This Toolkit](https://bitbucket.org/eulerx/euler-project/overview#markdown-header-structure-of-this-toolkit)
-* [Installation Steps](https://bitbucket.org/eulerx/euler-project/overview#markdown-header-installation-steps)
-* [Software Dependencies](https://bitbucket.org/eulerx/euler-project/overview#markdown-header-software-dependencies)
-* [Examples of Running EulerFO](https://bitbucket.org/eulerx/euler-project/overview#markdown-header-examples-of-running-eulerfo)
-* [Examples of Running EulerASP](https://bitbucket.org/eulerx/euler-project/overview#markdown-header-examples-of-running-eulerasp)
-* [Contact](https://bitbucket.org/eulerx/euler-project/overview#markdown-header-Contact)
+* [Introduction](https://github.com/EulerProject/EulerX#introduction)
+* [Structure of This Toolkit](https://github.com/EulerProject/EulerX#structure-of-this-toolkit)
+* [Installation Steps](https://github.com/EulerProject/EulerX#installation-steps)
+* [Software Dependencies](https://github.com/EulerProject/EulerX#software-dependencies)
+* [Examples of Running EulerFO](https://github.com/EulerProject/EulerX#examples-of-running-eulerfo)
+* [Examples of Running EulerASP](https://github.com/EulerProject/EulerX#examples-of-running-eulerasp)
+* [Contact](https://github.com/EulerProject/EulerX#Contact)
 
 # Introduction
 
@@ -19,19 +19,27 @@ Euler is an open source toolkit (mostly written in Python) for merging taxonomie
 
 We have all the EulerFO source code, EulerASP source code, and a bunch of use cases in this toolkit. EulerFO is a modified version of CleanTax which was firstly developed by Dave Thau. CleanTax/EulerFO are built upon Prover9/Mace4 reasoning software. EulerASP is a brand new taxonomy reasoning tool that Mingmin built from scratch. EulerASP is built based on popular ASP reasoners DLV and Potassco.
 
+Euler is designed for UNIX-like operating systems (Linux, Mac, etc). If you are running on Windows, you need to install a virtual machine to run Euler.
+
 # Structure of This Toolkit
 
-  DIRECTORIES       |  Description                                                          
- :----------------- | :---------------------------------------------------------------------
- `.hg/`             |  internal Mercurial folder (e.g. use `branch` file to switch branches)
- `example/`         |  subfolders with all Euler use cases
- `regress/`         |  for Regression testing
- `src-ct/ `         |  EulerFO source code
- `src-el/`          |  EulerASP source code
+  DIRECTORIES           |  Description                                                          
+ :--------------------- | :---------------------------------------------------------------------
+ `.git/`                |  internal git folder 
+ `ASP/`                 |  some ASP test code
+ `bbox-lattice/`        |  subroutine for blackbox lattice generation
+ `default-stylesheet/`  |  stylesheet files that are used by default
+ `example/`             |  subfolders with all Euler use cases
+ `projects/`            |  side tools and implementations
+ `regress/`             |  for Regression testing
+ `src-ct/ `             |  EulerFO source code
+ `src-el/`              |  EulerASP source code
+ `src-gu/`              |  source code from Gonzaga University
+ `src-tmp/`             |  temporary or deprecated code
 
   FILES             |  Description                                    
  :----------------- | :---------------------------------------------------------------------
- `README.md`        |  file used on Bitbucket homepage
+ `README.md`        |  file used on Github homepage
  `installCheck.sh`  |  installation requirements check
  `src-ct/main.py`   |  main entry of CleanTax++ source code
  `src-el/euler`     |  main entry of EulerASP source code
@@ -39,13 +47,11 @@ We have all the EulerFO source code, EulerASP source code, and a bunch of use ca
 
 # Installation Steps
 
-1. If you are a first-time user for hg/mercury, please download and install it [here][mercury].
-2. Click the button called **Clone** on top right of the page, copy the line `hg clone https://bitbucket.org/eulerx/euler-project` in tab HTTPS. (if you have logged-in to bitbucket, you will see something like `hg clone https://YOUR_USER_NAME@bitbucket.org/eulerx/euler-project`)
-3. Open your shell, go to a folder which you want to install Euler, paste this line and click **Enter**. It will download the Euler repository (in folder `euler-project/`) under this folder.
-4. The default branch is the released version. If you want to use the latest version with more functions support, please update to **main** branch. By doing this, open the file called `branch` under folder `euler-project/.hg/`, you will see the contents as **"default"**, change it to be **"main"**, save and close this file.
-5. Type `hg update` in shell, it will update to the latest version of Euler in main branch.
-6. **[IMPORTANT]** You need to make sure your machine has met the minimal software requirements before run Euler. (Please see section **Software Dependencies** in detail)
-7. You can add main entry of source code (e.g. `src-el/` of EulerASP) into your PATH env. 
+1. If you are a first-time user for git, please download and install it [here][gitdownloads].
+2. Open your shell, go to a folder which you want to install Euler, clone the repository under "main branch" to your local disk by copy and run `git clone -b "main" https://github.com/EulerProject/EulerX.git` in terminal.
+3. **[IMPORTANT]** You need to make sure your machine has met the minimal software requirements before run Euler. (Please see section **Software Dependencies** in detail)
+4. You can add main entry of source code (e.g. `src-el/` of EulerASP) into your PATH env. 
+5. When there is a new commit of the source, you can update it by running `git pull`.
 
 # Software Dependencies
 
@@ -95,7 +101,7 @@ Still under `example/` directory (assuming `src-el/` is in your PATH env, and gr
 If you have any question or comments, please contact Mingmin Chen at michen@ucdavis.edu.
 
 [euler]: http://euler.cs.ucdavis.edu/
-[mercury]: http://mercurial.selenic.com/
+[gitdownloads]:http://git-scm.com/downloads/ 
 [p9m4]: http://www.cs.unm.edu/~mccune/mace4/
 [graphviz]: http://www.graphviz.org/
 [dlv]: http://www.dlvsystem.com/

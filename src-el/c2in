@@ -1,0 +1,84 @@
+#! /usr/bin/env python
+# __author__ = "Parisa Kianmajd"
+#__version__ = "1.0.0"
+
+# Copyright (c) 2014 University of California, Davis
+# 
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+import yaml
+import sys
+
+def main():
+        art2symbol = {"equals":"==",
+                  "is_included_in":"<",
+                  "includes":">",
+                  "overlaps":"><",
+              "disjoint":"!"}
+        groups = dict()
+        arts = list()
+        for line in sys.stdin.readlines():
+            if line.startswith("taxonomy"):
+                l = line.strip().split(" ")
+                g = int(l[1])
+                author = l[2]
+                dics = list()   # a dict to map parents to their children
+                tree = list()   # a nested dict of parents and children
+            if line.startswith("("):
+                nodes = map(int, line.strip()[1:-1].split())
+                parent = nodes[0]
+                children = nodes[1:]
+                dics.append({parent:children})
+            if line == "\n":
+                    # create a nested dict of parents and children
+                    remove = list()
+                    dics.reverse()
+                    for i in xrange(len(dics)):
+                            for j in xrange(i+1,len(dics)):
+                                    if dics[i].keys()[0] in dics[j].values()[0]:
+                                            v = dics[j].values()[0]
+                                            k = dics[j].keys()[0]
+                                            v.append(dics[i])
+                                            v.remove(dics[i].keys()[0])
+                                            dics[j][k] = v
+                                            remove.append(dics[i])
+                    for d in dics:
+                            if d not in remove:
+                                    tree.append(d)
+                    groups.update({(g,author) : tree})
+            if line.startswith("["):
+                 l = line.strip()[1:-1].split()
+                 arts.append(l[0] + " " + art2symbol[l[1]] + " " + l[2])
+# create the yaml output
+        output = dict()
+        out = list()
+        for k in groups:
+                out.append({'Name':k[1]})
+                out.append({'Id':k[0]})
+                out.append({'Tree':groups[k]})
+        output.update({'Taxonomy': out})
+        output.update({'Articulations': arts})
+        with sys.stdout as outfile:
+           outfile.write(yaml.safe_dump({'Taxonomy' : output['Taxonomy']}, default_flow_style = False))
+           outfile.write(yaml.safe_dump({'Articulations': output['Articulations']}, default_flow_style = False))
+
+if __name__ == '__main__':
+                      main()

@@ -1,0 +1,46 @@
+% nodes
+node(X) :- up(X,_).
+node(X) :- up(_,X).
+node(cbR).
+node(cbG).
+
+% rules
+%edge(N1,cbR) :- up(N1,N2), solidR(N1),dashedR(N2).
+num1791R(X) :- #count{N2: up(1791,N2), dashedR(N2)} = X.
+num3636R(X) :- #count{N2: up(3636,N2), dashedR(N2)} = X.
+num3132R(X) :- #count{N2: up(3132,N2), dashedR(N2)} = X.
+num2039R(X) :- #count{N2: up(2039,N2), dashedR(N2)} = X.
+num1535R(X) :- #count{N2: up(1535,N2), dashedR(N2)} = X.
+
+%edge(cbG,N2) :- up(N1,N2), dashedG(N1),solidG(N2).
+num776G(X) :- #count{N1: up(N1,776), dashedG(N1)} = X.
+num2049G(X) :- #count{N1: up(N1,2049), dashedG(N1)} = X.
+num2050G(X) :- #count{N1: up(N1,2050), dashedG(N1)} = X.
+num2112G(X) :- #count{N1: up(N1,2112), dashedG(N1)} = X.
+num2176G(X) :- #count{N1: up(N1,2176), dashedG(N1)} = X.
+num2304G(X) :- #count{N1: up(N1,2304), dashedG(N1)} = X.
+num2568G(X) :- #count{N1: up(N1,2568), dashedG(N1)} = X.
+
+%blueedge(N1,N2) :- up(N1,N2), solidG(N1),solidR(N2).
+
+%blueedge(cbG,N2) :- up(N1,N2), dashedG(N1),solidR(N2).
+num1791G(X) :- #count{N1: up(N1,1791), dashedG(N1)} = X.
+num3636G(X) :- #count{N1: up(N1,3636), dashedG(N1)} = X.
+num3132G(X) :- #count{N1: up(N1,3132), dashedG(N1)} = X.
+num2039G(X) :- #count{N1: up(N1,2039), dashedG(N1)} = X.
+num1535G(X) :- #count{N1: up(N1,1535), dashedG(N1)} = X.
+
+%blueedge(N1,cbR) :- up(N1,N2), solidG(N1),dashedR(N2).
+num776R(X) :- #count{N2: up(776,N2), dashedR(N2)} = X.
+num2049R(X) :- #count{N2: up(2049,N2), dashedR(N2)} = X.
+num2050R(X) :- #count{N2: up(2050,N2), dashedR(N2)} = X.
+num2112R(X) :- #count{N2: up(2112,N2), dashedR(N2)} = X.
+num2176R(X) :- #count{N2: up(2176,N2), dashedR(N2)} = X.
+num2304R(X) :- #count{N2: up(2304,N2), dashedR(N2)} = X.
+num2568R(X) :- #count{N2: up(2568,N2), dashedR(N2)} = X.
+
+%blueedge(cbG,cbR) :- up(N1,N2), dashedG(N1),dashedR(N2).
+numdGdR(X) :- #count{N1,N2: up(N1,N2), dashedG(N1), dashedR(N2)} = X.
+
+%query
+% dlv -silent -filter=num1791R,num1791G,num3636R,num3636G,num3132R,num3132G,num2039R,num2039G,num1535R,num1535G,num776R,num776G,num2049R,num2049G,num2050R,num2050G,num2112R,num2112G,num2176R,num2176G,num2304R,num2304G,num2568R,num2568G,numdGdR

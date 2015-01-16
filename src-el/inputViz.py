@@ -1,3 +1,25 @@
+# Copyright (c) 2014 University of California, Davis
+# 
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 #=============================================================================================
 # Main program: Read from CleanTax/EulerDLV input file; Generate .dot file for visualization
 # Black: First Taxonomy
@@ -17,10 +39,9 @@ class InputVisual:
     def __init__(self):
         self.artSymbol = ""
     
+    @Callable
     def instance():
         return InputVisual()
-    
-    instance = Callable(instance)
     
     #remove the duplicate string in list li
     def remove_duplicate_string(self,li):
@@ -124,6 +145,8 @@ class InputVisual:
                         sum_list.append((temp_list[0], temp_list[2], temp_list[3]))
                     elif "r3sum" in temp_list:
                         sum_list.append((temp_list[0], temp_list[2], temp_list[3], temp_list[4]))
+                    elif "r4sum" in temp_list:
+                        sum_list.append((temp_list[0], temp_list[2], temp_list[3], temp_list[4], temp_list[5]))
                     elif "ldiff" in temp_list:
                         sum_list.append((temp_list[0], temp_list[1], temp_list[3]))
                     elif "rdiff" in temp_list:
@@ -150,8 +173,8 @@ class InputVisual:
         f_out.write("digraph {\n")
         f_out.write("rankdir = BT\n")
         
-        f_out.write("subgraph cluster_t1 {\n")
-        f_out.write("style=invis;\n")
+#        f_out.write("subgraph cluster_t1 {\n")
+#        f_out.write("style=invis;\n")
         f_out.write("node [shape=box style=\"filled\" fillcolor=\"#CCFFCC\"];\n")
         node_list = []
         for e in sc1_list:
@@ -164,10 +187,10 @@ class InputVisual:
             f_out.write("\"" + e + "\";\n")
         for e in pc_list1:
             f_out.write("\"" + e[1] + "\" -> \"" + e[0] + "\" [label=isa, color=black];\n")
-        f_out.write("}\n")
+#        f_out.write("}\n")
     
-        f_out.write("subgraph cluster_t2 {\n")
-        f_out.write("style=invis;\n")
+#        f_out.write("subgraph cluster_t2 {\n")
+#        f_out.write("style=invis;\n")
         f_out.write("node [shape=octagon style=\"filled\" fillcolor=\"#FFFFCC\"];\n")
         node_list = []
         for e in sc2_list:
@@ -180,15 +203,36 @@ class InputVisual:
             f_out.write("\"" + e + "\";\n")
         for e in pc_list2:
             f_out.write("\"" + e[1] + "\" -> \"" + e[0] + "\" [label=isa, color=black];\n")
-        f_out.write("}\n")
+#        f_out.write("}\n")
             
         for e in art_list:
-            f_out.write("\"" + e[0] + "\" -> \"" + e[1] + "\" [color=grey, style=dashed, label=\"" + e[2] + "\"];\n")
+            if e[2].find("!") != -1 or e[2].find("==") != -1 or e[2].find("><") != -1:
+                f_out.write("{rank=same;\"" + e[0] + "\" ; \"" + e[1] + "\" ;}\n")
+                f_out.write("\"" + e[0] + "\" -> \"" + e[1] + "\" [color=grey, style=dashed, label=\"" + e[2] + "\"];\n")
+            elif e[2].find(">") != -1 and e[2].find("><") == -1 :
+                f_out.write("\"" + e[1] + "\" -> \"" + e[0] + "\" [color=grey, style=dashed, label=\"" + e[2].replace(">","<") + "\"];\n")
+            else:
+                f_out.write("\"" + e[0] + "\" -> \"" + e[1] + "\" [color=grey, style=dashed, label=\"" + e[2] + "\"];\n")
+        
         for e in sum_list:
+#            implementation that lsum, rsum, etc are using a "+" node
+#            '''
+            f_out.write("node [shape=oval fillcolor=\"#FFFFFF\"];\n")
+            nodePlus = 0
+            f_out.write("\"" + nodePlus.__str__() + "\" [label=\"+\"];\n")
+            for i in range(1,len(e)):
+                f_out.write("\"" + e[i] + "\" -> \"" + nodePlus.__str__() + "\" [color=grey, style=dashed];\n")
+            f_out.write("\"" + nodePlus.__str__() + "\" -> \"" + e[0] + "\" [color=grey, style=dashed];\n")
+            nodePlus += 1
+#            '''
+
+#            implementation that lsum, rsum, etc are using different colors
+            '''
             r = lambda: random.randint(0,255)
             color = "#" + hex(r())[2:] + hex(r())[2:] + hex(r())[2:]
             for i in range(1,len(e)):
                 f_out.write("\"" + e[0] + "\" -> \"" + e[i] + "\" [color=\"" + color + "\", arrowhead=tee, style=dashed];\n")
+            '''
         
         f_out.write("}")
         f_in.close()

@@ -1,0 +1,76 @@
+#! /usr/bin/env python
+# __author__ = "Parisa Kianmajd"
+#__version__ = "1.0.1"
+# input: a csv file with three columns <Name, Author, Rank>
+# output: the input file with one additional column, ID, with format of <groupID>.<rankID><number>
+
+# Copyright (c) 2014 University of California, Davis
+# 
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+import csv
+import sys
+import wizardParser
+import taxon_dictionary
+
+def main (iFile, startNum):           
+    inputData = []            
+    data = {} # a nested dictionary to store the taxonomies
+
+    
+    for n in iFile:
+        inputData += csv.DictReader(open(n)) 
+
+    try:
+        for row in inputData:
+            author = row["Author"]
+            rank = row["Rank"]
+            if author not in data:
+                data[author] = {}
+            if rank not in data[author]:
+                data[author][rank] = []
+            data[author][rank].append(row["Name"])
+    except ValueError, e:
+        print "Error in the input file:", e
+            
+    with sys.stdout as oFile:
+        writer = csv.writer(oFile)
+        writer.writerow(["ID", "Name", "Author", "Rank"]) 
+    # Assign identifiers to each entity
+        j = startNum - 1
+        # group elements based on Author column
+        for author, value in data.iteritems():
+            j += 1
+            i = 1
+            numRanks = []
+            # map ranks to numerical value using taxon_dictionary
+            for rank in value.keys():
+                numRanks.append(taxon_dictionary.rank2num.get(rank,(0,0))[0])
+            # sort elements based on rank number and alphabetically inside each rank group
+            for rank in [k[0] for k in sorted(zip(value.keys(), numRanks), key=lambda l: l[1] ) ]:
+                for name in sorted(value[rank]):
+                    writer.writerow((str(j) + "." + str(taxon_dictionary.rank2num.get(rank,(0,0))[1]) + str(i), name, author, rank))
+                    i += 1
+
+
+# MAIN
+if __name__ == '__main__':
+    main(wizardParser.args.iFile, int(wizardParser.args.sNum))

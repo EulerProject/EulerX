@@ -1,0 +1,19 @@
+#
+#
+taxonomy 1 Taxonomy1
+(a b c)
+
+taxonomy 2 Taxonomy2
+(a b)
+
+taxonomy 3 Taxonomy3
+(a b c d)
+
+taxonomy 4 Taxonomy4
+(a)
+
+articulation tw1 tw1
+[1.a equals 2.a]
+[1.a equals 3.a]
+[1.a equals 4.a]
+[1.b equals 3.b]

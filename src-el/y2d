@@ -1,0 +1,220 @@
+#! /usr/bin/env python
+# __author__ = "Parisa Kianmajd"
+#__version__ = "1.0.1"
+
+# Copyright (c) 2014 University of California, Davis
+# 
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+import sys
+import yaml
+import optparse
+from collections import defaultdict
+
+
+
+nodes = defaultdict(list)
+edges = defaultdict(list)
+wList = []
+
+# convert penwidths to colors
+def genColor(numOfPws, penwidth):
+    pointDG = (12,169,97) #dark green
+    pointDR = (118,18,18) #dark red
+    distR = pointDR[0] - pointDG[0]
+    distG = pointDR[1] - pointDG[1]
+    distB = pointDR[2] - pointDG[2]
+    relra = float(penwidth) / float(numOfPws)
+    newPointDec = (round(pointDG[0] + distR*relra), round(pointDG[1] + distG*relra), round(pointDG[2] + distB*relra))
+    newColor = "#" + str(hex(int(newPointDec[0])))[2:] + str(hex(int(newPointDec[1])))[2:] + str(hex(int(newPointDec[2])))[2:]
+    return newColor
+
+# parse the stylesheet file
+def scale(value, dMin, dMax, sMin, sMax):
+    # Find how 'wide' each range is
+    dSpan = dMax - dMin
+    sSpan = sMax - sMin
+    # Convert the range in data file into a 0-1 range (float)
+    if dSpan != 0:
+    	scaledValue = float(value - dMin) / float(dSpan)
+    else:
+    	scaledValue = 0
+    # Convert the 0-1 range into a value in the stylesheet range
+    return sMin + (scaledValue * sSpan)
+def read_stylesheet(stylefile):
+    global styles
+    with open(stylefile) as style_file:    
+        styles = yaml.load(style_file)          
+def apply_style(data_file, f):
+    f.write("digraph{\n")
+    f.write(str(styles["graphstyle"]["graph"]) + "\n")
+    with data_file: 
+        data = yaml.load(data_file)
+    #separate nodes from edges
+        for key, value in data.iteritems():
+            if key == "Graph":
+                Gdict = data[key]
+            if "group" in data[key]:
+                nodes[data[key]["group"]].append(value.items())
+            elif "label" in data[key]:
+                if "w" in data[key]:
+                    wList.append(data[key]["w"])
+                else:
+                    wList.append("1")
+                if value["label"] in ["==", "><", "!", ">" , "<","?"] or "OR" in str(value["label"]):
+                    edges["Art."].append(value.items())
+                elif value["label"] == "isa":
+                    # separate "isa" edges based on their group
+                    edges[value["s"].split(".")[0]].append(value.items())
+                elif not any(d["label"] == value["label"] for d in styles["edgestyle"]):
+                    edges["default"].append(value.items())
+                else:
+                    edges[data[key]["label"]].append(value.items())
+    glabel = '<TR> <TD COLSPAN="2"><font face="Arial Black"> Nodes</font></TD> </TR> \n'
+    mapp = ""
+    for g in nodes:
+        if (g!= "comb" and g!= "(+)" and g != "cluster"):
+            mapp = mapp + '<TR> <TD COLSPAN="2"><font face="Arial Black"> Taxonomy' + g + '</font></TD> </TR> \n'
+    # if the style is not defined use the default
+        if (styles["graphstyle"]["subgraph"] == "on" and g!="(+)"):
+            f.write("subgraph cluster" + g + '{ style=invis\n')
+        if g in styles["nodestyle"]:
+            group = g
+        else:
+            group = "default"
+        color = styles["nodestyle"][group].split("fillcolor=")[1]
+        glabel = glabel + "<TR> \n <TD bgcolor=" + color + ">" + g + "</TD> \n <TD>" + str(len(nodes[g])) + "</TD> \n </TR> \n"
+        if "all" in styles["nodestyle"]:
+        	f.write("node[" + styles["nodestyle"]["all"] + '] \n')
+        f.write("node[" + styles["nodestyle"][group] + '] \n')
+        for n in nodes[g]:
+            if (g!= "comb" and g!= "(+)" and g!="cluster"):
+               f.write('"'+ g + "." + n[0][1]+ '"\n')
+               if len(n) < 3:
+                   n.append(('name','test'))
+               mapp = mapp + "<TR> \n <TD bgcolor=" + color + ">" + g + "." + n[0][1] + "</TD> \n <TD>" + n[2][1] + "</TD> \n </TR> \n"
+            else:
+                f.write('"'+ n[0][1] + '"')
+                if "+" in n[0][1]:
+                    f.write(' [label="+"]')
+                elif "-" in n[0][1]:
+                    f.write(' [label="-"]')
+                f.write("\n")
+        if (styles["graphstyle"]["subgraph"] == "on" and g != "(+)"):
+            f.write("}\n")
+    glabel = glabel + '<TR> <TD COLSPAN="2"><font face = "Arial Black"> Edges </font></TD> </TR> \n'
+    # source nodes in articulations
+    sources = []
+    for e in edges["Art."]:
+        sources.append(e[0][1].split(".")[0])
+    sources = list(set(sources))
+    for l in edges:
+        if l in nodes:
+            label = "isa"
+        else:
+            label = l
+        if not any(d["label"] == label for d in styles["edgestyle"]):
+            label = "default"
+        try:
+            style = (item for item in styles["edgestyle"] if item["label"] == label).next()
+        except StopIteration:
+            continue
+        if any(d["label"] == "all" for d in styles["edgestyle"]):
+            try:
+                allStyle = (item for item in styles["edgestyle"] if item["label"] == "all").next()
+                f.write("edge["+ allStyle["dot"] +"]\n")
+            except StopIteration:
+                continue
+        f.write("edge["+ style["dot"] +"]\n")
+        color = style["dot"]. split ("color=")[1].split(" ")[0]
+        if l in nodes:
+            lbl = "isa_" + l
+        else:
+            lbl = l
+        if len(edges[l]) > 0:
+            glabel = glabel + "<TR> \n <TD><font color =" + color + ">" + lbl + "</font></TD> \n <TD>" + str(len(edges[l])) + "</TD> \n </TR> \n"
+        for e in edges[l]:
+            if (styles["graphstyle"]["face2face"] == "on" and l in sources) or (l=="out" and e[1][1].split(".")[0] in sources) or (l == "in" and e[0][1].split(".")[0] not in sources):
+                f.write('"' + e[1][1] + '" -> "' + e[0][1] + '"')
+                f.write(" [dir=back]")
+            else:
+                for i in xrange(len(e)):
+                    if e[i][0] == 's':
+                        s = e[i][1]
+                    elif e[i][0] == 't':
+                        t = e[i][1]
+                    elif  e[i][0] == 'label':
+                        l =  e[i][1]
+                    elif  e[i][0] == 'dist':
+                        dist =  e[i][1]
+                f.write('"' + s + '" -> "' + t + '"')
+            if any("w" in edge for edge in e):
+            # if w is defined in the input
+                w = e[2][1]
+            else:
+                w = 1
+            if styles["graphstyle"]["wmap"] == "on":
+                w = str(scale(int(w), int(min(wList)), int(max(wList)), int(styles["graphstyle"]["wmin"]), int(styles["graphstyle"]["wmax"])))
+            if style["display"] != "":
+                if style["display"] == "(w)display":
+                    labelstyle = ' [label="' + str(w) + '"'
+            # check options for displaying label
+                elif style["display"] == "label":
+                    labelstyle = ' [label="' + str(e[-1][1]) + '"'
+                else:
+                    labelstyle = ' [label="' + style["display"] + '"'
+                if "len" in styles["graphstyle"]:
+                    if styles["graphstyle"]["len"] == "on":
+                        labelstyle +=', len = "' + str(l) + '"'
+                labelstyle += ']'
+                f.write(labelstyle)
+            if style["penwidth"] == "on":
+                f.write('[color="' + genColor(Gdict["PW"],w) + '"]')
+                f.write('[penwidth=' + str(w) + "]")
+            f.write("\n")
+    if styles["graphstyle"]["legend"] != "off":
+        f.write("node[shape=box] \n")
+        f.write('{rank=' + styles["graphstyle"]["legend"] + ' Legend [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
+        f.write(glabel)
+        f.write("</TABLE> \n >] } \n")
+
+    if styles["graphstyle"]["mapping"] != "off":
+        f.write("node[shape=box] \n")
+        f.write('{rank=' + styles["graphstyle"]["legend"] + ' Mapping [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
+        f.write(mapp)
+        f.write("</TABLE> \n >] } \n")       
+    f.write("}")            
+    f.close()
+def parse_options():
+	# parse options
+	parser = optparse.OptionParser(usage = "%prog [options]", version = "%prog 0.1")
+	parser.add_option("-s","--sfile",type="string",dest="sfile",
+					  default=None,
+					  help="file")
+	(options,args) = parser.parse_args()
+	return (options,args)
+# MAIN 
+if __name__ == '__main__':
+	(options,args) = parse_options()
+	if options.sfile == None:
+		options.sfile = "../example_stylesheet/inputstyle.yaml"
+	read_stylesheet(options.sfile)
+	apply_style(sys.stdin, sys.stdout)

@@ -1,0 +1,149 @@
+#! /usr/bin/env python
+# __author__ = "Parisa Kianmajd"
+#__version__ = "2.0.2"
+# This is a new version of Euler Wizard code that when suggesting articulation pairs,
+#  takes ISA relationships into account
+
+# Copyright (c) 2014 University of California, Davis
+# 
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+import sys
+import csv
+import taxon_dictionary
+from operator import itemgetter
+
+# global variables
+dict_data = {}
+isaMap = {}
+artMap = {}
+inputData = []
+data = {}
+
+for n in sys.argv[1:]:
+	inputData += csv.DictReader(open(n)) 
+
+try:
+    for row in inputData:
+        author = row["Author"]
+        rank = taxon_dictionary.rank2num[row["Rank"]][0]
+        taxon_id = row["ID"]
+        name = row["Name"]
+        if name[0:4] not in dict_data:
+            dict_data[name[0:4]] = []
+        dict_data[name[0:4]].append(row)
+except ValueError, e:
+    print "Error in the input file:", e
+
+
+for d in dict_data:
+    for i in dict_data[d]:
+        if d not in data:
+            data[d] = []
+        data[d].append([i["ID"], i["Name"], i["Author"], taxon_dictionary.rank2num[i["Rank"]][0]])
+        
+# compare the items in the list two by two to find possible ISA pairs
+for d in data:
+# find the lowest rank elements (leaves) and make sure there exists an articulation for each element in that rank
+    leavesRank = max(i[3] for i in data[d])
+    for i in data[d]:
+        # add an extra field for parent's information.
+        #  This will be used to check if the element is already claimed as a child or not
+        i.append(" ")
+    for taxa1 in data[d]:
+        isa = []
+        rank1 = taxa1[3]
+        for taxa2 in data[d]:
+            rank2 = taxa2[3]
+            g1 = taxa1[0].split(".")[0]
+            g2 = taxa2[0].split(".")[0]
+             #if the two elements belong to the same taxonomy groups look for potential ISAs
+            if g1 == g2:
+            # if they one is species, is not claimed as a child,
+            #  and its epithet is the same as the name of the other (genus)
+                if taxa2[4] == " " and ((rank2 == 74 and taxa2[1].split(" ")[0] == taxa1[1]) or (rank1 < rank2)):
+                    isa.append([taxa2[0], taxa2[1], taxa2[3]])
+                    taxa2[4] = taxa1[0]
+        isaMap.update({taxa1[0]: isa})
+# look for possible articulation pairs
+for d in data:
+    # articulations are defined from leaves to root
+    data[d] = sorted(data[d], key=itemgetter(3), reverse=True)
+    for taxa1 in data[d]:
+        art = []
+        rank1 = taxa1[3]
+        for taxa2 in data[d]:
+            rank2 = taxa2[3]
+            g1 = taxa1[0].split(".")[0]
+            g2 = taxa2[0].split(".")[0]
+             #if the two elements belong to the same taxonomy groups look for potential articulations
+            if g1 != g2:
+                # if they are both at species rank and the first 3 letters on their epithets is the same
+                if rank1 == 74 and rank2 == 74 and taxa1[1].split(" ")[1][0:3] == taxa2[1].split(" ")[1][0:3]:
+                    art.append([taxa2[0],taxa2[1],taxa2[3]])
+                    # keep the source group; this will be needed in CleanTax script,
+                    # where all articulations have the same source node
+                    source = i
+                elif art == [] and rank1 - rank2 >= 1:
+                    art.append([taxa2[0], taxa2[1], taxa2[3]])
+                    source = i
+                # if the two elements are on the same rank and no articulation is defined between their children
+                elif rank1 == rank2:
+                    for i in isaMap[taxa1[0]]:
+                        for j in isaMap[taxa2[0]]:
+                            if i[0] in artMap and j[0] in artMap:
+                               if i not in artMap[j[0]] and j not in artMap[i[0]] and [taxa2[0],taxa2[1], taxa2[3]] \
+                                       not in artMap[i[0]] and [taxa1[0], taxa1[1], taxa1[3]] not in artMap[j[0]]:
+                                   art.append([taxa2[0], taxa2[1],taxa2[3]])
+        # if there are more than one suggested articulation mates, pick the more accurate one
+        if len(art) > 1:
+            closestMatch = max(a[2] for a in art)
+            for a in art:
+                a2 = []
+                if a[2] == closestMatch:
+                    a2.append(a)
+                    taxa1.append(a2)
+                    artMap.update({taxa1[0]: a2})
+        else:
+            artMap.update({taxa1[0]: art})
+with sys.stdout as oFile:
+    writer = csv.writer(oFile)
+    writer.writerow(["Id, Taxonomy", "TaxId", "Rank", "SciName", "Relation", "Id", "Taxonomy", "TaxId", "Rank",
+                     "SciName"])
+    for d in data:
+        for i in data[d]:
+            isaMates = isaMap.get(i[0], [])
+            for p in isaMates:
+                writer.writerow([p[0], p[0].split(".")[0], p[0].split(".")[1][0], p[0].split(".")[1][1:], p[1],
+                                 "ISA", i[0], i[0].split(".")[0],i[0].split(".")[1][0], i[0].split(".")[1][1:], i[1]])
+    writer.writerow([" "])
+    for d in data:
+        for i in data[d]:
+            artMate = artMap.get(i[0],[])
+        # if the element is at the lowest rank and yet has no suggested articulation,
+        #  ask user to define the articulation for it
+            if i[0].split(".")[0] == source:
+                if artMate == [] and i[3] == leavesRank:
+                    writer.writerow([i[0], i[1], " ", "?", "?"])
+                else:
+                    for a in artMate:
+                        writer.writerow([i[0], i[0].split(".")[0], i[0].split(".")[1][0], i[0].split(".")[1][1:], i[1], "?",
+                                         a[0], a[0].split(".")[0], a[0].split(".")[1][0], a[0].split(".")[1][1:], a[1]])

@@ -1,32 +1,85 @@
 #!/usr/bin/env python
+
+# Copyright (c) 2014 University of California, Davis
+# 
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+#import os
+#import inspect
+#import imp
+#path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+#imp.load_source('parser', path + '/lib1.0/parser.py')
+#imp.load_source('runner', path + '/lib1.0/runner.py')
+#imp.load_source('generator', path + '/lib1.0/generator.py')
 from parser import *
 from runner import *
 from generator import *
+from externaltools import *
 
 def main():
 
-    elParser = EulerParser.instance()
-    ctiParser = CtiParser.instance()
-    (options, args) = elParser.parse_args()
-    if options.verbose:
-      print options
-    if options.inputfile is None:
-      if options.generateCti is False:
-        print "Invalid input: -i/-g must be specified, please run euler -h for more information"
-        return None
-      else:
-        generator = CtiGenerator.instance()
-        generator.run(options)
-    else:
-      if options.generateCti is False:
-        if not reasoner.has_key(options.reasoner):
-          print "unknown reasoner "+options.reasoner#+", please choose one reasoner from "+reasoner.keys().toString()
-          return None
-        elRunner = EulerRunner.instance()
-        elRunner.run(options)
-      else:
-        print "Invalid input: -i/-g cannot be both specified, please run euler -h for more information"
-        return None
+	elParser = EulerParser.instance()
+	#ctiParser = CtiParser.instance()
+	args = elParser.parse_args()
+	if args.verbose:
+		print args
+	if args.inputfile is None:
+		# artificial example generator
+		if args.generateCti:
+			generator = CtiGenerator.instance()
+			generator.run(args)
+		# input wizard
+		elif args.diaglat:
+			runLattice(args.diaglat)
+		elif args.addID:
+			runAddID(args.addID)
+		elif args.addIsa:
+			runAddIsa(args.addIsa)
+		elif args.p2c:
+			runP2C(args.p2c)
+		elif args.p2ct:
+			runP2CT(args.p2ct)
+		elif args.addArt:
+			runAddArt(args.addArt)
+		elif args.addArtT:
+			runAddArtT(args.addArtT)	
+		elif args.c2csv:
+			runC2CSV(args.c2csv)				
+		# wrong argument
+		else:
+			print "Invalid input: -i/-g must be specified, please run euler -h for more information"
+			return None
+	else:
+		if args.generateCti is False:
+			if not reasoner.has_key(args.reasoner):
+				print "unknown reasoner "+args.reasoner#+", please choose one reasoner from "+reasoner.keys().toString()
+				return None
+			elRunner = EulerRunner.instance()
+			elRunner.run(args)
+		else:
+			print "Invalid input: -i/-g cannot be both specified, please run euler -h for more information"
+			return None
 
 if __name__ == '__main__':
-    main()
+	#start_time = time.time()
+	main()
+	#print "\n===> Execution time: " + (time.time() - start_time).__str__() + " seconds\n"
+	

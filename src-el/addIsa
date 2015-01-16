@@ -1,0 +1,103 @@
+#! /usr/bin/env python
+# __author__ = "Parisa Kianmajd"
+#__version__ = "2.0.2"
+
+# Copyright (c) 2014 University of California, Davis
+# 
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+import sys
+import csv
+from operator import itemgetter
+import taxon_dictionary
+import wizardParser
+
+def main(files):
+    dict_data = {}
+    isaMap = {}
+    inputData = []
+    data = {}
+    isDict = {}
+
+    for n in files:
+            inputData += csv.DictReader(open(n)) 
+
+    try:
+        for row in inputData:
+            author = row["Author"]
+            rank = taxon_dictionary.rank2num[row["Rank"]][0]
+            taxon_id = row["ID"]
+            name = row["Name"]
+            if name[0:4] not in dict_data:
+                dict_data[name[0:4]] = []
+            dict_data[name[0:4]].append(row)
+    except ValueError, e:
+        print "Error in the input file:", e
+
+
+    for d in dict_data:
+        for i in dict_data[d]:
+            if d not in data:
+                data[d] = []
+            data[d].append([i["ID"], i["Name"], i["Author"], taxon_dictionary.rank2num[i["Rank"]][0]])
+            
+    # compare the items in the list two by two to find possible ISA pairs
+    for d in data:
+        for i in data[d]:
+            # add an extra field for parent's information.
+            #  This will be used to check if the element is already claimed as a child or not
+            i.append(" ")
+        for taxa1 in data[d]:
+            isa = []
+            rank1 = taxa1[3]
+            for taxa2 in data[d]:
+                rank2 = taxa2[3]
+                g1 = taxa1[0].split(".")[0]
+                g2 = taxa2[0].split(".")[0]
+                 #if the two elements belong to the same taxonomy groups look for potential ISAs
+                if g1 == g2:
+                # if they one is species, is not claimed as a child,
+                #  and its epithet is the same as the name of the other (genus)
+                    if taxa2[4] == " " and ((rank2 == 74 and taxa2[1].split(" ")[0] == taxa1[1]) or (rank1 < rank2)):
+                        isa.append([taxa2[0], taxa2[1], taxa2[3]])
+                        taxa2[4] = taxa1[0]
+            isDict.update({taxa1[0]: isa})
+    for k in isDict:
+        if k.split(".")[0] not in isaMap:
+            isaMap[k.split(".")[0]] = {}
+        isaMap[k.split(".")[0]].update({k:isDict[k]})
+   
+    for g in isaMap:
+        with open("isa" + g + ".csv",  'w+') as oFile:
+            writer = csv.writer(oFile)
+            writer.writerow(["ID1","Taxonomy1", "TaxId1", "Rank1", "SciName1", "Relation", "ID2", "Taxonomy2", "TaxId2", "Rank2",
+                             "SciName2"])
+            for d in data:
+                for i in data[d]:
+                    isaMates = isaMap[g].get(i[0], [])
+                    for p in isaMates:
+                        writer.writerow([p[0], p[0].split(".")[0], p[0].split(".")[1][0], p[0].split(".")[1][1:], p[1],
+                                         "ISA", i[0], i[0].split(".")[0],i[0].split(".")[1][0], i[0].split(".")[1][1:], i[1]])
+
+
+# MAIN
+if __name__ == '__main__':
+    main(wizardParser.args.iFile)

@@ -1,3 +1,25 @@
+# Copyright (c) 2014 University of California, Davis
+# 
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 import os
 import random
 import math
@@ -5,44 +27,43 @@ from helper import *
 from relations import *
 
 class CtiGenerator:
-
-    global inst
+    
     inst = None
-
+    
     def __init__(self):
-	return None
-
+        return None
+    
     # Currently only generate N-ary Cti input files
     def run(self, options):
         self.mednodes = []
-	if options.projectname is None:
-	    options.projectname = "foo"
-	if not os.path.exists(options.outputdir):
-	    os.mkdir(options.outputdir)
-
+        if options.projectname is None:
+            options.projectname = "foo"
+        if options.outputdir is None:
+            options.outputdir = "./"
+        if not os.path.exists(options.outputdir):
+            os.mkdir(options.outputdir)
+            
         # Create a complete n-nary tree
-	if options.nary != 0:
-	    self.ofile = os.path.join(options.outputdir, options.projectname+"_n"+options.nary.__str__()+"_"+options.depth.__str__()+".txt")
-	    fcti = open(self.ofile, 'w')
-	    for i in range(1,3):
-		fcti.write("taxonomy "+i.__str__()+" T"+i.__str__()+"\n")
-		for j in range(options.depth):
-		    slfidx =  int((options.nary ** j - 1) / (options.nary - 1)) + 1
-		    kididx =  int((options.nary ** (j+1) - 1) / (options.nary - 1)) + 1
-		    for k in range(options.nary ** j):
-			fcti.write("("+slfidx.__str__())
-			for t in range(options.nary):
-			    fcti.write(" "+kididx.__str__())
-			    kididx += 1
-		        fcti.write(")\n")
-			slfidx += 1
+        if options.nary != 0:
+            self.ofile = os.path.join(options.outputdir, options.projectname+"_n"+options.nary.__str__()+"_"+options.depth.__str__()+".txt")
+            fcti = open(self.ofile, 'w')
+            for i in range(1,3):
+                fcti.write("taxonomy "+i.__str__()+" T"+i.__str__()+"\n")
+                for j in range(options.depth):
+                    slfidx =  int((options.nary ** j - 1) / (options.nary - 1)) + 1
+                    kididx =  int((options.nary ** (j+1) - 1) / (options.nary - 1)) + 1
+                    for k in range(options.nary ** j):
+                        fcti.write("("+slfidx.__str__())
+                        for t in range(options.nary):
+                            fcti.write(" "+kididx.__str__())
+                            kididx += 1
+                        fcti.write(")\n")
+                        slfidx += 1
                 fcti.write("\n")
             nnodes = (options.nary**(options.depth+1) - 1)/(options.nary-1)
             self.mednodes = range((options.nary**options.depth - 1)/(options.nary-1) + 1,
                         (options.nary**options.depth - 1)/(options.nary-1) + options.nary + 1)
-            print "LALA"
-
-
+        
         # Create a balanced tree
         elif options.nnodes != 0:
             if options.nnodes <= options.depth+1:
@@ -58,32 +79,32 @@ class CtiGenerator:
                 print "Generating a balanced tree:"
                 for i in range(1,options.nnodes+1):
                     print "Node",i,": list of kids",kids[i]
-
-	    for i in range(1,3):
-		fcti.write("taxonomy "+i.__str__()+" T"+i.__str__()+"\n")
-		for j in range(options.depth):
-		    for k in noded[j]:
-			fcti.write("("+k.__str__())
-			for t in kids[k]:
-			    fcti.write(" "+t.__str__())
-		        fcti.write(")\n")
+                    
+            for i in range(1,3):
+                fcti.write("taxonomy "+i.__str__()+" T"+i.__str__()+"\n")
+                for j in range(options.depth):
+                    for k in noded[j]:
+                        fcti.write("("+k.__str__())
+                        for t in kids[k]:
+                            fcti.write(" "+t.__str__())
+                        fcti.write(")\n")
                 fcti.write("\n")
             nnodes = options.nnodes
-
+                
         fcti.write("articulation ar "+options.projectname)
         if(not relation.has_key(options.relation) or options.relation == "no"):
-	    myrel = int(random.randint(0,4))
-	else:
-	    myrel = int(math.log(relation[options.relation],2))
+            myrel = int(random.randint(0,4))
+        else:
+            myrel = int(math.log(relation[options.relation],2))
         # get rel string
-	myrelstr = relstr[myrel]
-	for i in range(1, nnodes+1):
+        myrelstr = relstr[myrel]
+        for i in range(1, nnodes+1):
             if options.incEx and i in self.mednodes:
                 fcti.write("\n[1."+i.__str__()+" equals 2."+i.__str__()+"]")
             else:
                 fcti.write("\n[1."+i.__str__()+" "+myrelstr+" 2."+i.__str__()+"]")
         fcti.close()
-
+        
     def fillBalanced(self, noded, kids, options):
         tmpnnodes = options.nnodes - 1
         for i in range(options.depth+1):
@@ -108,12 +129,9 @@ class CtiGenerator:
             tmpd = (tmpd+1) % options.depth
             if tmpd == 0:
                 options.nary += 1
-
+    
+    @Callable
     def instance():
-	global inst
-	if inst is None:
-	    inst = CtiGenerator()
-	return inst
-
-    instance = Callable(instance)
-
+        if CtiGenerator.inst is None:
+            CtiGenerator.inst = CtiGenerator()
+        return CtiGenerator.inst

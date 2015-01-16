@@ -1,0 +1,95 @@
+#! /usr/bin/env python
+# __author__ = "Parisa Kianmajd"
+#__version__ = "1.0.0"
+
+# Copyright (c) 2014 University of California, Davis
+# 
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+import yaml
+import argparse
+import sys
+
+
+edges = dict()
+nodes = dict()
+def add_edge(s,t,label):
+        edge = {}
+        edge.update({"s" : s})
+        edge.update({"t" : t})
+        edge.update({"label" : label})
+        edges.update({s + "_" + t : edge})
+
+        
+def add_node(concept, group):
+        node = {}
+        node.update({"concept": concept})
+        node.update({"group": group})
+        if group!="(+)":
+            nodes.update({group + "." + concept: node})
+        else:
+            nodes.update({concept: node})
+
+            
+def travserse(t,g, parent):
+        for k in t:
+                add_node(str(k),str(g))
+                if parent != None:
+                        add_edge(str(g) + "." + str(k),  str(g) + "." + str(parent), 'isa')
+                for v in t[k]:
+                        if isinstance(v,dict):
+                                travserse(v,g, k)
+                        else:
+                                add_node(str(v),str(g))
+                                add_edge(str(g) + "." + str(v),  str(g) + "." + str(k), 'isa')
+                               
+def main(inFile):
+        data = dict()
+        dicts = list()
+        for f in inFile:
+                dicts.append(yaml.load(open(f)))
+        for d in dicts:
+                for k, v in d.iteritems():
+                        data.setdefault(k, []).append(v)
+        for k in data:
+                data[k] = [item for sublist in data[k] for item in sublist]
+        for v in data['Taxonomy']:
+                if 'Id' in v:
+                        g = v['Id']
+                if 'Tree' in v:
+                        tree = v['Tree']
+                        travserse(tree[0],g, None)
+        for a in data['Articulations']:
+                art = a.split()
+                add_edge(art[0],art[2],art[1])
+                
+        with sys.stdout as outfile:
+           outfile.write(yaml.safe_dump(nodes, default_flow_style=False))
+           outfile.write(yaml.safe_dump(edges, default_flow_style=False))
+
+           
+if __name__ == '__main__':
+        parser = argparse.ArgumentParser()
+        parser.add_argument("-i","--iFile", action= "append")
+        args = parser.parse_args()
+        if args.iFile == None:
+            args.iFile = "in.yaml"
+        main(args.iFile)

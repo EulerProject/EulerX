@@ -1,0 +1,190 @@
+#! /usr/bin/env python
+# __author__ = "Parisa Kianmajd"
+#__version__ = "2.0.2"
+# This is a new version of Euler Wizard code that when suggesting articulation pairs,
+#  takes ISA relationships into account
+
+# Copyright (c) 2014 University of California, Davis
+# 
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+import sys
+import csv
+from operator import itemgetter
+import taxon_dictionary
+import wizardParser
+
+# global variables
+dict_data = {}
+isaMap = {}
+artMap = {}
+data = {}
+inv_taxon_dictionary = {v: k for k, v in taxon_dictionary.rank2num.items()}
+newIsa = []
+
+def findRank(e):
+    if len(e.split("_")) == 3:
+           return "Subspecies"
+    if len(e.split("_")) == 2:
+        return "Species"
+    if len(e.split("_")) == 1:
+        if e.endswith("ini"):
+            return "Tribe"
+        elif e.endswith("inae"):
+            return "Subfamily"
+        elif e.endswith("idae"):
+            return "Family"
+        elif e.endswith("oidea"):
+            return "Superfamily"
+        else:
+            return "Genus"
+    return "Undefined"
+def main(isaFile, inFile):
+    isa = []
+    inputData = []
+
+    for f in inFile:
+        inputData += csv.DictReader(open(f))
+        
+    try:
+        for row in inputData:
+            author = row["Author"]
+            rank = taxon_dictionary.rank2num[row["Rank"]][0]
+            taxon_id = row["ID"]
+            name = row["Name"]
+            if name[0:4] not in dict_data:
+                dict_data[name[0:4]] = []
+            dict_data[name[0:4]].append(row)
+    except ValueError, e:
+        print "Error in the input file:", e
+    if isaFile != " ":
+        for f in isaFile:
+            newIsa = []
+            for line in csv.DictReader(open(f)):
+                if "ID1" in line.values():
+                    parent = line["ID2"]
+                    child = line ["ID1"]
+                else:
+                    try:
+                        for d in dict_data:
+                            for l in dict_data[d]:
+                                if l["Name"] == line ["Name1"] and l["Author"] == f.split("_")[0]:
+                                    child = l["ID"]
+                                    namec =  line["Name1"]
+                                    rankc = findRank(namec)
+                                elif l["Name"] == line ["Name2"] and l["Author"] == f.split("_")[0]:
+                                    parent = l["ID"]
+                                    namep =  line["Name2"]
+                                    rankp = findRank(namep)
+                        newIsa.append([child, child.split(".")[0], rankc, child.split(".")[1][1:], namec, "ISA", parent, parent.split(".")[0], rankp, parent.split(".")[1][1:],namep])
+                        with open("new" + f, "w") as fNew:
+                            writer = csv.writer(fNew)
+                            writer.writerow(["ID1","Taxonomy1", "TaxId1", "Rank1", "SciName1", "Relation", "ID2", "Taxonomy2", "TaxId2", "Rank2",
+                             "SciName2"])
+                            for i in newIsa:
+                                writer.writerow(i)
+                    except ValueError, e:
+                        print "Error in ISA file:", e
+            if parent not in isaMap:
+                isaMap[parent] = []
+            isaMap[parent].append(child)
+    for d in dict_data:
+        for i in dict_data[d]:
+            if d not in data:
+                data[d] = []
+            data[d].append([i["ID"], i["Name"], i["Author"], taxon_dictionary.rank2num[i["Rank"]][0]])
+            
+    # look for possible articulation pairs
+    for d in data:
+        # articulations are defined from leaves to root
+        data[d] = sorted(data[d], key=itemgetter(3), reverse=True)
+        for taxa1 in data[d]:
+            art = []
+            rank1 = taxa1[3]
+            for taxa2 in data[d]:
+                rank2 = taxa2[3]
+                g1 = taxa1[0].split(".")[0]
+                g2 = taxa2[0].split(".")[0]
+                 #if the two elements belong to the same taxonomy groups look for potential articulations
+                if g1 != g2:
+                    # if they are both at species rank and the first 3 letters on their epithets is the same
+                    if rank1 == 74 and rank2 == 74:
+                        if len(taxa1) >= 3:
+                            if taxa1[1].replace("_"," ").split(" ")[1][0:3] == taxa2[1].replace("_"," ").split(" ")[1][0:3]:
+                                art.append([taxa2[0],taxa2[1],taxa2[3]])
+                        else:
+                            if taxa1[1].replace("_"," ").split(" ")[1][-2:] == taxa2[1].replace("_"," ").split(" ")[1][-2:]:
+                                art.append([taxa2[0],taxa2[1],taxa2[3]])
+                        # keep the source group; this will be needed in CleanTax script,
+                        # where all articulations have the same source node
+                        source = taxa2[0].split(".")[0]
+                    elif art == [] and rank1 - rank2 >= 1:
+                        art.append([taxa2[0], taxa2[1], taxa2[3]])
+                        source = taxa2[0].split(".")[0]
+                    # if the two elements are on the same rank and no articulation is defined between their children
+                    elif isaFile != "" and rank1 == rank2:
+                        if taxa1[0] in isaMap:
+                            for i in isaMap[taxa1[0]]:
+                                if taxa2[0] in isaMap:
+                                    for j in isaMap[taxa2[0]]:
+                                        if i[0] in artMap and j[0] in artMap:
+                                           if i not in artMap[j[0]] and j not in artMap[i[0]] and [taxa2[0],taxa2[1], taxa2[3]] \
+                                                   not in artMap[i[0]] and [taxa1[0], taxa1[1], taxa1[3]] not in artMap[j[0]]:
+                                               art.append([taxa2[0], taxa2[1],taxa2[3]])
+            # if there are more than one suggested articulation mates, pick the more accurate one
+            if len(art) > 1:
+                closestMatch = max(a[2] for a in art)
+                for a in art:
+                    a2 = []
+                    if a[2] == closestMatch:
+                        a2.append(a)
+                        taxa1.append(a2)
+                        artMap.update({taxa1[0]: a2})
+            else:
+                artMap.update({taxa1[0]: art})
+    with sys.stdout as oFile:
+        writer = csv.writer(oFile)
+        writer.writerow(["ID1", "Taxonomy1", "Rank1", "TaxId1", "SciName1", "Relation", "ID2", "Taxonomy2","Rank2", "TaxId2",
+                         "SciName2"])
+        for d in data:
+            for i in data[d]:
+                artMate = artMap.get(i[0],[])
+            # if the element is at the lowest rank and yet has no suggested articulation,
+            #  ask user to define the articulation for it
+                if i[0].split(".")[0] == source and artMate == [] and i[3] == 74:
+                    for k in inv_taxon_dictionary:
+                        if k[1] == i[3]:
+                            rank = inv_taxon_dictionary[k]
+                    writer.writerow([i[0], i[0].split(".")[0], rank, i[0].split(".")[1][1:], i[1] , "?", "?", "?", "?", "?", "?"])
+                else:
+                    for a in artMate:
+                        for k in inv_taxon_dictionary:
+                            if k[1] == i[0].split(".")[1][0]:
+                                rank1 = inv_taxon_dictionary[k]
+                            if k[1] == a[0].split(".")[1][0]:
+                                rank2 = inv_taxon_dictionary[k]
+	                if i[0].split(".")[0] == source:
+                            writer.writerow([i[0], i[0].split(".")[0], rank1, i[0].split(".")[1][1:], i[1], "?",
+                                             a[0], a[0].split(".")[0], rank2, a[0].split(".")[1][1:], a[1]])
+
+# MAIN
+if __name__ == '__main__':
+    main(wizardParser.args.tFile, wizardParser.args.iFile)
