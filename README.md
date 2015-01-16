@@ -23,17 +23,23 @@ Euler is designed for UNIX-like operating systems (Linux, Mac, etc). If you are 
 
 # Structure of This Toolkit
 
-  DIRECTORIES       |  Description                                                          
- :----------------- | :---------------------------------------------------------------------
- `.git/`            |  internal git folder 
- `example/`         |  subfolders with all Euler use cases
- `regress/`         |  for Regression testing
- `src-ct/ `         |  EulerFO source code
- `src-el/`          |  EulerASP source code
+  DIRECTORIES           |  Description                                                          
+ :--------------------- | :---------------------------------------------------------------------
+ `.git/`                |  internal git folder 
+ `ASP/`                 |  some ASP test code
+ `bbox-lattice/`        |  subroutine for blackbox lattice generation
+ `default-stylesheet/`  |  stylesheet files that are used by default
+ `example/`             |  subfolders with all Euler use cases
+ `projects/`            |  side tools and implementations
+ `regress/`             |  for Regression testing
+ `src-ct/ `             |  EulerFO source code
+ `src-el/`              |  EulerASP source code
+ `src-gu/`              |  source code from Gonzaga University
+ `src-tmp/`             |  temporary or deprecated code
 
   FILES             |  Description                                    
  :----------------- | :---------------------------------------------------------------------
- `README.md`        |  file used on Bitbucket homepage
+ `README.md`        |  file used on Github homepage
  `installCheck.sh`  |  installation requirements check
  `src-ct/main.py`   |  main entry of CleanTax++ source code
  `src-el/euler`     |  main entry of EulerASP source code
