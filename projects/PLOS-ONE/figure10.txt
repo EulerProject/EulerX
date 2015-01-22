@@ -1,0 +1,24 @@
+#Franz, N.M. et al. 2014. Reasoning over Taxonomic Change: Exploring Alignments for the Perelleschus Use Case. PONE-D-14-14848.
+#Input dataset for Alignment 3, intensional/ostensive reading, Figure 10.
+#Euler/X run command, Figure 10A: euler -i figure10.txt -e mnpw --rcgo
+#Euler/X run command, Figure 10B: euler -i figure10.txt -e mncb
+taxonomy 2001 FranzOBrien 
+(DER PHY PER)
+(PHY PHYIC PHYsubcin)
+(PER Prectir PevePsul)
+(PevePsul PevePvar PbivPsul)
+(PevePvar Pevelyn Pvariab)
+(PbivPsul Pbivent Psplend PpubPsul)
+(PpubPsul Ppubico PcarPsul)
+(PcarPsul Pcarlud Psulcat)
+
+taxonomy 1986 WibmerOBrien
+(PER Pcarlud Prectir Psubcin)
+
+articulation figure10
+[2001.DER includes 1986.PER]
+[2001.PHY overlaps 1986.PER]
+[2001.PHYsubcin equals 1986.Psubcin]
+[2001.PER overlaps 1986.PER]
+[2001.Prectir equals 1986.Prectir]
+[2001.Pcarlud equals 1986.Pcarlud]

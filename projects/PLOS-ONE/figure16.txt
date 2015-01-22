@@ -1,0 +1,45 @@
+#Franz, N.M. et al. 2014. Reasoning over Taxonomic Change: Exploring Alignments for the Perelleschus Use Case. PONE-D-14-14848.
+#Input dataset for Alignment 6, intensional reading, Figure 16.
+#Euler/X run command, Figure 16: euler -i figure16.txt -e mnpw --rcgo
+taxonomy 2013 FranzCardonaDuque
+(PHYLLO PHY PER)
+(PHY PHYsubcin)
+(PER Prectir PevePspi)
+(PevePspi PevePvar PbivPspi)
+(PevePvar Pevelyn Pvariab)
+(PbivPspi Pbivent Psplend PcarPspi)
+(PcarPspi PcarPsul Ppubico PsalPspi)
+(PcarPsul Pcarlud Psulcat)
+(PsalPspi Psalpin Pspinot)
+
+taxonomy 2001 FranzOBrien 
+(DER PHY PER)
+(PHY PHYsubcin)
+(PER Prectir PevePsul)
+(PevePsul PevePvar PbivPsul)
+(PevePvar Pevelyn Pvariab)
+(PbivPsul Pbivent Psplend PpubPsul)
+(PpubPsul PpubPsul_IC Ppubico PcarPsul)
+(PcarPsul Pcarlud Psulcat)
+
+articulation figure16
+[2013.PHYLLO equals 2001.DER]
+[2013.PHY equals 2001.PHY]
+[2013.PHYsubcin equals 2001.PHYsubcin]
+[2013.PER equals 2001.PER]
+[2013.Prectir equals 2001.Prectir]
+[2013.PevePspi equals 2001.PevePsul]
+[2013.PevePvar equals 2001.PevePvar]
+[2013.Pevelyn equals 2001.Pevelyn]
+[2013.Pvariab equals 2001.Pvariab]
+[2013.PbivPspi equals 2001.PbivPsul]
+[2013.Pbivent equals 2001.Pbivent]
+[2013.Psplend equals 2001.Psplend]
+[2013.PcarPspi equals 2001.PpubPsul]
+[2013.PcarPsul equals 2001.PcarPsul]
+[2013.Pcarlud equals 2001.Pcarlud]
+[2013.Psulcat equals 2001.Psulcat]
+[2013.Ppubico equals 2001.Ppubico]
+[2013.PsalPspi is_included_in 2001.PpubPsul]
+[2013.Psalpin is_included_in 2001.PpubPsul_IC]
+[2013.Pspinot is_included_in 2001.PpubPsul_IC]

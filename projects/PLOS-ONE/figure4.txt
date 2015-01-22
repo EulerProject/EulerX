@@ -1,0 +1,14 @@
+#Franz, N.M. et al. 2014. Reasoning over Taxonomic Change: Exploring Alignments for the Perelleschus Use Case. PONE-D-14-14848.
+#Input dataset for Alignment 1, ostensive reading, Figure 4.
+#Euler/X run command, Figure 4: euler -i figure4.txt -e mnpw --rcgo
+taxonomy 1954 Voss
+(PER Pcarlud Prectir Psubcin)
+
+taxonomy 1936 Guenther
+(ELL ELLcarlud)
+
+articulation figure4
+[1954.PER {includes is_included_in overlaps} 1936.ELL]
+[1954.Pcarlud equals 1936.ELLcarlud]
+[1954.Prectir disjoint 1936.ELLcarlud]
+[1954.Psubcin disjoint 1936.ELLcarlud]

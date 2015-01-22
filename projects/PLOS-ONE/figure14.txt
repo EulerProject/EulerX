@@ -1,0 +1,44 @@
+#Franz, N.M. et al. 2014. Reasoning over Taxonomic Change: Exploring Alignments for the Perelleschus Use Case. PONE-D-14-14848.
+#Input dataset for Alignment 5, intensional reading, Figure 14.
+#Euler/X run command, Figure 14A: euler -i figure14.txt -e mnpw --rcgo
+#Euler/X run command, Figure 14B: euler -i figure14.txt -e mncb
+taxonomy 2013 FranzCardonaDuque
+(PHYLLO PHY PER)
+(PHY PHYsubcin nc)
+(PER Prectir PevePspi)
+(PevePspi PevePvar PbivPspi)
+(PevePvar Pevelyn Pvariab)
+(PbivPspi Pbivent Psplend PcarPspi)
+(PcarPspi PcarPsul Ppubico PsalPspi)
+(PcarPsul Pcarlud Psulcat)
+(PsalPspi Psalpin Pspinot)
+
+taxonomy 2006 Franz
+(PHYLLO PHY PER)
+(PER Prectir PcarPeve)
+(PcarPeve PcarPeve_IC Pcarlud Pevelyn)
+
+articulation figure14 FranzCardonaDuque2013-Franz2006
+[2013.PHYLLO equals 2006.PHYLLO]
+[2013.PHY equals 2006.PHY]
+[2013.PHYsubcin is_included_in 2006.PHY]
+[2013.PER equals 2006.PER]
+[2013.Prectir equals 2006.Prectir]
+[2013.PevePspi is_included_in 2006.PER]
+[2013.PevePspi equals 2006.PcarPeve]
+[2013.PevePvar is_included_in 2006.PER]
+[2013.PevePvar is_included_in 2006.PcarPeve]
+[2013.Pevelyn equals 2006.Pevelyn]
+[2013.Pvariab is_included_in 2006.PcarPeve_IC]
+[2013.PbivPspi is_included_in 2006.PER]
+[2013.PbivPspi is_included_in 2006.PcarPeve]
+[2013.Pbivent is_included_in 2006.PcarPeve_IC]
+[2013.Psplend is_included_in 2006.PcarPeve_IC]
+[2013.PcarPspi is_included_in 2006.PcarPeve]
+[2013.PcarPsul is_included_in 2006.PcarPeve]
+[2013.Pcarlud equals 2006.Pcarlud] 
+[2013.Psulcat is_included_in 2006.PcarPeve_IC]
+[2013.Ppubico is_included_in 2006.PcarPeve_IC]
+[2013.PsalPspi is_included_in 2006.PcarPeve]
+[2013.Psalpin is_included_in 2006.PcarPeve_IC]
+[2013.Pspinot is_included_in 2006.PcarPeve_IC]

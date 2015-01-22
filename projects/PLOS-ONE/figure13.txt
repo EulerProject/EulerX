@@ -1,0 +1,44 @@
+#Franz, N.M. et al. 2014. Reasoning over Taxonomic Change: Exploring Alignments for the Perelleschus Use Case. PONE-D-14-14848.
+#Input dataset for Alignment 5, ostensive reading, Figure 13.
+#Euler/X run command, Figure 13A: euler -i figure13.txt -e mnpw --rcgo
+#Euler/X run command, Figure 13B: euler -i figure13.txt -e mncb
+taxonomy 2013 FranzCardonaDuque
+(PHYLLO PHY PER)
+(PHY PHYsubcin nc)
+(PER Prectir PevePspi)
+(PevePspi PevePvar PbivPspi)
+(PevePvar Pevelyn Pvariab)
+(PbivPspi Pbivent Psplend PcarPspi)
+(PcarPspi PcarPsul Ppubico PsalPspi)
+(PcarPsul Pcarlud Psulcat)
+(PsalPspi Psalpin Pspinot)
+
+taxonomy 2006 Franz
+(PHYLLO PHY PER)
+(PER Prectir PcarPeve)
+(PcarPeve Pcarlud Pevelyn)
+
+articulation figure13
+[2013.PHYLLO includes 2006.PHYLLO]
+[2013.PHY equals 2006.PHY]
+[2013.PHYsubcin is_included_in 2006.PHY]
+[2013.PER includes 2006.PER]
+[2013.Prectir equals 2006.Prectir]
+[2013.PevePspi overlaps 2006.PER]
+[2013.PevePspi includes 2006.PcarPeve]
+[2013.PevePvar overlaps 2006.PER]
+[2013.PevePvar overlaps 2006.PcarPeve]
+[2013.Pevelyn equals 2006.Pevelyn]
+[2013.Pvariab disjoint 2006.PcarPeve]
+[2013.PbivPspi overlaps 2006.PER]
+[2013.PbivPspi overlaps 2006.PcarPeve]
+[2013.Pbivent disjoint 2006.PcarPeve]
+[2013.Psplend disjoint 2006.PcarPeve]
+[2013.PcarPspi overlaps 2006.PcarPeve]
+[2013.PcarPsul overlaps 2006.PcarPeve]
+[2013.Pcarlud equals 2006.Pcarlud]
+[2013.Psulcat disjoint 2006.PcarPeve]
+[2013.Ppubico disjoint 2006.PcarPeve]
+[2013.PsalPspi disjoint 2006.PcarPeve]
+[2013.Psalpin disjoint 2006.PcarPeve]
+[2013.Pspinot disjoint 2006.PcarPeve]
