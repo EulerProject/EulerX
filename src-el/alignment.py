@@ -558,6 +558,7 @@ class TaxonomyMapping:
                 print "************************************"
                 print "UNIQUE POSSIBLE WORLD"
                 self.allMinimalArtSubsets(sets.Set(self.articulations))
+                #self.allMaximalAmbArts(sets.Set(self.articulations))
                 return
         if self.isPwNone():
             print "************************************"
@@ -1203,6 +1204,52 @@ class TaxonomyMapping:
             tmpart = copy.copy(artSet)
             tmpart.remove(a)
             self.computeAllMAS(tmpart, justSet, tmpcur, allpaths)
+            
+    # compute all Maximal Ambiguous Articulation (MAA) that have the multiple PW
+    def allMaximalAmbArts(self, artSet):
+        s = sets.Set()
+        curpath = sets.Set()
+        allpaths = sets.Set()
+        self.computeAllMAA(artSet, s, curpath, allpaths)
+
+    def computeAllMAA(self, artSet, justSet, curpath, allpaths):
+        for path in allpaths:
+            if path.issubset(curpath):
+                return
+        if not self.isResultUnique(artSet):
+            justSet.update(artSet)
+            allpaths.add(curpath)
+            return
+        j = sets.Set()
+        for s in justSet:
+            if len(s.intersection(curpath)) == 0:
+                j = s
+                break
+        if len(j) == 0:
+            j = self.computeOneMAA(artSet)
+            if len(j) != 0:
+                lj = list(j)
+                print "************************************"
+                print "Maximal ambiguous articulation subset ",self.fixedCnt,": [",
+                for i in range(len(lj)):
+                    if i != 0: print ",",
+                    print lj[i].ruleNum,":",lj[i].string,
+                print "]"
+                print "************************************"
+                self.fixedCnt += 1
+            for p in curpath:
+                tmpj = copy.copy(j)
+                tmpj.add(p)
+                if not self.isResultUnique(tmpj):
+                    j = tmpj
+        if len(j) != 0:
+            justSet.add(j)
+        for a in j:
+            tmpcur = copy.copy(curpath)
+            tmpcur.add(a)
+            tmpart = copy.copy(artSet)
+            tmpart.remove(a)
+            self.computeAllMAS(tmpart, justSet, tmpcur, allpaths)
 
     def isResultUnique(self, artSet):
         tmpart1 = copy.copy(self.articulations)
@@ -1217,11 +1264,16 @@ class TaxonomyMapping:
         self.eq = {}
         tmpart = copy.copy(artSet)
         for i in range(len(artSet)):
-            self.addArticulation(tmpart.pop().string)
+            aa = tmpart.pop().string
+            #self.addArticulation(tmpart.pop().string)
+            self.addArticulation(aa)
+            print aa
         # Now refresh the input file
         self.genASP()
         # Run the reasoner again
         self.pw = commands.getoutput(self.com)
+        print "# of PW", self.pw.strip().count("{")
+        print ""
 
         self.articulations = tmpart1
         self.mir = tmpmir
@@ -1239,6 +1291,12 @@ class TaxonomyMapping:
         return self.computeJust(sets.Set(), artSet)
 
     def computeOneMAS(self, artSet):
+        if not self.isResultUnique(artSet):
+            return sets.Set()
+        return self.computeMAS(sets.Set(), artSet)
+    
+    # same to computeOneMAS
+    def computeOneMAA(self, artSet):
         if not self.isResultUnique(artSet):
             return sets.Set()
         return self.computeMAS(sets.Set(), artSet)
