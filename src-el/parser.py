@@ -133,5 +133,7 @@ class EulerParser:
             EulerParser.inst.add_argument("--addArt", dest="addArt", help="input wizard, addArt")
             EulerParser.inst.add_argument("--c2csv", dest="c2csv", help="input wizard, c2csv")
             EulerParser.inst.add_argument("--addArtT", nargs="*", dest="addArtT", help="input wizard, addArt -t")
+            EulerParser.inst.add_argument("--addRank", dest="addRank", help="input wizard, addRank")
+            EulerParser.inst.add_argument("--mirStats", nargs="*", dest="mirStats", help="input wizard, mirStats")
             EulerParser.inst.add_argument('--version', action='version', version='<the version>')
         return EulerParser.inst
