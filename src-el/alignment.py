@@ -95,6 +95,7 @@ class TaxonomyMapping:
         self.clusterVizEdges = {}              # edges for cluster visualization in stylesheet
         self.leafConcepts = []                 # concepts from input that are leaf nodes
         self.nonleafConcepts = []              # concepts from input that are not leaf nodes
+        self.nosiblingdisjointness = []        # pairs that has no sibling disjointness
         self.args = args
         if self.args.ieo:
             self.args.ie = True
@@ -1834,11 +1835,18 @@ class TaxonomyMapping:
     def genAspPC(self):
         self.baseAsp += "\n%%% Parent-Child relations\n"
         for key in self.taxonomies.keys():
+#            print "taxa=", self.taxonomies[key].taxa
             queue = copy.deepcopy(self.taxonomies[key].roots)
             while len(queue) != 0:
                 if self.args.verbose:
                     print "PC: ",queue
                 t = queue.pop(0)
+#                print "original t=", t 
+#                print "parent", t.parent
+#                for child in t.children:
+#                    print "children", child.dlvName() 
+#                print "t.name", t.name
+#                print "t.abbrev", t.abbrev
                 # This is a nc flag
                 if t.abbrev == "nc":
                     self.baseAsp += "ncf(" + t.dlvName() + ").\n"
@@ -1889,37 +1897,47 @@ class TaxonomyMapping:
                         self.baseAsp += coverout + ", pw.\n"
                         #self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") " +coverage + ".\n\n"
                         
-                        # D
+                        # D enable sibling disjointness globally, by default is ON
                         if self.args.enableSD:
                             self.baseAsp += "%% sibling disjointness\n"
                             for i in range(len(t.children) - 1):
                                 for j in range(i+1, len(t.children)):
                                     name1 = t.children[i].dlvName()
                                     name2 = t.children[j].dlvName()
-                                    ruleNum = len(self.rules)
-                                    self.rules["r" + ruleNum.__str__()] = t.children[i].dotName() + " disjoint " + t.children[j].dotName()
-                                    self.baseAsp += "% " + name1 + " ! " + name2+ "\n"
-                                    #self.baseAsp += "out(" + name1 + ", X) :- in(" + name2+ ", X).\n"
-                                    #self.baseAsp += "out(" + name2 + ", X) :- in(" + name1+ ", X).\n"
-                                    #self.baseAsp += "in(" + name1 + ", X) v out(" + name1 + ", X) :- out(" + name2 + ", X).\n"
-                                    #self.baseAsp += "in(" + name2 + ", X) v out(" + name2 + ", X) :- out(" + name1 + ", X).\n"
-                                    self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") :- in(" + name1 + ", X), in(" + name2+ ", X).\n"
-                                    if reasoner[self.args.reasoner] == reasoner["dlv"]:
+                                    name_a = t.children[i].dotName()
+                                    name_b = t.children[j].dotName()
+                                    gotPairWithNoSD = False
+                                    # D' enter into the mode that disable sibling disjointness locally, by default is OFF
+                                    if self.args.disableSDP:
+                                        for pair in self.nosiblingdisjointness:
+                                            if name_a in pair and name_b in pair:
+                                                gotPairWithNoSD = True
+                                                break
+                                    if not gotPairWithNoSD:
+                                        ruleNum = len(self.rules)
+                                        self.rules["r" + ruleNum.__str__()] = t.children[i].dotName() + " disjoint " + t.children[j].dotName()
+                                        self.baseAsp += "% " + name1 + " ! " + name2+ "\n"
+                                        #self.baseAsp += "out(" + name1 + ", X) :- in(" + name2+ ", X).\n"
+                                        #self.baseAsp += "out(" + name2 + ", X) :- in(" + name1+ ", X).\n"
+                                        #self.baseAsp += "in(" + name1 + ", X) v out(" + name1 + ", X) :- out(" + name2 + ", X).\n"
+                                        #self.baseAsp += "in(" + name2 + ", X) v out(" + name2 + ", X) :- out(" + name1 + ", X).\n"
+                                        self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") :- in(" + name1 + ", X), in(" + name2+ ", X).\n"
+                                        if reasoner[self.args.reasoner] == reasoner["dlv"]:
+                                            if t.children[i].abbrev.find("nc") == -1:
+                                                self.baseAsp += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2+ ", X)} = 0, pw.\n"
+                                            if t.children[j].abbrev.find("nc") == -1:
+                                                self.baseAsp += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2+ ", X)} = 0, pw.\n"
+                                        elif reasoner[self.args.reasoner] == reasoner["gringo"]:
+                                            if t.children[i].abbrev.find("nc") == -1:
+                                                self.baseAsp += ":- [vrs(X): in(" + name1 + ", X): out(" + name2+ ", X)]0, pw.\n"
+                                            if t.children[j].abbrev.find("nc") == -1:
+                                                self.baseAsp += ":- [vrs(X): out(" + name1 + ", X): in(" + name2+ ", X)]0, pw.\n"
                                         if t.children[i].abbrev.find("nc") == -1:
-                                            self.baseAsp += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2+ ", X)} = 0, pw.\n"
+                                            self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
+                                            self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
                                         if t.children[j].abbrev.find("nc") == -1:
-                                            self.baseAsp += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2+ ", X)} = 0, pw.\n"
-                                    elif reasoner[self.args.reasoner] == reasoner["gringo"]:
-                                        if t.children[i].abbrev.find("nc") == -1:
-                                            self.baseAsp += ":- [vrs(X): in(" + name1 + ", X): out(" + name2+ ", X)]0, pw.\n"
-                                        if t.children[j].abbrev.find("nc") == -1:
-                                            self.baseAsp += ":- [vrs(X): out(" + name1 + ", X): in(" + name2+ ", X)]0, pw.\n"
-                                    if t.children[i].abbrev.find("nc") == -1:
-                                        self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
-                                        self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
-                                    if t.children[j].abbrev.find("nc") == -1:
-                                        self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 2) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
-                                        self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 2) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
+                                            self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 2) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
+                                            self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 2) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                     elif self.enc & encode["direct"]:
                         # ISA
                         # C
@@ -2102,6 +2120,9 @@ class TaxonomyMapping:
               
             elif (re.match("temporal", line)):
                 flag = "temporal"
+                
+            elif (re.match("NoSiblingDisjointness", line)):
+                flag = "noSD"
               
             # reads in lines of the form (a b c) where a is the parent
             # and b c are the children
@@ -2128,6 +2149,8 @@ class TaxonomyMapping:
                     self.addLocation(line)
                 elif flag == "temporal":
                     self.addTemporal(line)
+                elif flag == "noSD":
+                    self.addnonSDpair(line)
                 else:
                     None
                     
@@ -2227,7 +2250,11 @@ class TaxonomyMapping:
             if self.obslen > 3 and not self.exptmp:
                 self.temporal.append(obsin[3])
         self.obs.append(obs)
-
+        
+    def addnonSDpair(self, line):
+        pairs = re.match("\((.*)\)", line).group(1)
+        pairs = re.split("\s", pairs)
+        self.nosiblingdisjointness.append(pairs)
 
     def dotName2dlv(self, dotName):
         elems = re.match("(.*)\.(.*)", dotName)
