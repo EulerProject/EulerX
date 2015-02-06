@@ -96,6 +96,8 @@ class TaxonomyMapping:
         self.leafConcepts = []                 # concepts from input that are leaf nodes
         self.nonleafConcepts = []              # concepts from input that are not leaf nodes
         self.nosiblingdisjointness = []        # pairs that has no sibling disjointness
+        self.artDict = {}                      # dictionary map articulation with articulation index
+        self.arts2NumPW = {}                    # dictionary map articulation sets to number of PW
         self.args = args
         if self.args.ieo:
             self.args.ie = True
@@ -559,6 +561,10 @@ class TaxonomyMapping:
                 print "************************************"
                 print "UNIQUE POSSIBLE WORLD"
                 self.allMinimalArtSubsets(sets.Set(self.articulations))
+                fArt = open("arts2NumPW.py", "w")
+                fArt.write("artD = "+repr(self.arts2NumPW) + "\n")
+                fArt.close()
+
                 #self.allMaximalAmbArts(sets.Set(self.articulations))
                 return
         if self.isPwNone():
@@ -1268,13 +1274,15 @@ class TaxonomyMapping:
             aa = tmpart.pop().string
             #self.addArticulation(tmpart.pop().string)
             self.addArticulation(aa)
-            print aa
         # Now refresh the input file
         self.genASP()
         # Run the reasoner again
         self.pw = commands.getoutput(self.com)
-        print "# of PW", self.pw.strip().count("{")
-        print ""
+        tmpList = []
+        for e in self.articulations:
+            tmpList.append(self.artDict[e.string].__str__())
+        tmpTuple = tuple(sorted(tmpList))
+        self.arts2NumPW[tmpTuple] = self.pw.strip().count("{")
 
         self.articulations = tmpart1
         self.mir = tmpmir
@@ -1835,18 +1843,11 @@ class TaxonomyMapping:
     def genAspPC(self):
         self.baseAsp += "\n%%% Parent-Child relations\n"
         for key in self.taxonomies.keys():
-#            print "taxa=", self.taxonomies[key].taxa
             queue = copy.deepcopy(self.taxonomies[key].roots)
             while len(queue) != 0:
                 if self.args.verbose:
                     print "PC: ",queue
                 t = queue.pop(0)
-#                print "original t=", t 
-#                print "parent", t.parent
-#                for child in t.children:
-#                    print "children", child.dlvName() 
-#                print "t.name", t.name
-#                print "t.abbrev", t.abbrev
                 # This is a nc flag
                 if t.abbrev == "nc":
                     self.baseAsp += "ncf(" + t.dlvName() + ").\n"
@@ -2194,6 +2195,11 @@ class TaxonomyMapping:
             
         # used for input viz
         self.inputVisualization(group2concepts, art)
+        
+        # used for dict map articulation to index
+        if self.args.artRem:
+            for a in art:
+                self.artDict[a] = art.index(a)+1
         
         # update leaf concepts
         self.leafConcepts = list(set(self.leafConcepts).difference(self.nonleafConcepts))
