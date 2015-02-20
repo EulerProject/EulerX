@@ -138,6 +138,19 @@ class TaxonomyMapping:
         self.inputfilesdir = os.path.join(args.outputdir, "0-input") 
         if not os.path.exists(self.inputfilesdir):
             os.mkdir(self.inputfilesdir)
+        # copy input file to output dir
+        copyfile(os.path.join(self.args.inputdir, self.args.inputfile[0]),\
+                 os.path.join(self.inputfilesdir, self.name+".txt"))
+        # set up stylesheets folder
+        self.path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+        self.stylesheetdir = os.path.join(args.inputdir, "stylesheets/")
+        if not os.path.exists(self.stylesheetdir):
+            self.stylesheetdir = self.path + "/../default_stylesheet/"
+        elif not os.listdir(self.stylesheetdir):
+            self.stylesheetdir = self.path + "/../default_stylesheet/"
+                
+        if self.args.inputViz:
+            return
         self.aspdir = os.path.join(args.outputdir, "1-ASP-input-code")
         if not os.path.exists(self.aspdir):
             os.mkdir(self.aspdir)
@@ -163,9 +176,6 @@ class TaxonomyMapping:
         if not os.path.exists(self.logsdir):
             os.mkdir(self.logsdir)
 
-        # copy input file to output dir
-        copyfile(os.path.join(self.args.inputdir, self.args.inputfile[0]),\
-                 os.path.join(self.inputfilesdir, self.name+".txt"))        
         self.pwfile = os.path.join(self.aspdir, self.name+"_pw."+self.args.reasoner)
         self.cbfile = os.path.join(self.aspdir, self.name+"_cb."+self.args.reasoner)
         self.pwswitch = os.path.join(self.aspdir, self.name+"_pwswitch."+self.args.reasoner)
@@ -222,12 +232,6 @@ class TaxonomyMapping:
         self.iefile = os.path.join(self.pwsdotdir, self.name+"_ie.gv")
         self.iepdf = os.path.join(self.pwspdfdir, self.name+"_ie.pdf")
         #self.ivpdf = os.path.join(self.pwspdfdir, self.name+"_iv.pdf")
-        self.path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-        self.stylesheetdir = os.path.join(args.inputdir, "stylesheets/")
-        if not os.path.exists(self.stylesheetdir):
-            self.stylesheetdir = self.path + "/../default_stylesheet/"
-        elif not os.listdir(self.stylesheetdir):
-            self.stylesheetdir = self.path + "/../default_stylesheet/"
         if reasoner[self.args.reasoner] == reasoner["gringo"]:
             # possible world command
             self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0 | "+self.path+"/muniq -u"
@@ -282,6 +286,8 @@ class TaxonomyMapping:
         #    inputVisualizer = InputVisual.instance()
         #    inputVisualizer.run(self.args.inputdir, self.args.inputfile, self.ivout)
         #    commands.getoutput("dot -Tpdf "+self.ivout+" -o "+self.ivpdf)
+        if self.args.inputViz:
+            return
         if not self.enc:
             return
         print "******* You are running example", self.name, "*******"
@@ -2195,6 +2201,8 @@ class TaxonomyMapping:
             
         # used for input viz
         self.inputVisualization(group2concepts, art)
+        if self.args.inputViz:
+            return
         
         # used for dict map articulation to index
         if self.args.artRem:
