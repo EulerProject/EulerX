@@ -98,7 +98,7 @@ Still under `example/` directory (assuming `src-el/` is in your PATH env, and gr
 
 # Contact
 
-If you have any question or comments, please contact Bertram Ludaescher at ludaesch@illinois.edu.
+If you have any question or comments, please contact Shizhuo Yu at szyu@ucdavis.edu.
 
 [euler]: http://euler.cs.ucdavis.edu/
 [gitdownloads]:http://git-scm.com/downloads/ 
