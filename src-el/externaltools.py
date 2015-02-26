@@ -51,3 +51,9 @@ def runAddArtT(fileName):
 
 def runC2CSV(fileName):
     call("c2csv -i " + fileName, shell=True)
+
+def runAddRank(fileName):
+    call("cat " + fileName + " | addRank", shell=True)
+
+def runMirStats(fileName):
+    call("mirStats -i " + fileName[0] + " -r " + fileName[1], shell=True)

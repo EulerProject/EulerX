@@ -95,6 +95,9 @@ class TaxonomyMapping:
         self.clusterVizEdges = {}              # edges for cluster visualization in stylesheet
         self.leafConcepts = []                 # concepts from input that are leaf nodes
         self.nonleafConcepts = []              # concepts from input that are not leaf nodes
+        self.nosiblingdisjointness = []        # pairs that has no sibling disjointness
+        self.artDict = {}                      # dictionary map articulation with articulation index
+        self.arts2NumPW = {}                    # dictionary map articulation sets to number of PW
         self.args = args
         if self.args.ieo:
             self.args.ie = True
@@ -135,6 +138,19 @@ class TaxonomyMapping:
         self.inputfilesdir = os.path.join(args.outputdir, "0-input") 
         if not os.path.exists(self.inputfilesdir):
             os.mkdir(self.inputfilesdir)
+        # copy input file to output dir
+        copyfile(os.path.join(self.args.inputdir, self.args.inputfile[0]),\
+                 os.path.join(self.inputfilesdir, self.name+".txt"))
+        # set up stylesheets folder
+        self.path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+        self.stylesheetdir = os.path.join(args.inputdir, "stylesheets/")
+        if not os.path.exists(self.stylesheetdir):
+            self.stylesheetdir = self.path + "/../default_stylesheet/"
+        elif not os.listdir(self.stylesheetdir):
+            self.stylesheetdir = self.path + "/../default_stylesheet/"
+                
+        if self.args.inputViz:
+            return
         self.aspdir = os.path.join(args.outputdir, "1-ASP-input-code")
         if not os.path.exists(self.aspdir):
             os.mkdir(self.aspdir)
@@ -160,9 +176,6 @@ class TaxonomyMapping:
         if not os.path.exists(self.logsdir):
             os.mkdir(self.logsdir)
 
-        # copy input file to output dir
-        copyfile(os.path.join(self.args.inputdir, self.args.inputfile[0]),\
-                 os.path.join(self.inputfilesdir, self.name+".txt"))        
         self.pwfile = os.path.join(self.aspdir, self.name+"_pw."+self.args.reasoner)
         self.cbfile = os.path.join(self.aspdir, self.name+"_cb."+self.args.reasoner)
         self.pwswitch = os.path.join(self.aspdir, self.name+"_pwswitch."+self.args.reasoner)
@@ -219,12 +232,6 @@ class TaxonomyMapping:
         self.iefile = os.path.join(self.pwsdotdir, self.name+"_ie.gv")
         self.iepdf = os.path.join(self.pwspdfdir, self.name+"_ie.pdf")
         #self.ivpdf = os.path.join(self.pwspdfdir, self.name+"_iv.pdf")
-        self.path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-        self.stylesheetdir = os.path.join(args.inputdir, "stylesheets/")
-        if not os.path.exists(self.stylesheetdir):
-            self.stylesheetdir = self.path + "/../default_stylesheet/"
-        elif not os.listdir(self.stylesheetdir):
-            self.stylesheetdir = self.path + "/../default_stylesheet/"
         if reasoner[self.args.reasoner] == reasoner["gringo"]:
             # possible world command
             self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0 | "+self.path+"/muniq -u"
@@ -279,6 +286,8 @@ class TaxonomyMapping:
         #    inputVisualizer = InputVisual.instance()
         #    inputVisualizer.run(self.args.inputdir, self.args.inputfile, self.ivout)
         #    commands.getoutput("dot -Tpdf "+self.ivout+" -o "+self.ivpdf)
+        if self.args.inputViz:
+            return
         if not self.enc:
             return
         print "******* You are running example", self.name, "*******"
@@ -558,6 +567,11 @@ class TaxonomyMapping:
                 print "************************************"
                 print "UNIQUE POSSIBLE WORLD"
                 self.allMinimalArtSubsets(sets.Set(self.articulations))
+                fArt = open("arts2NumPW.py", "w")
+                fArt.write("artD = "+repr(self.arts2NumPW) + "\n")
+                fArt.close()
+
+                #self.allMaximalAmbArts(sets.Set(self.articulations))
                 return
         if self.isPwNone():
             print "************************************"
@@ -1203,6 +1217,52 @@ class TaxonomyMapping:
             tmpart = copy.copy(artSet)
             tmpart.remove(a)
             self.computeAllMAS(tmpart, justSet, tmpcur, allpaths)
+            
+    # compute all Maximal Ambiguous Articulation (MAA) that have the multiple PW
+    def allMaximalAmbArts(self, artSet):
+        s = sets.Set()
+        curpath = sets.Set()
+        allpaths = sets.Set()
+        self.computeAllMAA(artSet, s, curpath, allpaths)
+
+    def computeAllMAA(self, artSet, justSet, curpath, allpaths):
+        for path in allpaths:
+            if path.issubset(curpath):
+                return
+        if not self.isResultUnique(artSet):
+            justSet.update(artSet)
+            allpaths.add(curpath)
+            return
+        j = sets.Set()
+        for s in justSet:
+            if len(s.intersection(curpath)) == 0:
+                j = s
+                break
+        if len(j) == 0:
+            j = self.computeOneMAA(artSet)
+            if len(j) != 0:
+                lj = list(j)
+                print "************************************"
+                print "Maximal ambiguous articulation subset ",self.fixedCnt,": [",
+                for i in range(len(lj)):
+                    if i != 0: print ",",
+                    print lj[i].ruleNum,":",lj[i].string,
+                print "]"
+                print "************************************"
+                self.fixedCnt += 1
+            for p in curpath:
+                tmpj = copy.copy(j)
+                tmpj.add(p)
+                if not self.isResultUnique(tmpj):
+                    j = tmpj
+        if len(j) != 0:
+            justSet.add(j)
+        for a in j:
+            tmpcur = copy.copy(curpath)
+            tmpcur.add(a)
+            tmpart = copy.copy(artSet)
+            tmpart.remove(a)
+            self.computeAllMAS(tmpart, justSet, tmpcur, allpaths)
 
     def isResultUnique(self, artSet):
         tmpart1 = copy.copy(self.articulations)
@@ -1217,11 +1277,18 @@ class TaxonomyMapping:
         self.eq = {}
         tmpart = copy.copy(artSet)
         for i in range(len(artSet)):
-            self.addArticulation(tmpart.pop().string)
+            aa = tmpart.pop().string
+            #self.addArticulation(tmpart.pop().string)
+            self.addArticulation(aa)
         # Now refresh the input file
         self.genASP()
         # Run the reasoner again
         self.pw = commands.getoutput(self.com)
+        tmpList = []
+        for e in self.articulations:
+            tmpList.append(self.artDict[e.string].__str__())
+        tmpTuple = tuple(sorted(tmpList))
+        self.arts2NumPW[tmpTuple] = self.pw.strip().count("{")
 
         self.articulations = tmpart1
         self.mir = tmpmir
@@ -1239,6 +1306,12 @@ class TaxonomyMapping:
         return self.computeJust(sets.Set(), artSet)
 
     def computeOneMAS(self, artSet):
+        if not self.isResultUnique(artSet):
+            return sets.Set()
+        return self.computeMAS(sets.Set(), artSet)
+    
+    # same to computeOneMAS
+    def computeOneMAA(self, artSet):
         if not self.isResultUnique(artSet):
             return sets.Set()
         return self.computeMAS(sets.Set(), artSet)
@@ -1831,37 +1904,47 @@ class TaxonomyMapping:
                         self.baseAsp += coverout + ", pw.\n"
                         #self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") " +coverage + ".\n\n"
                         
-                        # D
+                        # D enable sibling disjointness globally, by default is ON
                         if self.args.enableSD:
                             self.baseAsp += "%% sibling disjointness\n"
                             for i in range(len(t.children) - 1):
                                 for j in range(i+1, len(t.children)):
                                     name1 = t.children[i].dlvName()
                                     name2 = t.children[j].dlvName()
-                                    ruleNum = len(self.rules)
-                                    self.rules["r" + ruleNum.__str__()] = t.children[i].dotName() + " disjoint " + t.children[j].dotName()
-                                    self.baseAsp += "% " + name1 + " ! " + name2+ "\n"
-                                    #self.baseAsp += "out(" + name1 + ", X) :- in(" + name2+ ", X).\n"
-                                    #self.baseAsp += "out(" + name2 + ", X) :- in(" + name1+ ", X).\n"
-                                    #self.baseAsp += "in(" + name1 + ", X) v out(" + name1 + ", X) :- out(" + name2 + ", X).\n"
-                                    #self.baseAsp += "in(" + name2 + ", X) v out(" + name2 + ", X) :- out(" + name1 + ", X).\n"
-                                    self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") :- in(" + name1 + ", X), in(" + name2+ ", X).\n"
-                                    if reasoner[self.args.reasoner] == reasoner["dlv"]:
+                                    name_a = t.children[i].dotName()
+                                    name_b = t.children[j].dotName()
+                                    gotPairWithNoSD = False
+                                    # D' enter into the mode that disable sibling disjointness locally, by default is OFF
+                                    if self.args.disableSDP:
+                                        for pair in self.nosiblingdisjointness:
+                                            if name_a in pair and name_b in pair:
+                                                gotPairWithNoSD = True
+                                                break
+                                    if not gotPairWithNoSD:
+                                        ruleNum = len(self.rules)
+                                        self.rules["r" + ruleNum.__str__()] = t.children[i].dotName() + " disjoint " + t.children[j].dotName()
+                                        self.baseAsp += "% " + name1 + " ! " + name2+ "\n"
+                                        #self.baseAsp += "out(" + name1 + ", X) :- in(" + name2+ ", X).\n"
+                                        #self.baseAsp += "out(" + name2 + ", X) :- in(" + name1+ ", X).\n"
+                                        #self.baseAsp += "in(" + name1 + ", X) v out(" + name1 + ", X) :- out(" + name2 + ", X).\n"
+                                        #self.baseAsp += "in(" + name2 + ", X) v out(" + name2 + ", X) :- out(" + name1 + ", X).\n"
+                                        self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") :- in(" + name1 + ", X), in(" + name2+ ", X).\n"
+                                        if reasoner[self.args.reasoner] == reasoner["dlv"]:
+                                            if t.children[i].abbrev.find("nc") == -1:
+                                                self.baseAsp += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2+ ", X)} = 0, pw.\n"
+                                            if t.children[j].abbrev.find("nc") == -1:
+                                                self.baseAsp += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2+ ", X)} = 0, pw.\n"
+                                        elif reasoner[self.args.reasoner] == reasoner["gringo"]:
+                                            if t.children[i].abbrev.find("nc") == -1:
+                                                self.baseAsp += ":- [vrs(X): in(" + name1 + ", X): out(" + name2+ ", X)]0, pw.\n"
+                                            if t.children[j].abbrev.find("nc") == -1:
+                                                self.baseAsp += ":- [vrs(X): out(" + name1 + ", X): in(" + name2+ ", X)]0, pw.\n"
                                         if t.children[i].abbrev.find("nc") == -1:
-                                            self.baseAsp += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2+ ", X)} = 0, pw.\n"
+                                            self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
+                                            self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
                                         if t.children[j].abbrev.find("nc") == -1:
-                                            self.baseAsp += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2+ ", X)} = 0, pw.\n"
-                                    elif reasoner[self.args.reasoner] == reasoner["gringo"]:
-                                        if t.children[i].abbrev.find("nc") == -1:
-                                            self.baseAsp += ":- [vrs(X): in(" + name1 + ", X): out(" + name2+ ", X)]0, pw.\n"
-                                        if t.children[j].abbrev.find("nc") == -1:
-                                            self.baseAsp += ":- [vrs(X): out(" + name1 + ", X): in(" + name2+ ", X)]0, pw.\n"
-                                    if t.children[i].abbrev.find("nc") == -1:
-                                        self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
-                                        self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
-                                    if t.children[j].abbrev.find("nc") == -1:
-                                        self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 2) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
-                                        self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 2) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
+                                            self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 2) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
+                                            self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 2) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                     elif self.enc & encode["direct"]:
                         # ISA
                         # C
@@ -2044,6 +2127,9 @@ class TaxonomyMapping:
               
             elif (re.match("temporal", line)):
                 flag = "temporal"
+                
+            elif (re.match("NoSiblingDisjointness", line)):
+                flag = "noSD"
               
             # reads in lines of the form (a b c) where a is the parent
             # and b c are the children
@@ -2070,6 +2156,8 @@ class TaxonomyMapping:
                     self.addLocation(line)
                 elif flag == "temporal":
                     self.addTemporal(line)
+                elif flag == "noSD":
+                    self.addnonSDpair(line)
                 else:
                     None
                     
@@ -2113,6 +2201,13 @@ class TaxonomyMapping:
             
         # used for input viz
         self.inputVisualization(group2concepts, art)
+        if self.args.inputViz:
+            return
+        
+        # used for dict map articulation to index
+        if self.args.artRem:
+            for a in art:
+                self.artDict[a] = art.index(a)+1
         
         # update leaf concepts
         self.leafConcepts = list(set(self.leafConcepts).difference(self.nonleafConcepts))
@@ -2169,7 +2264,11 @@ class TaxonomyMapping:
             if self.obslen > 3 and not self.exptmp:
                 self.temporal.append(obsin[3])
         self.obs.append(obs)
-
+        
+    def addnonSDpair(self, line):
+        pairs = re.match("\((.*)\)", line).group(1)
+        pairs = re.split("\s", pairs)
+        self.nosiblingdisjointness.append(pairs)
 
     def dotName2dlv(self, dotName):
         elems = re.match("(.*)\.(.*)", dotName)

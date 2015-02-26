@@ -37,5 +37,5 @@ python awf.py -filter=i,o expWorlds.asp;
 echo "running euler to get MIS...";
 euler -i $input -e mnpw --artRem > output.txt;
 echo "from MIS to MAC and get lattice..."
-python lattice.py $input $curdir;
+python amblattice.py $input $curdir;
 echo "finish";
