@@ -11,5 +11,3 @@ articulation abs abstract
 [1.D equals 2.D]
 [1.E {equals overlaps} 2.G]
 
-#[1.A includes 2.G]
-#[1.C disjoint 2.G]
