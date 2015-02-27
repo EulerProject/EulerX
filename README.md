@@ -71,7 +71,6 @@ EulerASP dependencies:
 	- gringo-3.0.3
 	- claspD-1.1.4
 3. [GraphViz][graphviz]
-4. [Python Yaml module][pyyaml]
 
 # Examples of Running EulerFO
 
@@ -108,4 +107,3 @@ If you have any question or comments, please contact Shizhuo Yu at szyu@ucdavis.
 [graphviz]: http://www.graphviz.org/
 [dlv]: http://www.dlvsystem.com/
 [potassco]: http://potassco.sourceforge.net/
-[pyyaml]: http://pyyaml.org/
