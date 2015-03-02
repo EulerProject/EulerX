@@ -99,7 +99,7 @@ Still under `example/` directory (assuming `src-el/` is in your PATH env, and gr
 
 # Contact
 
-If you have any question or comments, please contact Shizhuo Yu at szyu@ucdavis.edu.
+If you have any question or comments, please contact Bertram Ludäscher at ludaesch@illinois.edu.
 [wiki]: https://github.com/EulerProject/EulerX/wiki
 [gitdownloads]:http://git-scm.com/downloads/ 
 [p9m4]: http://www.cs.unm.edu/~mccune/mace4/
