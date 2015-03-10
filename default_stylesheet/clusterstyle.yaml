@@ -2,7 +2,7 @@
     graph: "rankdir=TB"
     face2face: "off"
     subgraph: "off"
-    legend: "off"
+    legend: "source"
     mapping: "off"
     len: "on" 
     wmap: "off"
