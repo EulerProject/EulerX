@@ -2719,8 +2719,10 @@ class TaxonomyMapping:
         inputPdfFile = os.path.join(self.inputfilesdir, self.name+".pdf")
         
         fInputVizYaml = open(inputYamlFile, 'w')
-        fInputVizYaml.write(yaml.safe_dump(self.inputVizNodes, default_flow_style=False))
-        fInputVizYaml.write(yaml.safe_dump(self.inputVizEdges, default_flow_style=False))
+        if self.inputVizNodes:
+            fInputVizYaml.write(yaml.safe_dump(self.inputVizNodes, default_flow_style=False))
+        if self.inputVizEdges:
+            fInputVizYaml.write(yaml.safe_dump(self.inputVizEdges, default_flow_style=False))
         fInputVizYaml.close()        
         
         # check whether stylesheet taxonomy names are in stylesheet
