@@ -2761,8 +2761,12 @@ class TaxonomyMapping:
             fNew.write(contents)
             fNew.close()
 
-        # Redo -- if taxonomy names are not in stylesheet, rewrite styesheet, for single taxnomy
+        # Redo -- check whether stylesheet taxonomy names are in stylesheet
+        # Redo -- if taxonomy names are not in stylesheet, rewrite styesheet, for single taxnomy        
         if not self.firstTName or not self.secondTName:
+            with open(self.stylesheetdir+"singletoninputstyle.yaml") as inputStyleFileOld:
+                styles = yaml.load(inputStyleFileOld)
+            
             if self.firstTName not in styles["nodestyle"] or self.secondTName not in styles["nodestyle"]:
                 fOld = open(self.stylesheetdir+"singletoninputstyle.yaml", "r")
                 contents = fOld.readlines()
