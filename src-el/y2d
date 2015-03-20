@@ -34,6 +34,8 @@ from collections import defaultdict
 nodes = defaultdict(list)
 edges = defaultdict(list)
 wList = []
+aligns1 = {}
+aligns2 = {}
 
 # convert penwidths to colors
 def genColor(numOfPws, penwidth):
@@ -64,16 +66,20 @@ def read_stylesheet(stylefile):
     with open(stylefile) as style_file:    
         styles = yaml.load(style_file)          
 def apply_style(data_file, f):
+    firstGroup = ""
     f.write("digraph{\n")
     f.write(str(styles["graphstyle"]["graph"]) + "\n")
     with data_file: 
         data = yaml.load(data_file)
     #separate nodes from edges
         for key, value in data.iteritems():
+            #print "data[key]=", data[key]
             if key == "Graph":
                 Gdict = data[key]
             if "group" in data[key]:
                 nodes[data[key]["group"]].append(value.items())
+                if firstGroup == "":
+                    firstGroup = nodes[data[key]["group"]]
             elif "label" in data[key]:
                 if "w" in data[key]:
                     wList.append(data[key]["w"])
@@ -88,6 +94,17 @@ def apply_style(data_file, f):
                     edges["default"].append(value.items())
                 else:
                     edges[data[key]["label"]].append(value.items())
+            if "pathlen" in data[key]:
+                if nodes[data[key]["group"]] == firstGroup:
+                    if data[key]["pathlen"] in aligns1:
+                        aligns1[data[key]["pathlen"]].append(key)
+                    else:
+                        aligns1[data[key]["pathlen"]] = [key]
+                else:
+                    if data[key]["pathlen"] in aligns2:
+                        aligns2[data[key]["pathlen"]].append(key)
+                    else:
+                        aligns2[data[key]["pathlen"]] = [key]
     glabel = '<TR> <TD COLSPAN="2"><font face="Arial Black"> Nodes</font></TD> </TR> \n'
     mapp = ""
     for g in nodes:
@@ -190,6 +207,16 @@ def apply_style(data_file, f):
                 f.write('[color="' + genColor(Gdict["PW"],w) + '"]')
                 f.write('[penwidth=' + str(w) + "]")
             f.write("\n")
+    for value in aligns1.itervalues():
+        f.write('{rank=same;')
+        for node in value:
+            f.write('"' + node + '";')
+        f.write('}\n')
+    for value in aligns2.itervalues():
+        f.write('{rank=same;')
+        for node in value:
+            f.write('"' + node + '";')
+        f.write('}\n')
     if styles["graphstyle"]["legend"] != "off":
         f.write("node[shape=box] \n")
         f.write('{rank=' + styles["graphstyle"]["legend"] + ' Legend [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
@@ -201,8 +228,9 @@ def apply_style(data_file, f):
         f.write('{rank=' + styles["graphstyle"]["legend"] + ' Mapping [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
         f.write(mapp)
         f.write("</TABLE> \n >] } \n")       
-    f.write("}")            
+    f.write("}")
     f.close()
+
 def parse_options():
 	# parse options
 	parser = optparse.OptionParser(usage = "%prog [options]", version = "%prog 0.1")

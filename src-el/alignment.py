@@ -2643,11 +2643,13 @@ class TaxonomyMapping:
         #        return rels[i][3]
         
         
-    def addInputVizNode(self, concept, group):
+    def addInputVizNode(self, concept, group, pathlen):
         node = {}
         node.update({"concept": concept})
         node.update({"group": group})
         node.update({"name": "test" + str(randint(0,100))})
+        if self.args.withrank:
+            node.update({"pathlen": pathlen})
         if group != "(+)":
             self.inputVizNodes.update({group + "." + concept: node})
         else:
@@ -2660,15 +2662,21 @@ class TaxonomyMapping:
         edge.update({"label" : label})
         self.inputVizEdges.update({s + "_" + t : edge})
         
+    def checkConceptRank(self, concept):
+        if "_" in concept:
+            return 1
+        else:
+            return 2
+        
     def inputVisualization(self, group2concepts, art):
         art2symbol = {"equals":"==","is_included_in":"<","includes":">","overlaps":"><","disjoint":"!"}
         
         for key, attr in group2concepts.iteritems():
             for value in attr:
                 parent = value.pop(0)
-                self.addInputVizNode(parent, key)
+                self.addInputVizNode(parent, key, self.checkConceptRank(parent))
                 for v in value:
-                    self.addInputVizNode(v, key)
+                    self.addInputVizNode(v, key, self.checkConceptRank(v))
                     self.addInputVizEdge(key + "." + v, key + "." + parent, "isa")
         
         for a in art:
@@ -2694,7 +2702,7 @@ class TaxonomyMapping:
                         l = "ldiff"
                         op = "-"
                     plus = a.split(l + " ")[-1].replace(".","") + op
-                    self.addInputVizNode(plus, "(+)")
+                    self.addInputVizNode(plus, "(+)", 0)
                     self.addInputVizEdge(plus, a.split(" " + l + " ")[-1], "out")
                     for i in range(0,len(a.split(" " + l)[0].split(" "))):
                         self.addInputVizEdge(a.split(" " + l)[0].split(" ")[i], plus, "in")
@@ -2706,7 +2714,7 @@ class TaxonomyMapping:
                         l= "rdiff"
                         op = "-"
                     plus = a.split(" " + l)[0].replace(".","") + op
-                    self.addInputVizNode(plus, "(+)")
+                    self.addInputVizNode(plus, "(+)", 0)
                     self.addInputVizEdge(plus, a.split(" " + l + " ")[0], "out")
                     for i in range(1,len(a.split(" " + l)[-1].split(" "))):
                         self.addInputVizEdge(a.split(" " + l)[-1].split(" ")[i], plus,"in")
@@ -2752,9 +2760,36 @@ class TaxonomyMapping:
             contents = "".join(contents)
             fNew.write(contents)
             fNew.close()
+
+        # Redo -- if taxonomy names are not in stylesheet, rewrite styesheet, for single taxnomy
+        if not self.firstTName or not self.secondTName:
+            if self.firstTName not in styles["nodestyle"] or self.secondTName not in styles["nodestyle"]:
+                fOld = open(self.stylesheetdir+"singletoninputstyle.yaml", "r")
+                contents = fOld.readlines()
+                fOld.close()
+                
+                for line in contents:
+                    if "nodestyle" in line:
+                        index = contents.index(line)
+                    if '"1":' in line:
+                        index2 = contents.index(line)
+                
+                del contents[index+1:index2]    # clean nodestyle previously added
+                    
+                value = '    "' + self.firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n    "' + self.secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n' 
+                                    
+                contents.insert(index+1, value)
+    
+                fNew = open(self.stylesheetdir+"singletoninputstyle.yaml", "w")
+                contents = "".join(contents)
+                fNew.write(contents)
+                fNew.close()
         
         # apply the inputviz stylesheet
-        commands.getoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"inputstyle.yaml" + ">" + inputDotFile)
+        if not self.firstTName or not self.secondTName:
+            commands.getoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"singletoninputstyle.yaml" + ">" + inputDotFile)
+        else:
+            commands.getoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"inputstyle.yaml" + ">" + inputDotFile)
         commands.getoutput("dot -Tpdf "+inputDotFile+" -o "+inputPdfFile)
 
     def addRcgVizNode(self, concept, group):

@@ -121,6 +121,8 @@ class EulerParser:
                                               help="generate an inconsistent example, used with -g")
             EulerParser.inst.add_argument("--iv", action="store_true", dest="inputViz", default=False,\
                                               help="input visualization")
+            EulerParser.inst.add_argument("--withrank", action="store_true", dest="withrank", default=False,\
+                                              help="input visualization with concept rank")
             EulerParser.inst.add_argument("--simpall", action="store_true", dest="simpAllView", default=False,\
                                               help="simplify the pw aggregate view")
             EulerParser.inst.add_argument("--artRem", action="store_true", dest="artRem", default=False,\
