@@ -1,0 +1,29 @@
+# 2015_1982 [class]
+taxonomy 2015 JansenFranz
+(Minyomerus Minyomerus_bulbifrons Minyomerus_caponei Minyomerus_caseyi Minyomerus_conicollis Minyomerus_constrictus Minyomerus_cracens Minyomerus_gravivultus Minyomerus_griseus Minyomerus_imberbus Minyomerus_languidus Minyomerus_laticeps Minyomerus_microps Minyomerus_politus Minyomerus_puticulatus Minyomerus_reburrus Minyomerus_rutellirostris Minyomerus_trisetosus)
+
+taxonomy 1982 OBrienWibmer
+(Minyomerus Minyomerus_caseyi Minyomerus_conicollis Minyomerus_constrictus Minyomerus_innocuus Minyomerus_languidus Minyomerus_laticeps Minyomerus_microps)
+(Piscatopus Piscatopus_griseus)
+
+articulation 2015_1982 JansenFranz_OBrienWibmer
+[2015.Minyomerus includes 1982.Minyomerus]
+[2015.Minyomerus includes 1982.Piscatopus]
+[2015.Minyomerus_bulbifrons disjoint 1982.Minyomerus]
+[2015.Minyomerus_caponei disjoint 1982.Minyomerus]
+[2015.Minyomerus_caseyi equals 1982.Minyomerus_caseyi]
+[2015.Minyomerus_conicollis equals 1982.Minyomerus_conicollis]
+[2015.Minyomerus_constrictus equals 1982.Minyomerus_constrictus]
+[2015.Minyomerus_cracens disjoint 1982.Minyomerus]
+[2015.Minyomerus_gravivultus disjoint 1982.Minyomerus]
+[2015.Minyomerus_griseus equals 1982.Piscatopus_griseus]
+[2015.Minyomerus_imberbus disjoint 1982.Minyomerus]
+[2015.Minyomerus_languidus equals 1982.Minyomerus_languidus]
+[2015.Minyomerus_laticeps equals 1982.Minyomerus_laticeps]
+[2015.Minyomerus_microps is_included_in 1982.Minyomerus]
+[2015.Minyomerus_microps rsum 1982.Minyomerus_innocuus 1982.Minyomerus_microps]
+[2015.Minyomerus_politus disjoint 1982.Minyomerus]
+[2015.Minyomerus_puticulatus disjoint 1982.Minyomerus]
+[2015.Minyomerus_reburrus disjoint 1982.Minyomerus]
+[2015.Minyomerus_rutellirostris disjoint 1982.Minyomerus]
+[2015.Minyomerus_trisetosus disjoint 1982.Minyomerus]
