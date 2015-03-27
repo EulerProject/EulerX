@@ -102,7 +102,7 @@ class TaxonomyMapping:
         if self.args.ieo:
             self.args.ie = True
         # If not input visualization, change the default valude of encode to "mnpw"
-        if not self.args.inputViz and not self.args.encode:
+        if not self.args.inputViz and self.args.function != "inputviz" and not self.args.encode:
             self.args.encode = "mnpw"
         self.enc = encode[args.encode]      # encoding
         self.name = ""
@@ -149,7 +149,7 @@ class TaxonomyMapping:
         elif not os.listdir(self.stylesheetdir):
             self.stylesheetdir = self.path + "/../default_stylesheet/"
                 
-        if self.args.inputViz:
+        if self.args.inputViz or self.args.function == "inputviz":
             return
         self.aspdir = os.path.join(args.outputdir, "1-ASP-input-code")
         if not os.path.exists(self.aspdir):
@@ -286,13 +286,13 @@ class TaxonomyMapping:
         #    inputVisualizer = InputVisual.instance()
         #    inputVisualizer.run(self.args.inputdir, self.args.inputfile, self.ivout)
         #    commands.getoutput("dot -Tpdf "+self.ivout+" -o "+self.ivpdf)
-        if self.args.inputViz:
+        if self.args.inputViz or self.args.function == "inputviz":
             return
         if not self.enc:
             return
         print "******* You are running example", self.name, "*******"
         self.genASP()
-        if self.args.consCheck:
+        if self.args.consCheck or self.args.function == "checkcons":
             if not self.testConsistency():
                 print "Input is inconsistent o_O"
             else:
@@ -2201,7 +2201,7 @@ class TaxonomyMapping:
             
         # used for input viz
         self.inputVisualization(group2concepts, art)
-        if self.args.inputViz:
+        if self.args.inputViz or self.args.function == "inputviz":
             return
         
         # used for dict map articulation to index

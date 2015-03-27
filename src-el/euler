@@ -43,43 +43,45 @@ def main():
 		print args
 	if args.inputfile is None:
 		# artificial example generator
-		if args.generateCti:
+		if args.function == "generate":
 			generator = CtiGenerator.instance()
 			generator.run(args)
-		# input wizard
+		# lattice generation
 		elif args.diaglat:
 			runLattice(args.diaglat)
-		elif args.addID:
-			runAddID(args.addID)
-		elif args.addIsa:
-			runAddIsa(args.addIsa)
-		elif args.p2c:
-			runP2C(args.p2c)
-		elif args.p2ct:
-			runP2CT(args.p2ct)
-		elif args.addArt:
-			runAddArt(args.addArt)
-		elif args.addArtT:
-			runAddArtT(args.addArtT)	
-		elif args.c2csv:
-			runC2CSV(args.c2csv)
-		elif args.addRank:
-			runAddRank(args.addRank)
-		elif args.mirStats:
-			runMirStats(args.mirStats)		
+		# input wizard
+		elif args.function == "wizard":
+			if args.addID:
+				runAddID(args.addID)
+			elif args.addIsa:
+				runAddIsa(args.addIsa)
+			elif args.p2c:
+				runP2C(args.p2c)
+			elif args.p2ct:
+				runP2CT(args.p2ct)
+			elif args.addArt:
+				runAddArt(args.addArt)
+			elif args.addArtT:
+				runAddArtT(args.addArtT)	
+			elif args.c2csv:
+				runC2CSV(args.c2csv)
+			elif args.addRank:
+				runAddRank(args.addRank)
+			elif args.mirStats:
+				runMirStats(args.mirStats)
 		# wrong argument
 		else:
-			print "Invalid input: -i/-g must be specified, please run euler -h for more information"
+			print "Invalid input: Euler analyze or generate or wizard must be specified, please run euler -h for more information"
 			return None
 	else:
-		if args.generateCti is False:
+		if args.function != "generate" and args.function != "wizard":
 			if not reasoner.has_key(args.reasoner):
 				print "unknown reasoner "+args.reasoner#+", please choose one reasoner from "+reasoner.keys().toString()
 				return None
 			elRunner = EulerRunner.instance()
 			elRunner.run(args)
 		else:
-			print "Invalid input: -i/-g cannot be both specified, please run euler -h for more information"
+			print "Invalid input: Euler analyze and generate cannot be both specified, please run euler -h for more information"
 			return None
 
 if __name__ == '__main__':
