@@ -1,0 +1,30 @@
+# Euler/X demonstration file “Perelleschus Overlap” - March, 2015
+# Source: Franz, N.M. et al. 2015. Reasoning over Taxonomic Change: Exploring Alignments for the Perelleschus Use Case. PONE-D-14-14848.
+# http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0118247
+# Input dataset for Alignment 3, intensional/ostensive reading, Figure 10.
+# Illustrates concept overlap in the merge; under two commands 
+# T2 = 17 concepts; T1 = 4 concepts; Total = 21 concepts
+# Consistent, one possible world alignment
+# Euler/X run command, Figure 10A: euler -i perelleschus-overlap.txt -e mnpw --rcgo
+# Euler/X run command, Figure 10B: euler -i perelleschus-overlap.txt -e mncb
+# 
+taxonomy 2001 FranzOBrien 
+(DER PHY PER)
+(PHY PHY_IC PHYsubcin)
+(PER Prectir Peve_Psul)
+(Peve_Psul Peve_Pvar Pbiv_Psul)
+(Peve_Pvar Pevelyn Pvariab)
+(Pbiv_Psul Pbivent Psplend Ppub_Psul)
+(Ppub_Psul Ppubico Pcar_Psul)
+(Pcar_Psul Pcarlud Psulcat)
+
+taxonomy 1986 WibmerOBrien
+(PER Pcarlud Prectir Psubcin)
+
+articulation figure10
+[2001.DER includes 1986.PER]
+[2001.PHY overlaps 1986.PER]
+[2001.PHYsubcin equals 1986.Psubcin]
+[2001.PER overlaps 1986.PER]
+[2001.Prectir equals 1986.Prectir]
+[2001.Pcarlud equals 1986.Pcarlud]
