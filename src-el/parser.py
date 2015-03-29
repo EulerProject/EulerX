@@ -47,6 +47,7 @@ class EulerParser:
             EulerParser.inst = argparse.ArgumentParser()
             EulerParser.inst.add_argument("-v", action="store_true", dest="verbose",\
                                         help="verbose mode")
+            EulerParser.inst.add_argument("function", nargs="?", default="genpws", help="generate artificial input file")
             EulerParser.inst.add_argument("-p", dest="projectname", help="project name for artificial example generator, by default foo")
             #EulerParser.inst.add_argument("-i", dest="inputfile", help="input file")
             EulerParser.inst.add_argument("-i", nargs="*", dest="inputfile", help="input file")
@@ -110,8 +111,8 @@ class EulerParser:
                                               help="hierarchical aggregate view, by default switch off")
             EulerParser.inst.add_argument("-N", action="store_false", dest="output", default=True,\
                                               help="no output")
-            EulerParser.inst.add_argument("-g", action="store_true", dest="generateCti", default=False,\
-                                              help="artificial example generator, cannot be used with -I option")
+            #EulerParser.inst.add_argument("-g", action="store_true", dest="generateCti", default=False,\
+            #                                  help="artificial example generator, cannot be used with -I option")
             EulerParser.inst.add_argument("-n", dest="nary", type=int, default=0, help="N-nary, used with -g")
             EulerParser.inst.add_argument("-m", dest="nnodes", type=int, default=0, help="#nodes, used with -g")
             EulerParser.inst.add_argument("-d", dest="depth", type=int, default=2, help="depth, used with -g")
@@ -121,6 +122,8 @@ class EulerParser:
                                               help="generate an inconsistent example, used with -g")
             EulerParser.inst.add_argument("--iv", action="store_true", dest="inputViz", default=False,\
                                               help="input visualization")
+            EulerParser.inst.add_argument("--withrank", action="store_true", dest="withrank", default=False,\
+                                              help="input visualization with concept rank")
             EulerParser.inst.add_argument("--simpall", action="store_true", dest="simpAllView", default=False,\
                                               help="simplify the pw aggregate view")
             EulerParser.inst.add_argument("--artRem", action="store_true", dest="artRem", default=False,\

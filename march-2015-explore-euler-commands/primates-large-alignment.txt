@@ -1,0 +1,219 @@
+# Euler/X demonstration file “Primates Large Alignment” - March, 2015
+# Source: Franz et al. 2015. Taxonomic Provenance: Two Influential Primate Classifications Logically Aligned. Systematic Biology. (In Review)
+# T2 = 169 concepts; T1 = 114 concepts; Total = 283 concepts
+# Consistent, one possible world alignment
+# Euler/X command - alignment: euler -i primates-large-alignment.txt -e mnpw --rcgo
+# 
+taxonomy 2005 Groves_MSW3
+(Haplorrhini Tarsiiformes Simiiformes)
+(Tarsiiformes Tarsiidae)
+(Tarsiidae Tarsius)
+(Tarsius Tarsius_bancanus Tarsius_dentatus Tarsius_pelengensis Tarsius_pumilus Tarsius_sangirensis Tarsius_syrichta Tarsius_tarsier) 
+(Simiiformes Platyrrhini Catarrhini)
+(Platyrrhini Cebidae Aotidae Pitheciidae Atelidae)
+(Cebidae Callitrichinae Cebinae Saimiriinae)
+(Callitrichinae Callimico Callithrix Leontopithecus Saguinus)
+(Callimico Callimico_goeldii)
+(Callithrix Callithrix_acariensis Callithrix_argentata Callithrix_aurita Callithrix_chrysoleuca Callithrix_emiliae Callithrix_flaviceps Callithrix_geoffroyi Callithrix_humeralifera Callithrix_humilis Callithrix_intermedia Callithrix_jacchus Callithrix_kuhlii Callithrix_leucippe Callithrix_manicorensis Callithrix_marcai Callithrix_mauesi Callithrix_melanura Callithrix_nigriceps Callithrix_penicillata Callithrix_pygmaea Callithrix_saterei)
+(Leontopithecus Leontopithecus_caissara Leontopithecus_chrysomelas Leontopithecus_chrysopygus Leontopithecus_rosalia)
+(Saguinus Saguinus_bicolor Saguinus_fuscicollis Saguinus_geoffroyi Saguinus_graellsi Saguinus_imperator Saguinus_inustus Saguinus_labiatus Saguinus_leucopus Saguinus_martinsi Saguinus_melanoleucus Saguinus_midas Saguinus_mystax Saguinus_niger Saguinus_nigricollis Saguinus_oedipus Saguinus_pileatus Saguinus_tripartitus)
+(Cebinae Cebus)
+(Cebus Cebus_albifrons Cebus_apella Cebus_capucinus Cebus_kaapori Cebus_libidinosus Cebus_nigritus Cebus_olivaceus Cebus_xanthosternos)
+(Saimiriinae Saimiri)
+(Saimiri Saimiri_boliviensis Saimiri_oerstedii Saimiri_sciureus Saimiri_ustus Saimiri_vanzolinii)
+(Aotidae Aotus)
+(Aotus Aotus_azarae Aotus_hershkovitzi Aotus_lemurinus Aotus_miconax Aotus_nancymaae Aotus_nigriceps Aotus_trivirgatus Aotus_vociferans)
+(Pitheciidae Callicebinae Pitheciinae)
+(Callicebinae Callicebus)
+(Callicebus Callicebus_baptista Callicebus_barbarabrownae Callicebus_bernhardi Callicebus_brunneus Callicebus_caligatus Callicebus_cinerascens Callicebus_coimbrai Callicebus_cupreus Callicebus_discolor Callicebus_donacophilus Callicebus_dubius Callicebus_hoffmannsi Callicebus_lucifer Callicebus_lugens Callicebus_medemi Callicebus_melanochir Callicebus_modestus Callicebus_moloch Callicebus_nigrifrons Callicebus_oenanthe Callicebus_olallae Callicebus_ornatus Callicebus_pallescens Callicebus_personatus Callicebus_purinus Callicebus_regulus Callicebus_stephennashi Callicebus_torquatus)
+(Pitheciinae Cacajao Chiropotes Pithecia)
+(Cacajao Cacajao_calvus Cacajao_melanocephalus)
+(Chiropotes Chiropotes_albinasus Chiropotes_chiropotes Chiropotes_israelita Chiropotes_satanas Chiropotes_utahickae)
+(Pithecia Pithecia_aequatorialis Pithecia_albicans Pithecia_irrorata Pithecia_monachus Pithecia_pithecia)
+(Atelidae Alouattinae Atelinae)
+(Alouattinae Alouatta)
+(Alouatta Alouatta_belzebul Alouatta_caraya Alouatta_coibensis Alouatta_guariba Alouatta_macconnelli Alouatta_nigerrima Alouatta_palliata Alouatta_pigra Alouatta_sara Alouatta_seniculus)
+(Atelinae Ateles Brachyteles Lagothrix Oreonax)
+(Ateles Ateles_belzebuth Ateles_chamek Ateles_fusciceps Ateles_geoffroyi Ateles_hybridus Ateles_marginatus Ateles_paniscus)
+(Brachyteles Brachyteles_arachnoides Brachyteles_hypoxanthus)
+(Lagothrix Lagothrix_cana Lagothrix_lagotricha Lagothrix_lugens Lagothrix_poeppigii)
+(Oreonax Oreonax_flavicauda)
+
+taxonomy 1993 Groves_MSW2
+(Tarsiidae Tarsius)
+(Tarsius Tarsius_bancanus Tarsius_dianae Tarsius_pumilus Tarsius_spectrum Tarsius_syrichta)
+(Callitrichidae Callimico Callithrix Leontopithecus Saguinus)
+(Callimico Callimico_goeldii)
+(Callithrix Callithrix_argentata Callithrix_aurita Callithrix_flaviceps Callithrix_geoffroyi Callithrix_humeralifera Callithrix_jacchus Callithrix_kuhlii Callithrix_penicillata Callithrix_pygmaea)
+(Leontopithecus Leontopithecus_caissara Leontopithecus_chrysomelas Leontopithecus_chrysopygus Leontopithecus_rosalia)
+(Saguinus Saguinus_bicolor Saguinus_fuscicollis Saguinus_geoffroyi Saguinus_imperator Saguinus_inustus Saguinus_labiatus Saguinus_leucopus Saguinus_midas Saguinus_mystax Saguinus_nigricollis Saguinus_oedipus Saguinus_tripartitus)
+(Cebidae Alouattinae Aotinae Atelinae Callicebinae Cebinae Pitheciinae)
+(Alouattinae Alouatta)
+(Alouatta Alouatta_belzebul Alouatta_caraya Alouatta_coibensis Alouatta_fusca Alouatta_palliata Alouatta_pigra Alouatta_sara Alouatta_seniculus)
+(Aotinae Aotus)
+(Aotus Aotus_azarai Aotus_brumbacki Aotus_hershkovitzi Aotus_infulatus Aotus_lemurinus Aotus_miconax Aotus_nancymaae Aotus_nigriceps Aotus_trivirgatus Aotus_vociferans)
+(Atelinae Ateles Brachyteles Lagothrix)
+(Ateles Ateles_belzebuth Ateles_chamek Ateles_fusciceps Ateles_geoffroyi Ateles_marginatus Ateles_paniscus)
+(Brachyteles Brachyteles_arachnoides)
+(Lagothrix Lagothrix_flavicauda Lagothrix_lagotricha)
+(Callicebinae Callicebus)
+(Callicebus Callicebus_brunneus Callicebus_caligatus Callicebus_cinerascens Callicebus_cupreus Callicebus_donacophilus Callicebus_dubius Callicebus_hoffmannsi Callicebus_modestus Callicebus_moloch Callicebus_oenanthe Callicebus_olallae Callicebus_personatus Callicebus_torquatus)
+(Cebinae Cebus Saimiri)
+(Cebus Cebus_albifrons Cebus_apella Cebus_capucinus Cebus_olivaceus)
+(Saimiri Saimiri_boliviensis Saimiri_oerstedii Saimiri_sciureus Saimiri_ustus Saimiri_vanzolinii)
+(Pitheciinae Cacajao Chiropotes Pithecia)
+(Cacajao Cacajao_calvus Cacajao_melanocephalus)
+(Chiropotes Chiropotes_albinasus Chiropotes_satanas)
+(Pithecia Pithecia_aequatorialis Pithecia_albicans Pithecia_irrorata Pithecia_monachus Pithecia_pithecia)
+
+articulation 2005-1993 Groves_MSW3-Groves_MSW2
+[2005.Tarsiidae equals 1993.Tarsiidae]
+[2005.Tarsius_bancanus equals 1993.Tarsius_bancanus]
+[2005.Tarsius_dentatus equals 1993.Tarsius_dianae]
+[2005.Tarsius_pelengensis is_included_in 1993.Tarsius_spectrum]
+[2005.Tarsius_pumilus equals 1993.Tarsius_pumilus]
+[2005.Tarsius_sangirensis is_included_in 1993.Tarsius_spectrum]
+[2005.Tarsius_syrichta equals 1993.Tarsius_syrichta]
+[2005.Tarsius_tarsier is_included_in 1993.Tarsius_spectrum]
+[2005.Platyrrhini includes 1993.Cebidae]
+[2005.Cebidae includes 1993.Cebinae]
+[2005.Cebinae is_included_in 1993.Cebinae]
+[2005.Cebus equals 1993.Cebus]
+[2005.Cebus_albifrons equals 1993.Cebus_albifrons]
+[2005.Cebus_apella is_included_in 1993.Cebus_apella]
+[2005.Cebus_capucinus is_included_in 1993.Cebus_capucinus]
+[2005.Cebus_kaapori is_included_in 1993.Cebus_capucinus]
+[2005.Cebus_libidinosus is_included_in 1993.Cebus_apella]
+[2005.Cebus_nigritus is_included_in 1993.Cebus_apella]
+[2005.Cebus_olivaceus equals 1993.Cebus_olivaceus]
+[2005.Saimiriinae is_included_in 1993.Cebinae]
+[2005.Cebus_xanthosternos is_included_in 1993.Cebus_apella]
+[2005.Saimiri_boliviensis equals 1993.Saimiri_boliviensis]
+[2005.Saimiri_oerstedii equals 1993.Saimiri_oerstedii]
+[2005.Saimiri_sciureus equals 1993.Saimiri_sciureus]
+[2005.Saimiri_ustus equals 1993.Saimiri_ustus]
+[2005.Saimiri_vanzolinii equals 1993.Saimiri_vanzolinii]
+[2005.Aotidae equals 1993.Aotinae]
+[2005.Aotus_azarae includes 1993.Aotus_azarai]
+[2005.Aotus_azarae includes 1993.Aotus_infulatus]
+[2005.Aotus_hershkovitzi equals 1993.Aotus_hershkovitzi]
+[2005.Aotus_lemurinus includes 1993.Aotus_lemurinus]
+[2005.Aotus_lemurinus includes 1993.Aotus_brumbacki]
+[2005.Aotus_miconax equals 1993.Aotus_miconax]
+[2005.Aotus_nancymaae equals 1993.Aotus_nancymaae]
+[2005.Aotus_nigriceps equals 1993.Aotus_nigriceps]
+[2005.Aotus_trivirgatus equals 1993.Aotus_trivirgatus]
+[2005.Aotus_vociferans equals 1993.Aotus_vociferans]
+[2005.Callicebinae includes 1993.Callicebinae]
+[2005.Callicebus_baptista is_included_in 1993.Callicebus_hoffmannsi]
+[2005.Callicebus_barbarabrownae is_included_in 1993.Callicebus_personatus]
+[2005.Callicebus_bernhardi disjoint 1993.Cebidae]
+[2005.Callicebus_brunneus equals 1993.Callicebus_brunneus]
+[2005.Callicebus_caligatus equals 1993.Callicebus_caligatus]
+[2005.Callicebus_cinerascens equals 1993.Callicebus_cinerascens]
+[2005.Callicebus_coimbrai disjoint 1993.Cebidae]
+[2005.Callicebus_cupreus is_included_in 1993.Callicebus_cupreus]
+[2005.Callicebus_discolor is_included_in 1993.Callicebus_cupreus]
+[2005.Callicebus_donacophilus is_included_in 1993.Callicebus_donacophilus]
+[2005.Callicebus_dubius equals 1993.Callicebus_dubius]
+[2005.Callicebus_hoffmannsi is_included_in 1993.Callicebus_hoffmannsi]
+[2005.Callicebus_lucifer is_included_in 1993.Callicebus_torquatus]
+[2005.Callicebus_lugens is_included_in 1993.Callicebus_torquatus]
+[2005.Callicebus_medemi is_included_in 1993.Callicebus_torquatus]
+[2005.Callicebus_melanochir is_included_in 1993.Callicebus_personatus]
+[2005.Callicebus_modestus equals 1993.Callicebus_modestus]
+[2005.Callicebus_moloch equals 1993.Callicebus_moloch]
+[2005.Callicebus_nigrifrons is_included_in 1993.Callicebus_personatus]
+[2005.Callicebus_oenanthe equals 1993.Callicebus_oenanthe]
+[2005.Callicebus_olallae equals 1993.Callicebus_olallae]
+[2005.Callicebus_ornatus is_included_in 1993.Callicebus_cupreus]
+[2005.Callicebus_pallescens is_included_in 1993.Callicebus_donacophilus]
+[2005.Callicebus_personatus is_included_in 1993.Callicebus_personatus]
+[2005.Callicebus_purinus is_included_in 1993.Callicebus_torquatus]
+[2005.Callicebus_regulus is_included_in 1993.Callicebus_torquatus]
+[2005.Callicebus_stephennashi disjoint 1993.Cebidae]
+[2005.Callicebus_torquatus is_included_in 1993.Callicebus_torquatus]
+[2005.Cacajao_calvus equals 1993.Cacajao_calvus]
+[2005.Cacajao_melanocephalus equals 1993.Cacajao_melanocephalus]
+[2005.Chiropotes equals 1993.Chiropotes]
+[2005.Chiropotes_albinasus equals 1993.Chiropotes_albinasus]
+[2005.Chiropotes_chiropotes is_included_in 1993.Chiropotes_satanas]
+[2005.Chiropotes_israelita is_included_in 1993.Chiropotes_satanas]
+[2005.Chiropotes_satanas is_included_in 1993.Chiropotes_satanas]
+[2005.Chiropotes_utahickae is_included_in 1993.Chiropotes_satanas]
+[2005.Pithecia_aequatorialis equals 1993.Pithecia_aequatorialis]
+[2005.Pithecia_albicans equals 1993.Pithecia_albicans]
+[2005.Pithecia_irrorata equals 1993.Pithecia_irrorata]
+[2005.Pithecia_monachus equals 1993.Pithecia_monachus]
+[2005.Pithecia_pithecia equals 1993.Pithecia_pithecia]
+[2005.Atelidae is_included_in 1993.Cebidae]
+[2005.Alouattinae equals 1993.Alouattinae]
+[2005.Alouatta_belzebul equals 1993.Alouatta_belzebul]
+[2005.Alouatta_caraya equals 1993.Alouatta_caraya]
+[2005.Alouatta_coibensis equals 1993.Alouatta_coibensis]
+[2005.Alouatta_guariba equals 1993.Alouatta_fusca]
+[2005.Alouatta_macconnelli is_included_in 1993.Alouatta_seniculus]
+[2005.Alouatta_nigerrima is_included_in 1993.Alouatta_seniculus]
+[2005.Alouatta_palliata equals 1993.Alouatta_palliata]
+[2005.Alouatta_pigra equals 1993.Alouatta_pigra]
+[2005.Alouatta_sara equals 1993.Alouatta_sara]
+[2005.Alouatta_seniculus is_included_in 1993.Alouatta_seniculus]
+[2005.Atelinae equals 1993.Atelinae]
+[2005.Ateles_belzebuth is_included_in 1993.Ateles_belzebuth]
+[2005.Ateles_chamek equals 1993.Ateles_chamek]
+[2005.Ateles_fusciceps equals 1993.Ateles_fusciceps]
+[2005.Ateles_geoffroyi equals 1993.Ateles_geoffroyi]
+[2005.Ateles_hybridus is_included_in 1993.Ateles_belzebuth]
+[2005.Ateles_marginatus equals 1993.Ateles_marginatus]
+[2005.Ateles_paniscus equals 1993.Ateles_paniscus]
+[2005.Brachyteles_arachnoides is_included_in 1993.Brachyteles_arachnoides]
+[2005.Brachyteles_hypoxanthus is_included_in 1993.Brachyteles_arachnoides]
+[2005.Lagothrix_cana is_included_in 1993.Lagothrix_lagotricha]
+[2005.Lagothrix_lagotricha is_included_in 1993.Lagothrix_lagotricha]
+[2005.Lagothrix_lugens is_included_in 1993.Lagothrix_lagotricha]
+[2005.Lagothrix_poeppigii is_included_in 1993.Lagothrix_lagotricha]
+[2005.Oreonax_flavicauda equals 1993.Lagothrix_flavicauda]
+[2005.Callitrichinae includes 1993.Callitrichidae]
+[2005.Callimico_goeldii equals 1993.Callimico_goeldii]
+[2005.Callithrix_acariensis disjoint 1993.Callitrichidae]
+[2005.Callithrix_argentata is_included_in 1993.Callithrix_argentata]
+[2005.Callithrix_aurita equals 1993.Callithrix_aurita]
+[2005.Callithrix_chrysoleuca is_included_in 1993.Callithrix_humeralifera]
+[2005.Callithrix_emiliae is_included_in 1993.Callithrix_argentata]
+[2005.Callithrix_flaviceps equals 1993.Callithrix_flaviceps]
+[2005.Callithrix_geoffroyi equals 1993.Callithrix_geoffroyi]
+[2005.Callithrix_humeralifera is_included_in 1993.Callithrix_humeralifera]
+[2005.Callithrix_humilis disjoint 1993.Callitrichidae]
+[2005.Callithrix_intermedia is_included_in 1993.Callithrix_humeralifera]
+[2005.Callithrix_jacchus equals 1993.Callithrix_jacchus]
+[2005.Callithrix_kuhlii equals 1993.Callithrix_kuhlii]
+[2005.Callithrix_leucippe is_included_in 1993.Callithrix_argentata]
+[2005.Callithrix_manicorensis disjoint 1993.Callitrichidae]
+[2005.Callithrix_marcai disjoint 1993.Callitrichidae]
+[2005.Callithrix_mauesi disjoint 1993.Callitrichidae]
+[2005.Callithrix_melanura is_included_in 1993.Callithrix_argentata]
+[2005.Callithrix_nigriceps disjoint 1993.Callitrichidae]
+[2005.Callithrix_penicillata equals 1993.Callithrix_penicillata]
+[2005.Callithrix_pygmaea equals 1993.Callithrix_pygmaea]
+[2005.Callithrix_saterei disjoint 1993.Callitrichidae]
+[2005.Leontopithecus_caissara equals 1993.Leontopithecus_caissara]
+[2005.Leontopithecus_chrysomelas equals 1993.Leontopithecus_chrysomelas]
+[2005.Leontopithecus_chrysopygus equals 1993.Leontopithecus_chrysopygus]
+[2005.Leontopithecus_rosalia equals 1993.Leontopithecus_rosalia]
+[2005.Saguinus_bicolor is_included_in 1993.Saguinus_bicolor]
+[2005.Saguinus_fuscicollis is_included_in 1993.Saguinus_fuscicollis]
+[2005.Saguinus_geoffroyi equals 1993.Saguinus_geoffroyi]
+[2005.Saguinus_graellsi is_included_in 1993.Saguinus_nigricollis]
+[2005.Saguinus_imperator equals 1993.Saguinus_imperator]
+[2005.Saguinus_inustus equals 1993.Saguinus_inustus]
+[2005.Saguinus_labiatus equals 1993.Saguinus_labiatus]
+[2005.Saguinus_leucopus equals 1993.Saguinus_leucopus]
+[2005.Saguinus_martinsi is_included_in 1993.Saguinus_bicolor]
+[2005.Saguinus_melanoleucus is_included_in 1993.Saguinus_fuscicollis]
+[2005.Saguinus_midas is_included_in 1993.Saguinus_midas]
+[2005.Saguinus_mystax is_included_in 1993.Saguinus_mystax]
+[2005.Saguinus_niger is_included_in 1993.Saguinus_midas]
+[2005.Saguinus_nigricollis is_included_in 1993.Saguinus_nigricollis]
+[2005.Saguinus_oedipus equals 1993.Saguinus_oedipus]
+[2005.Saguinus_pileatus is_included_in 1993.Saguinus_mystax]
+[2005.Saguinus_tripartitus equals 1993.Saguinus_tripartitus]
