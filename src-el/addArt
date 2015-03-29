@@ -60,7 +60,6 @@ def findRank(e):
 def main(isaFile, inFile):
     isa = []
     inputData = []
-
     for f in inFile:
         inputData += csv.DictReader(open(f))
         
@@ -76,25 +75,27 @@ def main(isaFile, inFile):
     except ValueError, e:
         print "Error in the input file:", e
     if isaFile != " ":
-        for f in isaFile:
+        for isaF in isaFile:
             newIsa = []
-            for line in csv.DictReader(open(f)):
+            for line in csv.DictReader(open(isaF)):
                 if "ID1" in line.values():
                     parent = line["ID2"]
                     child = line ["ID1"]
                 else:
-                    try:
+                    child = ""
+                    parent = ""
+                    try: 
                         for d in dict_data:
                             for l in dict_data[d]:
-                                if l["Name"] == line ["Name1"] and l["Author"] == f.split("_")[0]:
+                                if l["Name"] == line["SciName1"] and l["Author"].split(".")[0] == isaF.split("isa")[1]:
                                     child = l["ID"]
-                                    namec =  line["Name1"]
+                                    namec =  line["SciName1"]
                                     rankc = findRank(namec)
-                                elif l["Name"] == line ["Name2"] and l["Author"] == f.split("_")[0]:
+                                elif l["Name"] == line["SciName2"] and l["Author"].split(".")[0] == isaF.split("isa")[1]:
                                     parent = l["ID"]
-                                    namep =  line["Name2"]
+                                    namep =  line["SciName2"]
                                     rankp = findRank(namep)
-                        newIsa.append([child, child.split(".")[0], rankc, child.split(".")[1][1:], namec, "ISA", parent, parent.split(".")[0], rankp, parent.split(".")[1][1:],namep])
+                       # newIsa.append([child, child.split(".")[0], rankc, child.split(".")[1][1:], namec, "ISA", parent, parent.split(".")[0], rankp, parent.split(".")[1][1:],namep])
                         with open("new" + f, "w") as fNew:
                             writer = csv.writer(fNew)
                             writer.writerow(["ID1","Taxonomy1", "TaxId1", "Rank1", "SciName1", "Relation", "ID2", "Taxonomy2", "TaxId2", "Rank2",
@@ -186,5 +187,4 @@ def main(isaFile, inFile):
                                              a[0], a[0].split(".")[0], rank2, a[0].split(".")[1][1:], a[1]])
 
 # MAIN
-if __name__ == '__main__':
-    main(wizardParser.args.tFile, wizardParser.args.iFile)
+main(wizardParser.args.tFile, wizardParser.args.iFile)
