@@ -1,0 +1,11 @@
+taxonomy 1 Taxonomy1
+(a b e)
+
+taxonomy 2 Taxonomy2
+(c d f)
+
+articulation tw1 tw1
+[1.a equals 2.c]
+[1.b overlaps 2.d]
+[1.e overlaps 2.f]
+[1.a includes 2.f]
