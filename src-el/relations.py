@@ -86,15 +86,17 @@ relation["=-"] = (1 << 10) + 1 #rdiff
 
 relstr={}
 relstr[0] = "equals"
-relstr[1 << 0] = "equals"
 relstr[1] = "includes"
-relstr[1 << 1] = "includes"
 relstr[2] = "is_included_in"
-relstr[1 << 2] = "is_included_in"
 relstr[3] = "disjoint"
-relstr[1 << 3] = "disjoint"
 relstr[4] = "overlaps"
-relstr[1 << 4] = "overlaps"
+
+relss={}
+relss[1 << 0] = "equals"
+relss[1 << 1] = "includes"
+relss[1 << 2] = "is_included_in"
+relss[1 << 3] = "disjoint"
+relss[1 << 4] = "overlaps"
 
 reasoner={}
 reasoner["dlv"] = 1 << 0

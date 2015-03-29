@@ -2981,6 +2981,6 @@ class TaxonomyMapping:
             if line.find("[") == -1:
                 f.write(line)
         for leafRel in leafRels:
-            f.write("[" + leafRel[0] + " " + relstr[relation[leafRel[1].strip('"')]] + " " + leafRel[2] + "]\n")
+            f.write("[" + leafRel[0] + " " + relss[relation[leafRel[1].strip('"')]] + " " + leafRel[2] + "]\n")
         f.close()
         
