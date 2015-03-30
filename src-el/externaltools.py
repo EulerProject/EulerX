@@ -24,6 +24,9 @@ from subprocess import call
 
 def runLattice(fileName):
     call("lattice.sh " + fileName, shell=True)
+
+def runMuaLattice(fileName):
+    call("maslattice.sh " + fileName, shell=True)
     
 def runAddID(fileName):
     s = ""

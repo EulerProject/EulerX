@@ -49,6 +49,8 @@ def main():
 		# lattice generation
 		elif args.diaglat:
 			runLattice(args.diaglat)
+		elif args.mualat:
+			runMuaLattice(args.mualat)
 		# input wizard
 		elif args.function == "wizard":
 			if args.addID:
