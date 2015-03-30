@@ -1,0 +1,10 @@
+# Euler/X example for integration with ETC; March 2015
+# Articulations for input taxonomy 2 and input taxonomy 1
+# Quercus grisea complex sec. Nixon 1997 and sec. Landrum 193
+# Flora of North America and Vascular Plants of Arizona Project
+#
+articulation 1997-1993 FNA-VPAP
+[1997.Quercus equals 1993.Quercus]
+[1997.Quercus_arizonica is_included_in 1993.Quercus_grisea]
+[1997.Quercus_grisea is_included_in 1993.Quercus_grisea]
+[1997.Quercus_rugosa equals 1993.Quercus_rugosa]
