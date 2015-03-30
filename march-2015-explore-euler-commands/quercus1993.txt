@@ -1,0 +1,6 @@
+# Euler/X example for integration with ETC; March 2015
+# Input taxonomy 1 - Quercus grisea complex sec. Landrum 1993
+# Vascular Plants of Arizona Project
+#
+taxonomy 1993 Landrum-VPAP
+(Quercus Quercus_grisea Quercus_rugosa)
