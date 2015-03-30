@@ -63,7 +63,6 @@ def main(isaFile, inFile):
 
     for f in inFile:
         inputData += csv.DictReader(open(f))
-        
     try:
         for row in inputData:
             author = row["Author"]
