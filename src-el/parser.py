@@ -45,10 +45,9 @@ class EulerParser:
         if EulerParser.inst is None:
             #EulerParser.inst = OptionParser(usage="usage: %prog [options]", version="%prog 1.0")
             EulerParser.inst = argparse.ArgumentParser()
-            EulerParser.inst.add_argument("-v", action="store_true", dest="verbose",\
-                                        help="verbose mode")
+            #EulerParser.inst.add_argument("-v", action="store_true", dest="verbose")
             EulerParser.inst.add_argument("function", nargs="?", default="genpws", help="generate artificial input file")
-            EulerParser.inst.add_argument("-p", dest="projectname", help="project name for artificial example generator, by default foo")
+            #EulerParser.inst.add_argument("-p", dest="projectname", help="project name for artificial example generator, by default foo")
             #EulerParser.inst.add_argument("-i", dest="inputfile", help="input file")
             EulerParser.inst.add_argument("-i", nargs="*", dest="inputfile", help="input file")
             EulerParser.inst.add_argument("-r", dest="inputdir", default="",\
@@ -70,7 +69,7 @@ class EulerParser:
 													vrpw, use binary encoding, get possible worlds
 													vrve, use binary encoding, get valid euler regions
 													""")
-            EulerParser.inst.add_argument("-b", dest="dl", default=2, help="dl encoding spare parameter")
+            #EulerParser.inst.add_argument("-b", dest="dl", default=2, help="dl encoding spare parameter")
             EulerParser.inst.add_argument("--reasoner", dest="reasoner", type=str, default="dlv",\
                                               help="choose a reasoner between dlv and gringo, by deafult using dlv")
             EulerParser.inst.add_argument("--repair", dest="repair", type=str, default=None,\
@@ -93,8 +92,8 @@ class EulerParser:
                                                 help="disable sibling disjointness partially, need to show pairs in inputs, can be used with vr encoding only")            
             EulerParser.inst.add_argument("--ur", action="store_true", dest="reduction", default=False,\
                                               help="turn on uncertainty reduction")
-            EulerParser.inst.add_argument("--ho", action="store_true", dest="hideOverlaps", default=False,\
-                                              help="hide the concepts that are involved in overlapping, used with cb encoding")
+            #EulerParser.inst.add_argument("--ho", action="store_true", dest="hideOverlaps", default=False,\
+            #                                  help="hide the concepts that are involved in overlapping, used with cb encoding")
             EulerParser.inst.add_argument("--ie", action="store_true", dest="ie", default=False,\
                                                 help="inconsistency explanation")
             EulerParser.inst.add_argument("--ieo", action="store_true", dest="ieo", default=False,\
@@ -110,22 +109,22 @@ class EulerParser:
             EulerParser.inst.add_argument("--hierarchy", action="store_true", dest="hierarchy", default=False,\
                                               help="hierarchical aggregate view, by default switch off")
             EulerParser.inst.add_argument("-N", action="store_false", dest="output", default=True,\
-                                              help="no output")
+                                              help=argparse.SUPPRESS)
             #EulerParser.inst.add_argument("-g", action="store_true", dest="generateCti", default=False,\
             #                                  help="artificial example generator, cannot be used with -I option")
-            EulerParser.inst.add_argument("-n", dest="nary", type=int, default=0, help="N-nary, used with -g")
-            EulerParser.inst.add_argument("-m", dest="nnodes", type=int, default=0, help="#nodes, used with -g")
-            EulerParser.inst.add_argument("-d", dest="depth", type=int, default=2, help="depth, used with -g")
-            EulerParser.inst.add_argument("-t", dest="relation", type=str, default="<",\
-                                              help="artificial articulation rel, used with -g")
-            EulerParser.inst.add_argument("-I", action="store_true", dest="incEx", default=False,\
-                                              help="generate an inconsistent example, used with -g")
+            #EulerParser.inst.add_argument("-n", dest="nary", type=int, default=0, help="N-nary, used with -g")
+            #EulerParser.inst.add_argument("-m", dest="nnodes", type=int, default=0, help="#nodes, used with -g")
+            #EulerParser.inst.add_argument("-d", dest="depth", type=int, default=2, help="depth, used with -g")
+            #EulerParser.inst.add_argument("-t", dest="relation", type=str, default="<",\
+            #                                  help="artificial articulation rel, used with -g")
+            #EulerParser.inst.add_argument("-I", action="store_true", dest="incEx", default=False,\
+            #                                  help="generate an inconsistent example, used with -g")
             EulerParser.inst.add_argument("--iv", action="store_true", dest="inputViz", default=False,\
                                               help="input visualization")
             EulerParser.inst.add_argument("--withrank", action="store_true", dest="withrank", default=False,\
                                               help="input visualization with concept rank")
-            EulerParser.inst.add_argument("--simpall", action="store_true", dest="simpAllView", default=False,\
-                                              help="simplify the pw aggregate view")
+            #EulerParser.inst.add_argument("--simpall", action="store_true", dest="simpAllView", default=False,\
+            #                                  help="simplify the pw aggregate view")
             EulerParser.inst.add_argument("--artRem", action="store_true", dest="artRem", default=False,\
                                               help="articulation remover")
             EulerParser.inst.add_argument("--xia", action="store_true", dest="xia", default=False,\
@@ -141,5 +140,5 @@ class EulerParser:
             EulerParser.inst.add_argument("--addArtT", nargs="*", dest="addArtT", help="input wizard, addArt -t")
             EulerParser.inst.add_argument("--addRank", dest="addRank", help="input wizard, addRank")
             EulerParser.inst.add_argument("--mirStats", nargs="*", dest="mirStats", help="input wizard, mirStats")
-            EulerParser.inst.add_argument('--version', action='version', version='<the version>')
+            #EulerParser.inst.add_argument('--version', action='version', version='<the version>')
         return EulerParser.inst

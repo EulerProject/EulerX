@@ -22,7 +22,7 @@
 
 echo "\n\n##### Euler version:\n"
 euler=$(which euler)
-(cd $(dirname $euler);hg summary)
+(cd $(dirname $euler);git rev-parse --abbrev-ref HEAD;git rev-parse HEAD)
 echo "\n\n##### GraphViz version:\n"
 dot -V
 echo "\n\n##### DLV version:\n"

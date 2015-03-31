@@ -202,7 +202,7 @@ class TaxonomyMapping:
 #        if snap:
 #            self.snapfile = os.path.join(args.outputdir, "snap.out")
 #            fsnap = open(self.snapfile, 'w')
-#            fsnap.write(commands.getoutput("eulersnap"))
+#            fsnap.write(newgetoutput("eulersnap"))
 #            fsnap.write("\n\n##### Running User, Host and Date:\n")
 #            fsnap.write("User:\t"+self.runningUser+"\nHost:\t"+self.runningHost+"\nDate:\t"+self.runningDate)
 #            fsnap.close()
@@ -247,8 +247,8 @@ class TaxonomyMapping:
 
 
     def getTaxon(self, taxonomyName="", taxonName=""):
-        if(self.args.verbose):
-            print self.taxonomies, taxonomyName, taxonName
+        #if(self.args.verbose):
+        #    print self.taxonomies, taxonomyName, taxonName
         taxonomy = self.taxonomies[taxonomyName]
         taxon = taxonomy.getTaxon(taxonName)
         return taxon
@@ -285,7 +285,7 @@ class TaxonomyMapping:
         #if self.args.inputViz:
         #    inputVisualizer = InputVisual.instance()
         #    inputVisualizer.run(self.args.inputdir, self.args.inputfile, self.ivout)
-        #    commands.getoutput("dot -Tpdf "+self.ivout+" -o "+self.ivpdf)
+        #    newgetoutput("dot -Tpdf "+self.ivout+" -o "+self.ivpdf)
         if self.args.inputViz or self.args.function == "inputviz":
             return
         if not self.enc:
@@ -394,7 +394,7 @@ class TaxonomyMapping:
             frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
         frsnr.close()
         com = "dlv -silent -filter=rel -n=1 "+rsnrfile+" "+self.pwfile+" "+self.pwswitch
-        if commands.getoutput(com) == "":
+        if newgetoutput(com) == "":
             return 0
         return rcc5[rel]
 ## NF ends
@@ -402,22 +402,22 @@ class TaxonomyMapping:
     def testConsistency(self):
         if reasoner[self.args.reasoner] == reasoner["gringo"]:
             com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 1"
-            if commands.getoutput(com).find("Models     : 0") != -1:
+            if newgetoutput(com).find("Models     : 0") != -1:
                 return False
         else:
             com = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+self.pwswitch
-            if commands.getoutput(com) == "":
+            if newgetoutput(com) == "":
                 return False
         return True
 
     def inconsistencyExplanation(self):
         if reasoner[self.args.reasoner] == reasoner["gringo"]:
             com = "gringo "+self.pwfile+" "+ self.ixswitch+ " | claspD 1"
-            ie = commands.getoutput(com)
+            ie = newgetoutput(com)
             ie.replace(" ", ", ")
         else:
             com = "dlv -silent -filter=ie "+self.pwfile+" "+self.ixswitch
-            ie = commands.getoutput(com)
+            ie = newgetoutput(com)
             ie.replace("{", "").replace("}", "")
         self.postProcessIE(ie);
 
@@ -491,7 +491,7 @@ class TaxonomyMapping:
             fie.write("</TABLE> \n >] } \n")
             fie.write("}")
             fie.close()
-            commands.getoutput("dot -Tpdf "+self.iefile+" -o "+self.iepdf)
+            newgetoutput("dot -Tpdf "+self.iefile+" -o "+self.iepdf)
 
     def getDiag(self, raw):
         rawl = len(raw)
@@ -560,7 +560,7 @@ class TaxonomyMapping:
             raise Exception("Reasoner:", self.args.reasoner, " is not supported !!")    
 
     def genPW(self):
-        #self.pw = commands.getoutput(self.com)
+        #self.pw = newgetoutput(self.com)
         self.pw = newgetoutput(self.com)
         if self.isPwUnique():
             if self.args.artRem:
@@ -635,24 +635,24 @@ class TaxonomyMapping:
             else:
                 pwTm.firstRcg = False
             if self.enc & encode["cb"]:
-                if self.args.hideOverlaps:
-                    pwTm.tr = []
-                    pwTm.mir = {}
+                #if self.args.hideOverlaps:
+                #    pwTm.tr = []
+                #    pwTm.mir = {}
                 # if not hiding orignal concepts, basetr is useful
-                else:
-                    pwTm.tr = pwTm.basetr
-                    pwTm.mir = pwTm.basemir
+                #else:
+                pwTm.tr = pwTm.basetr
+                pwTm.mir = pwTm.basemir
                     
             outputstr += "\nPossible world "+i.__str__()+":\n{"
-            if self.args.verbose: print pws[i]+"#"
+            #if self.args.verbose: print pws[i]+"#"
             items = pws[i].split(";")
-            if self.args.verbose: print len(items),items
+            #if self.args.verbose: print len(items),items
             for j in range(len(items)):
                 rel = items[j].replace(ss+"(","").replace(")","").split(",")
-                if self.args.verbose: print items[j],rel 
+                #if self.args.verbose: print items[j],rel 
                 dotc1 = self.dlvName2dot(rel[0])
                 dotc2 = self.dlvName2dot(rel[1])
-                if self.args.verbose: print dotc1,rel[2],dotc2
+                #if self.args.verbose: print dotc1,rel[2],dotc2
                 if j != 0: outputstr += ", "
                 if dotc1.split(".")[0] == self.firstTName:
                     outputstr += dotc1+rel[2]+dotc2
@@ -707,7 +707,7 @@ class TaxonomyMapping:
         self.genAllPwRcg(len(pws), allRcgEdgesDict)
         #print self.genColor(len(pws),1) # will be used in y2d?? use 6 for example 
         fAllDot.close()
-        commands.getoutput("dot -Tpdf "+rcgAllDotFile+" -o "+rcgAllPdfFile)
+        newgetoutput("dot -Tpdf "+rcgAllDotFile+" -o "+rcgAllPdfFile)
         
         fRcgAllVizYaml = open(rcgAll2YamlFile, 'w')
         if allRcgNodesDict:
@@ -887,9 +887,9 @@ class TaxonomyMapping:
                         self.tr.remove([T1, T4, 1])
                         #self.tr.append([T1, T4, 3])
 
-        if self.args.verbose:
-            print "Transitive reduction:"
-            print self.tr
+        #if self.args.verbose:
+        #    print "Transitive reduction:"
+        #    print self.tr
             
         # restructure for cb visualization
         for [T1, T2, P] in self.tr:
@@ -1006,7 +1006,7 @@ class TaxonomyMapping:
         #fDot.write("  }\n")
 #        fDot.write("}\n")
 #        fDot.close()
-#        commands.getoutput("dot -Tpdf "+self.args.outputdir+fileName+".dot -o "+self.args.outputdir+fileName+".pdf")
+#        newgetoutput("dot -Tpdf "+self.args.outputdir+fileName+".dot -o "+self.args.outputdir+fileName+".pdf")
         
         # create the yaml file
         rcgYamlFile = os.path.join(self.pwsyamldir, fileName+".yaml")
@@ -1049,9 +1049,9 @@ class TaxonomyMapping:
         
         
         # apply the rcgviz stylesheet
-#        commands.getoutput("cat "+self.args.outputdir+fileName+".yaml"+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + self.args.outputdir+fileName+".dot")
-        commands.getoutput("cat "+rcgYamlFile+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + rcgDotFile)
-        commands.getoutput("dot -Tpdf "+rcgDotFile+" -o "+rcgPdfFile)
+#        newgetoutput("cat "+self.args.outputdir+fileName+".yaml"+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + self.args.outputdir+fileName+".dot")
+        newgetoutput("cat "+rcgYamlFile+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + rcgDotFile)
+        newgetoutput("dot -Tpdf "+rcgDotFile+" -o "+rcgPdfFile)
 
 
     def bottomupRemedy(self):
@@ -1072,7 +1072,7 @@ class TaxonomyMapping:
                 # Now refresh the input file
                 self.genASP()
     	        # Run the reasoner again
-                self.pw = commands.getoutput(self.con)
+                self.pw = newgetoutput(self.con)
                 if not self.isPwNone():
                     fixed = True
                     if first:
@@ -1168,7 +1168,7 @@ class TaxonomyMapping:
         # Now refresh the input file
         self.genASP()
     	# Run the reasoner again
-        self.pw = commands.getoutput(self.con)
+        self.pw = newgetoutput(self.con)
 
         self.articulations = tmpart1
         self.mir = tmpmir
@@ -1283,7 +1283,7 @@ class TaxonomyMapping:
         # Now refresh the input file
         self.genASP()
         # Run the reasoner again
-        self.pw = commands.getoutput(self.com)
+        self.pw = newgetoutput(self.com)
         tmpList = []
         for e in self.articulations:
             tmpList.append(self.artDict[e.string].__str__())
@@ -1377,7 +1377,7 @@ class TaxonomyMapping:
                 # Now refresh the input file
                 self.genASP()
     	        # Run the reasoner again
-                self.pw = commands.getoutput(self.con)
+                self.pw = newgetoutput(self.con)
                 if self.isPwNone():
                     print "************************************"
                     print "Min inconsistent subset ",fixedCnt,": [",
@@ -1414,7 +1414,7 @@ class TaxonomyMapping:
                 # Now refresh the input file
                 self.genASP()
     	        # Run the reasoner again
-                self.pw = commands.getoutput(self.con)
+                self.pw = newgetoutput(self.con)
                 if not self.isPwNone():
                     print "************************************"
                     print "Repair option ",fixedCnt,": remove problematic articulation [",
@@ -1459,7 +1459,7 @@ class TaxonomyMapping:
             # Now refresh the input file
             self.genASP()
     	    # Run the reasoner again
-            self.pw = commands.getoutput(self.con)
+            self.pw = newgetoutput(self.con)
             if not self.isPwNone():
                 # Remove mir is not needed because it will be reset anyways
                 self.removeMir(a.string)
@@ -1599,18 +1599,18 @@ class TaxonomyMapping:
             fclyaml.write(yaml.safe_dump(self.clusterVizEdges, default_flow_style=False))
         fclyaml.close()
         
-        commands.getoutput("cat "+self.clyaml+" | y2d -s "+self.stylesheetdir+"clusterstyle.yaml" + ">" + self.cldot)
-        commands.getoutput("dot -Tpdf "+self.cldot+" -o "+self.cldotpdf)
-        commands.getoutput("neato -Tpdf "+self.cldot+" -o "+self.clneatopdf)
+        newgetoutput("cat "+self.clyaml+" | y2d -s "+self.stylesheetdir+"clusterstyle.yaml" + ">" + self.cldot)
+        newgetoutput("dot -Tpdf "+self.cldot+" -o "+self.cldotpdf)
+        newgetoutput("neato -Tpdf "+self.cldot+" -o "+self.clneatopdf)
 
     def genOB(self):
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         if reasoner[self.args.reasoner] == reasoner["dlv"]:
             com = "dlv -silent -filter=pp "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
-            raw = commands.getoutput(com).replace("{","").replace("}","").replace(" ","").replace("),",");")
+            raw = newgetoutput(com).replace("{","").replace("}","").replace(" ","").replace("),",");")
         elif reasoner[self.args.reasoner] == reasoner["gringo"]:
             com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=no"
-            raw = commands.getoutput(com)
+            raw = newgetoutput(com)
         pws = raw.split("\n")
         self.npw = 0
         outputstr = ""
@@ -1649,7 +1649,7 @@ class TaxonomyMapping:
 
     def genVE(self):
         com = "dlv -silent -filter=vr "+self.pwfile+" "+self.pwswitch
-        self.ve = commands.getoutput(com)
+        self.ve = newgetoutput(com)
         if self.args.output:
             print self.ve
         self.updateReportFile(self.reportfile)
@@ -1658,22 +1658,22 @@ class TaxonomyMapping:
         pws = []
         if reasoner[self.args.reasoner] == reasoner["gringo"]:
             self.com = "gringo "+self.cbfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
-            self.cb = commands.getoutput(self.com)
+            self.cb = newgetoutput(self.com)
             if self.isCbNone():
                 self.remedy()
             if self.cb.find("ERROR") != -1:
                 print self.cb
                 raise Exception(template.getEncErrMsg())
             raw = self.cb.split("\n")
-            if self.args.verbose: print raw
+            #if self.args.verbose: print raw
             ## Filter out those trash in the gringo output
             for i in range(2, len(raw) - 2, 2):
                 pws.append(raw[i].strip().replace(") ",");"))
-                if self.args.verbose: print pws
+                #if self.args.verbose: print pws
         elif reasoner[self.args.reasoner] == reasoner["dlv"]:
             path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
             self.com = "dlv -silent -filter=relout "+self.cbfile+" "+ self.pwswitch + " | "+path+"/muniq -u"
-            self.cb = commands.getoutput(self.com)
+            self.cb = newgetoutput(self.com)
             if self.isCbNone():
                 self.remedy()
             if self.cb.find("error") != -1:
@@ -1703,8 +1703,8 @@ class TaxonomyMapping:
         idlv = open(self.ixswitch, 'w')
         pdlv.write(self.basePw)
         pdlv.write("pw.")
-        if self.args.hideOverlaps:
-            pdlv.write("\nhide.")
+        #if self.args.hideOverlaps:
+        #    pdlv.write("\nhide.")
         pdlv.write(self.baseIx)
         idlv.write("ix.")
         if reasoner[self.args.reasoner] == reasoner["gringo"]:
@@ -1777,21 +1777,21 @@ class TaxonomyMapping:
             proArray.append(pro)
             pro *= (cou+1)
             prod = prod*cou + prod + cou
-            if self.args.verbose:
-                print "count: ",cou,", product: ",prod
+            #if self.args.verbose:
+            #    print "count: ",cou,", product: ",prod
                 
-        if self.enc & encode["dl"]:
-            maxint = int(self.args.dl)*num
-            self.baseAsp  = "%%% Max Number of Euler Regions\n"
-            self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
-            self.baseAsp += "%%% Euler Regions\n"
-            self.baseAsp += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
-            
-            self.baseAsp += con
-            self.baseAsp += "%%% Euler Bit\n"
-            self.baseAsp += "bit(M, V):-r(M),#mod(M," + int(num).__str__() + ",V).\n\n"
-            self.baseAsp += template.getAspDlCon()
-        elif self.enc & encode["mn"]:
+        #if self.enc & encode["dl"]:
+            #maxint = int(self.args.dl)*num
+            #self.baseAsp  = "%%% Max Number of Euler Regions\n"
+            #self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
+            #self.baseAsp += "%%% Euler Regions\n"
+            #self.baseAsp += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
+            #
+            #self.baseAsp += con
+            #self.baseAsp += "%%% Euler Bit\n"
+            #self.baseAsp += "bit(M, V):-r(M),#mod(M," + int(num).__str__() + ",V).\n\n"
+            #self.baseAsp += template.getAspDlCon()
+        if self.enc & encode["mn"]:
             if len(self.taxonomies) == 1:
                 raise Exception("Polynomial encoding is not applicable for singleton taxonomy" +\
                                 " please use binary encoding for singleton example: eg. vrpw, vrve !!")
@@ -1851,15 +1851,15 @@ class TaxonomyMapping:
         for key in self.taxonomies.keys():
             queue = copy.deepcopy(self.taxonomies[key].roots)
             while len(queue) != 0:
-                if self.args.verbose:
-                    print "PC: ",queue
+                #if self.args.verbose:
+                #    print "PC: ",queue
                 t = queue.pop(0)
                 # This is a nc flag
                 if t.abbrev == "nc":
                     self.baseAsp += "ncf(" + t.dlvName() + ").\n"
                 if t.hasChildren():
-                    if self.args.verbose:
-                        print "PC: ",t.dlvName()
+                    #if self.args.verbose:
+                    #    print "PC: ",t.dlvName()
                     if self.enc & encode["vr"] or self.enc & encode["dl"] or self.enc & encode["mn"]:
                         # ISA
                         self.baseAsp += "%% ISA\n"
@@ -2312,8 +2312,8 @@ class TaxonomyMapping:
 
     def addAMir(self, astring, provenance):
         r = astring.split(" ")
-        if(self.args.verbose):
-            print "Articulations: ",astring
+        #if(self.args.verbose):
+        #    print "Articulations: ",astring
         if (r[1] == "includes"):
             self.addIMir(r[0], r[2], provenance)
             self.tr.append([r[2], r[0], provenance])
@@ -2468,8 +2468,8 @@ class TaxonomyMapping:
             pairkey = pair[0].dotName() + "," + pair[1].dotName()
             pairkey1 = pair[0].dotName()
             pairkey2 = pair[1].dotName()
-            if self.args.verbose:
-                print pairkey
+            #if self.args.verbose:
+            #    print pairkey
             if self.mir.has_key(pairkey) and self.mir[pairkey] != 0:
                 if self.mir[pairkey] & relation["infer"]:
                     hint = "inferred"
@@ -2487,16 +2487,16 @@ class TaxonomyMapping:
                 else:
 #                fmir.write(pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"])+"\n")
                     mirList.append([pairkey1, findkey(relation, self.mir[pairkey] & ~relation["infer"] & ~relation["input"]), pairkey2, hint])
-                    if self.args.verbose:
-                        print pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"] & ~relation["input"])+"\n"
+                    #if self.args.verbose:
+                    #    print pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"] & ~relation["input"])+"\n"
             else:
                 self.mir[pairkey] = self.getPairMir(pair)
                 rl = findkey(relation, self.mir[pairkey])
 #                fmir.write(pairkey + ",inferred," + rl +"\n")
 #                fmir.write(pairkey1 +"," + rl + "," + pairkey2 + ",inferred" +"\n")
                 mirList.append([pairkey1, rl, pairkey2, "inferred"])
-                if self.args.verbose:
-                    print pairkey + ",inferred," + rl +"\n"
+                #if self.args.verbose:
+                #    print pairkey + ",inferred," + rl +"\n"
         for pair in sorted(mirList, key=itemgetter(3,0,2)):
             fmir.write(','.join(pair) + "\n")
         fmir.close()
@@ -2538,8 +2538,8 @@ class TaxonomyMapping:
                     break
                 sleept += 5
                 time.sleep(4)
-                if self.args.verbose:
-                    print "Sleept ",sleept," seconds!"
+                #if self.args.verbose:
+                #    print "Sleept ",sleept," seconds!"
             if t.isAlive():
                 t.join(1)
                 continue
@@ -2598,19 +2598,19 @@ class TaxonomyMapping:
         rcgAllFile = os.path.join(self.pwsaggregatedir, self.name+"_all.gv")
 #        fAllDot = open(self.args.outputdir+self.name+"_all.dot", 'a')
         fAllDot = open(rcgAllFile, 'a')
-        if self.args.simpAllView:
-            for [T1, T2, cnt, color] in rels:
-                if cnt == numOfPws:
-                    fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",color=\"#FF0000\"];\n")
-                else:
-                    fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",color=\"#00FF00\"];\n")
-        else:
-            for [T1, T2, cnt, color] in rels:
-                #fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",penwidth=" + str(cnt) + ",color=\"" + color + "\"];\n")
-                fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",penwidth=" + "1" + ",color=\"" + color + "\"];\n")
-                self.addRcgAllVizEdge(T1, T2, cnt, numOfPws, allRcgEdgesDict)
-            if self.args.hierarchy:
-                self.genHierarchyView(rels)
+        #if self.args.simpAllView:
+        #    for [T1, T2, cnt, color] in rels:
+        #        if cnt == numOfPws:
+        #            fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",color=\"#FF0000\"];\n")
+        #        else:
+        #            fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",color=\"#00FF00\"];\n")
+        #else:
+        for [T1, T2, cnt, color] in rels:
+            #fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",penwidth=" + str(cnt) + ",color=\"" + color + "\"];\n")
+            fAllDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled,label=" + str(cnt) + ",penwidth=" + "1" + ",color=\"" + color + "\"];\n")
+            self.addRcgAllVizEdge(T1, T2, cnt, numOfPws, allRcgEdgesDict)
+        if self.args.hierarchy:
+            self.genHierarchyView(rels)
         self.addRcgAllVizNumOfPws(numOfPws, allRcgEdgesDict)
         fAllDot.write("}\n")
         fAllDot.close()
@@ -2791,10 +2791,10 @@ class TaxonomyMapping:
         
         # apply the inputviz stylesheet
         if not self.firstTName or not self.secondTName:
-            commands.getoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"singletoninputstyle.yaml" + ">" + inputDotFile)
+            newgetoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"singletoninputstyle.yaml" + ">" + inputDotFile)
         else:
-            commands.getoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"inputstyle.yaml" + ">" + inputDotFile)
-        commands.getoutput("dot -Tpdf "+inputDotFile+" -o "+inputPdfFile)
+            newgetoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"inputstyle.yaml" + ">" + inputDotFile)
+        newgetoutput("dot -Tpdf "+inputDotFile+" -o "+inputPdfFile)
 
     def addRcgVizNode(self, concept, group):
         node = {}
