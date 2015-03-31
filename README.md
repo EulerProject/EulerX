@@ -15,7 +15,7 @@ On this page:
 
 # Introduction
 
-Euler is an open source toolkit (mostly written in Python) for merging taxonomies (taxonomical organized datasets) and visualizing the results. (see [Euler Toolkit Wiki][wiki] for more information).
+Euler is an open source toolkit (mostly written in Python) for merging taxonomies (taxonomical organized datasets) and visualizing the results. (see [Euler Toolkit Wiki][wiki] for more information, and the remaining issue list in [Jira][jira])
 
 We have all the EulerFO source code, EulerASP source code, and a bunch of use cases in this toolkit. EulerFO is a modified version of CleanTax which was firstly developed by Dave Thau. CleanTax/EulerFO are built upon Prover9/Mace4 reasoning software. EulerASP is a brand new taxonomy reasoning tool that Mingmin built from scratch. EulerASP is built based on popular ASP reasoners DLV and Potassco.
 
@@ -68,8 +68,8 @@ EulerASP dependencies:
 
 1. [DLV][dlv] (version: static, no ODBC support)
 2. [Potassco][potassco]
-	- gringo-3.0.3
-	- claspD-1.1.4
+   - [gringo-3.0.3][gringo303]
+   - [claspD-1.1.4][claspD114]
 3. [GraphViz][graphviz]
 4. [Python Yaml module][pyyaml]
 
@@ -107,3 +107,6 @@ If you have any question or comments, please contact Bertram Ludäscher at ludae
 [dlv]: http://www.dlvsystem.com/
 [potassco]: http://potassco.sourceforge.net/
 [pyyaml]: http://pyyaml.org/
+[jira]: https://opensource.ncsa.illinois.edu/jira/projects/EULER/issues/
+[gringo303]: http://sourceforge.net/projects/potassco/files/gringo/3.0.3/
+[claspD114]: http://sourceforge.net/projects/potassco/files/claspD/1.1.4/
