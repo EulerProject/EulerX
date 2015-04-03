@@ -166,7 +166,7 @@ class TaxonomyMapping:
         self.pwsdotdir = os.path.join(args.outputdir, "5-PWs-dot")
         if not os.path.exists(self.pwsdotdir):
             os.mkdir(self.pwsdotdir)
-        self.pwspdfdir = os.path.join(args.outputdir, "6-PWs-pdf")
+        self.pwspdfdir = os.path.join(args.outputdir, "6-PWs-pdf-svg")
         if not os.path.exists(self.pwspdfdir):
             os.mkdir(self.pwspdfdir)
         self.pwsaggregatedir = os.path.join(args.outputdir, "7-PWs-aggregate")
@@ -223,7 +223,9 @@ class TaxonomyMapping:
             self.cldot = os.path.join(self.pwsclusterdir, self.name+"_cl.gv")
             self.clyaml = os.path.join(self.pwsclusterdir, self.name+"_cl.yaml")
             self.cldotpdf = os.path.join(self.pwsclusterdir, self.name+"_cl_dot.pdf")
+            self.cldotsvg = os.path.join(self.pwsclusterdir, self.name+"_cl_dot.svg")
             self.clneatopdf = os.path.join(self.pwsclusterdir, self.name+"_cl_neato.pdf")
+            self.clneatosvg = os.path.join(self.pwsclusterdir, self.name+"_cl_neato.svg")
         if self.args.hierarchy:
             self.hierarchydir = os.path.join(args.outputdir, "9-PWs-hierarchy")
             if not os.path.exists(self.hierarchydir):
@@ -615,6 +617,7 @@ class TaxonomyMapping:
         if self.args.cluster: pwmirs = []
         rcgAllDotFile = os.path.join(self.pwsaggregatedir, self.name+"_all.gv")
         rcgAllPdfFile = os.path.join(self.pwsaggregatedir, self.name+"_all.pdf")
+        rcgAllSvgFile = os.path.join(self.pwsaggregatedir, self.name+"_all.svg")
         fAllDot = open(rcgAllDotFile, 'w')
         
         rcgAll2YamlFile = os.path.join(self.pwsaggregatedir, self.name+"_all2.yaml")
@@ -708,6 +711,7 @@ class TaxonomyMapping:
         #print self.genColor(len(pws),1) # will be used in y2d?? use 6 for example 
         fAllDot.close()
         newgetoutput("dot -Tpdf "+rcgAllDotFile+" -o "+rcgAllPdfFile)
+        newgetoutput("dot -Tsvg "+rcgAllDotFile+" -o "+rcgAllSvgFile)
         
         fRcgAllVizYaml = open(rcgAll2YamlFile, 'w')
         if allRcgNodesDict:
@@ -1012,6 +1016,7 @@ class TaxonomyMapping:
         rcgYamlFile = os.path.join(self.pwsyamldir, fileName+".yaml")
         rcgDotFile = os.path.join(self.pwsdotdir, fileName+".gv")
         rcgPdfFile = os.path.join(self.pwspdfdir, fileName+".pdf")
+        rcgSvgFile = os.path.join(self.pwspdfdir, fileName+".svg")
         fRcgVizYaml = open(rcgYamlFile, 'w')
         if self.rcgVizNodes:
             fRcgVizYaml.write(yaml.safe_dump(self.rcgVizNodes, default_flow_style=False))
@@ -1052,6 +1057,7 @@ class TaxonomyMapping:
 #        newgetoutput("cat "+self.args.outputdir+fileName+".yaml"+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + self.args.outputdir+fileName+".dot")
         newgetoutput("cat "+rcgYamlFile+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + rcgDotFile)
         newgetoutput("dot -Tpdf "+rcgDotFile+" -o "+rcgPdfFile)
+        newgetoutput("dot -Tsvg "+rcgDotFile+" -o "+rcgSvgFile)
 
 
     def bottomupRemedy(self):
@@ -1601,7 +1607,9 @@ class TaxonomyMapping:
         
         newgetoutput("cat "+self.clyaml+" | y2d -s "+self.stylesheetdir+"clusterstyle.yaml" + ">" + self.cldot)
         newgetoutput("dot -Tpdf "+self.cldot+" -o "+self.cldotpdf)
+        newgetoutput("dot -Tsvg "+self.cldot+" -o "+self.cldotsvg)
         newgetoutput("neato -Tpdf "+self.cldot+" -o "+self.clneatopdf)
+        newgetoutput("neato -Tsvg "+self.cldot+" -o "+self.clneatosvg)
 
     def genOB(self):
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -2725,6 +2733,7 @@ class TaxonomyMapping:
         inputYamlFile = os.path.join(self.inputfilesdir, self.name+".yaml")
         inputDotFile = os.path.join(self.inputfilesdir, self.name+".gv")
         inputPdfFile = os.path.join(self.inputfilesdir, self.name+".pdf")
+        inputSvgFile = os.path.join(self.inputfilesdir, self.name+".svg")
         
         fInputVizYaml = open(inputYamlFile, 'w')
         if self.inputVizNodes:
@@ -2795,6 +2804,7 @@ class TaxonomyMapping:
         else:
             newgetoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"inputstyle.yaml" + ">" + inputDotFile)
         newgetoutput("dot -Tpdf "+inputDotFile+" -o "+inputPdfFile)
+        newgetoutput("dot -Tsvg "+inputDotFile+" -o "+inputSvgFile)
 
     def addRcgVizNode(self, concept, group):
         node = {}
