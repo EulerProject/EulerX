@@ -231,6 +231,10 @@ class TaxonomyMapping:
             if not os.path.exists(self.hierarchydir):
                 os.mkdir(self.hierarchydir)
             self.hrdot = os.path.join(self.hierarchydir, self.name+"_hr.gv")
+        if self.args.pw2input:
+            self.mergeinputdir = os.path.join(args.outputdir, "10-Merge-input")
+            if not os.path.exists(self.mergeinputdir):
+                os.mkdir(self.mergeinputdir)
         self.iefile = os.path.join(self.pwsdotdir, self.name+"_ie.gv")
         self.iepdf = os.path.join(self.pwspdfdir, self.name+"_ie.pdf")
         #self.ivpdf = os.path.join(self.pwspdfdir, self.name+"_iv.pdf")
@@ -698,7 +702,7 @@ class TaxonomyMapping:
             # for example, if mncb, genPW() is called for intermediate usage
             if self.enc & encode["pw"] and ss == "rel" or\
                self.enc & encode["cb"] and ss == "relout":
-                pwTm.genPwRcg(name + "_" + i.__str__() + "_" + self.args.encode, allRcgNodesDict)
+                pwTm.genPwRcg(name + "_" + i.__str__() + "_" + self.args.encode, allRcgNodesDict, i)
                 #pwTm.genPwCb(name + "_" + i.__str__())
                 for e in pwTm.tr:
                     self.trlist.append(e)
@@ -740,7 +744,7 @@ class TaxonomyMapping:
         fcb.close()
         self.genCB()
 
-    def genPwRcg(self, fileName, allRcgNodesDict):
+    def genPwRcg(self, fileName, allRcgNodesDict, pwIndex):
 #        fDot = open(self.args.outputdir+fileName+".dot", 'w')
 #        fAllDot = open(self.args.outputdir+self.name+"_all.dot", 'a')
         rcgAllFile = os.path.join(self.pwsaggregatedir, self.name+"_all.gv")
@@ -855,13 +859,17 @@ class TaxonomyMapping:
                     self.eqConLi.remove(T6)
         
         tmpTr = list(self.tr)
+        #print "self.eqConli", self.eqConLi
         for T in self.eqConLi:
             #for [T1, T2, P] in tmpTr:
             #    if T == T1 or T == T2:
+            #print "T=", T
             newT = self.restructureCbNames(T)
+            #print "newT=", newT
             tmpComLi.append(newT)
             tmpCom += "  \""+newT+"\"\n"
-            self.addRcgVizNode(newT, "comb")
+            if self.isCbInterTaxonomy(newT):
+                self.addRcgVizNode(newT, "comb")
             self.addRcgAllVizNode(newT, "comb", allRcgNodesDict)
             
         # Duplicates
@@ -919,10 +927,11 @@ class TaxonomyMapping:
             else:
 #                newT1 = self.restructureCbNames(T1)
 #                self.tr[self.tr.index([T1,T2,P])] = [newT1, T2, P]
-                tmpComLi.append(T1)
-                tmpCom += "  \""+T1+"\"\n"
-                self.addRcgVizNode(T1, "comb")
-                self.addRcgAllVizNode(T1, "comb", allRcgNodesDict)
+                if T1[0] != T2[0]:
+                    tmpComLi.append(T1)
+                    tmpCom += "  \""+T1+"\"\n"
+                    self.addRcgVizNode(T1, "comb")
+                    self.addRcgAllVizNode(T1, "comb", allRcgNodesDict)
             if(T2.find("*") == -1 and T2.find("\\") == -1 and T2.find("\\n") == -1 and T2.find(".") != -1):
                 T2s = T2.split(".")
                 if self.firstTName == T2s[0]:
@@ -934,10 +943,11 @@ class TaxonomyMapping:
             else:
 #                newT2 = self.restructureCbNames(T2)
 #                self.tr[self.tr.index([T1,T2,P])] = [T1, newT2, P]
-                tmpComLi.append(T2)
-                tmpCom += "  \""+T2+"\"\n"
-                self.addRcgVizNode(T2, "comb")
-                self.addRcgAllVizNode(T2, "comb", allRcgNodesDict)
+                if T1[0] != T2[0]:
+                    tmpComLi.append(T2)
+                    tmpCom += "  \""+T2+"\"\n"
+                    self.addRcgVizNode(T2, "comb")
+                    self.addRcgAllVizNode(T2, "comb", allRcgNodesDict)
                 
         # Dot drawing used for old viz
 #        fDot.write("  node [shape=box style=\"filled\" fillcolor=\"#CCFFCC\"]\n")
@@ -953,6 +963,9 @@ class TaxonomyMapping:
         fAllDot.write("  node [shape=box style=\"filled,rounded\" fillcolor=\"#EEEEEE\"]\n")
         fAllDot.write(tmpCom)
         fAllDot.close()
+        
+        if self.args.pw2input:
+            self.transPwToTaxonomy(self.tr, pwIndex)
         
         for [T1, T2, P] in self.tr:
     	    if(P == 0):
@@ -1060,6 +1073,17 @@ class TaxonomyMapping:
         newgetoutput("dot -Tsvg "+rcgDotFile+" -o "+rcgSvgFile)
 
 
+    def isCbInterTaxonomy(self, cbName):
+        if cbName.find("\\n") == -1:
+            return False
+        else:
+            cbNameLi = cbName.split("\\n")
+            for c1 in cbNameLi:
+                for c2 in cbNameLi:
+                    if c1.split(".")[0] != c2.split(".")[0]:
+                        return True
+            return False
+    
     def bottomupRemedy(self):
         first = True
         fixedOpt = []
@@ -2993,4 +3017,67 @@ class TaxonomyMapping:
         for leafRel in leafRels:
             f.write("[" + leafRel[0] + " " + relss[relation[leafRel[1].strip('"')]] + " " + leafRel[2] + "]\n")
         f.close()
+    
+    def transPwToTaxonomy(self, tr, pwIndex):
+        pcs = []
+        
+        # rename of all concepts in tr
+        tmptr = list(tr)
+        for [T1,T2,P] in tmptr:
+            T1rename = T1.replace(".","_")
+            T2rename = T2.replace(".","_")
+            if tr.count([T1,T2,P]) > 0:
+                tr.remove([T1,T2,P])
+                tr.append([T1rename,T2rename,P])
+        
+        # get all parent-child relations
+        for [T1,T2,P] in tr:
+            if P != 2:
+                if len(pcs) == 0:
+                    pcs.append([T2,T1])
+                else:
+                    for pc in pcs:
+                        if T2 == pc[0]:
+                            pc.append(T1)
+                            break
+                        else:
+                            pcs.append([T2,T1])
+        
+        # remove duplicates in each pc with order preserving
+        tmptr = list(pcs)
+        for pc in tmptr:
+            noDupPc = []
+            [noDupPc.append(i) for i in pc if not noDupPc.count(i)]
+            if pcs.count(pc) > 0:
+                pcs.remove(pc)
+                pcs.append(noDupPc)
+                
+        # remove duplicates in pcs
+        tmptr1 = list(pcs)
+        tmptr2 = list(pcs)
+        for tr1 in tmptr1:
+            for tr2 in tmptr2:
+                if tr1[0] == tr2[0] and tr1 != tr2 and set(tr1).issubset(set(tr2)):
+                    if pcs.count(tr1):
+                        pcs.remove(tr1)
+        
+        # generate merged input file        
+        fileName = os.path.join(self.mergeinputdir, self.name+"-merge-input"+pwIndex.__str__()+".txt")
+        f = open(fileName, "w")
+        f.write('taxonomy merge mergeTax\n')
+        for pc in pcs:
+            str = ""
+            f.write('(')
+            for e in pc:
+                str += e + " "
+            f.write(str.strip())
+            f.write(')\n')
+        f.close()
+
+
+                        
+        
+        
+        
+        
         
