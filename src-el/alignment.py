@@ -3018,8 +3018,9 @@ class TaxonomyMapping:
             f.write("[" + leafRel[0] + " " + relss[relation[leafRel[1].strip('"')]] + " " + leafRel[2] + "]\n")
         f.close()
     
-    def transPwToTaxonomy(self, tr, pwIndex):
+    def transPwToTaxonomy(self, trOrigin, pwIndex):
         pcs = []
+        tr = list(trOrigin)
         
         # rename of all concepts in tr
         tmptr = list(tr)
