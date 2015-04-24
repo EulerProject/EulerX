@@ -1,0 +1,23 @@
+#! /usr/bin/env python
+# __author__ = "Parisa Kianmajd"
+#__version__ = "1.0.1"
+
+
+# Convert CleanTax inputs to DLV facts
+import sysnodes = {}
+g = 1f = sys.stdin
+for line in f.readlines():
+    if line.startswith("("):
+        if g not in nodes:
+                nodes.update({g:set()})
+        for l in line[1:-2].split(" "):
+                nodes[g].add(l.lower())
+    if line ==  "\n":
+            g += 1
+
+for g in nodes:
+        lst = list(nodes[g])
+        fout = open("g" + str(g) + ".dlv", "w")
+        for i in xrange(1,len(lst)):
+                fout.write("g" + str(g) + "(" + str((lst[0]) + "," + str(lst[i]) + ")." + "\n"))
+        fout.close()
