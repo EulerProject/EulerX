@@ -131,6 +131,8 @@ class EulerParser:
                                               help="extract input articulations")
             EulerParser.inst.add_argument("--pw2input", action="store_true", dest="pw2input", default=False,\
                                               help="turn PW to input file")
+            EulerParser.inst.add_argument("--fourinone", action="store_true", dest="fourinone", default=False,\
+                                              help="four in one lattice")
             EulerParser.inst.add_argument("--diaglat", dest="diaglat", help="diagnostic lattice for inconsistent example")
             EulerParser.inst.add_argument("--mualat", dest="mualat", help="lattice for articulation sets that generates unique PW")
             EulerParser.inst.add_argument("--addID", nargs="*", dest="addID", help="input wizard, addID")

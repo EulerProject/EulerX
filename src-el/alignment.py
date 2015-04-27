@@ -49,6 +49,7 @@ from redCon import *
 from template import *
 from helper import *
 from inputViz import *
+from fourinone import *
 from random import randint
 from time import localtime, strftime
 from operator import itemgetter
@@ -97,7 +98,11 @@ class TaxonomyMapping:
         self.nonleafConcepts = []              # concepts from input that are not leaf nodes
         self.nosiblingdisjointness = []        # pairs that has no sibling disjointness
         self.artDict = {}                      # dictionary map articulation with articulation index
-        self.arts2NumPW = {}                    # dictionary map articulation sets to number of PW
+        self.artDictBin = {}                   # dictionary map articulation with binary index
+        self.arts2NumPW = {}                   # dictionary map articulation sets to number of PW
+        self.mis = []                          # MIS
+        self.misANDmus = []                    # MIS and MUS
+        self.mus = []                          # MUS
         self.args = args
         if self.args.ieo:
             self.args.ie = True
@@ -545,6 +550,9 @@ class TaxonomyMapping:
     
     def isPwUnique(self):
         return self.isUnique(self.pw)
+    
+    def isPwUniqueOrIncon(self):
+        return self.isUniqueOrIncon(self.pw)
 
     def isCbNone(self):
         return self.isNone(self.cb)
@@ -565,19 +573,31 @@ class TaxonomyMapping:
         else:
             raise Exception("Reasoner:", self.args.reasoner, " is not supported !!")    
 
+    def isUniqueOrIncon(self, output):
+        if reasoner[self.args.reasoner] == reasoner["gringo"]:
+            return (output.find("Models     : 1") != -1 and output.find("Models     : 1+") == -1) \
+                or output.find("Models     : 0 ") != -1
+        elif reasoner[self.args.reasoner] == reasoner["dlv"]:
+            return (output.strip() != "" and output.strip().count("{") == 1) or output.strip() == ""
+        else:
+            raise Exception("Reasoner:", self.args.reasoner, " is not supported !!")    
+
     def genPW(self):
-        #self.pw = newgetoutput(self.com)
         self.pw = newgetoutput(self.com)
+        if self.args.fourinone:
+            tmpArticulations = copy.deepcopy(self.articulations)
+            self.allMinimalArtSubsets(sets.Set(tmpArticulations), 'Consistency')
+            self.allMinimalArtSubsets(sets.Set(tmpArticulations), 'Both')
+            self.postFourinone()
+            return
         if self.isPwUnique():
             if self.args.artRem:
                 print "************************************"
                 print "UNIQUE POSSIBLE WORLD"
-                self.allMinimalArtSubsets(sets.Set(self.articulations))
+                self.allMinimalArtSubsets(sets.Set(self.articulations), 'Ambiguity')
                 fArt = open("arts2NumPW.py", "w")
                 fArt.write("artD = "+repr(self.arts2NumPW) + "\n")
                 fArt.close()
-
-                #self.allMaximalAmbArts(sets.Set(self.articulations))
                 return
         if self.isPwNone():
             print "************************************"
@@ -1210,17 +1230,17 @@ class TaxonomyMapping:
         return False
 
     # compute all Minimal Articulation Subsets (MAS) that have the unique PW
-    def allMinimalArtSubsets(self, artSet):
+    def allMinimalArtSubsets(self, artSet, flag):
         s = sets.Set()
         curpath = sets.Set()
         allpaths = sets.Set()
-        self.computeAllMAS(artSet, s, curpath, allpaths)
+        self.computeAllMAS(artSet, s, curpath, allpaths, flag)
         
-    def computeAllMAS(self, artSet, justSet, curpath, allpaths):
+    def computeAllMAS(self, artSet, justSet, curpath, allpaths, flag):
         for path in allpaths:
             if path.issubset(curpath):
                 return
-        if not self.isResultUnique(artSet):
+        if self.isResultAmbiguous(artSet, flag):
             allpaths.add(curpath)
             return
         j = sets.Set()
@@ -1228,14 +1248,25 @@ class TaxonomyMapping:
             if len(s.intersection(curpath)) == 0:
                 j = s
         if len(j) == 0:
-            j = self.computeOneMAS(artSet)
+            j = self.computeOneMAS(artSet, flag)
             if len(j) != 0:
                 lj = list(j)
+                tmplist = []
                 print "************************************"
                 print "Min articulation subset that makes unique PW ",self.fixedCnt,": [",
                 for i in range(len(lj)):
                     if i != 0: print ",",
                     print lj[i].ruleNum,":",lj[i].string,
+                    
+                    # store for fourinone lattice
+                    tmplist.append(lj[i].string)
+                    if flag == 'Consistency':
+                        if tmplist not in self.mis:
+                            self.mis.append(tmplist)
+                    else:
+                        if tmplist not in self.misANDmus:
+                            self.misANDmus.append(tmplist)
+                    
                 print "]"
                 print "************************************"
                 self.fixedCnt += 1
@@ -1246,55 +1277,9 @@ class TaxonomyMapping:
             tmpcur.add(a)
             tmpart = copy.copy(artSet)
             tmpart.remove(a)
-            self.computeAllMAS(tmpart, justSet, tmpcur, allpaths)
-            
-    # compute all Maximal Ambiguous Articulation (MAA) that have the multiple PW
-    def allMaximalAmbArts(self, artSet):
-        s = sets.Set()
-        curpath = sets.Set()
-        allpaths = sets.Set()
-        self.computeAllMAA(artSet, s, curpath, allpaths)
+            self.computeAllMAS(tmpart, justSet, tmpcur, allpaths, flag)
 
-    def computeAllMAA(self, artSet, justSet, curpath, allpaths):
-        for path in allpaths:
-            if path.issubset(curpath):
-                return
-        if not self.isResultUnique(artSet):
-            justSet.update(artSet)
-            allpaths.add(curpath)
-            return
-        j = sets.Set()
-        for s in justSet:
-            if len(s.intersection(curpath)) == 0:
-                j = s
-                break
-        if len(j) == 0:
-            j = self.computeOneMAA(artSet)
-            if len(j) != 0:
-                lj = list(j)
-                print "************************************"
-                print "Maximal ambiguous articulation subset ",self.fixedCnt,": [",
-                for i in range(len(lj)):
-                    if i != 0: print ",",
-                    print lj[i].ruleNum,":",lj[i].string,
-                print "]"
-                print "************************************"
-                self.fixedCnt += 1
-            for p in curpath:
-                tmpj = copy.copy(j)
-                tmpj.add(p)
-                if not self.isResultUnique(tmpj):
-                    j = tmpj
-        if len(j) != 0:
-            justSet.add(j)
-        for a in j:
-            tmpcur = copy.copy(curpath)
-            tmpcur.add(a)
-            tmpart = copy.copy(artSet)
-            tmpart.remove(a)
-            self.computeAllMAS(tmpart, justSet, tmpcur, allpaths)
-
-    def isResultUnique(self, artSet):
+    def isResultAmbiguous(self, artSet, flag):
         tmpart1 = copy.copy(self.articulations)
         tmpmir = copy.deepcopy(self.mir)
         tmptr = copy.deepcopy(self.tr)
@@ -1307,44 +1292,49 @@ class TaxonomyMapping:
         self.eq = {}
         tmpart = copy.copy(artSet)
         for i in range(len(artSet)):
-            aa = tmpart.pop().string
-            #self.addArticulation(tmpart.pop().string)
-            self.addArticulation(aa)
+            self.addArticulation(tmpart.pop().string)
         # Now refresh the input file
         self.genASP()
         # Run the reasoner again
-        self.pw = newgetoutput(self.com)
-        tmpList = []
-        for e in self.articulations:
-            tmpList.append(self.artDict[e.string].__str__())
-        tmpTuple = tuple(sorted(tmpList))
-        self.arts2NumPW[tmpTuple] = self.pw.strip().count("{")
+        if flag == 'Consistency':
+            self.pw = newgetoutput(self.con)
+        else:
+            self.pw = newgetoutput(self.com)
+
+        # TO-FIX: add the number of PWs visited
+        #tmpList = []
+        #for e in self.articulations:
+        #    tmpList.append(self.artDict[e.string].__str__())
+        #tmpTuple = tuple(sorted(tmpList))
+        #self.arts2NumPW[tmpTuple] = self.pw.strip().count("{")
 
         self.articulations = tmpart1
         self.mir = tmpmir
         self.tr = tmptr
         self.eq = tmpeq
 
-        if self.isPwUnique():
-            return True
-        return False
-
+        if flag == 'Consistency':
+            if not self.isPwNone():
+                return True
+            return False
+        elif flag == "Ambiguity":
+            if not self.isPwUnique():
+                return True
+            return False                    
+        else:
+            if not self.isPwUniqueOrIncon():
+                return True
+            return False
 
     def computeOneJust(self, artSet):
         if self.isConsistent(artSet):
             return sets.Set()
         return self.computeJust(sets.Set(), artSet)
 
-    def computeOneMAS(self, artSet):
-        if not self.isResultUnique(artSet):
+    def computeOneMAS(self, artSet, flag):
+        if self.isResultAmbiguous(artSet, flag):
             return sets.Set()
-        return self.computeMAS(sets.Set(), artSet)
-    
-    # same to computeOneMAS
-    def computeOneMAA(self, artSet):
-        if not self.isResultUnique(artSet):
-            return sets.Set()
-        return self.computeMAS(sets.Set(), artSet)
+        return self.computeMAS(sets.Set(), artSet, flag)
 
     # TODO move to generic header
     def printArtRuleN(self, artSet, prefix):
@@ -1370,20 +1360,41 @@ class TaxonomyMapping:
         return sl.union(sr)
 
     # s is non-unique, f is unique
-    def computeMAS(self, s, f):
+    def computeMAS(self, s, f, flag):
         if len(f) <= 1:
             return f
         f1 = copy.copy(f)
         f2 = sets.Set()
         for i in range(len(f) /2):
             f2.add(f1.pop())
-        if self.isResultUnique(s.union(f1)):
-            return self.computeMAS(s, f1)
-        if self.isResultUnique(s.union(f2)):
-            return self.computeMAS(s, f2)
-        sl = self.computeMAS(s.union(f1), f2)
-        sr = self.computeMAS(s.union(sl), f1)
+        if not self.isResultAmbiguous(s.union(f1), flag):
+            return self.computeMAS(s, f1, flag)
+        if not self.isResultAmbiguous(s.union(f2), flag):
+            return self.computeMAS(s, f2, flag)
+        sl = self.computeMAS(s.union(f1), f2, flag)
+        sr = self.computeMAS(s.union(sl), f1, flag)
         return sl.union(sr)
+    
+    def postFourinone(self):
+        self.mus = copy.deepcopy(self.misANDmus)
+        for e in self.mis:
+            if self.mus.count(e) > 0:
+                self.mus.remove(e)
+        
+#        print "self.mis", self.mis
+#        #print "self.misANDmus", self.misANDmus
+#        print "self.mus", self.mus
+        print "self.artDictBin", self.artDictBin
+        
+        genFourinone(self.artDictBin, self.mis, self.mus)
+        
+        
+        
+        
+        
+        
+         
+        return
 
     def minInconsRemedy(self):
         fixed = False      # Whether we find a way to fix it or not
@@ -2240,7 +2251,9 @@ class TaxonomyMapping:
         if self.args.artRem:
             for a in art:
                 self.artDict[a] = art.index(a)+1
-        
+        for a in art:
+            self.artDictBin[a] = 1 << art.index(a)
+                
         # update leaf concepts
         self.leafConcepts = list(set(self.leafConcepts).difference(self.nonleafConcepts))
 
