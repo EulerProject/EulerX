@@ -1568,6 +1568,7 @@ class TaxonomyMapping:
         return sl.union(sr)
     
     def postFourinone(self):
+        print "You have ..."
         self.mus = copy.deepcopy(self.misANDmus)
         for e in self.mis:
             if self.mus.count(e) > 0:
