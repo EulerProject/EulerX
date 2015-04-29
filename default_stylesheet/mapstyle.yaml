@@ -1,5 +1,5 @@
   graphstyle: 
-    graph: "rankdir=LR"
+    graph: "rankdir=BT ranksep=0.1 nodesep=0.3"
     face2face: "off"
     subgraph: "on"
     legend: "off"
@@ -9,19 +9,19 @@
     wmin: "1"
     wmax: "5"
   nodestyle: 
-    "1": "shape=box style=filled fillcolor=\"#CCFFCC\""
-    "2": "shape=octagon style=filled fillcolor=\"#FFFFCC\""
+    "1": "shape=circle style=filled fillcolor=\"#40ED74\""
+    "2": "shape=circle style=filled fillcolor=\"#8D87FF\""
     default: "shape=circle style=filled fillcolor=\"#FFFFFF\""
-    all: "shape=circle style=filled fillcolor=\"#FFFFFF\""
+    all: "fontname=Helvetica"
   edgestyle: 
     - 
       label: "isa"
-      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 arrowhead=none"
+      dot: "color=black style=solid arrowhead=none constraint=true penwidth=3"
       display: ""
       penwidth: "off"
     - 
       label: "map"
-      dot: "style=dotted color=\"#AA00FF\" constraint=true penwidth=3 "
+      dot: "color=red style=dashed arrowhead=normal penwidth=2 constraint=false"
       display: ""
       penwidth: "off"
     - 
