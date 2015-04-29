@@ -49,7 +49,7 @@ from redCon import *
 from template import *
 from helper import *
 from inputViz import *
-from fourinone import *
+from fourinone import genFourinone
 from random import randint
 from time import localtime, strftime
 from operator import itemgetter
@@ -585,9 +585,11 @@ class TaxonomyMapping:
     def genPW(self):
         self.pw = newgetoutput(self.com)
         if self.args.fourinone:
-            tmpArticulations = copy.deepcopy(self.articulations)
-            self.allMinimalArtSubsets(sets.Set(tmpArticulations), 'Consistency')
-            self.allMinimalArtSubsets(sets.Set(tmpArticulations), 'Both')
+            #tmpArticulations = copy.deepcopy(self.articulations)
+            #self.allMinimalArtSubsets(sets.Set(tmpArticulations), 'Consistency')
+            #self.allMinimalArtSubsets(sets.Set(tmpArticulations), 'Both')
+            
+            self.allJustificationsFourinone(sets.Set(self.articulations))
             self.postFourinone()
             return
         if self.isPwUnique():
@@ -1229,6 +1231,153 @@ class TaxonomyMapping:
             return True
         return False
 
+    # Compute all justifications in FOURINONE, contains two appraoches: inc and amb
+    def allJustificationsFourinone(self, artSet):
+        sInc = sets.Set() # justification set for inconsistency
+        sAmb = sets.Set() # justification set for ambiguity
+        curpathInc = sets.Set()
+        curpathAmb = sets.Set()
+        allpathsInc = sets.Set()
+        allpathsAmb = sets.Set()
+        self.computeAllJustFourinone(artSet, artSet, sInc, sAmb, curpathInc, curpathAmb, allpathsInc, allpathsAmb)
+        
+    def computeAllJustFourinone(self, artSetInc, artSetAmb, justSetInc, justSetAmb, curpathInc, curpathAmb, allpathsInc, allpathsAmb):
+        terminateInc1 = False
+        terminateAmb1 = False
+        terminateInc2 = False
+        terminateAmb2 = False        
+        for pathInc in allpathsInc:
+            if pathInc.issubset(curpathInc):
+                terminateInc1 = True
+        for pathAmb in allpathsAmb:
+            if pathAmb.issubset(curpathAmb):
+                terminateAmb1 = True
+        if terminateInc1 and terminateAmb1:
+            return
+
+        if self.checkFourinone(artSetInc) != 'inconsistent':
+            allpathsInc.add(curpathInc)
+            terminateInc2 = True
+        if self.checkFourinone(artSetAmb) == 'ambiguous':
+            allpathsAmb.add(curpathAmb)
+            terminateAmb2 = True
+        if terminateInc2 and terminateAmb2:
+            return
+        
+        # inconsistency approach paths
+        if not terminateInc1 and not terminateInc2:
+            jInc = sets.Set()
+            for s in justSetInc:
+                if len(s.intersection(curpathInc)) == 0:
+                    jInc = s
+            if len(jInc) == 0:
+                jInc = self.computeOneJustInc(artSetInc)
+            if len(jInc) != 0:
+                ljInc = list(jInc)
+                tmplist = []
+                #print "************************************"
+                #print "MIS ",self.fixedCnt,": [",
+                for i in range(len(ljInc)):
+                    #if i != 0: print ",",
+                    #print ljInc[i].ruleNum,":",ljInc[i].string,
+                    
+                    # store for fourinone
+                    tmplist.append(ljInc[i].string)
+                
+                if tmplist not in self.mis:
+                    self.mis.append(tmplist)
+                
+                #print "]"
+                #print "************************************"
+                self.fixedCnt += 1
+            if len(jInc) != 0:
+                justSetInc.add(jInc)
+            for aInc in jInc:
+                tmpcurInc = copy.copy(curpathInc)
+                tmpcurInc.add(aInc)
+                tmpartInc = copy.copy(artSetInc)
+                tmpartInc.remove(aInc)
+                self.computeAllJustFourinone(tmpartInc, artSetAmb, justSetInc, justSetAmb, tmpcurInc, curpathAmb, allpathsInc, allpathsAmb)
+        
+        # ambiguity approach paths
+        if not terminateAmb1 and not terminateAmb2:
+            jAmb = sets.Set()
+            for s in justSetAmb:
+                if len(s.intersection(curpathAmb)) == 0:
+                    jAmb = s
+            if len(jAmb) == 0:
+                jAmb = self.computeOneJustAmb(artSetAmb)
+                if len(jAmb) != 0:
+                    ljAmb = list(jAmb)
+                    tmplist2 = []
+                    #print "************************************"
+                    #print "MUS ",self.fixedCnt,": [",
+                    for i in range(len(ljAmb)):
+                        #if i != 0: print ",",
+                        #print ljAmb[i].ruleNum,":",ljAmb[i].string,
+                        
+                        # store for fourinone
+                        tmplist2.append(ljAmb[i].string)
+                    
+                    if tmplist2 not in self.misANDmus:
+                        self.misANDmus.append(tmplist2)
+                    
+                    #print "]"
+                    #print "************************************"
+                    self.fixedCnt += 1
+            if len(jAmb) != 0:
+                justSetAmb.add(jAmb)
+            for aAmb in jAmb:
+                tmpcurAmb = copy.copy(curpathAmb)
+                tmpcurAmb.add(aAmb)
+                tmpartAmb = copy.copy(artSetAmb)
+                tmpartAmb.remove(aAmb)
+                self.computeAllJustFourinone(artSetInc, tmpartAmb, justSetInc, justSetAmb, curpathInc, tmpcurAmb, allpathsInc, allpathsAmb)
+
+            
+    def checkFourinone(self, artSet):
+        tmpart1 = copy.copy(self.articulations)
+        tmpmir = copy.deepcopy(self.mir)
+        tmptr = copy.deepcopy(self.tr)
+        tmpeq = copy.deepcopy(self.eq)
+        if len(artSet) == 0:
+            return True
+        self.articulations = []
+        self.mir = copy.deepcopy(self.basemir)
+        self.tr = copy.deepcopy(self.basetr)
+        self.eq = {}
+        tmpart = copy.copy(artSet)
+        for i in range(len(artSet)):
+            self.addArticulation(tmpart.pop().string)
+        # Now refresh the input file
+        self.genASP()
+        # Run the reasoner again
+        self.pw = newgetoutput(self.com)
+
+        self.articulations = tmpart1
+        self.mir = tmpmir
+        self.tr = tmptr
+        self.eq = tmpeq
+        
+        result = ''
+        if reasoner[self.args.reasoner] == reasoner["gringo"]:
+            if self.pw.find("Models     : 0 ") != -1:
+                result = 'inconsistent'
+            elif self.pw.find("Models     : 1") != -1 and self.pw.find("Models     : 1+") == -1:
+                result = 'unique'
+            else:
+                result = 'ambiguous'        
+        elif reasoner[self.args.reasoner] == reasoner["dlv"]:
+            if self.pw.strip() == "":
+                result = 'inconsistent'
+            elif self.pw.strip() != "" and self.pw.strip().count("{") == 1:
+                result = 'unique'
+            else:
+                result = 'ambiguous'
+        else:
+            raise Exception("Reasoner:", self.args.reasoner, " is not supported !!")
+        return result
+
     # compute all Minimal Articulation Subsets (MAS) that have the unique PW
     def allMinimalArtSubsets(self, artSet, flag):
         s = sets.Set()
@@ -1260,12 +1409,13 @@ class TaxonomyMapping:
                     
                     # store for fourinone lattice
                     tmplist.append(lj[i].string)
-                    if flag == 'Consistency':
-                        if tmplist not in self.mis:
-                            self.mis.append(tmplist)
-                    else:
-                        if tmplist not in self.misANDmus:
-                            self.misANDmus.append(tmplist)
+
+                if flag == 'Consistency':
+                    if tmplist not in self.mis:
+                        self.mis.append(tmplist)
+                else:
+                    if tmplist not in self.misANDmus:
+                        self.misANDmus.append(tmplist)
                     
                 print "]"
                 print "************************************"
@@ -1336,6 +1486,17 @@ class TaxonomyMapping:
             return sets.Set()
         return self.computeMAS(sets.Set(), artSet, flag)
 
+    # Fourinone approach
+    def computeOneJustInc(self, artSet):
+        if self.checkFourinone(artSet) != 'inconsistent':
+            return sets.Set()
+        return self.computeJustInc(sets.Set(), artSet)
+
+    def computeOneJustAmb(self, artSet):
+        if self.checkFourinone(artSet) == 'ambiguous':
+            return sets.Set()
+        return self.computeJustAmb(sets.Set(), artSet)    
+    
     # TODO move to generic header
     def printArtRuleN(self, artSet, prefix):
         print prefix+"= ",
@@ -1357,6 +1518,37 @@ class TaxonomyMapping:
             return self.computeJust(s, f2)
         sl = self.computeJust(s.union(f1), f2)
         sr = self.computeJust(s.union(sl), f1)
+        return sl.union(sr)
+
+    # Fourinone approach
+    def computeJustInc(self, s, f):
+        if len(f) <= 1:
+            return f
+        f1 = copy.copy(f)
+        f2 = sets.Set()
+        for i in range(len(f) /2):
+            f2.add(f1.pop())
+        if self.checkFourinone(s.union(f1)) == 'inconsistent':
+            return self.computeJustInc(s, f1)
+        if self.checkFourinone(s.union(f2)) == 'inconsistent':
+            return self.computeJustInc(s, f2)
+        sl = self.computeJustInc(s.union(f1), f2)
+        sr = self.computeJustInc(s.union(sl), f1)
+        return sl.union(sr)
+    
+    def computeJustAmb(self, s, f):
+        if len(f) <= 1:
+            return f
+        f1 = copy.copy(f)
+        f2 = sets.Set()
+        for i in range(len(f) /2):
+            f2.add(f1.pop())
+        if not self.checkFourinone(s.union(f1)) == 'ambiguous':
+            return self.computeJustAmb(s, f1)
+        if not self.checkFourinone(s.union(f2)) == 'ambiguous':
+            return self.computeJustAmb(s, f2)
+        sl = self.computeJustAmb(s.union(f1), f2)
+        sr = self.computeJustAmb(s.union(sl), f1)
         return sl.union(sr)
 
     # s is non-unique, f is unique
@@ -1382,18 +1574,12 @@ class TaxonomyMapping:
                 self.mus.remove(e)
         
 #        print "self.mis", self.mis
-#        #print "self.misANDmus", self.misANDmus
+#        print "self.misANDmus", self.misANDmus
 #        print "self.mus", self.mus
-        print "self.artDictBin", self.artDictBin
+#        print "self.artDictBin", self.artDictBin
         
         genFourinone(self.artDictBin, self.mis, self.mus)
-        
-        
-        
-        
-        
-        
-         
+                 
         return
 
     def minInconsRemedy(self):

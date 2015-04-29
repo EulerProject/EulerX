@@ -60,7 +60,7 @@ def genFourinone(artDictbin, mis, mus):
                         tmp = '0' + tmp
                     t = tmp + t
                 edges.append([s,t])
-    print "edges=", edges
+    #print "edges=", edges
 
     # create binary candidates
     binCandidates = []
@@ -103,8 +103,8 @@ def genFourinone(artDictbin, mis, mus):
             for i in range(len(artDictbin)-len(musBin[i])):
                 s = '0' + s
             musBin[i] = s + musBin[i] 
-    print "misBin",misBin
-    print "musBin",musBin
+    #print "misBin",misBin
+    #print "musBin",musBin
     
     # find all mcs and mus
     supOfmis = []
@@ -141,10 +141,34 @@ def genFourinone(artDictbin, mis, mus):
         if e not in rem:
             maaBin.append(e)
 
-    print "mcsBin", mcsBin
-    print "maaBin", maaBin
+    #print "mcsBin", mcsBin
+    #print "maaBin", maaBin
     
+    print ""
+    print "MIS:",
+    for e in misBin:
+        print decodeToName(e, artDictbin),
+
+    print ""
+    print "MCS:",
+    for e in mcsBin:
+        print decodeToName(e, artDictbin),
+
+    print ""
+    print "MUS:",
+    for e in musBin:
+        print decodeToName(e, artDictbin),
+
+    print ""
+    print "MAA:",
+    for e in maaBin:
+        print decodeToName(e, artDictbin),
     
-    
-    
-    
+
+def decodeToName(bin, artDictbin):
+    arts = []
+    intNum = int(bin,2)
+    for k,v in artDictbin.iteritems():
+        if v & intNum != 0:
+            arts.append(k)
+    return arts
