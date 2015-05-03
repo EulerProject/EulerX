@@ -31,7 +31,7 @@
 #imp.load_source('generator', path + '/lib1.0/generator.py')
 from parser import *
 from runner import *
-from generator import *
+#from generator import *
 from externaltools import *
 
 def main():
@@ -39,16 +39,18 @@ def main():
 	elParser = EulerParser.instance()
 	#ctiParser = CtiParser.instance()
 	args = elParser.parse_args()
-	if args.verbose:
-		print args
+	#if args.verbose:
+	#	print args
 	if args.inputfile is None:
 		# artificial example generator
-		if args.function == "generate":
-			generator = CtiGenerator.instance()
-			generator.run(args)
+		#if args.function == "generate":
+		#	generator = CtiGenerator.instance()
+		#	generator.run(args)
 		# lattice generation
-		elif args.diaglat:
+		if args.diaglat:
 			runLattice(args.diaglat)
+		elif args.mualat:
+			runMuaLattice(args.mualat)
 		# input wizard
 		elif args.function == "wizard":
 			if args.addID:
@@ -71,7 +73,7 @@ def main():
 				runMirStats(args.mirStats)
 		# wrong argument
 		else:
-			print "Invalid input: Euler analyze or generate or wizard must be specified, please run euler -h for more information"
+			print "Invalid input: Please run euler -h for more information"
 			return None
 	else:
 		if args.function != "generate" and args.function != "wizard":
@@ -81,7 +83,7 @@ def main():
 			elRunner = EulerRunner.instance()
 			elRunner.run(args)
 		else:
-			print "Invalid input: Euler analyze and generate cannot be both specified, please run euler -h for more information"
+			print "Invalid input: Please run euler -h for more information"
 			return None
 
 if __name__ == '__main__':

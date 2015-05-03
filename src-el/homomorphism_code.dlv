@@ -1,0 +1,21 @@
+g1(X,Y) :- g1(Y,X).
+g2(X,Y) :- g2(Y,X).
+
+v1(X) :- g1(X,_).
+v1(X) :- g1(_,X).
+v2(X) :- g2(X,_).
+v2(X) :- g2(_,X).
+
+in(X,Y) v out(X,Y) :- v1(X),v2(Y).
+
+% mappings must satisfy edge relations of both graphs
+:- in(X1,Y1), in(X2,Y2), g1(X1,X2), not g2(Y1,Y2).
+%:- in(X1,Y1), in(X2,Y2), not g1(X1,X2), g2(Y1,Y2).
+
+% must use every vertex in g1
+used(X) :- in(X,_).
+:- #count{X: v1(X), not used(X)} > 0.
+
+% can only use each vertex in g1 once
+:- in(X,Y),in(X,Z),Y!=Z.
+

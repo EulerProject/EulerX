@@ -1,0 +1,6 @@
+# Euler/X example for integration with ETC; March 2015
+# Input taxonomy 2 - Quercus grisea complex sec. Nixon 1997
+# Flora of North America
+#
+taxonomy 1997 Nixon-FNA-Vol3
+(Quercus Quercus_arizonica Quercus_grisea Quercus_rugosa)

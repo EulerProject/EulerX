@@ -1,0 +1,36 @@
+  graphstyle: 
+    graph: "rankdir=BT ranksep=0.1 nodesep=0.3"
+    face2face: "off"
+    subgraph: "on"
+    legend: "off"
+    mapping: "off"
+    wmap: "off"
+    wcolor: "off"
+    wmin: "1"
+    wmax: "5"
+  nodestyle: 
+    "1": "shape=circle style=filled fillcolor=\"#40ED74\""
+    "2": "shape=circle style=filled fillcolor=\"#8D87FF\""
+    default: "shape=circle style=filled fillcolor=\"#FFFFFF\""
+    all: "fontname=Helvetica"
+  edgestyle: 
+    - 
+      label: "isa"
+      dot: "color=black style=solid arrowhead=none constraint=true penwidth=3"
+      display: ""
+      penwidth: "off"
+    - 
+      label: "map"
+      dot: "color=red style=dashed arrowhead=normal penwidth=2 constraint=false"
+      display: ""
+      penwidth: "off"
+    - 
+      label: "default"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 "
+      display: ""
+      penwidth: "off"
+    - 
+      label: "all"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 arrowhead=normal"
+      display: ""
+      penwidth: "off"

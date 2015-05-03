@@ -29,6 +29,7 @@ import subprocess
 from subprocess import call
 import sys
 import os
+import re
 from arts2NumPW import artD
 
 def removeRed(originList,removeList):
@@ -90,22 +91,27 @@ f.close()
 f = open(fileName, "r")
 lines = f.readlines()
 for line in lines:
-    if line[0] == "[":
-        arts.append(line[1:-2])
+    if (re.match("\[.*?\]", line)):
+        arts.append(re.match("\[(.*)\]", line).group(1))
 f.close()
 
 misArtIds = []
 misList = []
 for mis in misArts:
+    tmpindex = 0
     tmpindexes = []
     tmpindexesList = []
     tmpAs = mis.split(",")
     for tmpA in tmpAs:
-        for a in arts:
-            if tmpA == a:
-                tmpindex = arts.index(a)+1
+        tmpindex = arts.index(tmpA)+1
         tmpindexes.append(tmpindex)
         tmpindexesList.append(str(tmpindex))
+#    for tmpA in tmpAs:
+#        for a in arts:
+#            if tmpA == a:
+#                tmpindex = arts.index(a)+1
+#                tmpindexes.append(tmpindex)
+#                tmpindexesList.append(str(tmpindex))
     misArtIds.append(tmpindexes)
     misList.append(tmpindexesList)
 
