@@ -38,10 +38,10 @@ def checkInputFiles(iFiles):
                 parents = []
         if line.startswith("["):
             art = line[1:-2].split(" ")
-            source = art[0].split('.')
-            dest = art[-1].split('.')
-            taxonDict[source[0]]['arts'].append(source[1])
-            taxonDict[dest[0]]['arts'].append(dest[1])
+            for a in art:
+                if "." in a: 
+                    node = a.split('.')
+                    taxonDict[node[0]]['arts'].append(node[1])
 
     for g in taxonDict:
         if len(taxonDict[g]['parents']) > 1:
@@ -66,4 +66,4 @@ def checkInputFiles(iFiles):
 
 # MAIN
 #if __name__ == '__main__':
-#    main(wizardParser.args.iFile)
+#    checkInputFiles(wizardParser.args.iFile)
