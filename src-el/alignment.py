@@ -50,6 +50,7 @@ from template import *
 from helper import *
 from inputViz import *
 from fourinone import genFourinone
+from checker import checkInputFiles
 from random import randint
 from time import localtime, strftime
 from operator import itemgetter
@@ -2319,6 +2320,12 @@ class TaxonomyMapping:
         
     
     def readFile(self):
+        # check input only
+        if self.args.ci:
+            checkInputFiles(self.args.inputfile)
+            return
+        
+        # start to read files
         lines = []
         for i in range(len(self.args.inputfile)):
             file = open(os.path.join(self.args.inputdir, self.args.inputfile[i]), 'r')

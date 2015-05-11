@@ -6,10 +6,10 @@
 #__version__ = "1.0.1"
 
 
-import wizardParser
+#import wizardParser
 
 
-def main(iFiles):
+def checkInputFiles(iFiles):
     inputData = list()
     taxonDict = dict()
     unmatched = dict()
@@ -65,5 +65,5 @@ def main(iFiles):
             print e
 
 # MAIN
-if __name__ == '__main__':
-    main(wizardParser.args.iFile)
+#if __name__ == '__main__':
+#    main(wizardParser.args.iFile)
