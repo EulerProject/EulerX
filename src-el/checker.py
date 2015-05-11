@@ -35,6 +35,7 @@ def main(iFiles):
                 taxonDict[g]['parents'] += list(set(parents) - set(leaves))
                 taxonDict[g]['leaves'] += list(set(leaves) - set(parents))
                 leaves = []
+                parents = []
         if line.startswith("["):
             art = line[1:-2].split(" ")
             source = art[0].split('.')
@@ -43,6 +44,8 @@ def main(iFiles):
             taxonDict[dest[0]]['arts'].append(dest[1])
 
     for g in taxonDict:
+        print g
+        print taxonDict[g]['parents']
         if len(taxonDict[g]['parents']) > 1:
             errors.append('Too many roots in taxonomy ' + str(g) + ": " + ', '.join(taxonDict[g]['parents']) + ".")
 
