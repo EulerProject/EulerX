@@ -44,8 +44,6 @@ def main(iFiles):
             taxonDict[dest[0]]['arts'].append(dest[1])
 
     for g in taxonDict:
-        print g
-        print taxonDict[g]['parents']
         if len(taxonDict[g]['parents']) > 1:
             errors.append('Too many roots in taxonomy ' + str(g) + ": " + ', '.join(taxonDict[g]['parents']) + ".")
 
