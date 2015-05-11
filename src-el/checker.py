@@ -39,7 +39,7 @@ def checkInputFiles(iFiles):
         if line.startswith("["):
             art = line[1:-2].split(" ")
             source = art[0].split('.')
-            dest = art[2].split('.')
+            dest = art[-1].split('.')
             taxonDict[source[0]]['arts'].append(source[1])
             taxonDict[dest[0]]['arts'].append(dest[1])
 
