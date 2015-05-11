@@ -2718,7 +2718,9 @@ class TaxonomyMapping:
 #                                +self.mirc[pairkey][i].__str__()+","+self.npw.__str__()+"\n")
                 else:
 #                fmir.write(pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"])+"\n")
-                    mirList.append([pairkey1, findkey(relation, self.mir[pairkey] & ~relation["infer"] & ~relation["input"]), pairkey2, hint])
+                    rl = findkey(relation, self.mir[pairkey] & ~relation["infer"] & ~relation["input"])
+                    if rl != "!":
+                        mirList.append([pairkey1, rl, pairkey2, hint])
                     #if self.args.verbose:
                     #    print pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"] & ~relation["input"])+"\n"
             else:
@@ -2726,7 +2728,8 @@ class TaxonomyMapping:
                 rl = findkey(relation, self.mir[pairkey])
 #                fmir.write(pairkey + ",inferred," + rl +"\n")
 #                fmir.write(pairkey1 +"," + rl + "," + pairkey2 + ",inferred" +"\n")
-                mirList.append([pairkey1, rl, pairkey2, "inferred"])
+                if rl != "!":
+                    mirList.append([pairkey1, rl, pairkey2, "inferred"])
                 #if self.args.verbose:
                 #    print pairkey + ",inferred," + rl +"\n"
         for pair in sorted(mirList, key=itemgetter(3,0,2)):
