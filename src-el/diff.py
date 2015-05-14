@@ -40,14 +40,10 @@ def findDiff():
             if name.endswith(".txt"):
                 timestamp = root.split("/")[-2]
                 filesList.append([os.path.join(root, name),timestamp])
-
-    for i in xrange(0,len(filesList),2):
+    i = 0
+    while i < len(filesList) - 1:
         time = filesList[i][1] + "_" + filesList[i+1][1]
         diff(filesList[i][0],filesList[i+1][0],time)
+        i += 2
 
 findDiff()
-
-
-
-
-
