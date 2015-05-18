@@ -1,12 +1,14 @@
 
 # Euler diff receives filename as input and outputs diff file showing the difference between the pair of files with this filename
 # in the current directory
+# It also generates a csv file called "sum.csv" in the current directory that lists all of the cleanTax files in the current directory and their timestamps
 # __author__ = "Parisa Kianmajd"
-#__version__ = "1.0.1"
+#__version__ = "1.0.2"
 
 import difflib
 import sys
 import os
+import csv
 
 def diff(f1,f2,t,c):
     filename = {f1:"", f2: ""}
@@ -31,6 +33,7 @@ def diff(f1,f2,t,c):
 
 def einputdiff():
     filesList = list()
+    compareList = list()
 
     try:
         arg1 = sys.argv[1]
@@ -42,14 +45,24 @@ def einputdiff():
 
     for root, dirs, files in os.walk('.'):
         for name in files:
-            if name == filename:
+            if name.endswith('.txt'):
                 timestamp = root [2:20]
-                filesList.append([os.path.join(root, name),timestamp])
+                if root != '.':
+                    filesList.append([os.path.join(root, name),timestamp])
+                if name == filename:
+                    compareList.append([os.path.join(root, name),timestamp])
+
+    with open("sum.csv","w") as reportFile:
+        writer = csv.writer(reportFile, delimiter=',')
+        writer.writerow (["Filename", "TimeStamp"])
+        for n in filesList:
+            writer.writerow([n[0],n[1]])
+        
     i = 0
     c = 1
-    while i < len(filesList) - 1:
-        time = (filesList[i][1], filesList[i+1][1])
-        diff(filesList[i][0],filesList[i+1][0],time,c)
+    while i < len(compareList) - 1:
+        time = (compareList[i][1], compareList[i+1][1])
+        diff(compareList[i][0],compareList[i+1][0],time,c)
         i += 2
         c += 1
 
