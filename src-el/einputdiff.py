@@ -11,6 +11,7 @@ import difflib
 import sys
 import os
 import csv
+import re
 
 def diff(f1,f2,t,c):
     filename = {f1:"", f2: ""}
@@ -42,7 +43,7 @@ def einputdiff():
     try:
         arg1 = sys.argv[1]
     except IndexError:
-        print "Usage: diff.py <arg1>"
+        print 'Usage: diff.py <arg1>'
         sys.exit(1)
         
     filename = sys.argv[1]
@@ -50,17 +51,23 @@ def einputdiff():
     for root, dirs, files in os.walk('.'):
         for name in files:
             if name.endswith('.txt'):
-                timestamp = root [2:20]
                 if root != '.':
-                    filesList.append([os.path.join(root, name),timestamp])
-                if name == filename:
-                    compareList.append([os.path.join(root, name),timestamp])
+                    fpath = os.path.join(root, name)
+                    timestamp = fpath.split('./')[1].split('/')[1].split('/')[0]
+                    timestamp = timestamp[:timestamp.find(":") + 6]
+                    filesList.append([fpath,timestamp])
+                    if name == filename:
+                        compareList.append([fpath,timestamp])
 
-    with open("sum.csv","w") as reportFile:
+    with open('sum.csv',"w") as reportFile:
         writer = csv.writer(reportFile, delimiter=',')
-        writer.writerow (["Filename", "TimeStamp"])
+        writer.writerow (['User', 'Filename', 'TimeStamp'])
+
         for n in filesList:
-            writer.writerow([n[0],n[1]])
+            user = n[0].split("/")[1]
+            if ":" in user:
+                user = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(n[0])), '..')).split("/")[-1]
+            writer.writerow([user, n[0],n[1]])
         
     i = 0
     c = 1
