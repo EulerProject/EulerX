@@ -1,7 +1,9 @@
 
-# Euler diff receives filename as input and outputs diff file showing the difference between the pair of files with this filename
-# in the current directory
-# It also generates a csv file called "sum.csv" in the current directory that lists all of the cleanTax files in the current directory and their timestamps
+# Euler Input diff (einputdiff) receives filename as input and outputs diff files
+# showing the difference between the pair of files with this filename in the current
+# directory
+# It also generates a csv file called "sum.csv" in the current directory that lists
+# all of the cleanTax files in the current directory and their timestamps
 # __author__ = "Parisa Kianmajd"
 #__version__ = "1.0.2"
 
@@ -13,22 +15,24 @@ import csv
 def diff(f1,f2,t,c):
     filename = {f1:"", f2: ""}
     diff = difflib.ndiff(open(f1).readlines(), open(f2).readlines())
+    
     for f in [f1,f2]:
         if "/" in f:
             filename[f] = f.split("/")[-1]
         else:
             filename[f] = f
-        
+            
     out = open('diff_' + str(c) + "_" + filename[f1]  , "w")
-    out.write('timestamp #1:' + t[0] + '\n')
-    out.write('timestamp #2:' + t[1] + '\n')
+    out.write('File #1: ' + f1 + ' Timestamp #1:' + t[0] + '\n')
+    out.write('File #2: ' + f2 + 'Timestamp #2:' + t[1] + '\n')
     out.write('\n')
-
+    
     try:
         while 1:
             out.write(diff.next(),)
     except:
         pass
+    
     out.close()
 
 def einputdiff():
@@ -40,9 +44,9 @@ def einputdiff():
     except IndexError:
         print "Usage: diff.py <arg1>"
         sys.exit(1)
-
+        
     filename = sys.argv[1]
-
+    
     for root, dirs, files in os.walk('.'):
         for name in files:
             if name.endswith('.txt'):
