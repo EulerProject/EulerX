@@ -1,0 +1,23 @@
+Usage: rcc8.py [options] < [spatial CSP file]
+
+Options:
+  -h, --help            show this help message and exit
+  -m METHOD, --method=METHOD
+                        interaction mode: recursive, or iterative [default:
+                        recursive]
+  -v VARHEURISTIC, --varheuristic=VARHEURISTIC
+                        interaction mode: none, cardinality, or random
+                        [default: cardinality]
+  -p PCHEURISTIC, --pcheuristic=PCHEURISTIC
+                        interaction mode: none, weighted, or smart [default:
+                        weighted]
+  -s SPLIT, --split=SPLIT
+                        interaction mode: base, or horn [default: horn]
+  -l VALHEURISTIC, --valheuristic=VALHEURISTIC
+                        interaction mode: none, or lcv [default: lcv]
+  -r PROCESS, --process=PROCESS
+                        interaction mode: static, or dynamic [default:
+                        dynamic]
+  -o SCOPE, --scope=SCOPE
+                        interaction mode: local, or global [default: local]
+  -d, --print           print solution to output
