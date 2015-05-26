@@ -60,7 +60,7 @@ def checkInputFiles(iFiles):
     if len(errors) == 0:
         print "The input is valid"
     else:
-        print "Errors in the input:"
+        print "Warnings:"
         for e in errors:
             print e
 
