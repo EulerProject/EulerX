@@ -18,9 +18,21 @@ class SpecialTokenizer{
 		lineNumber = 1;
 		Scanner input = new Scanner(in); // TODO change to BufferedReader
 
-		while ( input.hasNextLine() )
-			addLineToTokenStream( input.nextLine().split("[ ]+") );
-
+		while (input.hasNextLine()) {
+		    String line = input.nextLine();
+		    int endIndex = line.indexOf("Local:");
+		    if(endIndex == -1)
+		    	endIndex = line.indexOf(" Global:");
+		    if(endIndex == -1){
+		    	if(!line.startsWith("#"))
+					addLineToTokenStream(line.split("[ ]+"));
+		    }
+		    else{
+		    	String subline = line.substring(0, endIndex);
+		    	if(!subline.startsWith("#"))
+					addLineToTokenStream(subline.split("[ ]+"));
+			}
+		}
 		input.close();
 	}
 
@@ -32,14 +44,26 @@ class SpecialTokenizer{
 	 */
 	private void addLineToTokenStream(String[] line) throws InvalidTokenException{
 		boolean foundSubjectCandidate = false;
+		boolean foundSubjectCandidate2 = false;
+		boolean foundSubjectCandidate3 = false;
 		boolean foundPredicateCandidate = false;
 		boolean foundObjectCandidate = false;
+		boolean foundObjectCandidate2 = false;
+		boolean foundObjectCandidate3 = false;
+		String predToken = "";
 
 		for (int i=0;  i < line.length;  i++){
 			// renamed for the purpose of readability
 			String curToken = line[i];
+			String nextToken = new String();
+			String thirdToken = new String();
+			if(i < line.length - 2)
+				nextToken = line[i+1];
+			if(i < line.length - 3)
+				thirdToken = line[i+2];
 			// remove whitespace (spaces and newlines have already been handled)
 			curToken = curToken.replace("\t","");
+			nextToken = nextToken.replace("\t", "");
 
 			if ( curToken.isEmpty() )
 				continue;
@@ -52,10 +76,28 @@ class SpecialTokenizer{
 					throw new InvalidTokenException("Invalid Subject", lineNumber, curToken);
 			}
 
+			else if (!foundSubjectCandidate2 && (isLeftSum(nextToken) || isLeftSum3(thirdToken))){
+				foundSubjectCandidate2 = true;
+				if( isClassToken(curToken) )
+					tokenStream.add(new ClassToken(lineNumber, curToken));
+				else
+					throw new InvalidTokenException("Invalid Subject 2", lineNumber, curToken);
+			}
+
+			else if (!foundSubjectCandidate3 && isLeftSum3(nextToken)){
+				foundSubjectCandidate3 = true;
+				if(isClassToken(curToken))
+					tokenStream.add(new ClassToken(lineNumber, curToken));
+				else
+					throw new InvalidTokenException("Invalid Subject 3", lineNumber, curToken);
+			}
+
 			else if (!foundPredicateCandidate){
 				foundPredicateCandidate = true;
-				if ( isRelationToken(curToken) )
+				if ( isRelationToken(curToken) || isSum3Token(curToken)){
 					tokenStream.add(new RelationToken(lineNumber, curToken));
+					predToken = curToken;
+				}
 				else
 					throw new InvalidTokenException("Invalid Predicate", lineNumber, curToken);
 			}
@@ -66,6 +108,22 @@ class SpecialTokenizer{
 					tokenStream.add(new ClassToken(lineNumber, curToken));
 				else
 					throw new InvalidTokenException("Invalid Object", lineNumber, curToken);
+			}
+
+			else if (!foundObjectCandidate2 && (isRightSum(predToken) || isRightSum3(predToken))){
+				foundObjectCandidate2 = true;
+				if ( isClassToken(curToken) )
+					tokenStream.add(new ClassToken(lineNumber, curToken));
+				else
+					throw new InvalidTokenException("Invalid Object 2", lineNumber, curToken);
+			}
+
+			else if (!foundObjectCandidate3 && isRightSum3(predToken)){
+				foundObjectCandidate3 = true;
+				if(isClassToken(curToken))
+					tokenStream.add(new ClassToken(lineNumber, curToken));
+				else
+					throw new InvalidTokenException("Invalid Object 3", lineNumber, curToken);
 			}
 
 			else
@@ -104,7 +162,7 @@ class SpecialTokenizer{
 		// relation tokens must have valid characters,
 		// at most one of each relation,
 		// and commas separating the relations
-		String validRelationChars = "<>=!o";
+		String validRelationChars = "<>=!olr";
 		for (int i=1;  i < valueArray.length-1;  i++){
 			if ( validRelationChars.contains("" + valueArray[i]) ){
 				validRelationChars = validRelationChars.replace("" + valueArray[i], "");
@@ -119,6 +177,73 @@ class SpecialTokenizer{
 		}
 		
 		return true;
+	}
+
+	private static boolean isSum3Token(String value){
+		if(value.length() != 4)
+			return false;
+		if(value.equals("{l3}") || value.equals("{r3}")){
+			return true;
+		}
+		else
+			return false;
+	}
+
+	private static boolean isLeftSum(String value){
+		char[] valueArray = value.toCharArray();
+		if (valueArray.length != 3)
+			return false;
+		else if (valueArray[0] != '{')
+			return false;
+		else if (valueArray[valueArray.length - 1] != '}')
+			return false;
+		else if (valueArray[1] == 'l')
+			return true;
+		else
+			return false;
+	}
+
+	private static boolean isRightSum(String value){
+		char[] valueArray = value.toCharArray();
+		if (valueArray.length != 3)
+			return false;
+		else if (valueArray[0] != '{')
+			return false;
+		else if (valueArray[valueArray.length - 1] != '}')
+			return false;
+		else if (valueArray[1] == 'r')
+			return true;
+		else
+			return false;
+	}
+
+	private static boolean isLeftSum3(String value){
+		char[] valueArray = value.toCharArray();
+		if(valueArray.length != 4)
+			return false;
+		else if(valueArray[0] != '{')
+			return false;
+		else if(valueArray[valueArray.length - 1] != '}')
+			return false;
+		else if(valueArray[1] == 'l' && valueArray[2] == '3'){
+			return true;
+		}
+		else
+			return false;
+	}
+
+	private static boolean isRightSum3(String value){
+		char[] valueArray = value.toCharArray();
+		if(valueArray.length != 4)
+			return false;
+		else if(valueArray[0] != '{')
+			return false;
+		else if(valueArray[valueArray.length - 1] != '}')
+			return false;
+		else if(valueArray[1] == 'r' && valueArray[2] == '3')
+			return true;
+		else
+			return false;
 	}
 
 	/** Returns true if the given string represents a class token,

@@ -28,11 +28,24 @@ public class Tokenizer{
 		lineNumber = 1;
 		Scanner input = new Scanner(in);
 
-		try{
-			while ( input.hasNextLine() )
-				addLineToTokenStream( input.nextLine().split("[ ]+") );
-		} catch(InvalidTokenException ex) { System.out.println( ex.getMessage() ); return false; }
-
+		try {
+		    while(input.hasNextLine()) {
+				String line = input.nextLine();
+				int endIndex = line.indexOf(']');
+				if(endIndex == -1){
+			    	if(!line.startsWith("#"))
+						addLineToTokenStream(line.split("[ ]+"));
+			    }
+			    else{
+			    	String subline = line.substring(0, endIndex+1);
+			    	if(!subline.startsWith("#"))
+						addLineToTokenStream(subline.split("[ ]+"));
+				}
+			}
+		} catch(InvalidTokenException ex) { 
+		    System.out.println( ex.getMessage() ); 
+		    return false; 
+		}
 		input.close();
 		return true;
 	}
@@ -45,12 +58,20 @@ public class Tokenizer{
 	 */
 	private void addLineToTokenStream(String[] line) throws InvalidTokenException{
 		boolean foundSubjectCandidate = false;
+		boolean foundSubjectCandidate2 = false;
 		boolean foundPredicateCandidate = false;
 		boolean foundObjectCandidate = false;
+		boolean foundObjectCandidate2 = false;
 
 		for (int i=0;  i < line.length;  i++){
 			// renamed for the purpose of readability
 			String curToken = line[i];
+			String nextToken = new String();
+			if(i < line.length - 2)
+				nextToken = line[i+1];
+			String prevToken = new String();
+			if(i > 0)
+				prevToken = line[i-1];
 			// remove whitespace (spaces and newlines have already been handled)
 			curToken = curToken.replace("\t","");
 
@@ -63,6 +84,14 @@ public class Tokenizer{
 					tokenStream.add(new ClassToken(lineNumber, curToken));
 				else
 					throw new InvalidTokenException("Invalid Subject", lineNumber, curToken);
+			}
+
+			else if (!foundSubjectCandidate2 && foundSubjectCandidate && isLeftSum(nextToken)){
+				foundSubjectCandidate2 = true;
+				if( isClassToken(curToken) )
+					tokenStream.add(new ClassToken(lineNumber, curToken));
+				else
+					throw new InvalidTokenException("Invalid Subject 2", lineNumber, curToken);
 			}
 
 			else if (!foundPredicateCandidate){
@@ -79,6 +108,14 @@ public class Tokenizer{
 					tokenStream.add(new ClassToken(lineNumber, curToken));
 				else
 					throw new InvalidTokenException("Invalid Object", lineNumber, curToken);
+			}
+
+			else if (!foundObjectCandidate2 && foundObjectCandidate && isRightSum(prevToken)){
+				foundObjectCandidate2 = true;
+				if ( isClassToken(curToken) )
+					tokenStream.add(new ClassToken(lineNumber, curToken));
+				else
+					throw new InvalidTokenException("Invalid Object 2", lineNumber, curToken);
 			}
 
 			else
@@ -132,6 +169,36 @@ public class Tokenizer{
 		}
 		
 		return true;
+	}
+
+	private static boolean isLeftSum(String value){
+		System.out.println("isLeftSum");
+		char[] valueArray = value.toCharArray();
+		if (valueArray.length != 3)
+			return false;
+		else if (valueArray[0] != '{')
+			return false;
+		else if (valueArray[valueArray.length - 1] != '}')
+			return false;
+		else if (valueArray[1] == 'l')
+			return true;
+		else
+			return false;
+	}
+
+	private static boolean isRightSum(String value){
+		System.out.println("isRightSum");
+		char[] valueArray = value.toCharArray();
+		if (valueArray.length != 3)
+			return false;
+		else if (valueArray[0] != '{')
+			return false;
+		else if (valueArray[valueArray.length - 1] != '}')
+			return false;
+		else if (valueArray[1] == 'r')
+			return true;
+		else
+			return false;
 	}
 
 	/** Returns true if the given string represents a class token,
