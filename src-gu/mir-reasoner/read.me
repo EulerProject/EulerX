@@ -1,0 +1,30 @@
+
+
+SETUP
+
+1. Compile the source code. 
+
+To compile, run the setup.py script: 
+
+   python setup.py
+
+
+RUNNING THE REASONER
+
+2. Run the reasoner using the mir.py script. 
+
+Use the following command to run the specialized reasoner: 
+
+   python mir.py examples/simple_pw_example.txt output.txt true true true
+
+This will run the reasoner over the simple-pw-example.txt file in the
+examples directory, and output the result into the file
+output.txt. The last three command line arguments tell the reasoner to
+include provenance information, to generate possible worlds, and to
+output benchmarking (timing) data, respectively. To only output the
+MIR, use the following command:
+
+   python mir.py examples/simple_pw_example.txt output.txt false false false
+
+
+
