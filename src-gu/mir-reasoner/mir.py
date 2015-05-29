@@ -26,7 +26,6 @@ def mirPW(infile, outfile, isProvenance, isBenchmark):
 		cmd = 'time -f "real\t%es\nuser\t%Us\nsys\t%Ss" java -cp ./src reasoner.ApplyMIRReasonerPW ' + args
 	else:
 		cmd = 'java -cp ./src reasoner.ApplyMIRReasonerPW ' + args
-        print "calling:", cmd
 	subprocess.call(cmd, shell=True)
 
 
