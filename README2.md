@@ -3,15 +3,6 @@ EulerX Toolkit Overview
 
 ![Alt text](http://euler.cs.ucdavis.edu/_/rsrc/1366832610901/home/logo_small.png)
 
-On this page:
-
-* [Introduction](https://github.com/EulerProject/EulerX#introduction)
-* [Structure of This Toolkit](https://github.com/EulerProject/EulerX#structure-of-this-toolkit)
-* [Installation Steps](https://github.com/EulerProject/EulerX#installation-steps)
-* [Software Dependencies](https://github.com/EulerProject/EulerX#software-dependencies)
-* [Command Line Interface to run Euler2]
-* [Contact](https://github.com/EulerProject/EulerX#Contact)
-
 # Introduction
 
 Euler is an open source toolkit (mostly written in Python) for merging taxonomies (taxonomical organized datasets) and visualizing the results. (see [Euler Toolkit Wiki][wiki] for more information, and the remaining issue list in [Jira][jira])
