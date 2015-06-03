@@ -112,7 +112,8 @@ Please run `installCheck.sh` and make sure the minimal dependency check passes b
 Make sure all commands of running softwares before and main entry of source code (e.g. `src-el/` of EulerASP) are in your PATH env.
 Note: [Prover9/Mace4][p9m4] is not necessary to install if you do not want to use EulerFO.
 
-# Examples of Running Euler2 with new command line interface. Use example [abstract4][https://github.com/EulerProject/EulerX/blob/forcli/example/abstract4/abstract4.txt]
+# Examples of Running Euler2 with new command line interface. 
+Use example [abstract4][abstract4eg]
 
 ##### 1. Show the available commands
 List all usage commands.
@@ -170,3 +171,4 @@ If you have any question or comments, please contact Bertram Ludäscher at ludae
 [jira]: https://opensource.ncsa.illinois.edu/jira/projects/EULER/issues/
 [gringo303]: http://sourceforge.net/projects/potassco/files/gringo/3.0.3/
 [claspD114]: http://sourceforge.net/projects/potassco/files/claspD/1.1.4/
+[abstract4eg]: https://github.com/EulerProject/EulerX/blob/forcli/example/abstract4/abstract4.txt
