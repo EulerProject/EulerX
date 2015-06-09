@@ -45,7 +45,7 @@ def checkInputFiles(iFiles):
 
     for g in taxonDict:
         if len(taxonDict[g]['parents']) > 1:
-            errors.append('Too many roots in taxonomy ' + str(g) + ": " + ', '.join(taxonDict[g]['parents']) + ".")
+            errors.append('Multiple roots in taxonomy ' + str(g) + ": " + ', '.join(taxonDict[g]['parents']) + ".")
 
     for g in taxonDict:
         for c in taxonDict[g]['leaves']:
