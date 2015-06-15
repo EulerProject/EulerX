@@ -1983,7 +1983,7 @@ class TaxonomyMapping:
         prod = 0   # product
         n = 0      # number of taxonomies
         pro = 1    # product of num
-        couArray = []
+        couArray = [] # number of count
         proArray = []
         taxaArray = []
         for key in self.taxonomies.keys():
@@ -2011,17 +2011,17 @@ class TaxonomyMapping:
             #if self.args.verbose:
             #    print "count: ",cou,", product: ",prod
                 
-        #if self.enc & encode["dl"]:
-            #maxint = int(self.args.dl)*num
-            #self.baseAsp  = "%%% Max Number of Euler Regions\n"
-            #self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
-            #self.baseAsp += "%%% Euler Regions\n"
-            #self.baseAsp += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
-            #
-            #self.baseAsp += con
-            #self.baseAsp += "%%% Euler Bit\n"
-            #self.baseAsp += "bit(M, V):-r(M),#mod(M," + int(num).__str__() + ",V).\n\n"
-            #self.baseAsp += template.getAspDlCon()
+        if self.enc & encode["dl"]:
+            maxint = int(self.args.dl)*num
+            self.baseAsp  = "%%% Max Number of Euler Regions\n"
+            self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
+            self.baseAsp += "%%% Euler Regions\n"
+            self.baseAsp += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
+            
+            self.baseAsp += con
+            self.baseAsp += "%%% Euler Bit\n"
+            self.baseAsp += "bit(M, V):-r(M),#mod(M," + int(num).__str__() + ",V).\n\n"
+            self.baseAsp += template.getAspDlCon()
         if self.enc & encode["mn"]:
             if len(self.taxonomies) == 1:
                 raise Exception("Polynomial encoding is not applicable for singleton taxonomy" +\
@@ -2036,6 +2036,7 @@ class TaxonomyMapping:
                 self.baseAsp += con
                 
                 self.baseAsp += "\n%%% Euler Bit\n"
+                
                 for i in range(len(couArray)):
                     self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n"
                     
