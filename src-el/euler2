@@ -47,19 +47,11 @@ Options:
     --fourinone		  Four in one lattice.
     --xia		  Extract input file.
     --ur		  Uncertainty reduction.
-    --run FOLDER		  Show a particular Run.
+    --run FOLDER	  Show a particular Run.
     <name>		  The knowledge product you want to show, including: 
     				iv (input visualization)
     				pw (possible worlds)
-    				av (aggregate view)
-    				avStable (stable aggregate view, show relations from all PWs)
-    				avLabile (Labile aggregate view, show relations from proper subset of PWs)
-    				cv (cluster view)
-    				hv (hierarchy view)
-    				inconLat (inconsistency lattice, BETA)
-    				ambLat (ambiguity lattice, BETA)
-    				pw2input (taxonomy that converted from PW, BETA) 
-
+    				sv (summary view, including aggregate view, cluster view, hierarchy view)
 
 """
 
@@ -75,11 +67,14 @@ def main():
 	args = docopt(__doc__)
 	#print args
 	
+	if args['--version']:
+		print "Euler 2.0"
+		return
+	
 	if args['check']:
 		print "Checking the input file...\n"
 		checkInputFiles(args['<inputfile>'])
 		return
-	
 	
 	if args['align']:
 		if not reasoner.has_key(args['-r']):
