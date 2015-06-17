@@ -1,0 +1,151 @@
+#!/usr/bin/env python
+
+# Copyright (c) 2014 University of California, Davis
+# 
+# 
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+# 
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+"""Euler CLI 2.0 doc
+
+Usage:
+	euler2 (-h | --help)
+	euler2 --version
+	euler2 check <inputfile>
+	euler2 align <inputfile>... [-e METHOD] [-r TOOL] [--consistency] [--hidemirdisjoint] [--disablecov] [--disablesib] [--repair=WAY] [--artRem] [--fourinone] [--xia] [--ur] [--ie] [--ieo]
+	euler2 show <name> [--all]
+	euler2 show <inputfile> iv [--all]
+
+
+Options:
+    -h --help		  Show this screen.
+    --version		  Show version.
+    -e METHOD		  Set the encoding method, including mnpw, mncb, mnve, vrpw, vrve [default: mnpw].
+    -r TOOl		  Set the reasoner, including dlv and gringo [default: dlv].
+    --consistency	  Check consistency ONLY.
+    --disablecov	  Disable coverage.
+    --disablesib	  Disable sibling disjointness.
+    --repair WAY	  Repair inconsistency.
+    --artRem		  Articulation remover.
+    --fourinone		  Four in one lattice.
+    --xia		  Extract input file.
+    --ur		  Uncertainty reduction. 
+    --all		  Show all formats (pdf and svg) of visualization, by default only yaml and graphviz output
+    <name>		  The knowledge product you want to show, including: 
+    				iv (input visualization)
+    				pw (possible worlds)
+    				av (aggregate view)
+    				avStable (stable aggregate view, show relations from all PWs)
+    				avLabile (Labile aggregate view, show relations from proper subset of PWs)
+    				cv (cluster view)
+    				hv (hierarchy view)
+    				inconLat (inconsistency lattice, BETA)
+    				ambLat (ambiguity lattice, BETA)
+    				pw2input (taxonomy that converted from PW, BETA) 
+
+
+"""
+
+#from parser import *
+from checker import *
+from runner import *
+from show import *
+from externaltools import *
+from docopt import docopt
+
+def main():
+
+	args = docopt(__doc__)
+	#print args
+	
+	if args['check']:
+		print "Checking the input file...\n"
+		checkInputFiles(args['<inputfile>'])
+		return
+	
+	
+	if args['align']:
+		if not reasoner.has_key(args['-r']):
+			print "Unknown reasoner " + args['-r']
+			return None
+		elRunner = EulerRunner.instance()
+		elRunner.run(args)
+		
+		return
+	
+	if args['show']:
+		elShower = ProductsShowing(args)
+		elShower.show()
+
+
+#	elParser = EulerParser.instance()
+#	#ctiParser = CtiParser.instance()
+#	args = elParser.parse_args()
+#	#if args.verbose:
+#	#	print args
+#	if args.inputfile is None:
+#		# artificial example generator
+#		#if args.function == "generate":
+#		#	generator = CtiGenerator.instance()
+#		#	generator.run(args)
+#		# lattice generation
+#		if args.diaglat:
+#			runLattice(args.diaglat)
+#		elif args.mualat:
+#			runMuaLattice(args.mualat)
+#		# input wizard
+#		elif args.function == "wizard":
+#			if args.addID:
+#				runAddID(args.addID)
+#			elif args.addIsa:
+#				runAddIsa(args.addIsa)
+#			elif args.p2c:
+#				runP2C(args.p2c)
+#			elif args.p2ct:
+#				runP2CT(args.p2ct)
+#			elif args.addArt:
+#				runAddArt(args.addArt)
+#			elif args.addArtT:
+#				runAddArtT(args.addArtT)	
+#			elif args.c2csv:
+#				runC2CSV(args.c2csv)
+#			elif args.addRank:
+#				runAddRank(args.addRank)
+#			elif args.mirStats:
+#				runMirStats(args.mirStats)
+#		# wrong argument
+#		else:
+#			print "Invalid input: Please run euler -h for more information"
+#			return None
+#	else:
+#		if args.function != "generate" and args.function != "wizard":
+#			if not reasoner.has_key(args.reasoner):
+#				print "unknown reasoner "+args.reasoner#+", please choose one reasoner from "+reasoner.keys().toString()
+#				return None
+#			elRunner = EulerRunner.instance()
+#			elRunner.run(args)
+#		else:
+#			print "Invalid input: Please run euler -h for more information"
+#			return None
+
+if __name__ == '__main__':
+	#start_time = time.time()
+	main()
+	#print "\n===> Execution time: " + (time.time() - start_time).__str__() + " seconds\n"
+	

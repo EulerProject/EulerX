@@ -20,23 +20,48 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from helper2 import *
-from taxonomy2 import *
-from alignment2 import *
+import sys
+import commands
+import os
 
-class EulerRunner:
-    
-    inst = None
-    
-    def __init__(self):
-        self.name = "Euler Runner"
+class Callable:
+    def __init__(self, callable):
+        self.__call__ = callable
 
-    @Callable
-    def instance():
-        return EulerRunner()
-    
-    def run(self, args):
-        taxMap = TaxonomyMapping(args)
-        # Parse the cti file
-        taxMap.readFile()
-        taxMap.run()
+def findkey(mapp, value):
+#    tmplist = [k for k, v in mapp.iteritems() if v == value]
+#    if tmplist is []:
+#        return None
+#    return tmplist[0]
+    return mapp.keys()[mapp.values().index(value)]
+
+
+class Logger(object):
+    # filename may have proper path
+    def __init__(self, filename):
+        self.terminal = sys.stdout
+        self.log = open(filename, "a")
+        
+    def __del__(self):
+        self.log.close()
+        
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+
+def newgetoutput(cmd):
+    result = commands.getstatusoutput(cmd)
+    if result[0] != 0:
+        print "cmd: ", cmd
+        print "exit status: ", result[0]
+        return
+    else:
+        return result[1]
+
+def createLastRunTimeStamp(fileName, user, host, timestamp, name):
+    f = open(fileName, "w")
+    s = os.path.join(user + '-' + host, timestamp + '-' + name)
+    f.write(s)
+    f.write('\n')
+    f.write(name)
+    f.close()

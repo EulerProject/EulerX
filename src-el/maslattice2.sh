@@ -20,23 +20,22 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from helper2 import *
-from taxonomy2 import *
-from alignment2 import *
+curdir=$(pwd)
+euler=$(which euler)
+srcdir=$(dirname $euler)
+prodir=$(dirname $srcdir)
+cd $prodir
+cd bbox-lattice
+input=$curdir/$1
 
-class EulerRunner:
-    
-    inst = None
-    
-    def __init__(self):
-        self.name = "Euler Runner"
-
-    @Callable
-    def instance():
-        return EulerRunner()
-    
-    def run(self, args):
-        taxMap = TaxonomyMapping(args)
-        # Parse the cti file
-        taxMap.readFile()
-        taxMap.run()
+echo "preprocessing..."
+echo "creating the lattice without color...";
+python preprocess.py $input;
+echo "saving all worlds...";
+python awf.py -filter=i,o expWorlds.asp;
+#dlv -silent -filter=up  wexp-up.asp expWorlds_aw.asp > up.dlv;
+echo "running euler to get MIS...";
+euler2 align $input -e mnpw --artRem > output.txt;
+echo "from MIS to MAC and get lattice..."
+python amblattice.py $input $curdir;
+echo "finish";
