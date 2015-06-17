@@ -64,7 +64,7 @@ Options:
 
 #from parser import *
 from checker import *
-from runner import *
+from runner2 import *
 from show import *
 from externaltools import *
 from docopt import docopt
