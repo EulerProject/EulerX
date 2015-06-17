@@ -48,12 +48,18 @@ class ProductsShowing:
         self.runningHost = socket.gethostname()
         self.projectdir = ''      # initiate the project folder to be the current folder
         self.lastrundir = ''
+        self.userdir = ''
         self.lastruntimestamp = os.path.join(self.projectdir, self.runningUser+'-'+self.runningHost+'-lastrun.timestamp')
         if os.path.isfile(self.lastruntimestamp):
             f = open(self.lastruntimestamp, "r")
             self.lastrundir = f.readline().strip()
+            self.userdir =  re.match('(.*)/(.*)', self.lastrundir).group(1)
             self.name = f.readline()
             f.close()
+        
+        if args['--run']:
+            self.lastrundir = self.userdir + '/' + args['--run']
+            self.name = re.match('(.*)-(.*)-(.*)-(.*)-(.*)', args['--run']).group(5)
         
         self.path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         self.stylesheetdir = os.path.join(self.projectdir, "stylesheets/")
@@ -114,6 +120,9 @@ class ProductsShowing:
             if self.args['<name>'] == 'pw':    # possible worlds
                 self.showPW()
             if self.args['<name>'] == 'sv':    # summary view, including av (stable and labile), cv, hv
+                if not self.checkPwFlag():
+                    print 'Need to run "euler2 show pw" first.'
+                    return
                 self.showAV("regular")
                 self.showAV("avStable")
                 self.showAV("avLabile")
@@ -713,6 +722,15 @@ class ProductsShowing:
         edge.update({"label" : label})
         self.rcgVizEdges.update({s + "_" + t : edge})
         
+    def checkPwFlag(self):
+        avInternalFile = os.path.join(self.pwinternalfilesdir, 'av.internal')
+        it = imp.load_source('it', avInternalFile)
+        # check whether showPW() run first
+        if not it.avFlag:
+            return False
+        else:
+            return True
+    
     def showAV(self, avType):
         print "******aggregates visualization "+ avType +" ******"
         
@@ -724,9 +742,9 @@ class ProductsShowing:
         it = imp.load_source('it', avInternalFile)
         
         # check whether showPW() run first
-        if not it.avFlag:
-            print 'Need to run "euler2 show pw" first.'
-            return
+        #if not it.avFlag:
+        #    print 'Need to run "euler2 show pw" first.'
+        #    return
         
         self.allRcgNodesDict = it.allRcgNodesDict
         self.allRcgEdgesDict = it.allRcgEdgesDict

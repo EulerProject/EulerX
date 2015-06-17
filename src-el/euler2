@@ -29,8 +29,9 @@ Usage:
 	euler2 --version
 	euler2 check <inputfile>
 	euler2 align <inputfile>... [-e METHOD] [-r TOOL] [--consistency] [--hidemirdisjoint] [--disablecov] [--disablesib] [--repair=WAY] [--artRem] [--fourinone] [--xia] [--ur] [--ie] [--ieo]
-	euler2 show <name> [--all]
-	euler2 show <inputfile> iv [--all]
+	euler2 show <name>
+	euler2 show [--run=FOLDER] <name>
+	euler2 show <inputfile> iv
 
 
 Options:
@@ -45,7 +46,8 @@ Options:
     --artRem		  Articulation remover.
     --fourinone		  Four in one lattice.
     --xia		  Extract input file.
-    --ur		  Uncertainty reduction. 
+    --ur		  Uncertainty reduction.
+    --run FOLDER		  Show a particular Run.
     <name>		  The knowledge product you want to show, including: 
     				iv (input visualization)
     				pw (possible worlds)
