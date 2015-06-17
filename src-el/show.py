@@ -81,7 +81,7 @@ class ProductsShowing:
         self.clusterVizEdges = {}
         self.hierarchyVizNodes = {}
         self.hierarchyVizEdges = {}
-        self.hrdot = os.path.join(self.pwsaggregatedir, self.name + "_hr.gv")
+        self.hvdot = os.path.join(self.pwsaggregatedir, self.name + "_hv.gv")
         
         self.latticedir = os.path.join(self.lastrundir, "6-Lattices")
         
@@ -113,12 +113,16 @@ class ProductsShowing:
                 self.showIV()
             if self.args['<name>'] == 'pw':    # possible worlds
                 self.showPW()
-            if self.args['<name>'] == 'av' or self.args['<name>'] == 'avStable' or self.args['<name>'] == 'avLabile':    # aggregate view
-                self.showAV()
-            if self.args['<name>'] == 'cv':    # cluster view
+            if self.args['<name>'] == 'sv':    # summary view, including av (stable and labile), cv, hv
+                self.showAV("regular")
+                self.showAV("avStable")
+                self.showAV("avLabile")
                 self.showCV()
-            if self.args['<name>'] == 'hv':    # hierarchy view
                 self.showHV()
+            #if self.args['<name>'] == 'cv':    # cluster view
+            #    self.showCV()
+            #if self.args['<name>'] == 'hv':    # hierarchy view
+            #    self.showHV()
             if self.args['<name>'] == 'inconLat':   # inconsistency lattice 
                 self.showInconLAT()
             if self.args['<name>'] == 'ambLat':   # ambiguity lattice 
@@ -300,9 +304,8 @@ class ProductsShowing:
             newgetoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"singletoninputstyle.yaml" + ">" + inputDotFile)
         else:
             newgetoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"inputstyle.yaml" + ">" + inputDotFile)
-        if self.args['--all']:
-            newgetoutput("dot -Tpdf "+inputDotFile+" -o "+inputPdfFile)
-            newgetoutput("dot -Tsvg "+inputDotFile+" -o "+inputSvgFile)
+        newgetoutput("dot -Tpdf "+inputDotFile+" -o "+inputPdfFile)
+        #newgetoutput("dot -Tsvg "+inputDotFile+" -o "+inputSvgFile)
         
     def addInputVizNode(self, concept, group, pathlen):
         node = {}
@@ -631,9 +634,8 @@ class ProductsShowing:
             
             # apply the rcgviz stylesheet
             newgetoutput("cat "+rcgYamlFile+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + rcgDotFile)
-            if self.args['--all']:
-                newgetoutput("dot -Tpdf "+rcgDotFile+" -o "+rcgPdfFile)
-                newgetoutput("dot -Tsvg "+rcgDotFile+" -o "+rcgSvgFile)
+            newgetoutput("dot -Tpdf "+rcgDotFile+" -o "+rcgPdfFile)
+            #newgetoutput("dot -Tsvg "+rcgDotFile+" -o "+rcgSvgFile)
             
             # prepare for aggregate view
             for e in it.tr:
@@ -647,9 +649,9 @@ class ProductsShowing:
         fav.close()
         
         # prepare for cluster view
-        fcv = open(cvInternalFile, "a")
-        fcv.write('cvFlag = ' + repr(True) + '\n')
-        fcv.close()
+        #fcv = open(cvInternalFile, "a")
+        #fcv.write('cvFlag = ' + repr(True) + '\n')
+        #fcv.close()
 
 
     def restructureCbNames(self, cbName, firstTName):
@@ -711,8 +713,8 @@ class ProductsShowing:
         edge.update({"label" : label})
         self.rcgVizEdges.update({s + "_" + t : edge})
         
-    def showAV(self):
-        print "******aggregates visualization******"
+    def showAV(self, avType):
+        print "******aggregates visualization "+ avType +" ******"
         
         if not os.path.exists(self.pwsaggregatedir):
             os.mkdir(self.pwsaggregatedir)
@@ -748,7 +750,7 @@ class ProductsShowing:
             newColor = "#" + str(hex(int(newPointDec[0])))[2:] + str(hex(int(newPointDec[1])))[2:] + str(hex(int(newPointDec[2])))[2:]
             rels[i][3] = newColor
 
-        if self.args['<name>'] == 'avStable':
+        if avType == 'avStable':
             tmprels = Set()
             removekey = Set()
             for [T1, T2, cnt, color] in rels:
@@ -767,7 +769,7 @@ class ProductsShowing:
             for [T1, T2, cnt, color] in rels:
                 if cnt == it.numOfPws:
                     self.addRcgAllVizEdge(T1, T2, cnt, it.numOfPws)
-        elif self.args['<name>'] == 'avLabile':
+        elif avType == 'avLabile':
             tmprels = Set()
             removekey = Set()
             for [T1, T2, cnt, color] in rels:
@@ -793,15 +795,15 @@ class ProductsShowing:
         # prepare for hierarchy view
         fhv = open(hvInternalFile, "a")
         fhv.write('rels = ' + repr(rels) + '\n')
-        fhv.write('hvFlag = ' + repr(True) + '\n')
+        #fhv.write('hvFlag = ' + repr(True) + '\n')
         fhv.close()
         
         self.addRcgAllVizNumOfPws(it.numOfPws)
                 
-        rcgAllYamlFile = os.path.join(self.pwsaggregatedir, self.name+"_all.yaml")
-        rcgAllDotFile = os.path.join(self.pwsaggregatedir, self.name+"_all.gv")
-        rcgAllPdfFile = os.path.join(self.pwsaggregatedir, self.name+"_all.pdf")
-        rcgAllSvgFile = os.path.join(self.pwsaggregatedir, self.name+"_all.svg")
+        rcgAllYamlFile = os.path.join(self.pwsaggregatedir, self.name+"_"+avType+"_all.yaml")
+        rcgAllDotFile = os.path.join(self.pwsaggregatedir, self.name+"_"+avType+"_all.gv")
+        rcgAllPdfFile = os.path.join(self.pwsaggregatedir, self.name+"_"+avType+"_all.pdf")
+        rcgAllSvgFile = os.path.join(self.pwsaggregatedir, self.name+"_"+avType+"_all.svg")
         
         fRcgAllVizYaml = open(rcgAllYamlFile, 'w')
         if self.allRcgNodesDict:
@@ -840,9 +842,8 @@ class ProductsShowing:
         
         
         newgetoutput("cat "+rcgAllYamlFile+" | y2d -s "+self.stylesheetdir+"aggregatestyle.yaml" + ">" + rcgAllDotFile)
-        if self.args['--all']:
-            newgetoutput("dot -Tpdf "+rcgAllDotFile+" -o "+rcgAllPdfFile)
-            newgetoutput("dot -Tsvg "+rcgAllDotFile+" -o "+rcgAllSvgFile)
+        newgetoutput("dot -Tpdf "+rcgAllDotFile+" -o "+rcgAllPdfFile)
+        #newgetoutput("dot -Tsvg "+rcgAllDotFile+" -o "+rcgAllSvgFile)
         
     
     def addRcgAllVizNode(self, concept, group):
@@ -875,9 +876,9 @@ class ProductsShowing:
         cvInternalFile = os.path.join(self.pwinternalfilesdir, 'cv.internal')
         it = imp.load_source('it', cvInternalFile)
         
-        if not it.cvFlag:
-            print 'Need to run "euler2 show pw" first.'
-            return
+        #if not it.cvFlag:
+        #    print 'Need to run "euler2 show pw" first.'
+        #    return
         
         # if there is only one PW, showCV will return nothing
         if it.npw == 1:
@@ -958,10 +959,9 @@ class ProductsShowing:
         
         newgetoutput("cat "+clyaml+" | y2d -s "+self.stylesheetdir+"clusterstyle.yaml" + ">" + cldot)
         newgetoutput("neato -Tpdf "+cldot+" -o "+clneatopdf)
-        if self.args['--all']:
-            newgetoutput("dot -Tpdf "+cldot+" -o "+cldotpdf)
-            newgetoutput("dot -Tsvg "+cldot+" -o "+cldotsvg)
-            newgetoutput("neato -Tsvg "+cldot+" -o "+clneatosvg)        
+        #newgetoutput("dot -Tpdf "+cldot+" -o "+cldotpdf)
+        #newgetoutput("dot -Tsvg "+cldot+" -o "+cldotsvg)
+        #newgetoutput("neato -Tsvg "+cldot+" -o "+clneatosvg)        
 
         
         
@@ -989,9 +989,9 @@ class ProductsShowing:
         hvInternalFile = os.path.join(self.pwinternalfilesdir, 'hv.internal')
         it = imp.load_source('it', hvInternalFile)
         
-        if not it.hvFlag:
-            print 'Need to run "euler2 show pw" and "euler2 show av" first.'
-            return
+        #if not it.hvFlag:
+        #    print 'Need to run "euler2 show pw" and "euler2 show av" first.'
+        #    return
         
         paths = []
         mergedNodes = []
@@ -1050,7 +1050,7 @@ class ProductsShowing:
         self.remove_duplicate_string(nodes)
         
         # write to dot file
-        fDot = open(self.hrdot, 'w')
+        fDot = open(self.hvdot, 'w')
         fDot.write("digraph {\n\nrankdir = RL\n\n")
         for node in nodes:
             if(node.find("*") == -1 and node.find("\\") == -1 and node.find("\\n") == -1 and node.find(".") != -1):
@@ -1073,8 +1073,8 @@ class ProductsShowing:
         fDot.close()
         
 #        hvyaml = os.path.join(self.pwsaggregatedir, self.name+"_hv.yaml")
-#        hvdot = os.path.join(self.pwsaggregatedir, self.name+"_hv.gv")
-#        hvdotpdf = os.path.join(self.pwsaggregatedir, self.name+"_hv.pdf")
+        hvdot = os.path.join(self.pwsaggregatedir, self.name+"_hv.gv")
+        hvdotpdf = os.path.join(self.pwsaggregatedir, self.name+"_hv.pdf")
 #        hvdotsvg = os.path.join(self.pwsaggregatedir, self.name+"_hv.svg")
 #        
 #        fhvyaml = open(hvyaml, 'w')
@@ -1085,7 +1085,7 @@ class ProductsShowing:
 #        fhvyaml.close()
 #        
 #        newgetoutput("cat "+hvyaml+" | y2d -s "+self.stylesheetdir+"hierarchystyle.yaml" + ">" + hvdot)
-#        newgetoutput("dot -Tpdf "+hvdot+" -o "+hvdotpdf)
+        newgetoutput("dot -Tpdf "+hvdot+" -o "+hvdotpdf)
 #        newgetoutput("dot -Tsvg "+hvdot+" -o "+hvdotsvg)
 
         

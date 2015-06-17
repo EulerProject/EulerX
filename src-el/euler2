@@ -46,7 +46,6 @@ Options:
     --fourinone		  Four in one lattice.
     --xia		  Extract input file.
     --ur		  Uncertainty reduction. 
-    --all		  Show all formats (pdf and svg) of visualization, by default only yaml and graphviz output
     <name>		  The knowledge product you want to show, including: 
     				iv (input visualization)
     				pw (possible worlds)
