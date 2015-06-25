@@ -108,6 +108,8 @@ class EulerParser:
                                               help="simplify the possible world cluster, by default switch off")
             EulerParser.inst.add_argument("--hierarchy", action="store_true", dest="hierarchy", default=False,\
                                               help="hierarchical aggregate view, by default switch off")
+            EulerParser.inst.add_argument("--hidemirdisjoint", action="store_true", dest="hidemirdisjoint", default=False,\
+                                              help="hide disjoint in mir")
             EulerParser.inst.add_argument("--ci", action="store_true", dest="ci", default=False,\
                                               help="check input files only")
             EulerParser.inst.add_argument("-N", action="store_false", dest="output", default=True,\
