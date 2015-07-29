@@ -42,27 +42,27 @@ def containsymb(rel, symb):
 def r32compTab(r1, r2):
     rel = 0
     if containsymb(r1, rcc["<"]) and containsymb(r2, rcc["<"]): rel = rel | rcc["<"]
-    if containsymb(r1, rcc["<"]) and containsymb(r2, rcc[">"]): rel = rel | rcc["=><!o"]
+    if containsymb(r1, rcc["<"]) and containsymb(r2, rcc[">"]): rel = rel | rcc["!<=>o"]
     if containsymb(r1, rcc["<"]) and containsymb(r2, rcc["!"]): rel = rel | rcc["!"]
-    if containsymb(r1, rcc["<"]) and containsymb(r2, rcc["o"]): rel = rel | rcc["<!o"]
+    if containsymb(r1, rcc["<"]) and containsymb(r2, rcc["o"]): rel = rel | rcc["!<o"]
     if containsymb(r1, rcc["<"]) and containsymb(r2, rcc["="]): rel = rel | rcc["<"]
     
-    if containsymb(r1, rcc[">"]) and containsymb(r2, rcc["<"]): rel = rel | rcc["=><o"]
+    if containsymb(r1, rcc[">"]) and containsymb(r2, rcc["<"]): rel = rel | rcc["<=>o"]
     if containsymb(r1, rcc[">"]) and containsymb(r2, rcc[">"]): rel = rel | rcc[">"]
-    if containsymb(r1, rcc[">"]) and containsymb(r2, rcc["!"]): rel = rel | rcc[">!o"]
+    if containsymb(r1, rcc[">"]) and containsymb(r2, rcc["!"]): rel = rel | rcc["!>o"]
     if containsymb(r1, rcc[">"]) and containsymb(r2, rcc["o"]): rel = rel | rcc[">o"]
     if containsymb(r1, rcc[">"]) and containsymb(r2, rcc["="]): rel = rel | rcc[">"]
     
-    if containsymb(r1, rcc["!"]) and containsymb(r2, rcc["<"]): rel = rel | rcc["<!o"]
+    if containsymb(r1, rcc["!"]) and containsymb(r2, rcc["<"]): rel = rel | rcc["!<o"]
     if containsymb(r1, rcc["!"]) and containsymb(r2, rcc[">"]): rel = rel | rcc["!"]
-    if containsymb(r1, rcc["!"]) and containsymb(r2, rcc["!"]): rel = rel | rcc["=><!o"]
-    if containsymb(r1, rcc["!"]) and containsymb(r2, rcc["o"]): rel = rel | rcc["<!o"]
+    if containsymb(r1, rcc["!"]) and containsymb(r2, rcc["!"]): rel = rel | rcc["!<=>o"]
+    if containsymb(r1, rcc["!"]) and containsymb(r2, rcc["o"]): rel = rel | rcc["!<o"]
     if containsymb(r1, rcc["!"]) and containsymb(r2, rcc["="]): rel = rel | rcc["!"]
     
     if containsymb(r1, rcc["o"]) and containsymb(r2, rcc["<"]): rel = rel | rcc["<o"]
-    if containsymb(r1, rcc["o"]) and containsymb(r2, rcc[">"]): rel = rel | rcc[">!o"]
-    if containsymb(r1, rcc["o"]) and containsymb(r2, rcc["!"]): rel = rel | rcc[">!o"]
-    if containsymb(r1, rcc["o"]) and containsymb(r2, rcc["o"]): rel = rel | rcc["=><!o"]
+    if containsymb(r1, rcc["o"]) and containsymb(r2, rcc[">"]): rel = rel | rcc["!>o"]
+    if containsymb(r1, rcc["o"]) and containsymb(r2, rcc["!"]): rel = rel | rcc["!>o"]
+    if containsymb(r1, rcc["o"]) and containsymb(r2, rcc["o"]): rel = rel | rcc["!<=>o"]
     if containsymb(r1, rcc["o"]) and containsymb(r2, rcc["="]): rel = rel | rcc["o"]
     
     if containsymb(r1, rcc["="]) and containsymb(r2, rcc["<"]): rel = rel | rcc["<"]
