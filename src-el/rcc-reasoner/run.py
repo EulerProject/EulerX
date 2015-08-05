@@ -7,6 +7,7 @@ from reasoner import *
 def readFile(file):
     d = {}
     f = open(file, "r")
+
     lines = f.readlines()
     for line in lines:
         if not " " in line and len(line) != 1:
@@ -16,6 +17,7 @@ def readFile(file):
             rel = "".join(sorted(items.group(3).replace(",","").replace(" ","")))
             d[(int(items.group(1)), int(items.group(2)))] = rel
     f.close()
+    
     completeDict(d, totalConceptsCount)
     return d
 
@@ -39,9 +41,6 @@ def completeDict(d, totalConceptsCount):
             elif ">" in symbol and "<" not in symbol:
                 symbol = symbol.replace(">", "<")
             d[pair] = "".join(sorted(symbol))
-#    for k,v in d.iteritems():
-        
-        
     
     return
 
@@ -68,7 +67,6 @@ def main(d):
 #         (3,5) : ">",       (5,3) : "<",
 #         (4,5) : "!",       (5,4) : "!",
 #         }
-
     
     toDo = []
     for k,v in d.iteritems():

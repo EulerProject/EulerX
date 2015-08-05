@@ -1,4 +1,5 @@
-from comptables import *
+#from comptables import *
+from tables import *
 
 def findKey(d, value):
     for k,v in d.iteritems():
@@ -9,7 +10,8 @@ def reasonOver(pair, d, toDo):
     relativeOfPair = {}
     for k, v in d.iteritems():
         if k[0] == pair[1]:
-            newRelPost = r32compTab(rcc[d[pair]], rcc[d[k]])
+            #newRelPost = r32compTab(rcc[d[pair]], rcc[d[k]])
+            newRelPost = rcc[comptab[rccd[d[pair]]][rccd[d[k]]]]
             deducedPair = (pair[0], k[1])
             if deducedPair in d:
                 deducedRel = rcc[d[deducedPair]] & newRelPost
@@ -17,7 +19,8 @@ def reasonOver(pair, d, toDo):
                     
             
         if k[1] == pair[0]:
-            newRelPre = r32compTab(rcc[d[k]], rcc[d[pair]])
+            #newRelPre = r32compTab(rcc[d[k]], rcc[d[pair]])
+            newRelPre = rcc[comptab[rccd[d[k]]][rccd[d[pair]]]]
             deducedPair = (k[0], pair[1])
             if deducedPair in d:
                 deducedRel = rcc[d[deducedPair]] & newRelPre
