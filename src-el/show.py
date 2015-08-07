@@ -277,6 +277,7 @@ class ProductsShowing:
         if firstTName not in styles["nodestyle"] or secondTName not in styles["nodestyle"] \
            or thirdTName not in styles["nodestyle"] or fourthTName not in styles["nodestyle"] \
            or fifthTName not in styles["nodestyle"]:
+            value = ""
             fOld = open(self.stylesheetdir+"inputstyle.yaml", "r")
             contents = fOld.readlines()
             fOld.close()
@@ -284,16 +285,21 @@ class ProductsShowing:
             for line in contents:
                 if "nodestyle" in line:
                     index = contents.index(line)
-                if '"1":' in line:
+                if 'all:' in line:
                     index2 = contents.index(line)
             
             del contents[index+1:index2]    # clean nodestyle previously added
-                
-            value = '    "' + firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n    "' \
-                  + secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n    "' \
-                  + thirdTName + '": "' + styles["nodestyle"]["3"].replace('"','\\"',2) + '"\n    "' \
-                  + fourthTName + '": "' + styles["nodestyle"]["4"].replace('"','\\"',2) + '"\n    "' \
-                  + fifthTName + '": "' + styles["nodestyle"]["5"].replace('"','\\"',2) + '"\n' 
+            
+            if firstTName != "" and firstTName not in styles["nodestyle"]:
+                value += '    "' + firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n'
+            if secondTName != "" and secondTName not in styles["nodestyle"]:
+                value += '    "' + secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n'
+            if thirdTName != "" and thirdTName not in styles["nodestyle"]:
+                value += '    "' + thirdTName + '": "' + styles["nodestyle"]["3"].replace('"','\\"',2) + '"\n' 
+            if fourthTName != "" and fourthTName not in styles["nodestyle"]:
+                value += '    "' + fourthTName + '": "' + styles["nodestyle"]["4"].replace('"','\\"',2) + '"\n'
+            if fifthTName != "" and fifthTName not in styles["nodestyle"]: 
+                value += '    "' + fifthTName + '": "' + styles["nodestyle"]["5"].replace('"','\\"',2) + '"\n' 
                                 
             contents.insert(index+1, value)
 
@@ -316,7 +322,7 @@ class ProductsShowing:
                 for line in contents:
                     if "nodestyle" in line:
                         index = contents.index(line)
-                    if '"1":' in line:
+                    if 'all:' in line:
                         index2 = contents.index(line)
                 
                 del contents[index+1:index2]    # clean nodestyle previously added
@@ -640,7 +646,10 @@ class ProductsShowing:
                 styles = yaml.load(rcgStyleFileOld)
                         
             # if taxonomy names are not in stylesheet, rewrite styesheet
-            if it.firstTName not in styles["nodestyle"] or it.secondTName not in styles["nodestyle"]:
+            if it.firstTName not in styles["nodestyle"] or it.secondTName not in styles["nodestyle"] \
+                or it.thirdTName not in styles["nodestyle"] or it.fourthTName not in styles["nodestyle"] \
+                or it.fifthTName not in styles["nodestyle"]:
+                value = ""
                 fOld = open(self.stylesheetdir+"rcgstyle.yaml", "r")
                 contents = fOld.readlines()
                 fOld.close()
@@ -648,12 +657,21 @@ class ProductsShowing:
                 for line in contents:
                     if "nodestyle" in line:
                         index = contents.index(line)
-                    if '"1":' in line:
+                    if 'default:' in line:
                         index2 = contents.index(line)
                 
                 del contents[index+1:index2]    # clean nodestyle previously added
-                    
-                value = '    "' + it.firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n    "' + it.secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n' 
+                
+                if it.firstTName != "" and it.firstTName not in styles["nodestyle"]:
+                    value += '    "' + it.firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n'
+                if it.secondTName != "" and it.secondTName not in styles["nodestyle"]:
+                    value += '    "' + it.secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n' 
+                if it.thirdTName != "" and it.thirdTName not in styles["nodestyle"]:
+                    value += '    "' + it.thirdTName + '": "' + styles["nodestyle"]["3"].replace('"','\\"',2) + '"\n' 
+                if it.fourthTName != "" and it.fourthTName not in styles["nodestyle"]:
+                    value += '    "' + it.fourthTName + '": "' + styles["nodestyle"]["4"].replace('"','\\"',2) + '"\n'
+                if it.fifthTName != "" and it.fourthTName not in styles["nodestyle"]: 
+                    value += '    "' + it.fifthTName + '": "' + styles["nodestyle"]["5"].replace('"','\\"',2) + '"\n' 
                                     
                 contents.insert(index+1, value)
     

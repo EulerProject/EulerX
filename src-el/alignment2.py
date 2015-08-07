@@ -106,6 +106,9 @@ class TaxonomyMapping:
         self.name = self.name[:-1]             # file name
         self.firstTName = ""                   # The abbrev name of the first taxonomy
         self.secondTName = ""                  # The abbrev name of the second taxonomy
+        self.thirdTName = ""                   # The abbrev name of the third taxonomy
+        self.fourthTName = ""                  # The abbrev name of the fourth taxonomy
+        self.fifthTName = ""                   # The abbrev name of the fifth taxonomy
         self.firstRcg = False
         self.trlist = []
         self.eqConLi = []                      # list of concepts that are equal
@@ -713,6 +716,9 @@ class TaxonomyMapping:
                 f.write('eq = ' + repr(pwTm.eq) + '\n')
                 f.write('firstTName = ' + repr(pwTm.firstTName) + '\n')
                 f.write('secondTName = ' + repr(pwTm.secondTName) + '\n')
+                f.write('thirdTName = ' + repr(pwTm.thirdTName) + '\n')
+                f.write('fourthTName = ' + repr(pwTm.fourthTName) + '\n')
+                f.write('fifthTName = ' + repr(pwTm.fifthTName) + '\n')
                 f.write('eqConLi = ' + repr(pwTm.eqConLi) + '\n')
                 f.write('tr = ' + repr(pwTm.tr) + '\n')
                 f.write('mir = ' + repr(pwTm.mir) + '\n')
@@ -2327,11 +2333,33 @@ class TaxonomyMapping:
                     taxName = re.match("(.*?)\s(.*)", taxName)
                     taxonomy.nameit(taxName.group(1), taxName.group(2))
 
+#                if self.firstTName == "":
+#                    self.firstTName = taxonomy.abbrev
+#                
+#                if self.firstTName != "" and self.secondTName == "" and self.firstTName != taxonomy.abbrev:
+#                    self.secondTName = taxonomy.abbrev
+                    
+                    
                 if self.firstTName == "":
                     self.firstTName = taxonomy.abbrev
                 
                 if self.firstTName != "" and self.secondTName == "" and self.firstTName != taxonomy.abbrev:
                     self.secondTName = taxonomy.abbrev
+                    
+                if self.firstTName != "" and self.secondTName != "" and self.thirdTName == "" \
+                    and self.firstTName != taxonomy.abbrev and self.secondTName != taxonomy.abbrev:
+                    self.thirdTName = taxonomy.abbrev
+                    
+                if self.firstTName != "" and self.secondTName != "" and self.thirdTName != "" \
+                    and self.fourthTName == "" and self.firstTName != taxonomy.abbrev and self.secondTName != taxonomy.abbrev \
+                    and self.thirdTName != taxonomy.abbrev:
+                    self.fourthTName = taxonomy.abbrev
+                
+                if self.firstTName != "" and self.secondTName != "" and self.thirdTName != "" \
+                    and self.fourthTName != "" and self.fifthTName == "" and self.firstTName != taxonomy.abbrev \
+                    and self.secondTName != taxonomy.abbrev and self.thirdTName != taxonomy.abbrev \
+                    and self.fourthTName != taxonomy.abbrev:
+                    self.fifthTName = taxonomy.abbrev
                   
                 self.taxonomies[taxonomy.abbrev] = taxonomy
                 flag = "taxonomy"

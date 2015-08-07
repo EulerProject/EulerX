@@ -9,13 +9,13 @@
     wmin: "1"
     wmax: "5"
   nodestyle: 
+    default: "shape=circle style=filled fillcolor=\"#FFFFFF\""
     "1": "shape=box style=filled fillcolor=\"#CCFFCC\""
     "2": "shape=octagon style=filled fillcolor=\"#FFFFCC\""
     "3": "shape=box style=filled fillcolor=\"#CCCCFF\""
     "4": "shape=box style=filled fillcolor=\"#FFCCCC\""
     "5": "shape=box style=filled fillcolor=\"#CCFFFF\""
     "comb": "shape=box style=\"filled,rounded\" fillcolor=\"#EEEEEE\""
-    default: "shape=circle style=filled fillcolor=\"#FFFFFF\""
   edgestyle: 
     - 
       label: "input"
