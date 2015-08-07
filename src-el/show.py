@@ -154,6 +154,9 @@ class ProductsShowing:
         art = []
         firstTName = ""
         secondTName = ""
+        thirdTName = ""
+        fourthTName = ""
+        fifthTName = ""
         taxName = ""
         
         f = open(inputFile, 'r')
@@ -170,6 +173,19 @@ class ProductsShowing:
                 
                 if firstTName != "" and secondTName == "" and firstTName != taxName:
                     secondTName = taxName
+                    
+                if firstTName != "" and secondTName != "" and thirdTName == "" \
+                    and firstTName != taxName and secondTName != taxName:
+                    thirdTName = taxName
+                    
+                if firstTName != "" and secondTName != "" and thirdTName != "" \
+                    and fourthTName == "" and firstTName != taxName and secondTName != taxName and thirdTName != taxName:
+                    fourthTName = taxName
+                
+                if firstTName != "" and secondTName != "" and thirdTName != "" \
+                    and fourthTName != "" and fifthTName == "" and firstTName != taxName and secondTName != taxName \
+                    and thirdTName != taxName and fourthTName != taxName:
+                    fifthTName = taxName
             
             elif (re.match("\(.*\)", line)):
 
@@ -258,7 +274,9 @@ class ProductsShowing:
             styles = yaml.load(inputStyleFileOld)
                     
         # if taxonomy names are not in stylesheet, rewrite styesheet
-        if firstTName not in styles["nodestyle"] or secondTName not in styles["nodestyle"]:
+        if firstTName not in styles["nodestyle"] or secondTName not in styles["nodestyle"] \
+           or thirdTName not in styles["nodestyle"] or fourthTName not in styles["nodestyle"] \
+           or fifthTName not in styles["nodestyle"]:
             fOld = open(self.stylesheetdir+"inputstyle.yaml", "r")
             contents = fOld.readlines()
             fOld.close()
@@ -271,7 +289,11 @@ class ProductsShowing:
             
             del contents[index+1:index2]    # clean nodestyle previously added
                 
-            value = '    "' + firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n    "' + secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n' 
+            value = '    "' + firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n    "' \
+                  + secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n    "' \
+                  + thirdTName + '": "' + styles["nodestyle"]["3"].replace('"','\\"',2) + '"\n    "' \
+                  + fourthTName + '": "' + styles["nodestyle"]["4"].replace('"','\\"',2) + '"\n    "' \
+                  + fifthTName + '": "' + styles["nodestyle"]["5"].replace('"','\\"',2) + '"\n' 
                                 
             contents.insert(index+1, value)
 
