@@ -7,18 +7,93 @@ from reasoner import *
 def readFile(file):
     d = {}
     f = open(file, "r")
-
     lines = f.readlines()
-    for line in lines:
-        if not " " in line and len(line) != 1:
-            totalConceptsCount = re.match("(\d+)\n", line).group(1)
-        elif len(line) != 1:
-            items = re.match("(\d+)\s+(\d+)\s+\[(.*)\]", line)
-            rel = "".join(sorted(items.group(3).replace(",","").replace(" ","")))
-            d[(int(items.group(1)), int(items.group(2)))] = rel
-    f.close()
     
-    completeDict(d, totalConceptsCount)
+#    function eliminateEquals(lines)
+    allConcepts = []
+    newAllConcepts = []
+    allRels = []
+    equalsPair = {}
+    for line in lines:
+        if " " in line:
+            items = re.match("(\d+)\s+(\d+)\s+\[(.*)\]", line)
+#            print "items", items.group(1), items.group(2), items.group(3)
+            allConcepts.append(items.group(1))
+            allConcepts.append(items.group(2))
+            rel = "".join(sorted(items.group(3).replace(",","").replace(" ","")))
+            allRels.append([items.group(1), items.group(2), rel])
+            
+            if rel == "=":
+                equalsPair[items.group(2)] = items.group(1)
+    
+#    print equalsPair, len(equalsPair)
+#    print len(allRels)
+    
+    for allRel in allRels:
+        for c1,c2 in equalsPair.iteritems():
+            if allRel[0] == c1:
+                allRel[0] = c2
+            if allRel[1] == c1:
+                allRel[1] = c2
+        
+    allRels_set = set(map(tuple,allRels))
+    allRels = map(list,allRels_set)
+    
+#    print allRels,len(allRels)
+            
+    allConcepts = list(set(allConcepts))
+#    print len(allConcepts)
+    
+    for allRel in allRels:
+        d[(int(allRel[0]), int(allRel[1]))] = allRel[2]
+        newAllConcepts.append(int(allRel[0]))
+        newAllConcepts.append(int(allRel[1]))
+    
+    newAllConcepts = list(set(newAllConcepts))
+#    print newAllConcepts,len(newAllConcepts)
+    
+    indexList = []
+    pairs = []
+
+    pairs = list(permutations(newAllConcepts,2))
+#    print "len(d)", d, len(d)
+#    print "len(pairs)", pairs, len(pairs)
+    
+    for pair in pairs:
+        reversePair = (pair[1], pair[0])
+        if pair in d:
+            pass
+        elif pair not in d and reversePair not in d:
+            d[pair] = "!<=>o"
+        elif pair not in d and reversePair in d:
+            symbol = d[reversePair]
+            if "<" in symbol and ">" not in symbol:
+                symbol = symbol.replace("<", ">")
+            elif ">" in symbol and "<" not in symbol:
+                symbol = symbol.replace(">", "<")
+            d[pair] = "".join(sorted(symbol))
+    
+    diagnalConcepts = []
+    for k,v in d.iteritems():
+        if k[0] == k[1]:
+            diagnalConcepts.append(k)
+            
+#    print "diagnalConcepts", diagnalConcepts
+    for diagnalConcept in diagnalConcepts:
+        if diagnalConcept in d:
+            del d[diagnalConcept]
+    
+    
+#    for line in lines:
+#        if not " " in line and len(line) != 1:
+#            totalConceptsCount = re.match("(\d+)\n", line).group(1)
+#        elif len(line) != 1:
+#            items = re.match("(\d+)\s+(\d+)\s+\[(.*)\]", line)
+#            rel = "".join(sorted(items.group(3).replace(",","").replace(" ","")))
+#            d[(int(items.group(1)), int(items.group(2)))] = rel
+#    f.close()
+    
+#    completeDict(d, totalConceptsCount)
     return d
 
 def completeDict(d, totalConceptsCount):
@@ -44,6 +119,49 @@ def completeDict(d, totalConceptsCount):
     
     return
 
+def eliminateEquals(lines):
+    allConcepts = []
+    newAllConcepts = []
+    allRels = []
+    equalsPair = {}
+    for line in lines:
+        if " " in line:
+            items = re.match("(\d+)\s+(\d+)\s+\[(.*)\]", line)
+            print "items", items.group(1), items.group(2), items.group(3)
+            allConcepts.append(items.group(1))
+            allConcepts.append(items.group(2))
+            rel = "".join(sorted(items.group(3).replace(",","").replace(" ","")))
+            allRels.append([items.group(1), items.group(2), rel])
+            
+            if rel == "=":
+                equalsPair[items.group(2)] = items.group(1)
+    
+    print equalsPair, len(equalsPair)
+    print len(allRels)
+    
+    for allRel in allRels:
+        for c1,c2 in equalsPair.iteritems():
+            if allRel[0] == c1:
+                allRel[0] = c2
+            if allRel[1] == c1:
+                allRel[1] = c2
+        
+    allRels_set = set(map(tuple,allRels))
+    allRels = map(list,allRels_set)
+    
+    print allRels,len(allRels)
+            
+    allConcepts = list(set(allConcepts))
+    print len(allConcepts)
+    
+    for allRel in allRels:
+        newAllConcepts.append(allRel[0])
+        newAllConcepts.append(allRel[1])
+    
+    newAllConcepts = list(set(newAllConcepts))
+    print newAllConcepts,len(newAllConcepts)
+    
+    return
     
 
 
@@ -91,4 +209,8 @@ def main(d):
 
 if __name__ == "__main__":
     d = readFile(sys.argv[1])
+#    for k,v in d.iteritems():
+#        if k[0] < k[1]:
+#            print k, v
+#    print "len(d)", len(d)
     main(d)
