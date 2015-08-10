@@ -1,0 +1,70 @@
+# Taxonomy-1: NSF BD Hubs http://www.nsf.gov/pubs/2015/nsf15562/nsf15562.htm
+# Taxonomy 2: http://www.nationaldiversitycouncil.org/wp-content/uploads/2011/12/us_regions.jpg
+#
+taxonomy BDH Big_Data_Hubs
+(USA Northeast Midwest South West)
+(Northeast CT MA ME NH NJ NY PA RI VT)
+(Midwest IL IN IA KS MI MN MO NE ND OH SD WI)
+(South AL AR DE DC FL GA KY LA MD MS NC OK SC TN TX VA WV)
+(West AK AZ CA CO HI ID MT NV NM OR UT WA WY)
+
+taxonomy NDC National_Diversity_Council
+(USA Midwest Northeast Southeast Southwest West)
+(Northeast CT DE MD MA ME NH NJ NY PA RI VT)
+(Midwest IA IL IN KS MI MN MO ND NE OH SD WI)
+(Southeast AL AR FL GA KY LA MS NC SC TN VA WV)
+(Southwest AZ NM OK TX)
+(West CA CO ID MT NV OR WA WY UT)
+
+articulations BDH NDC
+
+# [BDH.AK .. ]
+# [BDH.HI .. NDC.USA]
+[BDH.AL equals NDC.AL]
+[BDH.AR equals NDC.AR]
+[BDH.AZ equals NDC.AZ]
+[BDH.CA equals NDC.CA]
+[BDH.CO equals NDC.CO]
+[BDH.CT equals NDC.CT]
+[BDH.DE equals NDC.DE]
+[BDH.FL equals NDC.FL]
+[BDH.GA equals NDC.GA]
+[BDH.IA equals NDC.IA]
+[BDH.ID equals NDC.ID]
+[BDH.IL equals NDC.IL]
+[BDH.IN equals NDC.IN]
+[BDH.KS equals NDC.KS]
+[BDH.KY equals NDC.KY]
+[BDH.LA equals NDC.LA]
+[BDH.MA equals NDC.MA]
+[BDH.MD equals NDC.MD]
+[BDH.ME equals NDC.ME]
+[BDH.MI equals NDC.MI]
+[BDH.MN equals NDC.MN]
+[BDH.MO equals NDC.MO]
+[BDH.MS equals NDC.MS]
+[BDH.MT equals NDC.MT]
+[BDH.NC equals NDC.NC]
+[BDH.ND equals NDC.ND]
+[BDH.NE equals NDC.NE]
+[BDH.NH equals NDC.NH]
+[BDH.NJ equals NDC.NJ]
+[BDH.NM equals NDC.NM]
+[BDH.NV equals NDC.NV]
+[BDH.NY equals NDC.NY]
+[BDH.OH equals NDC.OH]
+[BDH.OK equals NDC.OK]
+[BDH.OR equals NDC.OR]
+[BDH.PA equals NDC.PA]
+[BDH.RI equals NDC.RI]
+[BDH.SC equals NDC.SC]
+[BDH.SD equals NDC.SD]
+[BDH.TN equals NDC.TN]
+[BDH.TX equals NDC.TX]
+[BDH.UT equals NDC.UT]
+[BDH.VA equals NDC.VA]
+[BDH.VT equals NDC.VT]
+[BDH.WA equals NDC.WA]
+[BDH.WI equals NDC.WI]
+[BDH.WV equals NDC.WV]
+[BDH.WY equals NDC.WY]
