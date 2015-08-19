@@ -37,14 +37,7 @@ def containsymb(rel, symb):
 #    if symb == rcc[">"]: return rel & rcc[">"]
 #    if symb == rcc["!"]: return rel & rcc["!"]
 #    if symb == rcc["o"]: return rel & rcc["o"]
-#    if symb == rcc["="]: return rel & rcc["="]
-
-
-def findKey(d, value):
-    for k,v in d.iteritems():
-        if v == value:
-            return k
-        
+#    if symb == rcc["="]: return rel & rcc["="]        
     
 def r32compTab(r1, r2):
     rel = 0
@@ -79,9 +72,3 @@ def r32compTab(r1, r2):
     if containsymb(r1, rcc["="]) and containsymb(r2, rcc["="]): rel = rel | rcc["="]
     
     return rel
-
-# test        
-#value = r32compTab(rcc["><"]rcc["o"])
-#for k,v in rcc.iteritems():
-#    if v == value:
-#        print k

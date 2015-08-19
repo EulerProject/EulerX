@@ -141,7 +141,7 @@ replace_list = replace_names(concept_list, pc_list1, pc_list2, art_list, childre
 print "Hash of concepts:", replace_list
 
 # write the title
-f_out.write(str(len(concept_list)) + "\n")
+#f_out.write(str(len(concept_list)) + "\n")
 
 # write the parent-child relation
 for e in pc_list1:
