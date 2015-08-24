@@ -288,7 +288,7 @@ class ProductsShowing:
                 if 'all:' in line:
                     index2 = contents.index(line)
             
-#            del contents[index+1:index2]    # clean nodestyle previously added
+            del contents[index+1:index2]    # clean nodestyle previously added
             
             if firstTName != "" and firstTName not in styles["nodestyle"]:
                 value += '    "' + firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n'
