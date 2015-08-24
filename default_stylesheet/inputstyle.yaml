@@ -9,7 +9,7 @@
     wmin: "1"
     wmax: "5"
   nodestyle: 
-    all: "shape=circle style=filled fillcolor=\"#FFFFFF\""
+    default: "shape=circle style=filled fillcolor=\"#FFFFFF\""
     "1": "shape=box style=filled fillcolor=\"#CCFFCC\""
     "2": "shape=octagon style=filled fillcolor=\"#FFFFCC\""
     "3": "shape=box style=filled fillcolor=\"#CCCCFF\""

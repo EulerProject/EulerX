@@ -288,7 +288,7 @@ class ProductsShowing:
                 if 'all:' in line:
                     index2 = contents.index(line)
             
-            del contents[index+1:index2]    # clean nodestyle previously added
+#            del contents[index+1:index2]    # clean nodestyle previously added
             
             if firstTName != "" and firstTName not in styles["nodestyle"]:
                 value += '    "' + firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n'
@@ -306,6 +306,7 @@ class ProductsShowing:
             fNew = open(self.stylesheetdir+"inputstyle.yaml", "w")
             contents = "".join(contents)
             fNew.write(contents)
+            fNew.flush()
             fNew.close()
 
         # Redo -- check whether stylesheet taxonomy names are in stylesheet
@@ -334,6 +335,7 @@ class ProductsShowing:
                 fNew = open(self.stylesheetdir+"singletoninputstyle.yaml", "w")
                 contents = "".join(contents)
                 fNew.write(contents)
+                fNew.flush()
                 fNew.close()
         
         # apply the inputviz stylesheet
@@ -678,6 +680,7 @@ class ProductsShowing:
                 fNew = open(self.stylesheetdir+"rcgstyle.yaml", "w")
                 contents = "".join(contents)
                 fNew.write(contents)
+                fNew.flush()
                 fNew.close()
             
             
@@ -695,6 +698,7 @@ class ProductsShowing:
         fav.write("allRcgNodesDict = " + repr(self.allRcgNodesDict) + '\n')
         fav.write('trlist = ' + repr(self.trlist) + '\n')
         fav.write('avFlag = ' + repr(True) + '\n')
+        fav.flush()
         fav.close()
         
         # prepare for cluster view
@@ -908,6 +912,7 @@ class ProductsShowing:
             fNew = open(self.stylesheetdir+"aggregatestyle.yaml", "w")
             contents = "".join(contents)
             fNew.write(contents)
+            fNew.flush()
             fNew.close()
         
         
