@@ -10,7 +10,7 @@ def reasonOver(pair, d, toDo):
     for k, v in d.iteritems():
         if k[0] == pair[1]:
             deducedPair = (pair[0], k[1])
-            newRelPost = comptab[d[pair]][d[k]]            
+            newRelPost = comptab[d[pair]][d[k]]
             if deducedPair in d:
                 deducedRel = d[deducedPair] & newRelPost
                 assertNew(d, d[deducedPair], deducedPair, deducedRel, relativeOfPair, toDo)

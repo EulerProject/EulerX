@@ -58,7 +58,7 @@ def replace_art_names(s):
             outputs = outputs + ">,"
         elif e == "overlaps":
             outputs = outputs + "o,"
-        elif e == "disjoints":
+        elif e == "disjoint":
             outputs = outputs + "!,"
     outputs = outputs[:-1]
     return outputs 
