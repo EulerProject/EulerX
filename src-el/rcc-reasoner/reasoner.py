@@ -5,6 +5,12 @@ def findKey(d, value):
         if v == value:
             return k
 
+# reaasonOver(pair, d, toDo)
+# Take a pair (e.g. A-B) of concepts and "uber-matrix" d,
+# for each B-C (and similarly, for each C-A)
+#   looking at A--R1--B--R2--C we lookup R3 = R1 o_RCC32 R2 
+#   and "combine" R3 with the existing R in A--R--C
+#   to obtain the final A--R'--C        
 def reasonOver(pair, d, toDo):
     relativeOfPair = {}
     for k, v in d.iteritems():
