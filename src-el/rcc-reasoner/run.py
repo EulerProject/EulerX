@@ -8,7 +8,10 @@ def readFile(file):
     d = {}
     f = open(file, "r")
     lines = f.readlines()
-    return eliminateEquals(lines, d) 
+    if sys.argv[2] in ['True', 'true', '1']:
+        return eliminateEquals(lines, d)
+    else:
+        return nonEliminateEquals(lines, d) 
 
 def completeDict(newAllConcepts, d):
     indexList = []
@@ -48,13 +51,13 @@ def eliminateEquals(lines, d):
     equalsPair = {}
     for line in lines:
         items = re.match("(\d+)\s+(\d+)\s+\[(.*)\]", line)
-        allConcepts.append(items.group(1))
-        allConcepts.append(items.group(2))
+        allConcepts.append(int(items.group(1)))
+        allConcepts.append(int(items.group(2)))
         rel = "".join(sorted(items.group(3).replace(",","").replace(" ","")))
-        allRels.append([items.group(1), items.group(2), rel])
+        allRels.append([int(items.group(1)), int(items.group(2)), rel])
         
         if rel == "=":
-            equalsPair[items.group(2)] = items.group(1)
+            equalsPair[int(items.group(2))] = int(items.group(1))
     
     for allRel in allRels:
         for c1,c2 in equalsPair.iteritems():
@@ -68,15 +71,37 @@ def eliminateEquals(lines, d):
     allConcepts = list(set(allConcepts))
 
     for allRel in allRels:
-        d[(int(allRel[0]), int(allRel[1]))] = allRel[2]
-        newAllConcepts.append(int(allRel[0]))
-        newAllConcepts.append(int(allRel[1]))
+        d[(allRel[0], allRel[1])] = allRel[2]
+        newAllConcepts.append(allRel[0])
+        newAllConcepts.append(allRel[1])
     
     newAllConcepts = list(set(newAllConcepts))
-        
+    
     d = completeDict(newAllConcepts, d)
     
     return d
+
+def nonEliminateEquals(lines, d):
+    allConcepts = []
+    allRels = []
+    for line in lines:
+        items = re.match("(\d+)\s+(\d+)\s+\[(.*)\]", line)
+        allConcepts.append(int(items.group(1)))
+        allConcepts.append(int(items.group(2)))
+        rel = "".join(sorted(items.group(3).replace(",","").replace(" ","")))
+        allRels.append([int(items.group(1)), int(items.group(2)), rel])
+        
+    allRels_set = set(map(tuple,allRels))
+    allRels = map(list,allRels_set)
+    allConcepts = list(set(allConcepts))
+
+    for allRel in allRels:
+        d[(allRel[0], allRel[1])] = allRel[2]
+    
+    d = completeDict(allConcepts, d)
+    
+    return d
+
 
 
 def main(d):
@@ -101,6 +126,7 @@ def main(d):
 #         }
     
     toDo = []
+    counter = {}
     for k,v in d.iteritems():
         if v != "!<=>o":
             toDo.append(k)
@@ -111,7 +137,7 @@ def main(d):
     while len(toDo) > 0:
         pair = toDo[0]
         del toDo[0]    
-        relativeOfPair = reasonOver(pair, d, toDo)
+        relativeOfPair = reasonOver(pair, d, toDo, counter)
         d.update(relativeOfPair)
         
     print "********"
