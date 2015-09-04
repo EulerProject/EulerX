@@ -2,27 +2,27 @@ from rccrelations import *
 
 #def rcc5compTab(r1, r2):
 #    if r1 == rcc["<"] and r2 == rcc["<"]: return rcc["<"]
-#    if r1 == rcc["<"] and r2 == rcc[">"]: return rcc["=><!o"]
+#    if r1 == rcc["<"] and r2 == rcc[">"]: return rcc["!<=>o"]
 #    if r1 == rcc["<"] and r2 == rcc["!"]: return rcc["!"]
-#    if r1 == rcc["<"] and r2 == rcc["o"]: return rcc["<!o"]
+#    if r1 == rcc["<"] and r2 == rcc["o"]: return rcc["!<o"]
 #    if r1 == rcc["<"] and r2 == rcc["="]: return rcc["<"]
 #
-#    if r1 == rcc[">"] and r2 == rcc["<"]: return rcc["=><o"]
+#    if r1 == rcc[">"] and r2 == rcc["<"]: return rcc["<=>o"]
 #    if r1 == rcc[">"] and r2 == rcc[">"]: return rcc[">"]
-#    if r1 == rcc[">"] and r2 == rcc["!"]: return rcc[">!o"]
+#    if r1 == rcc[">"] and r2 == rcc["!"]: return rcc["!>o"]
 #    if r1 == rcc[">"] and r2 == rcc["o"]: return rcc[">o"]
 #    if r1 == rcc[">"] and r2 == rcc["="]: return rcc[">"]
 #
-#    if r1 == rcc["!"] and r2 == rcc["<"]: return rcc["<!o"]
+#    if r1 == rcc["!"] and r2 == rcc["<"]: return rcc["!<o"]
 #    if r1 == rcc["!"] and r2 == rcc[">"]: return rcc["!"]
-#    if r1 == rcc["!"] and r2 == rcc["!"]: return rcc["=><!o"]
-#    if r1 == rcc["!"] and r2 == rcc["o"]: return rcc["<!o"]
+#    if r1 == rcc["!"] and r2 == rcc["!"]: return rcc["!<=>o"]
+#    if r1 == rcc["!"] and r2 == rcc["o"]: return rcc["!<o"]
 #    if r1 == rcc["!"] and r2 == rcc["="]: return rcc["!"]
 #
 #    if r1 == rcc["o"] and r2 == rcc["<"]: return rcc["<o"]
-#    if r1 == rcc["o"] and r2 == rcc[">"]: return rcc[">!o"]
-#    if r1 == rcc["o"] and r2 == rcc["!"]: return rcc[">!o"]
-#    if r1 == rcc["o"] and r2 == rcc["o"]: return rcc["=><!o"]
+#    if r1 == rcc["o"] and r2 == rcc[">"]: return rcc["!>o"]
+#    if r1 == rcc["o"] and r2 == rcc["!"]: return rcc["!>o"]
+#    if r1 == rcc["o"] and r2 == rcc["o"]: return rcc["!<=>o"]
 #    if r1 == rcc["o"] and r2 == rcc["="]: return rcc["o"]
 #
 #    if r1 == rcc["="] and r2 == rcc["<"]: return rcc["<"]

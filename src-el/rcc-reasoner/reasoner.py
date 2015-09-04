@@ -28,7 +28,7 @@ def reasonOver(pair, d, toDo, counter):
                         counter[deducedPair] += 1
                     else:
                         counter[deducedPair] = 1
-                    data = [pair, k, deducedPair, counter[deducedPair], findKey(rcc, d[deducedPair]), findKey(rcc, newRelPost), findKey(rcc, deducedRel)]
+                    data = [str(pair)+' '+findKey(rcc,d[pair]), str(k)+' '+findKey(rcc,d[k]), deducedPair, counter[deducedPair], findKey(rcc, d[deducedPair]), findKey(rcc, newRelPost), findKey(rcc, deducedRel)]
                     with open("output.csv", "a") as csvFile:
                         writer = csv.writer(csvFile, delimiter=',')
                         writer.writerow(data)
@@ -53,7 +53,7 @@ def reasonOver(pair, d, toDo, counter):
                         counter[deducedPair] += 1
                     else:
                         counter[deducedPair] = 1                
-                    data = [k, pair, deducedPair, counter[deducedPair], findKey(rcc, d[deducedPair]), findKey(rcc, newRelPre), findKey(rcc, deducedRel)]
+                    data = [str(k)+' '+findKey(rcc,d[k]), str(pair)+' '+findKey(rcc,d[pair]), deducedPair, counter[deducedPair], findKey(rcc, d[deducedPair]), findKey(rcc, newRelPre), findKey(rcc, deducedRel)]
                     with open("output.csv", "a") as csvFile:
                         writer = csv.writer(csvFile, delimiter=',')
                         writer.writerow(data)                
