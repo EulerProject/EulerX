@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #from tables import *
 from rccrelations import *
 import sys
@@ -980,15 +981,26 @@ for i in range(32):
 
 # write the composition table nodes
 ctr = 1
-givenNode = int(sys.argv[1])
-for comp in comptab:
-    if comp[2] == givenNode:
-        intersection = "i" + str(ctr)
-        f.write('"' + intersection + '" [shape=point width = 0.1];\n')
-        f.write('"' + findKey(rcc, comp[0]) + '" -> "' + intersection + '";\n')
-        f.write('"' + findKey(rcc, comp[1]) + '" -> "' + intersection + '";\n')
-        f.write('"' + intersection + '" -> "' + findKey(rcc, comp[2]) + '";\n')
-        ctr += 1
+if sys.argv[1] == "all":
+    for givenNode in range(32):
+        for comp in comptab:
+            if comp[2] == givenNode:
+                intersection = "i" + str(ctr)
+                f.write('"' + intersection + '" [shape=point width = 0.1];\n')
+                f.write('"' + findKey(rcc, comp[0]) + '" -> "' + intersection + '";\n')
+                f.write('"' + findKey(rcc, comp[1]) + '" -> "' + intersection + '";\n')
+                f.write('"' + intersection + '" -> "' + findKey(rcc, comp[2]) + '";\n')
+                ctr += 1    
+else:
+    givenNode = int(sys.argv[1])
+    for comp in comptab:
+        if comp[2] == givenNode:
+            intersection = "i" + str(ctr)
+            f.write('"' + intersection + '" [shape=point width = 0.1];\n')
+            f.write('"' + findKey(rcc, comp[0]) + '" -> "' + intersection + '";\n')
+            f.write('"' + findKey(rcc, comp[1]) + '" -> "' + intersection + '";\n')
+            f.write('"' + intersection + '" -> "' + findKey(rcc, comp[2]) + '";\n')
+            ctr += 1
 
 f.write("}")
 f.close()
