@@ -997,8 +997,8 @@ else:
         if comp[2] == givenNode:
             intersection = "i" + str(ctr)
             f.write('"' + intersection + '" [shape=point width = 0.1];\n')
-            f.write('"' + findKey(rcc, comp[0]) + '" -> "' + intersection + '";\n')
-            f.write('"' + findKey(rcc, comp[1]) + '" -> "' + intersection + '";\n')
+            f.write('"' + findKey(rcc, comp[0]) + '" -> "' + intersection + '" [label=1];\n')
+            f.write('"' + findKey(rcc, comp[1]) + '" -> "' + intersection + '" [label=2];\n')
             f.write('"' + intersection + '" -> "' + findKey(rcc, comp[2]) + '";\n')
             ctr += 1
 

@@ -50,6 +50,7 @@ class ProductsShowing:
         self.lastrundir = ''
         self.userdir = ''
         self.lastruntimestamp = os.path.join(self.projectdir, self.runningUser+'-'+self.runningHost+'-lastrun.timestamp')
+        self.exampleName = ''        
         if os.path.isfile(self.lastruntimestamp):
             f = open(self.lastruntimestamp, "r")
             self.lastrundir = f.readline().strip()
@@ -59,7 +60,12 @@ class ProductsShowing:
         
         if args['--run']:
             self.lastrundir = self.userdir + '/' + args['--run']
-            self.name = re.match('(.*)-(.*)-(.*)-(.*)-(.*)', args['--run']).group(5)
+            self.exampleName = os.path.join(args['--run'], 'lastrun.timestamp')
+            if os.path.isfile(self.exampleName):
+                f = open(self.exampleName, "r")
+                self.name = f.readline().strip()
+            else:
+                self.name = re.match('(.*)-(.*)-(.*)-(.*)-(.*)', args['--run']).group(5)
         
         self.path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         self.stylesheetdir = os.path.join(self.projectdir, "stylesheets/")
@@ -110,7 +116,7 @@ class ProductsShowing:
         if self.args['<inputfile>'] and self.args['iv']:
             self.showIV()
         
-        elif not os.path.isfile(self.lastruntimestamp):
+        elif not os.path.isfile(self.lastruntimestamp) and not os.path.isfile(self.exampleName):
             print 'Nothing to show, need to run "euler2 align" first.\n'
             print 'Use "euler2 -h" to see more help.'
         else:

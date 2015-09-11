@@ -65,3 +65,8 @@ def createLastRunTimeStamp(fileName, user, host, timestamp, name):
     f.write('\n')
     f.write(name)
     f.close()
+
+def createLastRunName(fileName, name):
+    f = open(fileName, "w")
+    f.write(name)
+    f.close()

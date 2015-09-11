@@ -116,23 +116,31 @@ class TaxonomyMapping:
         self.runningHost = socket.gethostname()                         # get the current host
         self.startTime = time.time()                                    # time to start
         self.runningDate = strftime("%Y-%m-%d-%H:%M:%S", localtime())   # running date
-        self.projectdir = ''                    # initiate project folder to be the current folder, inputdir originally
+        self.projectdir = ''               # initiate project folder to be the current folder, inputdir originally
+        if not self.args['-o']:
+            self.userdir = os.path.join(self.projectdir, self.runningUser+"-"+self.runningHost)
+            if not os.path.exists(self.userdir):
+                os.mkdir(self.userdir)
+            self.outputdir = os.path.join(self.userdir, self.runningDate+"-"+self.name)
+        else:
+            self.outputdir = os.path.join(self.args['-o'])
         
         # construct a last run time stamp for "show" command to track
         if args['align']:
-            self.lastrunfile = os.path.join(self.projectdir, self.runningUser+'-'+self.runningHost+'-lastrun.timestamp')
-            createLastRunTimeStamp(self.lastrunfile, self.runningUser, self.runningHost, self.runningDate, self.name)
-        
-        self.userdir = os.path.join(self.projectdir, self.runningUser+"-"+self.runningHost)
-        if not os.path.exists(self.userdir):
-            os.mkdir(self.userdir)
+            if not self.args['-o']:
+                self.lastrunfile = os.path.join(self.projectdir, self.runningUser+'-'+self.runningHost+'-lastrun.timestamp')
+                createLastRunTimeStamp(self.lastrunfile, self.runningUser, self.runningHost, self.runningDate, self.name)
+            else:
+                self.lastrunfile = os.path.join(self.outputdir, 'lastrun.timestamp')
+                createLastRunName(self.lastrunfile, self.name)
+            
         self.reportfile = os.path.join(self.projectdir, "report.csv")
         if not os.path.isfile(self.reportfile):
             f = open(self.reportfile, "w")
             writer = csv.writer(f, delimiter='\t')
             writer.writerow(['START_TIME','END_TIME','DURATION','INPUT-FILE','#PWs'])
             f.close()
-        self.outputdir = os.path.join(self.userdir, self.runningDate+"-"+self.name)
+        
         if not os.path.exists(self.outputdir):
             os.mkdir(self.outputdir)
             
