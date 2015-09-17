@@ -456,8 +456,8 @@ class ProductsShowing:
             #NOW BEGIN self.genPwRcg(it.fileName, allRcgNodesDict, it.pwIndex)
             
             tmpCom = ""    # cache of combined taxa
-            taxa1 = ""     # cache of taxa in the first taxonomy
-            taxa2 = ""     # cache of taxa in the second taxonomy
+#            taxa1 = ""     # cache of taxa in the first taxonomy
+#            taxa2 = ""     # cache of taxa in the second taxonomy
             tmpComLi = [] # cache of list of combined taxa for --rcgo option in RCG
             replace1 = "" # used for replace combined concept in --rcgo option in RCG
             replace2 = "" # used for replace combined concept in --rcgo option in RCG
@@ -603,42 +603,37 @@ class ProductsShowing:
             for [T1, T2, P] in it.tr:
                 if(T1.find("*") == -1 and T1.find("\\") == -1 and T1.find("\\n") == -1 and T1.find(".") != -1):
                     T1s = T1.split(".")
-                    if it.firstTName == T1s[0]:
-                        taxa1 += "  \""+T1+"\"\n"               # used in old viz
-                    else:
-                        taxa2 += "  \""+T1+"\"\n"
+#                    if it.firstTName == T1s[0]:
+#                        taxa1 += "  \""+T1+"\"\n"               # used in old viz
+#                    else:
+#                        taxa2 += "  \""+T1+"\"\n"
                     self.addRcgVizNode(T1s[1], T1s[0])          # used in stylesheet
                     self.addRcgAllVizNode(T1s[1], T1s[0])
                 else:
-
-                    if T1[0] != T2[0]:
-                        tmpComLi.append(T1)
-                        tmpCom += "  \""+T1+"\"\n"
-                        self.addRcgVizNode(T1, "comb")
-                        self.addRcgAllVizNode(T1, "comb")
+                    tmpComLi.append(T1)
+                    tmpCom += "  \""+T1+"\"\n"
+                    self.addRcgVizNode(T1, "comb")
+                    self.addRcgAllVizNode(T1, "comb")
+                
                 if(T2.find("*") == -1 and T2.find("\\") == -1 and T2.find("\\n") == -1 and T2.find(".") != -1):
                     T2s = T2.split(".")
-                    if it.firstTName == T2s[0]:
-                        taxa1 += "  \""+T2+"\"\n"
-                    else:
-                        taxa2 += "  \""+T2+"\"\n"
+#                    if it.firstTName == T2s[0]:
+#                        taxa1 += "  \""+T2+"\"\n"
+#                    else:
+#                        taxa2 += "  \""+T2+"\"\n"
                     self.addRcgVizNode(T2s[1], T2s[0])
                     self.addRcgAllVizNode(T2s[1], T2s[0])
                 else:
-
-                    if T1[0] != T2[0]:
-                        tmpComLi.append(T2)
-                        tmpCom += "  \""+T2+"\"\n"
-                        self.addRcgVizNode(T2, "comb")
-                        self.addRcgAllVizNode(T2, "comb")
+                    tmpComLi.append(T2)
+                    tmpCom += "  \""+T2+"\"\n"
+                    self.addRcgVizNode(T2, "comb")
+                    self.addRcgAllVizNode(T2, "comb")
             
             # prepare for pw2input
             fpw2input = open(pw2inputInternalFile + i.__str__(), "w")
             fpw2input.write("tr = " + repr(it.tr) + '\n')
             fpw2input.write('pwIndex = ' + repr(it.pwIndex) + '\n')
             fpw2input.close()
-            
-            
             
             for [T1, T2, P] in it.tr:
                 if(P == 0):
@@ -666,14 +661,14 @@ class ProductsShowing:
                             if item.group(2) in comb.split("\\n"):
                                 replace2 = comb
                                 break                            
-                        if "\\n" in replace1 or "\\\\" in replace1:
+                        if "\\n" in replace1 or "\\\\" in replace1 or "*" in replace1:
                             replace1 = self.restructureCbNames(replace1, it.firstTName)
                             self.addRcgVizNode(replace1, "comb")
                             self.addRcgAllVizNode(replace1, "comb")
                         else:
                             self.addRcgVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1))
                             self.addRcgAllVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1))
-                        if "\\n" in replace2 or "\\\\" in replace2:
+                        if "\\n" in replace2 or "\\\\" in replace2 or "*" in replace2:
                             replace2 = self.restructureCbNames(replace2, it.firstTName)
                             self.addRcgVizNode(replace2, "comb")
                             self.addRcgAllVizNode(replace2, "comb")
