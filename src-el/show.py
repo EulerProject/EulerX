@@ -145,7 +145,65 @@ class ProductsShowing:
             if self.args['<name>'] == 'pw2input':   # transfer PW to input 
                 self.showPW2INPUT()
             
-            return
+        self.refreshStylesheets()
+        
+        return
+
+    def refreshStylesheets(self):
+        fOld = open(self.stylesheetdir+"inputstyle.yaml", "r")
+        contents = fOld.readlines()
+        fOld.close()
+            
+        for line in contents:
+            if "nodestyle" in line:
+                index = contents.index(line)
+            if 'all:' in line:
+                index2 = contents.index(line)
+        
+        del contents[index+1:index2]    # clean nodestyle previously added
+        
+        fNew = open(self.stylesheetdir+"inputstyle.yaml", "w")
+        contents = "".join(contents)
+        fNew.write(contents)
+        fNew.flush()
+        fNew.close()
+        
+        fOld = open(self.stylesheetdir+"rcgstyle.yaml", "r")
+        contents = fOld.readlines()
+        fOld.close()
+            
+        for line in contents:
+            if "nodestyle" in line:
+                index = contents.index(line)
+            if 'default:' in line:
+                index2 = contents.index(line)
+        
+        del contents[index+1:index2]    # clean nodestyle previously added
+        fNew = open(self.stylesheetdir+"rcgstyle.yaml", "w")
+        contents = "".join(contents)
+        fNew.write(contents)
+        fNew.flush()
+        fNew.close()
+
+        fOld = open(self.stylesheetdir+"aggregatestyle.yaml", "r")
+        contents = fOld.readlines()
+        fOld.close()
+            
+        for line in contents:
+            if "nodestyle" in line:
+                index = contents.index(line)
+            if 'default:' in line:
+                index2 = contents.index(line)
+        
+        del contents[index+1:index2]    # clean nodestyle previously added
+        fNew = open(self.stylesheetdir+"aggregatestyle.yaml", "w")
+        contents = "".join(contents)
+        fNew.write(contents)
+        fNew.flush()
+        fNew.close()        
+        
+        return
+    
 
     
     def showIV(self):
@@ -279,7 +337,7 @@ class ProductsShowing:
         with open(self.stylesheetdir+"inputstyle.yaml") as inputStyleFileOld:
             styles = yaml.load(inputStyleFileOld)
                     
-        # if taxonomy names are not in stylesheet, rewrite styesheet
+#        # if taxonomy names are not in stylesheet, rewrite styesheet
         if firstTName not in styles["nodestyle"] or secondTName not in styles["nodestyle"] \
            or thirdTName not in styles["nodestyle"] or fourthTName not in styles["nodestyle"] \
            or fifthTName not in styles["nodestyle"]:
@@ -294,7 +352,7 @@ class ProductsShowing:
                 if 'all:' in line:
                     index2 = contents.index(line)
             
-            del contents[index+1:index2]    # clean nodestyle previously added
+            #del contents[index+1:index2]    # clean nodestyle previously added
             
             if firstTName != "" and firstTName not in styles["nodestyle"]:
                 value += '    "' + firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n'
@@ -332,7 +390,7 @@ class ProductsShowing:
                     if 'all:' in line:
                         index2 = contents.index(line)
                 
-                del contents[index+1:index2]    # clean nodestyle previously added
+                #del contents[index+1:index2]    # clean nodestyle previously added
                     
                 value = '    "' + firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n    "' + secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n' 
                                     
@@ -668,7 +726,7 @@ class ProductsShowing:
                     if 'default:' in line:
                         index2 = contents.index(line)
                 
-                del contents[index+1:index2]    # clean nodestyle previously added
+                #del contents[index+1:index2]    # clean nodestyle previously added
                 
                 if it.firstTName != "" and it.firstTName not in styles["nodestyle"]:
                     value += '    "' + it.firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n'
@@ -900,7 +958,7 @@ class ProductsShowing:
                 if 'default:' in line:
                     index2 = contents.index(line)
             
-            del contents[index+1:index2]    # clean nodestyle previously added
+            #del contents[index+1:index2]    # clean nodestyle previously added
             
             if it.firstTName != "" and it.firstTName not in styles["nodestyle"]:
                 value += '    "' + it.firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n'
