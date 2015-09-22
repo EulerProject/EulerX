@@ -74,7 +74,7 @@ def genFourinone(latticedir, stylesheetdir, artDictbin, mis, mus):
     for i in range(numOfNodes):
         s = bin(i)[2:]
         if len(s) < len(artDictbin):
-            for i in range(len(artDictbin)-len(s)):
+            for j in range(len(artDictbin)-len(s)):
                 s = '0' + s
         binCandidates.append(s)
 
@@ -92,9 +92,9 @@ def genFourinone(latticedir, stylesheetdir, artDictbin, mis, mus):
     for i in range(len(misBin)):
         s = ""
         if len(misBin[i]) < len(artDictbin):
-            for i in range(len(artDictbin)-len(misBin[i])):
+            for j in range(len(artDictbin)-len(misBin[i])):
                 s = '0' + s
-            misBin[i] = s + misBin[i]
+        misBin[i] = s + misBin[i]
     for i in range(len(mus)):
         for j in range(len(mus[i])):
             musBin[i][j] = artDictbin[mus[i][j]]
@@ -106,9 +106,9 @@ def genFourinone(latticedir, stylesheetdir, artDictbin, mis, mus):
     for i in range(len(musBin)):
         s = ""
         if len(musBin[i]) < len(artDictbin):
-            for i in range(len(artDictbin)-len(musBin[i])):
+            for j in range(len(artDictbin)-len(musBin[i])):
                 s = '0' + s
-            musBin[i] = s + musBin[i] 
+        musBin[i] = s + musBin[i] 
     #print "misBin",misBin
     #print "musBin",musBin
     
@@ -144,7 +144,7 @@ def genFourinone(latticedir, stylesheetdir, artDictbin, mis, mus):
             if e1 != e2 and isSupset(e1,e2):
                 rem.append(e2)
     for e in tmpmaa:
-        if e not in rem:
+        if e not in rem and supOfmis.count(e) == 0:
             maaBin.append(e)
 
     #print "mcsBin", mcsBin
@@ -183,7 +183,7 @@ def genFourinone(latticedir, stylesheetdir, artDictbin, mis, mus):
         if len(nodeBin) < len(artDictbin):
             for k in range(len(artDictbin)-len(nodeBin)):
                 tmp = '0' + tmp
-            nodeBin = tmp + nodeBin
+        nodeBin = tmp + nodeBin
         nodesBin.append(nodeBin)
     #print "nodesBin", nodesBin
     
@@ -204,6 +204,12 @@ def genFourinone(latticedir, stylesheetdir, artDictbin, mis, mus):
         elif nodeBin in mcsBin:
             #addFourinoneVizNode(nodeBin, "mcs", fourinoneNodes)
             fDot.write(nodeBin + ' [shape=box style="filled" fillcolor="#00FF00"];\n')
+        elif nodeBin in musBin:
+            #addFourinoneVizNode(nodeBin, "musOnly", fourinoneNodes)
+            fDot.write(nodeBin + ' [shape=octagon style="filled" fillcolor="#00FF00"];\n')
+        elif nodeBin in maaBin:
+            #addFourinoneVizNode(nodeBin, "maaOnly", fourinoneNodes)
+            fDot.write(nodeBin + ' [shape=diamond style="filled" fillcolor="#00FFCC"];\n')
         else:
             fDot.write(nodeBin + ' [shape=box style="filled" fillcolor="#FFFFFF"];\n')
     
