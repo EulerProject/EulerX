@@ -67,6 +67,8 @@ def createLastRunTimeStamp(fileName, user, host, timestamp, name):
     f.close()
 
 def createLastRunName(fileName, name):
+    if not os.path.exists(os.path.dirname(fileName)):
+        os.makedirs(os.path.dirname(fileName))
     f = open(fileName, "w")
     f.write(name)
     f.close()
