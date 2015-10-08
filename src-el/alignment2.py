@@ -44,11 +44,13 @@ import fileinput
 import sys
 import csv
 from taxonomy2 import * 
+from taxonomypair2 import * 
 from alignment2 import * 
 from redCon import *
 from template import *
 from helper2 import *
 from inputViz import *
+from r32comptable import *
 from fourinone2 import genFourinone
 from random import randint
 from time import localtime, strftime
@@ -96,6 +98,7 @@ class TaxonomyMapping:
         self.mis = []                          # MIS
         self.misANDmus = []                    # MIS and MUS
         self.mus = []                          # MUS
+        self.allPairsMir = {}                  # mir used in RCC reasoner 
         self.args = args
         if self.args['--ieo']:
             self.args['--ie'] = True
@@ -258,6 +261,8 @@ class TaxonomyMapping:
             #self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch
             # consistency command
             self.con = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+ self.pwswitch
+        elif reasoner[self.args['-r']] == reasoner["rcc"]:
+            pass
         else:
             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")
 
@@ -299,6 +304,9 @@ class TaxonomyMapping:
         return taxa
 
     def run(self):
+        if reasoner[self.args['-r']] == reasoner["rcc"]:
+            self.runRCCReasoner()
+            return
         if not self.enc:
             return
         print "******* You are running example", self.name, "*******"
@@ -2454,6 +2462,28 @@ class TaxonomyMapping:
                 
         # update leaf concepts
         self.leafConcepts = list(set(self.leafConcepts).difference(self.nonleafConcepts))
+        
+        #### TEST
+#        for taxonPair in self.getAllArticulationPairs():
+#            print taxonPair[0].name
+#            print taxonPair[1].name
+#            print ""
+        
+#        for i in range(len(self.articulations)):
+#            art = self.articulations[i]
+#            print art.taxon1.name, art.relations, art.taxon2.name
+        
+#        testTaxonomy1 = self.taxonomies['1']
+#        siblings = []
+#        siblings = testTaxonomy1.getTaxon('e').parent.children
+#        siblings.remove(testTaxonomy1.getTaxon('e'))
+#        print siblings[0].name
+        
+#        name1 = testTaxonomy1.getTaxon('a').name
+#        name2 = testTaxonomy1.getTaxon('a').children[1].name
+#        taxonPair = TaxonPair(name1, name2)
+#        print taxonPair.taxon1.name
+#        print taxonPair.taxon2.name
 
         return True
     
@@ -3125,9 +3155,100 @@ class TaxonomyMapping:
         f.close()
 
 
-                        
+    def runRCCReasoner(self):
+#        for pair in self.getAllArticulationPairs():
+#            print pair[0].name, pair[1].name
+#            
+#        for art in self.articulations:
+#            print art.taxon1.name, art.relations, art.taxon2.name
+#        
+#        print ""
         
+        # prepare for input
+        for pair in self.getAllArticulationPairs():
+            self.allPairsMir[(pair[0], pair[1])] = relation["{=, >, <, !, ><}"]
         
+        for art in self.articulations:
+            self.allPairsMir[(art.taxon1, art.taxon2)] = art.relations
         
+        toDo = []
+        for taxonPair,rel in self.allPairsMir.iteritems():
+            if rel != relation["{=, >, <, !, ><}"]:
+                toDo.append(taxonPair)
         
+        while len(toDo) > 0:
+            taxonPair = toDo[0]
+            del toDo[0]
+            self.reasonOver(taxonPair, toDo)
         
+        print "#########"
+        for k,v in self.allPairsMir.iteritems():
+            print k[0].name, k[1].name, findkey(relation, v)
+            
+#        print "TO-DO"
+#        for e in toDo:
+#            print e[0].name, e[1].name
+        
+        return
+    
+    def reasonOver(self, taxonPair, toDo):
+        t1 = taxonPair[0]
+        t2 = taxonPair[1]
+        t1Parent = t1.parent
+        t2Parent = t2.parent
+        givenRel = self.allPairsMir[taxonPair]
+        
+        if t2Parent != "":
+            # update pair between t1 and t2's parent
+            deducedPair = (t1, t2Parent)
+            deducedRel = comptab[givenRel][relation["<"]]
+            self.assertNew(deducedPair, deducedRel, toDo)
+            
+            # update pair between t1 and t2's siblings
+            t2Siblings = t2Parent.children
+            for t2Sibling in t2Siblings:
+                if t2Sibling != t2:
+                    deducedPair = (t1, t2Sibling)
+                    deducedRel = comptab[givenRel][relation["!"]]
+                    self.assertNew(deducedPair, deducedRel, toDo)
+        
+        # update pair between t1 and t2's children
+        t2Children = t2.children
+        for t2Child in t2Children:
+            deducedPair = (t1, t2Child)
+            deducedRel = comptab[givenRel][relation[">"]]
+            self.assertNew(deducedPair, deducedRel, toDo)
+            
+        if t1Parent != "":
+            # update pair between t1's Parent and t2
+            deducedPair = (t1Parent, t2)
+            deducedRel = comptab[relation[">"]][givenRel]
+            self.assertNew(deducedPair, deducedRel, toDo)
+            
+            # update pair between t1's siblings and t2 siblings
+            t1Siblings = t1Parent.children
+            for t1Sibling in t1Siblings:
+                if t1Sibling != t1:
+                    deducedPair = (t1Sibling, t2)
+                    deducedRel = comptab[relation["!"]][givenRel]
+                    self.assertNew(deducedPair, deducedRel, toDo)
+        
+        # update pair between t1's children and t2
+        t1Children = t1.children
+        for t1Child in t1Children:
+            deducedPair = (t1Child, t2)
+            deducedRel = comptab[relation["<"]][givenRel]
+            self.assertNew(deducedPair, deducedRel, toDo)
+        
+    def assertNew(self, deducedPair, deducedRel, toDo):
+#        print "deducedPair=", deducedPair[0].name, deducedPair[1].name
+        oldRel = self.allPairsMir[deducedPair]
+        newRel = oldRel & deducedRel
+        if not newRel:
+            print "Inconsisten pair", deducedPair
+            exit(0)
+        else:
+            if newRel == relation["{=, >, <, !, ><}"] or oldRel == newRel:
+                return
+        self.allPairsMir[deducedPair] = newRel
+        toDo.append(deducedPair)

@@ -40,7 +40,7 @@ class Taxon:
         self.children += [child]
         
     def hasChildren(self):
-        return len(self.children) > 0
+        return len(self.children) > 0    
     
     def dotName(self):
         return self.taxonomy.abbrev + "." + self.abbrev

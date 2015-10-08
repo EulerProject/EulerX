@@ -21,15 +21,15 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 rcc5 = {}
-rcc5["equals"] = 1 << 0
-rcc5["includes"] = 1 << 1
-rcc5["is_included_in"] = 1 << 2
-rcc5["disjoint"] = 1 << 3
+rcc5["disjoint"] = 1 << 0
+rcc5["is_included_in"] = 1 << 1
+rcc5["equals"] = 1 << 2
+rcc5["includes"] = 1 << 3
 rcc5["overlaps"] = 1 << 4
-rcc5['"="'] = 1 << 0
-rcc5['">"'] = 1 << 1
-rcc5['"<"'] = 1 << 2
-rcc5['"!"'] = 1 << 3
+rcc5['"!"'] = 1 << 0
+rcc5['"<"'] = 1 << 1
+rcc5['"="'] = 1 << 2
+rcc5['">"'] = 1 << 3
 rcc5['"><"'] = 1 << 4
 
 logmap = {}
@@ -41,41 +41,41 @@ logmap[1<<4] = 4
 
 relation = {}
 relation["no"] = 0
-relation["="] = 1 << 0
-relation[">"] = 1 << 1
-relation["<"] = 1 << 2
-relation["!"] = 1 << 3
+relation["!"] = 1 << 0
+relation["<"] = 1 << 1
+relation["="] = 1 << 2
+relation[">"] = 1 << 3
 #relation["<>"] = 1 << 3
 relation["><"] = 1 << 4
 # Imfer bit
 relation["input"] = 1 << 5
 relation["infer"] = 1 << 6
-relation["{=, >}"] = 1 << 0 | 1 << 1
-relation["{=, <}"] = 1 << 0 | 1 << 2
-relation["{=, !}"] = 1 << 0 | 1 << 3
-relation["{=, ><}"] = 1 << 0 | 1 << 4
-relation["{>, <}"] = 1 << 1 | 1 << 2
-relation["{>, !}"] = 1 << 1 | 1 << 3
-relation["{>, ><}"] = 1 << 1 | 1 << 4
-relation["{<, !}"] = 1 << 2 | 1 << 3
-relation["{<, ><}"] = 1 << 2 | 1 << 4
-relation["{!, ><}"] = 1 << 3 | 1 << 4
-relation["{=, >, <}"] = 1 << 0 | 1 << 1 | 1 << 2
-relation["{=, >, !}"] = 1 << 0 | 1 << 1 | 1 << 3
-relation["{=, >, ><}"] = 1 << 0 | 1 << 1 | 1 << 4
-relation["{=, <, !}"] = 1 << 0 | 1 << 2 | 1 << 3
-relation["{=, <, ><}"] = 1 << 0 | 1 << 2 | 1 << 4
-relation["{=, !, ><}"] = 1 << 0 | 1 << 3 | 1 << 4
-relation["{>, <, !}"] = 1 << 1 | 1 << 2 | 1 << 3
-relation["{>, <, ><}"] = 1 << 1 | 1 << 2 | 1 << 4
-relation["{>, !, ><}"] = 1 << 1 | 1 << 3 | 1 << 4
-relation["{<, !, ><}"] = 1 << 2 | 1 << 3 | 1 << 4
-relation["{=, >, <, !}"] = 1 << 0 | 1 << 1 | 1 << 2 | 1 << 3
-relation["{=, >, <, ><}"] = 1 << 0 | 1 << 1 | 1 << 2 | 1 << 4
-relation["{=, >, !, ><}"] = 1 << 0 | 1 << 1 | 1 << 3 | 1 << 4
-relation["{=, <, !, ><}"] = 1 << 0 | 1 << 2 | 1 << 3 | 1 << 4
-relation["{>, <, !, ><}"] = 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4
-relation["{=, >, <, !, ><}"] = 1 << 0 | 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4
+relation["{=, >}"] = 1 << 2 | 1 << 3
+relation["{=, <}"] = 1 << 2 | 1 << 1
+relation["{=, !}"] = 1 << 2 | 1 << 0
+relation["{=, ><}"] = 1 << 2 | 1 << 4
+relation["{>, <}"] = 1 << 3 | 1 << 1
+relation["{>, !}"] = 1 << 3 | 1 << 0
+relation["{>, ><}"] = 1 << 3 | 1 << 4
+relation["{<, !}"] = 1 << 1 | 1 << 0
+relation["{<, ><}"] = 1 << 1 | 1 << 4
+relation["{!, ><}"] = 1 << 0 | 1 << 4
+relation["{=, >, <}"] = 1 << 2 | 1 << 3 | 1 << 1
+relation["{=, >, !}"] = 1 << 2 | 1 << 3 | 1 << 0
+relation["{=, >, ><}"] = 1 << 2 | 1 << 3 | 1 << 4
+relation["{=, <, !}"] = 1 << 2 | 1 << 1 | 1 << 0
+relation["{=, <, ><}"] = 1 << 2 | 1 << 1 | 1 << 4
+relation["{=, !, ><}"] = 1 << 2 | 1 << 0 | 1 << 4
+relation["{>, <, !}"] = 1 << 3 | 1 << 1 | 1 << 0
+relation["{>, <, ><}"] = 1 << 3 | 1 << 1 | 1 << 4
+relation["{>, !, ><}"] = 1 << 3 | 1 << 0 | 1 << 4
+relation["{<, !, ><}"] = 1 << 1 | 1 << 0 | 1 << 4
+relation["{=, >, <, !}"] = 1 << 2 | 1 << 3 | 1 << 1 | 1 << 0
+relation["{=, >, <, ><}"] = 1 << 2 | 1 << 3 | 1 << 1 | 1 << 4
+relation["{=, >, !, ><}"] = 1 << 2 | 1 << 3 | 1 << 0 | 1 << 4
+relation["{=, <, !, ><}"] = 1 << 2 | 1 << 2 | 1 << 0 | 1 << 4
+relation["{>, <, !, ><}"] = 1 << 3 | 1 << 1 | 1 << 0 | 1 << 4
+relation["{=, >, <, !, ><}"] = 1 << 2 | 1 << 3 | 1 << 1 | 1 << 0 | 1 << 4
 relation["+="] = 1 << 7 #lsum
 relation["=+"] = (1 << 7) + 1 #rsum
 relation["+3="] = 1 << 8 #l3sum
@@ -85,22 +85,23 @@ relation["-="] = 1 << 10 #ldiff
 relation["=-"] = (1 << 10) + 1 #rdiff
 
 relstr={}
-relstr[0] = "equals"
-relstr[1] = "includes"
-relstr[2] = "is_included_in"
-relstr[3] = "disjoint"
+relstr[0] = "disjoint"
+relstr[1] = "is_included_in"
+relstr[2] = "equals"
+relstr[3] = "includes"
 relstr[4] = "overlaps"
 
 relss={}
-relss[1 << 0] = "equals"
-relss[1 << 1] = "includes"
-relss[1 << 2] = "is_included_in"
-relss[1 << 3] = "disjoint"
+relss[1 << 0] = "disjoint"
+relss[1 << 1] = "is_included_in"
+relss[1 << 2] = "equals"
+relss[1 << 3] = "includes"
 relss[1 << 4] = "overlaps"
 
 reasoner={}
 reasoner["dlv"] = 1 << 0
 reasoner["gringo"] = 1 << 1
+reasoner["rcc"] = 1 << 2
 
 encode = {}
 encode[0] = 0                                  # null encoding
