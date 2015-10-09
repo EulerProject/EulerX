@@ -2464,6 +2464,8 @@ class TaxonomyMapping:
         self.leafConcepts = list(set(self.leafConcepts).difference(self.nonleafConcepts))
         
         #### TEST
+#        for k,v in self.taxonomies.iteritems():
+#            print k, v.name
 #        for taxonPair in self.getAllArticulationPairs():
 #            print taxonPair[0].name
 #            print taxonPair[1].name
@@ -3166,10 +3168,17 @@ class TaxonomyMapping:
         
         # prepare for input
         for pair in self.getAllArticulationPairs():
-            self.allPairsMir[(pair[0], pair[1])] = relation["{=, >, <, !, ><}"]
-        
+#            print "pair[0].taxonomy", pair[0].taxonomy.abbrev, self.firstTName
+            if pair[0].taxonomy.abbrev == self.firstTName:
+                self.allPairsMir[(pair[0], pair[1])] = relation["{=, >, <, !, ><}"]
+            else:
+                self.allPairsMir[(pair[1], pair[0])] = relation["{=, >, <, !, ><}"]
+                    
         for art in self.articulations:
             self.allPairsMir[(art.taxon1, art.taxon2)] = art.relations
+        
+#        for k,v in self.allPairsMir.iteritems():
+#            print k[0].name, k[1].name, v
         
         toDo = []
         for taxonPair,rel in self.allPairsMir.iteritems():
