@@ -43,8 +43,7 @@ import socket
 import fileinput
 import sys
 import csv
-from taxonomy2 import * 
-from taxonomypair2 import * 
+from taxonomy2 import *  
 from alignment2 import * 
 from redCon import *
 from template import *
