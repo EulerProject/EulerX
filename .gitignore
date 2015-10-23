@@ -1,0 +1,17 @@
+# files to be ignored
+*.pyc
+*.class
+*.classpath
+*.project
+*.timestamp
+*.csv
+*.asp
+*.dlv
+*.csp
+*.gv
+*.dot
+*.png
+*.pdf
+*.yaml
+*.DS_Store
+*.out
