@@ -3189,9 +3189,11 @@ class TaxonomyMapping:
             del toDo[0]
             self.reasonOver(taxonPair, toDo)
         
-        print "#########"
-        for k,v in self.allPairsMir.iteritems():
-            print k[0].name, k[1].name, findkey(relation, v)
+        # output all mirs
+        self.rccGenMir()
+#        print "#########"
+#        for k,v in self.allPairsMir.iteritems():
+#            print k[0].name, k[1].name, findkey(relation, v)
             
 #        print "TO-DO"
 #        for e in toDo:
@@ -3260,3 +3262,15 @@ class TaxonomyMapping:
                 return
         self.allPairsMir[deducedPair] = newRel
         toDo.append(deducedPair)
+        
+    def rccGenMir(self):
+        fmir = open(self.mirfile, 'w')
+        for k,v in self.allPairsMir.iteritems():
+            fmir.write(self.firstTName + "." + k[0].name + ",")
+            fmir.write(findkey(relation, v) + ",")
+            fmir.write(self.secondTName + "." + k[1].name + "\n")
+        
+        print "#########"
+        for k,v in self.allPairsMir.iteritems():
+            print k[0].name, k[1].name, findkey(relation, v)
+        fmir.close()
