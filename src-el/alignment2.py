@@ -3264,13 +3264,15 @@ class TaxonomyMapping:
         toDo.append(deducedPair)
         
     def rccGenMir(self):
+        mirList = []
         fmir = open(self.mirfile, 'w')
         for k,v in self.allPairsMir.iteritems():
-            fmir.write(self.firstTName + "." + k[0].name + ",")
-            fmir.write(findkey(relation, v) + ",")
-            fmir.write(self.secondTName + "." + k[1].name + "\n")
+            mirList.append([self.firstTName + "." + k[0].name, findkey(relation, v), self.secondTName + "." + k[1].name])
         
+        # sorted the mirList
+#        for pair in sorted(mirList, key=itemgetter(3,0,2)):
         print "#########"
-        for k,v in self.allPairsMir.iteritems():
-            print k[0].name, k[1].name, findkey(relation, v)
+        for pair in sorted(mirList, key=itemgetter(0,2)):
+            print pair[0], pair[1], pair[2]
+            fmir.write(pair[0] + ',' + pair[1] + ',' + pair[2])            
         fmir.close()
