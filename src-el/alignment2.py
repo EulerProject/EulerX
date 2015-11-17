@@ -98,6 +98,7 @@ class TaxonomyMapping:
         self.misANDmus = []                    # MIS and MUS
         self.mus = []                          # MUS
         self.allPairsMir = {}                  # mir used in RCC reasoner 
+        self.rccPreArts = []                   # RCC reasoner pre-processing articulation relations
         self.args = args
         if self.args['--ieo']:
             self.args['--ie'] = True
@@ -3159,6 +3160,21 @@ class TaxonomyMapping:
     def runRCCReasoner(self):
 #        for pair in self.getAllArticulationPairs():
 #            print pair[0].name, pair[1].name
+#        t = self.getAllArticulationPairs()[20][0]
+#        a = []
+#        d = []
+#        self.findAncestors(t, a)
+#        self.findDescedants(t, d)
+#        print t.name
+#        print ""
+#        for eachD in d:
+#            print eachD.name 
+##
+#        for pair in self.getAllArticulationPairs():
+#            print pair[0].name
+#            for child in pair[0].children:
+#                print child.name            
+#            print ""
 #            
 #        for art in self.articulations:
 #            print art.taxon1.name, art.relations, art.taxon2.name
@@ -3175,6 +3191,12 @@ class TaxonomyMapping:
                     
         for art in self.articulations:
             self.allPairsMir[(art.taxon1, art.taxon2)] = art.relations
+        
+        # apply the RCC preprocessing
+        self.rccPreProcessGuidedReference()
+        for art in self.rccPreArts:
+            if (art[0], art[1]) in self.allPairsMir:
+                self.allPairsMir[(art[0], art[1])] = art[2]
         
 #        for k,v in self.allPairsMir.iteritems():
 #            print k[0].name, k[1].name, v
@@ -3274,5 +3296,57 @@ class TaxonomyMapping:
         print "#########"
         for pair in sorted(mirList, key=itemgetter(0,2)):
             print pair[0], pair[1], pair[2]
-            fmir.write(pair[0] + ',' + pair[1] + ',' + pair[2])            
+            fmir.write(pair[0] + ',' + pair[1] + ',' + pair[2] + '\n')            
         fmir.close()
+        
+    # function findAncestors that do not require recursion
+#    def findAncestors2(self, taxon):
+#        ancestors = []
+#        parent = taxon.parent
+#        while not type(parent) is str:
+#            print "parent.name", parent.name
+#            ancestors.append(parent.name)
+#            parent = parent.parent
+#        return ancestors
+    
+    def findAncestors(self, taxon, ancestors):
+        if not type(taxon.parent) is str:
+            ancestors.append(taxon.parent)
+            self.findAncestors(taxon.parent, ancestors)
+    
+    def findDescedants(self, taxon, descedants):
+        if len(taxon.children) > 0:
+            descedants.extend(taxon.children)
+            for child in taxon.children:
+                self.findDescedants(child, descedants)
+    
+    def rccPreProcessGuidedReference(self):
+        for art in self.articulations:
+            c1 = art.taxon1
+            c2 = art.taxon2
+            rel = art.relations
+            c2ancestors = []
+            c2descedants = []
+            self.findAncestors(c2, c2ancestors)
+            self.findDescedants(c2, c2descedants)
+            # check rel(c1, c2) is "=" ==> rel(c1, c2's ancestor) is "<"
+            if rel == relation["="]:
+                for c2ancestor in c2ancestors:
+                    self.rccPreArts.append([c1, c2ancestor, relation['<']])
+            
+            # check rel(c1, c2) is "!" ==> rel(c1, c2's descendant) is "!"
+            if rel == relation["!"]:
+                for c2descedant in c2descedants:
+                    self.rccPreArts.append([c1, c2descedant, relation['!']])
+            
+            # check rel(c1, c2) is "<" ==> rel(c1, c2's ancestor) is "<"
+            if rel == relation["<"]:
+                for c2ancestor in c2ancestors:
+                    self.rccPreArts.append([c1, c2ancestor, relation['<']])
+            
+            # check rel(c1, c2) is ">" ==> rel(c1, c2's descendant) is ">"
+            if rel == relation[">"]:
+                for c2descedant in c2descedants:
+                    self.rccPreArts.append([c1, c2descedant, relation['>']])
+                    
+        

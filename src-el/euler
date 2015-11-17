@@ -31,7 +31,7 @@
 #imp.load_source('generator', path + '/lib1.0/generator.py')
 from parser import *
 from runner import *
-#from generator import *
+from generator import *
 from externaltools import *
 
 def main():
@@ -43,9 +43,10 @@ def main():
 	#	print args
 	if args.inputfile is None:
 		# artificial example generator
-		#if args.function == "generate":
-		#	generator = CtiGenerator.instance()
-		#	generator.run(args)
+		if args.generateCti:
+			generator = CtiGenerator.instance()
+			generator.run(args)
+			return
 		# lattice generation
 		if args.diaglat:
 			runLattice(args.diaglat)
