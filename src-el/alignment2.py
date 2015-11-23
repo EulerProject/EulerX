@@ -688,6 +688,10 @@ class TaxonomyMapping:
                         if dotc1 in self.leafConcepts and dotc2 in self.leafConcepts:
                             tmpLeafRels.append([dotc1,rel[2],dotc2])
                 else:
+                    if rel[2] == '">"':
+                        rel[2] = '"<"'
+                    elif rel[2] == '"<"':
+                        rel[2] = '">"'
                     outputstr += dotc2+rel[2]+dotc1
                     if self.args['--xia']:
                         if dotc1 in self.leafConcepts and dotc2 in self.leafConcepts:
