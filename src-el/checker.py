@@ -20,7 +20,7 @@ def checkInputFiles(iFiles):
         inputData += open(f).readlines()
     for line in inputData:
         if (re.match("taxonomy", line)):
-           g = re.match("taxonomy\s(.*)\s(.*)", line).group(1)
+           g = re.match("taxonomy\s+(\S+)\s(.*)", line).group(1)
            if g not in taxonDict:
                taxonDict.update({g:{'parents':[], 'leaves': [], 'arts': []}})
         if (re.match("\(.*\)", line)):
