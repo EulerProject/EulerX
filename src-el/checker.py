@@ -7,7 +7,7 @@
 
 
 #import wizardParser
-
+import re
 
 def checkInputFiles(iFiles):
     inputData = list()
@@ -19,12 +19,12 @@ def checkInputFiles(iFiles):
     for f in iFiles:
         inputData += open(f).readlines()
     for line in inputData:
-        if line.startswith('taxonomy'):
-           g = line.split(" ")[1]
+        if (re.match("taxonomy", line)):
+           g = re.match("taxonomy\s(.*)\s(.*)", line).group(1)
            if g not in taxonDict:
                taxonDict.update({g:{'parents':[], 'leaves': [], 'arts': []}})
-        if line.startswith("("):
-            elements = line[1:-2].split(" ")
+        if (re.match("\(.*\)", line)):
+            elements = re.match("\((.*)\)", line).group(1).split(" ")
             parents.append(elements[0])
             for e in elements[1:]:
                 if e in leaves:
@@ -36,8 +36,8 @@ def checkInputFiles(iFiles):
                 taxonDict[g]['leaves'] += list(set(leaves) - set(parents))
                 leaves = []
                 parents = []
-        if line.startswith("["):
-            art = line[1:-2].split(" ")
+        if (re.match("\[.*?\]", line)):
+            art = re.match("\[(.*)\]", line).group(1).split(" ")
             for a in art:
                 if "." in a: 
                     node = a.split('.')
