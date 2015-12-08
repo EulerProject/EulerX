@@ -65,7 +65,7 @@ class ProductsShowing:
                 f = open(self.exampleName, "r")
                 self.name = f.readline().strip()
             else:
-                self.name = sys.argv[2].replace('.txt','')
+                self.name = os.path.splitext(os.path.basename(sys.argv[2]))[0]
         
         self.path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         self.stylesheetdir = os.path.join(self.projectdir, "stylesheets/")
@@ -314,12 +314,14 @@ class ProductsShowing:
                     self.addInputVizEdge(a.split(" ")[0], a.split(" ")[2], art2symbol.get(a.split(" ")[1], a.split(" ")[1]))
                 
         # create the yaml file
-        if self.args['<inputfile>'] and self.args['iv']:
+        if self.args['<inputfile>'] and self.args['iv'] and not self.args['-o']:
             inputYamlFile = fileName+".yaml"
             inputDotFile = fileName+".gv"
             inputPdfFile = fileName+".pdf"
             inputSvgFile = fileName+".svg"
         else:
+            if not os.path.exists(self.inputfilesdir):
+                os.makedirs(self.inputfilesdir)
             inputYamlFile = os.path.join(self.inputfilesdir, self.name+".yaml")
             inputDotFile = os.path.join(self.inputfilesdir, self.name+".gv")
             inputPdfFile = os.path.join(self.inputfilesdir, self.name+".pdf")
