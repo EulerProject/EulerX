@@ -50,6 +50,7 @@ from template import *
 from helper import *
 from inputViz import *
 from fourinone import genFourinone
+from checker import checkInputFiles
 from random import randint
 from time import localtime, strftime
 from operator import itemgetter
@@ -245,12 +246,14 @@ class TaxonomyMapping:
         #self.ivpdf = os.path.join(self.pwspdfdir, self.name+"_iv.pdf")
         if reasoner[self.args.reasoner] == reasoner["gringo"]:
             # possible world command
-            self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0 | "+self.path+"/muniq -u"
+            #self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0 | "+self.path+"/muniq -u"
+            self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
             # consistency command
             self.con = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD --eq=1"
         elif reasoner[self.args.reasoner] == reasoner["dlv"]:
             # possible world command
-            self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+self.path+"/muniq -u"
+            #self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+self.path+"/muniq -u"
+            self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch
             # consistency command
             self.con = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+ self.pwswitch
         else:
@@ -689,6 +692,10 @@ class TaxonomyMapping:
                         if dotc1 in self.leafConcepts and dotc2 in self.leafConcepts:
                             tmpLeafRels.append([dotc1,rel[2],dotc2])
                 else:
+                    if rel[2] == '">"':
+                        rel[2] = '"<"'
+                    elif rel[2] == '"<"':
+                        rel[2] = '">"'
                     outputstr += dotc2+rel[2]+dotc1
                     if self.args.xia:
                         if dotc1 in self.leafConcepts and dotc2 in self.leafConcepts:
@@ -1982,7 +1989,7 @@ class TaxonomyMapping:
         prod = 0   # product
         n = 0      # number of taxonomies
         pro = 1    # product of num
-        couArray = []
+        couArray = [] # number of count
         proArray = []
         taxaArray = []
         for key in self.taxonomies.keys():
@@ -2010,17 +2017,17 @@ class TaxonomyMapping:
             #if self.args.verbose:
             #    print "count: ",cou,", product: ",prod
                 
-        #if self.enc & encode["dl"]:
-            #maxint = int(self.args.dl)*num
-            #self.baseAsp  = "%%% Max Number of Euler Regions\n"
-            #self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
-            #self.baseAsp += "%%% Euler Regions\n"
-            #self.baseAsp += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
-            #
-            #self.baseAsp += con
-            #self.baseAsp += "%%% Euler Bit\n"
-            #self.baseAsp += "bit(M, V):-r(M),#mod(M," + int(num).__str__() + ",V).\n\n"
-            #self.baseAsp += template.getAspDlCon()
+        if self.enc & encode["dl"]:
+            maxint = int(self.args.dl)*num
+            self.baseAsp  = "%%% Max Number of Euler Regions\n"
+            self.baseAsp += "#maxint=" + maxint.__str__() + ".\n\n"
+            self.baseAsp += "%%% Euler Regions\n"
+            self.baseAsp += "r(M):- #int(M),M>=0,M<#maxint.\n\n"
+            
+            self.baseAsp += con
+            self.baseAsp += "%%% Euler Bit\n"
+            self.baseAsp += "bit(M, V):-r(M),#mod(M," + int(num).__str__() + ",V).\n\n"
+            self.baseAsp += template.getAspDlCon()
         if self.enc & encode["mn"]:
             if len(self.taxonomies) == 1:
                 raise Exception("Polynomial encoding is not applicable for singleton taxonomy" +\
@@ -2035,6 +2042,7 @@ class TaxonomyMapping:
                 self.baseAsp += con
                 
                 self.baseAsp += "\n%%% Euler Bit\n"
+                
                 for i in range(len(couArray)):
                     self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n"
                     
@@ -2319,6 +2327,12 @@ class TaxonomyMapping:
         
     
     def readFile(self):
+        # check input only
+        if self.args.ci:
+            checkInputFiles(self.args.inputfile)
+            return
+        
+        # start to read files
         lines = []
         for i in range(len(self.args.inputfile)):
             file = open(os.path.join(self.args.inputdir, self.args.inputfile[i]), 'r')
@@ -2718,7 +2732,12 @@ class TaxonomyMapping:
 #                                +self.mirc[pairkey][i].__str__()+","+self.npw.__str__()+"\n")
                 else:
 #                fmir.write(pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"])+"\n")
-                    mirList.append([pairkey1, findkey(relation, self.mir[pairkey] & ~relation["infer"] & ~relation["input"]), pairkey2, hint])
+                    rl = findkey(relation, self.mir[pairkey] & ~relation["infer"] & ~relation["input"])
+                    if self.args.hidemirdisjoint:
+                        if rl != "!":
+                            mirList.append([pairkey1, rl, pairkey2, hint])
+                    else:
+                        mirList.append([pairkey1, rl, pairkey2, hint])
                     #if self.args.verbose:
                     #    print pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"] & ~relation["input"])+"\n"
             else:
@@ -2726,7 +2745,11 @@ class TaxonomyMapping:
                 rl = findkey(relation, self.mir[pairkey])
 #                fmir.write(pairkey + ",inferred," + rl +"\n")
 #                fmir.write(pairkey1 +"," + rl + "," + pairkey2 + ",inferred" +"\n")
-                mirList.append([pairkey1, rl, pairkey2, "inferred"])
+                if self.args.hidemirdisjoint:
+                    if rl != "!":
+                        mirList.append([pairkey1, rl, pairkey2, "inferred"])
+                else:
+                    mirList.append([pairkey1, rl, pairkey2, "inferred"])
                 #if self.args.verbose:
                 #    print pairkey + ",inferred," + rl +"\n"
         for pair in sorted(mirList, key=itemgetter(3,0,2)):

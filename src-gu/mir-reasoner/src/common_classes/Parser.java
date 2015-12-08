@@ -63,6 +63,8 @@ public class Parser{
 		List<SimpleRelation> T1intrarelations = new LinkedList<SimpleRelation>();
 		// list of the second taxonomy's intra-taxonomical relations
 		List<SimpleRelation> T2intrarelations = new LinkedList<SimpleRelation>();
+		List<SimpleRelation> T1sums = new LinkedList<SimpleRelation>();
+		List<SimpleRelation> T2sums = new LinkedList<SimpleRelation>();
 		// taxonomy namespaces
 		String Namespace1 = "";
 		String Namespace2 = "";
@@ -85,18 +87,86 @@ public class Parser{
 		try{
 
 			for (int i = 0; i < tokenStream.size(); i+= 3){
+				String subj = tokenStream.get(i).getContents();
+				String subj2, subj3;
+				String possibleLSum = tokenStream.get(i+2).getContents();
+				String possibleL3Sum = new String();
+				if(i + 4 <= tokenStream.size() - 1)
+					possibleL3Sum = tokenStream.get(i+3).getContents();
 				String pred = tokenStream.get(i+1).getContents();
+				String obj;
+				String obj2, obj3;
+				SimpleRelation rel;
 
-				if ( pred.toLowerCase().equals("isa") )
+				if(possibleLSum.toLowerCase().equals("{l}") || possibleLSum.toLowerCase().equals("l")){
+					pred = "l";
+					subj2 = tokenStream.get(i+1).getContents();
+					obj = tokenStream.get(i+3).getContents();
+					rel = new SimpleRelation(subj, subj2, pred, obj);
+					if(rel.getSubjectNamespace().equals(Namespace1))
+						T1sums.add(rel);
+					else
+						T2sums.add(rel);
+					i++;
+				}
+				else if(possibleL3Sum.toLowerCase().equals("{l3}") || possibleL3Sum.toLowerCase().equals("l3")){
+					pred = "l3";
+					subj2 = tokenStream.get(i+1).getContents();
+					subj3 = tokenStream.get(i+2).getContents();
+					obj = tokenStream.get(i+4).getContents();
+					rel = new SimpleRelation(subj, subj2, subj3, pred, obj);
+					if(rel.getSubjectNamespace().equals(Namespace1))
+						T1sums.add(rel);
+					else
+						T2sums.add(rel);
+					i += 2;
+				}
+				else if (pred.toLowerCase().equals("{r}") || pred.toLowerCase().equals("r")){
+					pred = "r";
+					obj = tokenStream.get(i+2).getContents();
+					obj2 = tokenStream.get(i+3).getContents();
+					rel = new SimpleRelation(subj, pred, obj, obj2, true);
+					if(rel.getObjectNamespace().equals(Namespace2))
+						T2sums.add(rel);
+					else
+						T1sums.add(rel);
+					i++;
+				}
+				else if(pred.toLowerCase().equals("{r3}") || pred.toLowerCase().equals("r3")){
+					pred = "r3";
+					obj = tokenStream.get(i+2).getContents();
+					obj2 = tokenStream.get(i+3).getContents();
+					obj3 = tokenStream.get(i+4).getContents();
+					rel = new SimpleRelation(subj, pred, obj, obj2, obj3, true);
+					if(rel.getObjectNamespace().equals(Namespace2))
+						T2sums.add(rel);
+					else
+						T1sums.add(rel);
+					i += 2;
+				}
+				else if ( pred.toLowerCase().equals("isa") ){
 					pred = "isa";
-				else if (inputType == SPECIAL)
+					rel = new SimpleRelation(
+						tokenStream.get(i).getContents(),
+						pred,
+						tokenStream.get(i+2).getContents()
+						);
+				}
+				else if (inputType == SPECIAL){
 					pred = pred.substring(1, pred.length()-1).replace(",","");
-
-				SimpleRelation rel = new SimpleRelation(
-					tokenStream.get(i).getContents(),
-					pred,
-					tokenStream.get(i+2).getContents()
-				);
+					rel = new SimpleRelation(
+						tokenStream.get(i).getContents(),
+						pred,
+						tokenStream.get(i+2).getContents()
+						);
+				}
+				else{
+					rel = new SimpleRelation(
+						tokenStream.get(i).getContents(),
+						pred,
+						tokenStream.get(i+2).getContents()
+						);
+				}
 
 				/** Errors with individual relations */
 				// Error: intra-taxonomical relation ("isa") between taxa of different taxonomies
@@ -131,26 +201,32 @@ public class Parser{
 				if ( Namespace2.isEmpty() ){
 					if ( !( rel.getSubjectNamespace().equals(Namespace1) ) )
 						Namespace2 = rel.getSubjectNamespace();
+					else if ( !( rel.getSubject2Namespace().equals(Namespace1)))
+						Namespace2 = rel.getSubject2Namespace();
 					else if ( !( rel.getObjectNamespace().equals(Namespace1) ) )
 						Namespace2 = rel.getObjectNamespace();
+					else if ( !( rel.getObject2Namespace().equals(Namespace1)))
+						Namespace2 = rel.getObject2Namespace();
 				}
+
 				// Error: input file declares more than two taxonomies
 				else if ( !( rel.getSubjectNamespace().equals( Namespace1 ) )  &&
-						  !( rel.getSubjectNamespace().equals( Namespace2 ) ) )
+						  !( rel.getSubjectNamespace().equals( Namespace2 ) ) ){
 					throw new InvalidTaxonomyException("Error, \"" +
 						rel.getSubject() + "\": the input file declares more than two taxonomies."
 					);
+				}
 				// Error: input file declares more than two taxonomies
 				else if ( !( rel.getObjectNamespace().equals( Namespace1 ) )  &&  
-						  !( rel.getObjectNamespace().equals( Namespace2 ) ) )
+						  !( rel.getObjectNamespace().equals( Namespace2 ) ) ){
 					throw new InvalidTaxonomyException("Error, \"" +
 						rel.getObject() + "\": the input file declares more than two taxonomies."
 					);
-
+				}
 
 				/** Errors with individual taxa */
 				// Error: taxon has more than one parent
-				if ( rel.isInternal() )
+				if ( rel.isInternal() ){
 					if ( rel.getSubjectNamespace().equals(Namespace1) ){
 						// the subject is always a child (no longer parentless)
 						T1parentlessTaxa.remove( rel.getSubjectClassname() );
@@ -179,6 +255,7 @@ public class Parser{
 							T2parentlessTaxa.add( rel.getObjectClassname() );
 						T2intrarelations.add(rel);
 					}
+				}
 				else{
 					// if the subject is in namespace one and is not a child
 					if ( rel.getSubjectNamespace().equals(Namespace1)  &&
@@ -238,7 +315,13 @@ public class Parser{
 			T1RootName = T1parentlessTaxa.iterator().next();
 			T2RootName = T2parentlessTaxa.iterator().next();
 			T1 = new Taxonomy(Namespace1, T1intrarelations, T1RootName);
+			for(SimpleRelation rel : T1sums){
+				T1.handleSums(rel);
+			}
 			T2 = new Taxonomy(Namespace2, T2intrarelations, T2RootName);
+			for(SimpleRelation rel : T2sums){
+				T2.handleSums(rel);
+			}
 			
 			// store the taxonomies and their interrelations
 			taxonomyInformation = new TaxonomyInfo(T1, T2, interrelations);

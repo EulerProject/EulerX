@@ -25,6 +25,9 @@
 # In order to convert RCC5 to RCC8, we join the tangential and non-tangential relations 
 #=============================================================================================
 import sys
+import re
+import commands
+
 
 #remove the duplicate string in list li
 def remove_duplicate_string(li):
@@ -105,95 +108,119 @@ def containLsumRsum(li):
             return "lsum"
     return "none"
 
+
+def findConcept(n, rep_list):
+    for t in rep_list:
+        if n == t[1]:
+            return t[0] 
+    
+
+def findRelation(s):
+    relation = ""
+    if "DC" in s and "EC" in s:
+        relation = relation + "!"
+    if "EQ" in s:
+        relation = relation + "="
+    if "PO" in s:
+        relation = relation + "o"
+    if "TPP" in s and "NTPP" in s and "TPPI" not in s and "NTPPI" not in s:
+        relation = relation + "<"
+    if "TPPI" in s and "NTPPI" in s:
+        relation = relation + ">"
+    
+    relation2 = ""
+    if len(relation) > 1:
+        relation2 = "{"
+        for r in relation:
+            relation2 = relation2 + r + ", "
+        relation2 = relation2[:-2]+"}"
+    else:
+        relation2 = relation
+    
+    relation2 = relation2.replace("o","><")
+    return relation2
+
+def newgetoutput(cmd):
+    result = commands.getstatusoutput(cmd)
+    if result[0] != 0:
+        print "cmd: ", cmd
+        print "exit status: ", result[0]
+        return
+    else:
+        return result[1]
+
 # open the files
 fileName = sys.argv[1]
+pyrccFileName = fileName[:-4] + "_pyrcc.csp"
 f_in = open(fileName, "r")
-f_out = open(fileName[:-4] + "_pyrcc.csp", "w")
+f_out = open(pyrccFileName, "w")
 
 # initialize variables
-not_EOF = True
 pc_list1 =[]
 pc_list2 = []
 art_list = []
 concept_list = []
 replace_list = []
 children_list = []
+name1 = ""          # first taxonomy name
+name2 = ""          # second taxonomy name
 
-while not_EOF:
-    # read taxonomy 1 keywords
-    line = f_in.readline()
-    name1 = line[:-1].split(" ")[1]
-    
-    # read concepts in taxonomy 1
-    line = f_in.readline()
-    while len(line) != 1:
-        children = []
-        temp_list = line[1:-2].split(" ")
-        parent = name1 + "." + temp_list[0]
-        concept_list.append(parent)
-        for i in range(1,len(temp_list)):
-            child = name1 + "." + temp_list[i]
-            concept_list.append(child)
-            children.append(child)
-            pc_item = [parent, child]
-            pc_list1.append(pc_item)
-        for e in children:
-            children_list.append(children)
-        line = f_in.readline()
 
-    # read taxonomy 2 keywords
-    line = f_in.readline()
-    name2 = line[:-1].split(" ")[1]
-    
-    # read concepts in taxonomy 2
-    line = f_in.readline()
-    while len(line) != 1:
-        children = []
-        temp_list = line[1:-2].split(" ")
-        parent = name2 + "." + temp_list[0]
-        concept_list.append(parent)
-        for i in range(1,len(temp_list)):
-            child = name2 + "." + temp_list[i]
-            concept_list.append(child)
+# read CleanTax input file
+lines = f_in.readlines()
 
-            children.append(child)
-            pc_item = [parent, child]
-            pc_list2.append(pc_item)
-        for e in children:
-            children_list.append(children)
-        line = f_in.readline()
-        
-    # read articulation keyword
-    line = f_in.readline()
+for line in lines:
     
-    # read articulation pairs
-    line = f_in.readline()
-    while len(line) != 0:
-        art_type = ""
-        if line[-1] == "\n":
-            line = line[1:-2].replace("{","").replace("}","")
+    if (re.match("taxonomy", line)):
+        if name1 == "":
+            name1 = re.match("taxonomy (.*) (.*)", line).group(1)
         else:
-            line = line[1:-1].replace("{","").replace("}","")
-        temp_list = line.split(" ")
-        if len(temp_list) > 1:
-            if containLsumRsum(temp_list) == "none": 
-                for i in range(1, len(temp_list)-1):
-                    art_type = art_type + temp_list[i] + " "
-                art_item = [temp_list[0], temp_list[len(temp_list)-1], art_type[:-1]]
-                art_list.append(art_item)
-            elif containLsumRsum(temp_list) == "rsum":
-                for i in range(2, len(temp_list)):
-                    art_item = [temp_list[0], temp_list[i], "includes"]
-                    art_list.append(art_item)
-#                children_list.append(temp_list[2:])
-            elif containLsumRsum(temp_list) == "lsum":
-                for i in range(0, len(temp_list)-2):
-                    art_item = [temp_list[i], temp_list[len(temp_list)-1], "is_included_in"]
-                    art_list.append(art_item)
-#                children_list.append(temp_list[0:-2])            
-            line = f_in.readline()      
-    if len(line) == 0:
-        not_EOF = False
+            name2 = re.match("taxonomy (.*) (.*)", line).group(1)
+    
+    elif (re.match("\(.*\)", line)):
+        conceptLine = re.match("\((.*)\)", line).group(1)
+        concepts = re.split("\s", conceptLine)
+        children = []
+        
+        # read taxonomy1 section
+        if name1 != "" and name2 == "":
+            parent = name1 + "." + concepts[0]
+            concept_list.append(parent)
+            
+            for i in range(1, len(concepts)):
+                child = name1 + "." + concepts[i]
+                concept_list.append(child)
+                children.append(child)
+                pc_item = [parent, child]
+                pc_list1.append(pc_item)
+            for e in children:
+                children_list.append(children)
+                
+        # read taxonomy2 section
+        else:
+            parent = name2 + "." + concepts[0]
+            concept_list.append(parent)
+            
+            for i in range(1, len(concepts)):
+                child = name2 + "." + concepts[i]
+                concept_list.append(child)
+                children.append(child)
+                pc_item = [parent, child]
+                pc_list2.append(pc_item)
+            for e in children:
+                children_list.append(children)
+                
+    elif (re.match("\[.*?\]", line)):
+        inside = re.match("\[(.*)\]", line).group(1)
+        inside = inside.replace("{","").replace("}","")
+        temp_list = re.split("\s", inside)
+        art_type = ""
+        
+        # articulation key words
+        for i in range(1, len(temp_list)-1):
+            art_type = art_type + temp_list[i] + " "
+        art_item = [temp_list[0], temp_list[len(temp_list)-1], art_type[:-1]]
+        art_list.append(art_item)
         
 #print "pc_list1=", pc_list1
 #print "pc_list2=", pc_list2
@@ -211,7 +238,7 @@ remove_duplicate_string(children_list)
 
 replace_list = replace_names(concept_list, pc_list1, pc_list2, art_list, children_list)
 #print "AFTERRRRRR"
-print "rep_list=", replace_list
+#print "replace_list=", replace_list
 #print "pc_list1=", pc_list1
 #print "pc_list2=", pc_list2
 #print "art_list=", art_list
@@ -259,4 +286,33 @@ f_out.write(".")
 
 
 f_in.close()
-f_out.close()    
+f_out.close()
+
+# execute PyRCC8
+newgetoutput("rcc8 -d < " + pyrccFileName + " > output.txt")
+
+mir = []
+f = open("output.txt", "r")
+lines = f.readlines()
+
+for line in lines:
+    if '[' in line:
+        pair = []
+
+        rels = re.match('(.*)\s(.*)\s\[(.*)\](.*)', line)
+        
+        pair.append(findConcept(int(rels.group(1)), replace_list))
+        pair.append(findRelation(rels.group(3)))
+        pair.append(findConcept(int(rels.group(2)), replace_list))
+        
+        print pair
+        mir.append(pair)
+        
+
+#print mir
+
+
+newgetoutput("rm output.txt")
+
+
+

@@ -51,6 +51,7 @@ class Logger(object):
 def newgetoutput(cmd):
     result = commands.getstatusoutput(cmd)
     if result[0] != 0:
+        print "cmd:", cmd
         print "exit status: ", result[0]
         return
     else:

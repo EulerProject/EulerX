@@ -231,10 +231,19 @@ class Articulation:
                 #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
             elif self.relations == (rcc5["equals"] | rcc5["disjoint"]):
                 if reasoner[rnr] == reasoner["dlv"]:
-                    result  = ":- #count{X : vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y : vrs(Y), out(" + name1 + ", Y), in(" + name2 + ", Y)} > 0.\n"
-                    result += ":- #count{X : vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} = 0, #count{Y : vrs(Y), out(" + name1 + ", Y), in(" + name2 + ", Y)} = 0.\n"
-                    result += ":- #count{X : vrs(X), in(" + name1 + ", X), in(" + name2 + ", X)} > 0, #count{Y : vrs(Y), out(" + name1 + ", Y), in(" + name2 + ", Y)} = 0.\n"
-                    result += ":- #count{X : vrs(X), in(" + name1 + ", X), in(" + name2 +", X)} = 0, #count{Y : vrs(Y), out(" + name1 + ", Y), in(" + name2 + ", Y)} > 0.\n"
+                    result = ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} = 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} = 0, #count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} = 0.\n\n"
+                    result += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} = 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} = 0, #count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} > 0.\n\n"
+                    result += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} = 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} > 0, #count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} > 0.\n\n"
+                    result += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} = 0, #count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} = 0.\n\n"
+                    result += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} > 0, #count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} = 0.\n\n"
+                    result += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} > 0, #count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} > 0.\n\n"
+#                    result = "vr(X, r" + self.ruleNum.__str__() + ") v ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
+#                    result += "vr(X, r" + self.ruleNum.__str__() + ") v ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
+#                    result += "vr(X, r" + self.ruleNum.__str__() + ") v ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), in(" + name2 + ",X).\n"  
+#                    result  = ":- #count{X : vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y : vrs(Y), out(" + name1 + ", Y), in(" + name2 + ", Y)} > 0.\n"
+#                    result += ":- #count{X : vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} = 0, #count{Y : vrs(Y), out(" + name1 + ", Y), in(" + name2 + ", Y)} = 0.\n"
+#                    result += ":- #count{X : vrs(X), in(" + name1 + ", X), in(" + name2 + ", X)} > 0, #count{Y : vrs(Y), out(" + name1 + ", Y), in(" + name2 + ", Y)} = 0.\n"
+#                    result += ":- #count{X : vrs(X), in(" + name1 + ", X), in(" + name2 +", X)} = 0, #count{Y : vrs(Y), out(" + name1 + ", Y), in(" + name2 + ", Y)} > 0.\n"
                 elif reasoner[rnr] == reasoner["gringo"]:
                     ## TODO
                     result = ""

@@ -3,21 +3,11 @@ EulerX Toolkit Overview
 
 ![Alt text](http://euler.cs.ucdavis.edu/_/rsrc/1366832610901/home/logo_small.png)
 
-On this page:
-
-* [Introduction](https://github.com/EulerProject/EulerX#introduction)
-* [Structure of This Toolkit](https://github.com/EulerProject/EulerX#structure-of-this-toolkit)
-* [Installation Steps](https://github.com/EulerProject/EulerX#installation-steps)
-* [Software Dependencies](https://github.com/EulerProject/EulerX#software-dependencies)
-* [Examples of Running EulerFO](https://github.com/EulerProject/EulerX#examples-of-running-eulerfo)
-* [Examples of Running EulerASP](https://github.com/EulerProject/EulerX#examples-of-running-eulerasp)
-* [Contact](https://github.com/EulerProject/EulerX#Contact)
-
 # Introduction
 
 Euler is an open source toolkit (mostly written in Python) for merging taxonomies (taxonomical organized datasets) and visualizing the results. (see [Euler Toolkit Wiki][wiki] for more information, and the remaining issue list in [Jira][jira])
 
-We have all the EulerFO source code, EulerASP source code, and a bunch of use cases in this toolkit. EulerFO is a modified version of CleanTax which was firstly developed by Dave Thau. CleanTax/EulerFO are built upon Prover9/Mace4 reasoning software. EulerASP is a brand new taxonomy reasoning tool that Mingmin built from scratch. EulerASP is built based on popular ASP reasoners DLV and Potassco.
+We have all the EulerFO source code, EulerASP source code, and a bunch of use cases in this toolkit. EulerFO is a modified version of CleanTax which was firstly developed by Dave Thau. CleanTax/EulerFO are built upon Prover9/Mace4 reasoning software. EulerASP is a brand new taxonomy reasoning tool that Mingmin built from scratch. EulerASP is built based on popular ASP reasoners DLV and Potassco. This readme page is mainly focusing on the use of EulerASP.
 
 Euler is designed for UNIX-like operating systems (Linux, Mac, etc). If you are running on Windows, you need to install a virtual machine to run Euler.
 
@@ -43,37 +33,147 @@ Euler is designed for UNIX-like operating systems (Linux, Mac, etc). If you are 
  `installCheck.sh`  |  installation requirements check
  `src-ct/main.py`   |  main entry of CleanTax++ source code
  `src-el/euler`     |  main entry of EulerASP source code
+ `src-el/euler2`    |  main entry of EulerASP source code using new commland line interface
  `example/runct.sh` |  shell script to run EulerFO
 
-# Installation Steps
+# Installation Instructions For Users
 
-1. If you are a first-time user for git, please download and install it [here][gitdownloads].
-2. Open your shell, go to a folder which you want to install Euler, clone the repository under "main branch" to your local disk by copy and run `git clone -b "main" https://github.com/EulerProject/EulerX.git` in terminal.
-3. **[IMPORTANT]** You need to make sure your machine has met the minimal software requirements before run Euler. (Please see section **Software Dependencies** in detail)
-4. You can add main entry of source code (e.g. `src-el/` of EulerASP) into your PATH env. 
-5. When there is a new commit of the source, you can update it by running `git pull`.
+##### 1. First-time user for git
+Before using Euler/X, you need to download it from this git repo. You can first check the installation of git.
 
-# Software Dependencies
+    $ git —-version
 
-Please run `installCheck.sh` and make sure the dependency check passes before running this toolkit.
+If you are a first-time user for git, please download and install it [http://git-scm.com/downloads/].
 
-The whole toolkit is written in **Python**, so you need have Python 2.X or later installed in your computer. You also need the following dependent software to run this toolkit.
+##### 2. Download the repository. You may also clone the repository of git into local disk, including two branches.
+The `master` is the released branch, which is stable and tested, but may not be the latest. To use the master branch: 
 
-EulerFO dependencies:
+    $ git clone -b “master” https://github.com/EulerProject/EulerX.git
 
-1. [Prover9/Mace4][p9m4]
-2. [GraphViz][graphviz]
+The `main` is the development branch, which has latest code. To use the main branch:
 
-EulerASP dependencies:
+    $ git clone -b “main” https://github.com/EulerProject/EulerX.git
 
-1. [DLV][dlv] (version: static, no ODBC support)
-2. [Potassco][potassco]
-   - [gringo-3.0.3][gringo303]
-   - [claspD-1.1.4][claspD114]
-3. [GraphViz][graphviz]
-4. [Python Yaml module][pyyaml]
+##### 3. Check the installation of Python
+Euler/X is written in **Python**, so it requires Python2.X or later installed in your computer. 
 
-# Examples of Running EulerFO
+    $ python --version
+    Python 2.7.8
+
+Installation of Python2 can be found at [https://www.python.org/downloads/].
+
+##### 4. Check the installation of reasoner
+Euler/X use either **DLV** or **Gringo** as underlining reasoner. Please install them and make sure they are in your PATH:
+
+    $ dlv --version
+    DLV [build BEN/Dec 17 2012   gcc 4.2.1 (Apple Inc. build 5666) (dot 3)]
+    
+    usage: dlv {FRONTEND} {OPTIONS} [filename [filename [...]]]
+    
+    Specify -help for more detailed usage information.
+    
+    
+    $ gringo --version
+    gringo 3.0.3
+    
+    Copyright (C) Arne König
+    Copyright (C) Benjamin Kaufmann
+    Copyright (C) Roland Kaminski
+    License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+    Gringo is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+    
+    $ claspD --version
+    claspD - Version: 1.1.4
+    Copyright (C) Benjamin Kaufmann, Christian Drescher
+    This software is provided "as is" without expressed or implied warranty,
+    and with no claim as to its suitability for any purpose.
+
+To install DLV, please use the version `static no ODBC support` from [DLV download page][dlv].
+To install Gringo, please use the version [3.0.3][gringo303] (avoid the latest one to change the syntax).
+To install ClaspD, please use the version [1.1.4][claspD114] (avoid the latest one to change the syntax).
+Note: You do not need to install all to use Euler/X, either DLV or Gringo+ClaspD will do the job.
+
+##### 5. Install Graphviz visualization tool
+All knowledge products generated by Euler/X use Graphviz for rendering visualizations, to check the installation of it:
+
+    $ dot -V
+    dot - graphviz version 2.36.0 (20140111.2315)
+
+Installation of Graphviz can be found at [http://www.graphviz.org/].
+
+##### 6. Install parser module (If you want to use new commandline interface `euler2`)
+The Euler/X command line interface 2.0 use python module `docopt` as the parser generator. Use pip to install it:
+
+    $ pip install docopt==0.6.1
+
+Installation of pip can be found at [https://pip.pypa.io/en/latest/installing.html].
+To get more about `docopt`, please check [http://docopt.org/].
+
+##### 7. Install stylesheet module
+Euler/X use python module `yaml` for representing graph and stylesheet files. Install it [here][pyyaml]
+
+##### 8. **[IMPORTANT]** You need to make sure your machine has met the minimal software requirements before run Euler.
+Please run `installCheck.sh` and make sure the minimal dependency check passes before running this toolkit.
+Make sure all commands of running softwares before and main entry of source code (e.g. `src-el/` of EulerASP) are in your PATH env.
+Note: [Prover9/Mace4][p9m4] is not necessary to install if you do not want to use EulerFO.
+
+# Examples of Running Euler2 with new command line interface. 
+Use example [abstract4][abstract4eg]
+
+##### 1. Show the available commands
+List all usage commands.
+
+    $ euler2 -h
+
+##### 2. Check the input file
+Check the validity of input file, including “multiple roots per taxonomy”, “multiple parents per child”, “unmatched leaves (leaves that are not involved in any articulations)”.
+
+    $ euler2 check abstract4.txt
+
+##### 3. Run taxonomic alignment problem
+The main task for Euler/X, you can suggest the encoding method, the reasoning tool, options to switch on/off coverage and sibling disjointness, et al.
+
+    $ euler2 align abstract4.txt
+
+##### 4. Show the input visualization
+TO show the input visualization of the last run (the same as the following **show** commands), need to do “euler2 align” first. The result will be in `0-Input/` folder.
+
+    $ euler2 show iv
+
+##### 5. Show the possible worlds
+The result will be in `4-PWs/` folder
+
+    $ euler2 show pw
+
+##### 6. Show the aggregate view
+The result will be in `5-Aggregates/` folder
+
+    $ euler2 show av
+
+##### 7. Show the cluster view
+The result will be in `5-Aggregates/` folder
+
+    $ euler2 show cv
+
+##### 8. Show the hierarchy view
+The result will be in `5-Aggregates/` folder
+
+    $ euler2 show hv
+
+# Examples of Running EulerASP (old command line interface)
+
+Still under `example/` directory (assuming `src-el/` is in your PATH env, and gringo, claspD, dlv in your PATH env),
+
+0. `euler -h` or `euler --help` wil give you the options that you have
+1. `euler -i example/abstract4.txt -e vr`, you will get all the mir relations in the generated output file using binary encoding.
+2. `euler -i example/abstract4.txt -e vrpw`, you will get all the possible worlds in the console using binary encoding.
+3. `euler -i example/abstract4.txt -e vrve`, you will get all the valid euler regions in the console using binary encoding.
+4. `euler -i example/abstract4.txt -e mn`, you will get all the mir relations in the generated output file using polynomial encoding.
+5. `euler -i example/abstract4.txt -e mnpw`, you will get all the possible worlds in the console using polynomial encoding.
+6. `euler -i example/abstract4.txt -e mnve`, you will get all the valid euler regions in the console using polynomial encoding.
+
+# Examples of Running EulerFO (need to install Prover9/Mace4)
 
 Here are examples under `example/` directory,
 
@@ -85,28 +185,14 @@ Here are examples under `example/` directory,
 6. `./runct.sh abstract3b`, you will find the output files in `output/abstract3b/`, it is the "Bertram" mode for abstract3.
 7. `./runct.sh abstract2c`, you will find the output files in `output/abstract2c/`, it is the test case with articulation confidence for abstract2.
 
-# Examples of Running EulerASP
-
-Still under `example/` directory (assuming `src-el/` is in your PATH env, and gringo, claspD, dlv in your PATH env),
-
-0. `euler --help` wil give you the options that you have
-1. `euler -i example/abstract4.txt -e vr`, you will get all the mir relations in the generated output file using binary encoding.
-2. `euler -i example/abstract4.txt -e vrpw`, you will get all the possible worlds in the console using binary encoding.
-3. `euler -i example/abstract4.txt -e vrve`, you will get all the valid euler regions in the console using binary encoding.
-4. `euler -i example/abstract4.txt -e mn`, you will get all the mir relations in the generated output file using polynomial encoding.
-5. `euler -i example/abstract4.txt -e mnpw`, you will get all the possible worlds in the console using polynomial encoding.
-6. `euler -i example/abstract4.txt -e mnve`, you will get all the valid euler regions in the console using polynomial encoding.
-
 # Contact
-
 If you have any question or comments, please contact Bertram Ludäscher at ludaesch@illinois.edu.
 [wiki]: https://github.com/EulerProject/EulerX/wiki
-[gitdownloads]:http://git-scm.com/downloads/ 
 [p9m4]: http://www.cs.unm.edu/~mccune/mace4/
-[graphviz]: http://www.graphviz.org/
-[dlv]: http://www.dlvsystem.com/
+[dlv]: http://www.dlvsystem.com/dlv/#1
 [potassco]: http://potassco.sourceforge.net/
 [pyyaml]: http://pyyaml.org/
 [jira]: https://opensource.ncsa.illinois.edu/jira/projects/EULER/issues/
 [gringo303]: http://sourceforge.net/projects/potassco/files/gringo/3.0.3/
 [claspD114]: http://sourceforge.net/projects/potassco/files/claspD/1.1.4/
+[abstract4eg]: https://github.com/EulerProject/EulerX/blob/master/example/abstract4/abstract4.txt

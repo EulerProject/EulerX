@@ -20,25 +20,23 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from helper import *
-from taxonomy import *
-from alignment import *
+from helper2 import *
+from taxonomy2 import *
+from alignment2 import *
 
 class EulerRunner:
-
+    
     inst = None
-
+    
     def __init__(self):
         self.name = "Euler Runner"
 
+    @Callable
     def instance():
-	return EulerRunner()
-
-    instance = Callable(instance)
-
-    def run(self, options):
-        taxMap = TaxonomyMapping(options)
+        return EulerRunner()
+    
+    def run(self, args):
+        taxMap = TaxonomyMapping(args)
         # Parse the cti file
         taxMap.readFile()
         taxMap.run()
-

@@ -20,6 +20,22 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-python parser.py $1.txt
-rcc8 -d < $1_pyrcc.csp
+curdir=$(pwd)
+euler=$(which euler)
+srcdir=$(dirname $euler)
+prodir=$(dirname $srcdir)
+cd $prodir
+cd bbox-lattice
+input=$curdir/$1
 
+echo "preprocessing..."
+echo "creating the lattice without color...";
+python preprocess.py $input;
+echo "saving all worlds...";
+python awf.py -filter=i,o expWorlds.asp;
+#dlv -silent -filter=up  wexp-up.asp expWorlds_aw.asp > up.dlv;
+echo "running euler to get MIS...";
+euler2 align $input -e mnpw --artRem > output.txt;
+echo "from MIS to MAC and get lattice..."
+python amblattice.py $input $curdir;
+echo "finish";

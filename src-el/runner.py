@@ -39,4 +39,5 @@ class EulerRunner:
         taxMap = TaxonomyMapping(args)
         # Parse the cti file
         taxMap.readFile()
-        taxMap.run()
+        if not args.ci:
+            taxMap.run()

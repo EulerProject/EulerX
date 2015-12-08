@@ -10,6 +10,7 @@ PyRCC8 is an efficient qualitative spatial reasoner written in pure Python. It i
 PyRCC8 source code
 ############################
 
+All source code are in subfolder src/, also can find it from the following URL:
 http://pypi.python.org/pypi/PyRCC8/
 
 ############################

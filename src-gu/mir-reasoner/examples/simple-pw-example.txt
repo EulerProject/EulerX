@@ -1,0 +1,9 @@
+taxonomy 1 t1
+(1 2 3 4)
+
+taxonomy 2 t2
+(1 2 3)
+
+articulation 12 t1t2
+[1.1 equals 2.1]
+[1.2 overlaps 2.2]

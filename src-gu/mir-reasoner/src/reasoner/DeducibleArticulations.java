@@ -27,11 +27,11 @@ public class DeducibleArticulations {
 		t1Sibling_to_t2 = "";
 		t1Children_to_t2 = "";
 
-		if ( articulation.contains("<") )  this.union(PROPER_PART);
-		if ( articulation.contains(">") )  this.union(INVERSE_PROPER_PART);
-		if ( articulation.contains("=") )  this.union(EQUALS);
-		if ( articulation.contains("!") )  this.union(DISJOINT);
-		if ( articulation.contains("o") )  this.union(OVERLAPS);
+		if ( articulation.contains("<") ){  this.union(PROPER_PART); }
+		if ( articulation.contains(">") ){  this.union(INVERSE_PROPER_PART); }
+		if ( articulation.contains("=") ){  this.union(EQUALS); }
+		if ( articulation.contains("!") ){  this.union(DISJOINT); }
+		if ( articulation.contains("o") ){  this.union(OVERLAPS); }
 	}
 
 	private void union(String[] newRelations){

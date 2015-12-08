@@ -37,7 +37,7 @@ public class ParentToChildrenPatterns {
 					A_to_b1.contains(""+pattern.charAt(0)) &&
 					A_to_b2.contains(""+pattern.charAt(1));
 			if (matchesPattern)
-				consistentPatterns.add(pattern);			
+				consistentPatterns.add(pattern);
 		}
 
 		String new_A_to_b1 = "";

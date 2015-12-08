@@ -4,16 +4,34 @@ import sys
 
 
 def usage():
-    print 'USAGE: python mir.py input_file output_file'
+    print 'USAGE: python mir.py input_file output_file provenance_flag pw_flag benchmark_flag'
 
-def main(infile, outfile): 
-    args = infile + ' standard ' + outfile
-    cmd = 'java -cp ./src reasoner.ApplyMIRReasoner ' + args
-    subprocess.call(cmd, shell=True)
+def main(infile, outfile, isProvenance, isPW, isBenchmark):
+    if(isPW in ['True', 'true', 't', '1']):
+    	mirPW(infile, outfile, isProvenance, isBenchmark)
+    else:
+   	mirNoPW(infile, outfile, isProvenance, isBenchmark)
+
+def mirNoPW(infile, outfile, isProvenance, isBenchmark):
+	args = infile + ' standard ' + outfile + ' ' + isProvenance
+	if(isBenchmark in ['True', 'true', 't', '1']):
+		cmd = 'time -f "real\t%es\nuser\t%Us\nsys\t%Ss" java -cp ./src reasoner.ApplyMIRReasoner ' + args
+	else:
+		cmd = 'java -cp ./src reasoner.ApplyMIRReasoner ' + args
+	subprocess.call(cmd, shell=True)
+
+def mirPW(infile, outfile, isProvenance, isBenchmark):
+	args = infile + ' standard ' + outfile + ' standard ' + isProvenance
+	if(isBenchmark in ['True', 'true', 't', '1']):
+		cmd = 'time -f "real\t%es\nuser\t%Us\nsys\t%Ss" java -cp ./src reasoner.ApplyMIRReasonerPW ' + args
+	else:
+		cmd = 'java -cp ./src reasoner.ApplyMIRReasonerPW ' + args
+	subprocess.call(cmd, shell=True)
+
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        usage()
+    if len(sys.argv) == 6:
+	main(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
     else:
-        main(sys.argv[1], sys.argv[2])
+        usage()
 

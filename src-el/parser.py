@@ -108,17 +108,21 @@ class EulerParser:
                                               help="simplify the possible world cluster, by default switch off")
             EulerParser.inst.add_argument("--hierarchy", action="store_true", dest="hierarchy", default=False,\
                                               help="hierarchical aggregate view, by default switch off")
+            EulerParser.inst.add_argument("--hidemirdisjoint", action="store_true", dest="hidemirdisjoint", default=False,\
+                                              help="hide disjoint in mir")
+            EulerParser.inst.add_argument("--ci", action="store_true", dest="ci", default=False,\
+                                              help="check input files only")
             EulerParser.inst.add_argument("-N", action="store_false", dest="output", default=True,\
                                               help=argparse.SUPPRESS)
-            #EulerParser.inst.add_argument("-g", action="store_true", dest="generateCti", default=False,\
-            #                                  help="artificial example generator, cannot be used with -I option")
-            #EulerParser.inst.add_argument("-n", dest="nary", type=int, default=0, help="N-nary, used with -g")
-            #EulerParser.inst.add_argument("-m", dest="nnodes", type=int, default=0, help="#nodes, used with -g")
-            #EulerParser.inst.add_argument("-d", dest="depth", type=int, default=2, help="depth, used with -g")
-            #EulerParser.inst.add_argument("-t", dest="relation", type=str, default="<",\
-            #                                  help="artificial articulation rel, used with -g")
-            #EulerParser.inst.add_argument("-I", action="store_true", dest="incEx", default=False,\
-            #                                  help="generate an inconsistent example, used with -g")
+            EulerParser.inst.add_argument("-g", action="store_true", dest="generateCti", default=False,\
+                                              help="artificial example generator, cannot be used with -I option")
+            EulerParser.inst.add_argument("-n", dest="nary", type=int, default=0, help="N-nary, used with -g")
+            EulerParser.inst.add_argument("-m", dest="nnodes", type=int, default=0, help="#nodes, used with -g")
+            EulerParser.inst.add_argument("-d", dest="depth", type=int, default=2, help="depth, used with -g")
+            EulerParser.inst.add_argument("-t", dest="relation", type=str, default="<",\
+                                              help="artificial articulation rel, used with -g")
+            EulerParser.inst.add_argument("-I", action="store_true", dest="incEx", default=False,\
+                                              help="generate an inconsistent example, used with -g")
             EulerParser.inst.add_argument("--iv", action="store_true", dest="inputViz", default=False,\
                                               help="input visualization")
             EulerParser.inst.add_argument("--withrank", action="store_true", dest="withrank", default=False,\

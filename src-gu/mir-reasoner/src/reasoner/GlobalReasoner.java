@@ -12,11 +12,13 @@ public class GlobalReasoner {
 	private Map<TaxonPair, String> decomposedArticulations;
 	// list of microreasoners to run over each tiny tree in the decomposed taxonomies
 	private List<MicroReasoner> microreasoners;
+	private Map<TaxonPair, String> provenance;
 
 	public GlobalReasoner(Taxonomy T1, Taxonomy T2){
 		// decompose the taxonomies into binary trees
 		Taxonomy _T1 = T1.decompose();
 		Taxonomy _T2 = T2.decompose();
+
 
 		// place in the articulations map all TaxonPair objects from the decomposed taxonomies
 		decomposedArticulations = new HashMap<TaxonPair, String>();
@@ -37,7 +39,8 @@ public class GlobalReasoner {
 	 * @return True is new information was found, else false.
 	 * @throws InvalidTaxonomyException If the taxonomy is inconsistent.
 	 */
-	public boolean runReasoner(Map<TaxonPair, String> articulations) throws InvalidTaxonomyException{
+	public boolean runReasoner(Map<TaxonPair, String> articulations, Map<TaxonPair, String> provenance) throws InvalidTaxonomyException{
+		this.provenance = provenance;
 		// update the working map of articulations and clear the map of new articulations
 		decomposedArticulations.putAll(articulations);
 
@@ -45,8 +48,10 @@ public class GlobalReasoner {
 		boolean foundNew = false;
 		for (MicroReasoner microreasoner : microreasoners){
 			microreasoner.updateRelations(decomposedArticulations);
-			if (foundNew |= microreasoner.runReasoner())
+			if (foundNew |= microreasoner.runReasoner(provenance)){
 				microreasoner.putNewRelationsInMap(decomposedArticulations);
+				//microreasoner.putProvenanceInMap(provenance);
+			}
 		}
 
 		// store the new relations between the non-false taxa in the map of articulations
@@ -82,5 +87,10 @@ public class GlobalReasoner {
 				sortedPairs.add(new TaxonPair(t1, t2));
 
 		return sortedPairs;
+	}
+
+	public void printProvenance(){
+		for(Map.Entry<TaxonPair, String> entry : provenance.entrySet())
+			System.out.println("global " + entry.getKey().toString() + ": " + entry.getValue());
 	}
 }

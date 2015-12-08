@@ -1,0 +1,38 @@
+# Euler/X demonstration file “Quercus - Concepts, Characters, Specimens” - May, 2015
+# Source: Franz. 2015. A semi-realistic example use case with freely adopted parts from the treatments of Nixon (1997; FNA) and Landrum (1993; VPAP) of the Quercus arizonica-grisea complex.
+# The example uses taxonomic concepts, diagnostic features (also represented as concepts), and specimens; the latter informing concept identity by virtue of reciprocally realized in- or exclusion from paired parent concepts.
+# ASU, ARIZ, JEP, etc. represent uniquely identified herbarium specimens.
+# The purpose of this use case is to show that in principle (and really, in practice), characters and specimens can be productively incorporated into the Euler/X reasoning workflow.
+# Alignment of Quercus sec. 1997/1993; consistent, with 2 possible merge alignments, where   quercus-all_1_mnpw.pdf is the more appropriate merge.
+# T2 = 19 concepts; T1 = 15 concepts; Total = 34 concepts.
+# Euler/X commands with relevance: euler -i quercus-concepts-characters-specimens.txt -e mnpw --rcgo
+# Euler/X commands with relevance: euler -i quercus-concepts-characters-specimens.txt -e mncb
+# 
+taxonomy 1997 Nixon-FNA-Vol3
+(Quercus Quercus_arizonica Quercus_grisea Quercus_rugosa)
+(Quercus_arizonica Leaves_Adaxially_Pubescent ASU0001 ARIZ0003 JEP0005 UNM0009 UNM0010)
+(Quercus_grisea Buds_Yellowish ASU0002 ARIZ0004 JEP0006)
+(Quercus_rugosa Acorn_Peduncled COR0013 COR0014 NAU0007 NAU0008)
+
+taxonomy 1993 Landrum-VPAP
+(Quercus Quercus_grisea Quercus_rugosa)
+(Quercus_grisea LateralVeins_Flat ASU0001 ASU0002 ARIZ0003 ARIZ0004 JEP0005 JEP0006 TEX0011 TEX0012)
+(Quercus_rugosa LateralVeins_Impressed NAU0007 NAU0008)
+
+articulation 1997-1993 Nixon-Landrum
+[1997.ASU0001 equals 1993.ASU0001]
+[1997.ASU0002 equals 1993.ASU0002]
+[1997.ARIZ0003 equals 1993.ARIZ0003]
+[1997.ARIZ0004 equals 1993.ARIZ0004]
+[1997.JEP0005 equals 1993.JEP0005]
+[1997.JEP0006 equals 1993.JEP0006]
+[1997.NAU0007 equals 1993.NAU0007]
+[1997.NAU0008 equals 1993.NAU0008]
+[1997.UNM0009 is_included_in 1993.LateralVeins_Flat]
+[1997.UNM0010 is_included_in 1993.LateralVeins_Flat]
+[1997.Leaves_Adaxially_Pubescent includes 1993.TEX0011]
+[1997.Leaves_Adaxially_Pubescent includes 1993.TEX0012]
+[1997.COR0013 is_included_in 1993.LateralVeins_Impressed]
+[1997.COR0014 is_included_in 1993.LateralVeins_Impressed]
+[1997.Quercus_rugosa equals 1993.Quercus_rugosa]
+[1997.Quercus equals 1993.Quercus]
