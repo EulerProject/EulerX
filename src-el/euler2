@@ -30,8 +30,8 @@ Usage:
 	euler2 check <inputfile>
 	euler2 align <inputfile>... [-o OUTFOLDER] [-e METHOD] [-r TOOL] [--consistency] [--hidemirdisjoint] [--disablecov] [--disablesib] [--repair=WAY] [--artRem] [--fourinone] [--xia] [--ur] [--ie] [--ieo]
 	euler2 show <name>
-	euler2 show [--run=FOLDER] <name>
-	euler2 show <inputfile> iv
+	euler2 show [-o OUTFOLDER] <name>
+	euler2 show <inputfile> [-o OUTFOLDER] iv
 
 
 Options:
@@ -48,7 +48,6 @@ Options:
     --fourinone		  Four in one lattice.
     --xia		  Extract input file.
     --ur		  Uncertainty reduction.
-    --run FOLDER	  Show a particular Run.
     <name>		  The knowledge product you want to show, including: 
     				iv (input visualization)
     				pw (possible worlds)
