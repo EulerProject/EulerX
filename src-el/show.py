@@ -58,14 +58,14 @@ class ProductsShowing:
             self.name = f.readline()
             f.close()
         
-        if args['--run']:
-            self.lastrundir = self.userdir + '/' + args['--run']
-            self.exampleName = os.path.join(args['--run'], 'lastrun.timestamp')
+        if args['-o']:
+            self.lastrundir = self.userdir + args['-o']
+            self.exampleName = os.path.join(args['-o'], 'lastrun.timestamp')
             if os.path.isfile(self.exampleName):
                 f = open(self.exampleName, "r")
                 self.name = f.readline().strip()
             else:
-                self.name = re.match('(.*)-(.*)-(.*)-(.*)-(.*)', args['--run']).group(5)
+                self.name = sys.argv[2].replace('.txt','')
         
         self.path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         self.stylesheetdir = os.path.join(self.projectdir, "stylesheets/")
