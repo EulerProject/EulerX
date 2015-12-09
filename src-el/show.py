@@ -254,12 +254,18 @@ class ProductsShowing:
                     fifthTName = taxName
             
             elif (re.match("\(.*\)", line)):
-
-                    if taxName in group2concepts:
-                        group2concepts[taxName].append(re.match("\((.*)\)", line).group(1).split(" "))
-                    else:
-                        group2concepts[taxName] = [re.match("\((.*)\)", line).group(1).split(" ")]
-              
+                
+                conceptsToAdd = re.match("\((.*)\)", line).group(1).split(" ")
+                # check multiple nc
+                for c in conceptsToAdd:
+                    if c == 'nc':
+                        conceptsToAdd[conceptsToAdd.index(c)] = 'nc_' + conceptsToAdd[0]
+                        
+                if taxName in group2concepts:
+                    group2concepts[taxName].append(conceptsToAdd)
+                else:
+                    group2concepts[taxName] = [conceptsToAdd]
+                    
             elif (re.match("\[.*?\]", line)):
                 art.append(re.match("\[(.*)\]", line).group(1))
                 

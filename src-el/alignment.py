@@ -2391,10 +2391,17 @@ class TaxonomyMapping:
                                 self.nonleafConcepts.append(taxonomy.abbrev+"."+concept)
             
                     # input visualization
+                    conceptsToAdd = re.match("\((.*)\)", line).group(1).split(" ")
+                    
+                    # check multiple nc
+                    for c in conceptsToAdd:
+                        if c == 'nc':
+                            conceptsToAdd[conceptsToAdd.index(c)] = 'nc_' + conceptsToAdd[0] 
+                    
                     if taxonomy.abbrev in group2concepts:
-                        group2concepts[taxonomy.abbrev].append(re.match("\((.*)\)", line).group(1).split(" "))
+                        group2concepts[taxonomy.abbrev].append(conceptsToAdd)
                     else:
-                        group2concepts[taxonomy.abbrev] = [re.match("\((.*)\)", line).group(1).split(" ")]
+                        group2concepts[taxonomy.abbrev] = [conceptsToAdd]
 #                    groups.append(re.match("\((.*)\)", line).group(1).split(" "))
                 elif flag == "location":
                     self.addLocation(line)
