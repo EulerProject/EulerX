@@ -59,13 +59,15 @@ class ProductsShowing:
             f.close()
         
         if args['-o']:
-            self.lastrundir = self.userdir + args['-o']
+            if self.lastrundir == '':
+                self.lastrundir = self.userdir + args['-o']
             self.exampleName = os.path.join(args['-o'], 'lastrun.timestamp')
             if os.path.isfile(self.exampleName):
                 f = open(self.exampleName, "r")
                 self.name = f.readline().strip()
             else:
-                self.name = os.path.splitext(os.path.basename(sys.argv[2]))[0]
+                if self.name == '':
+                    self.name = os.path.splitext(os.path.basename(sys.argv[2]))[0]
         
         self.path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         self.stylesheetdir = os.path.join(self.projectdir, "stylesheets/")
