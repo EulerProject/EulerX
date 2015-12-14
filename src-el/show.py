@@ -566,7 +566,8 @@ class ProductsShowing:
                 tmpCom += "  \""+newT+"\"\n"
                 if self.isCbInterTaxonomy(newT):
                     self.addRcgVizNode(newT, "comb")
-                self.addRcgAllVizNode(newT, "comb")
+                g = self.defineCombConceptGroup(newT, it.firstTName, it.secondTName)
+                self.addRcgAllVizNode(newT, g)
                 
             # Duplicates
             tmpTr = list(it.tr)
