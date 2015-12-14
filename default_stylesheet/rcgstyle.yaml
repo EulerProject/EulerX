@@ -15,6 +15,8 @@
     "3": "shape=box style=filled fillcolor=\"#CCCCFF\""
     "4": "shape=box style=filled fillcolor=\"#FFCCCC\""
     "5": "shape=box style=filled fillcolor=\"#CCFFFF\""
+    "combT1": "shape=box style=\"filled,rounded\" fillcolor=\"#CCFFCC\""
+    "combT2": "shape=box style=\"filled,rounded\" fillcolor=\"#FFFFCC\""
     "comb": "shape=box style=\"filled,rounded\" fillcolor=\"#EEEEEE\""
   edgestyle: 
     - 

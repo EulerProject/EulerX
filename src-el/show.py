@@ -622,8 +622,9 @@ class ProductsShowing:
                 else:
                     tmpComLi.append(T1)
                     tmpCom += "  \""+T1+"\"\n"
-                    self.addRcgVizNode(T1, "comb")
-                    self.addRcgAllVizNode(T1, "comb")
+                    g = self.defineCombConceptGroup(T1, it.firstTName, it.secondTName)
+                    self.addRcgVizNode(T1, g)
+                    self.addRcgAllVizNode(T1, g)
                 
                 if(T2.find("*") == -1 and T2.find("\\") == -1 and T2.find("\\n") == -1 and T2.find(".") != -1):
                     T2s = T2.split(".")
@@ -636,8 +637,9 @@ class ProductsShowing:
                 else:
                     tmpComLi.append(T2)
                     tmpCom += "  \""+T2+"\"\n"
-                    self.addRcgVizNode(T2, "comb")
-                    self.addRcgAllVizNode(T2, "comb")
+                    g = self.defineCombConceptGroup(T2, it.firstTName, it.secondTName)
+                    self.addRcgVizNode(T2, g)
+                    self.addRcgAllVizNode(T2, g)
             
             # prepare for pw2input
             fpw2input = open(pw2inputInternalFile + i.__str__(), "w")
@@ -774,6 +776,18 @@ class ProductsShowing:
         #fcv = open(cvInternalFile, "a")
         #fcv.write('cvFlag = ' + repr(True) + '\n')
         #fcv.close()
+        
+    def defineCombConceptGroup(self, conceptStr, firstTName, secondTName):
+        taxNames = []
+        concepts = conceptStr.split("\\n")
+        for concept in concepts:
+            taxNames.append(concept.split(".")[0])
+        if firstTName in taxNames and secondTName not in taxNames:
+            return "combT1"
+        elif firstTName not in taxNames and secondTName in taxNames:
+            return "combT2"
+        else:
+            return "comb"
 
 
     def restructureCbNames(self, cbName, firstTName):
