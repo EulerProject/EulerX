@@ -688,18 +688,18 @@ class TaxonomyMapping:
                 if j != 0: outputstr += ", "
                 if dotc1.split(".")[0] == self.firstTName:
                     outputstr += dotc1+rel[2]+dotc2
-                    if self.args.xia:
-                        if dotc1 in self.leafConcepts and dotc2 in self.leafConcepts:
-                            tmpLeafRels.append([dotc1,rel[2],dotc2])
                 else:
                     if rel[2] == '">"':
-                        rel[2] = '"<"'
+                        #rel[2] = '"<"'
+                        outputstr += dotc2+'"<"'+dotc1
                     elif rel[2] == '"<"':
-                        rel[2] = '">"'
-                    outputstr += dotc2+rel[2]+dotc1
-                    if self.args.xia:
-                        if dotc1 in self.leafConcepts and dotc2 in self.leafConcepts:
-                            tmpLeafRels.append([dotc2,rel[2],dotc1])
+                        #rel[2] = '">"'
+                        outputstr += dotc2+'">"'+dotc1
+                    else:
+                        outputstr += dotc2+rel[2]+dotc1
+                if self.args.xia:
+                    if dotc1 in self.leafConcepts and dotc2 in self.leafConcepts:
+                        tmpLeafRels.append([dotc1,rel[2],dotc2])
                 pair = dotc1+","+dotc2
                 if self.args.cluster: pwmirs[i][pair] = rcc5[rel[2]]
                 # RCG
