@@ -564,9 +564,9 @@ class ProductsShowing:
                 newT = self.restructureCbNames(T, it.firstTName)
                 tmpComLi.append(newT)
                 tmpCom += "  \""+newT+"\"\n"
-                if self.isCbInterTaxonomy(newT):
-                    self.addRcgVizNode(newT, "comb")
                 g = self.defineCombConceptGroup(newT, it.firstTName, it.secondTName)
+                if self.isCbInterTaxonomy(newT):
+                    self.addRcgVizNode(newT, g)
                 self.addRcgAllVizNode(newT, g)
                 
             # Duplicates
@@ -676,15 +676,17 @@ class ProductsShowing:
                                 break                            
                         if "\\n" in replace1 or "\\\\" in replace1 or "*" in replace1:
                             replace1 = self.restructureCbNames(replace1, it.firstTName)
-                            self.addRcgVizNode(replace1, "comb")
-                            self.addRcgAllVizNode(replace1, "comb")
+                            g = self.defineCombConceptGroup(replace1, it.firstTName, it.secondTName)
+                            self.addRcgVizNode(replace1, g)
+                            self.addRcgAllVizNode(replace1, g)
                         else:
                             self.addRcgVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1))
                             self.addRcgAllVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1))
                         if "\\n" in replace2 or "\\\\" in replace2 or "*" in replace2:
                             replace2 = self.restructureCbNames(replace2, it.firstTName)
-                            self.addRcgVizNode(replace2, "comb")
-                            self.addRcgAllVizNode(replace2, "comb")
+                            g = self.defineCombConceptGroup(replace2, it.firstTName, it.secondTName)
+                            self.addRcgVizNode(replace2, g)
+                            self.addRcgAllVizNode(replace2, g)
                         else:
                             self.addRcgVizNode(re.match("(.*)\.(.*)", replace2).group(2), re.match("(.*)\.(.*)", replace2).group(1))
                             self.addRcgAllVizNode(re.match("(.*)\.(.*)", replace2).group(2), re.match("(.*)\.(.*)", replace2).group(1))
@@ -779,6 +781,8 @@ class ProductsShowing:
         #fcv.close()
         
     def defineCombConceptGroup(self, conceptStr, firstTName, secondTName):
+        if "\\\\" in conceptStr or "*" in conceptStr:
+            return "comb"
         taxNames = []
         concepts = conceptStr.split("\\n")
         for concept in concepts:
