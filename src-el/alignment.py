@@ -897,9 +897,10 @@ class TaxonomyMapping:
             #print "newT=", newT
             tmpComLi.append(newT)
             tmpCom += "  \""+newT+"\"\n"
-            if self.isCbInterTaxonomy(newT):
-                self.addRcgVizNode(newT, "comb")
-            self.addRcgAllVizNode(newT, "comb", allRcgNodesDict)
+            g = self.defineCombConceptGroup(newT, self.firstTName, self.secondTName)
+            #if self.isCbInterTaxonomy(newT):
+            self.addRcgVizNode(newT, g)
+            self.addRcgAllVizNode(newT, g, allRcgNodesDict)
             
         # Duplicates
     	tmpTr = list(self.tr)
@@ -959,8 +960,9 @@ class TaxonomyMapping:
                 if T1[0] != T2[0]:
                     tmpComLi.append(T1)
                     tmpCom += "  \""+T1+"\"\n"
-                    self.addRcgVizNode(T1, "comb")
-                    self.addRcgAllVizNode(T1, "comb", allRcgNodesDict)
+                    g = self.defineCombConceptGroup(T1, self.firstTName, self.secondTName)
+                    self.addRcgVizNode(T1, g)
+                    self.addRcgAllVizNode(T1, g, allRcgNodesDict)
             if(T2.find("*") == -1 and T2.find("\\") == -1 and T2.find("\\n") == -1 and T2.find(".") != -1):
                 T2s = T2.split(".")
                 if self.firstTName == T2s[0]:
@@ -975,8 +977,9 @@ class TaxonomyMapping:
                 if T1[0] != T2[0]:
                     tmpComLi.append(T2)
                     tmpCom += "  \""+T2+"\"\n"
-                    self.addRcgVizNode(T2, "comb")
-                    self.addRcgAllVizNode(T2, "comb", allRcgNodesDict)
+                    g = self.defineCombConceptGroup(T2, self.firstTName, self.secondTName)
+                    self.addRcgVizNode(T2, g)
+                    self.addRcgAllVizNode(T2, g, allRcgNodesDict)
                 
         # Dot drawing used for old viz
 #        fDot.write("  node [shape=box style=\"filled\" fillcolor=\"#CCFFCC\"]\n")
@@ -1027,15 +1030,17 @@ class TaxonomyMapping:
 #                    fDot.write("     \"" + replace1 + "\" -> \"" + replace2 + "\"\n")
                     if "\\n" in replace1 or "\\\\" in replace1:
                         replace1 = self.restructureCbNames(replace1)
-                        self.addRcgVizNode(replace1, "comb")
-                        self.addRcgAllVizNode(replace1, "comb", allRcgNodesDict)
+                        g = self.defineCombConceptGroup(replace1, self.firstTName, self.secondTName)
+                        self.addRcgVizNode(replace1, g)
+                        self.addRcgAllVizNode(replace1, g, allRcgNodesDict)
                     else:
                         self.addRcgVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1))
                         self.addRcgAllVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1), allRcgNodesDict)
                     if "\\n" in replace2 or "\\\\" in replace2:
                         replace2 = self.restructureCbNames(replace2)
-                        self.addRcgVizNode(replace2, "comb")
-                        self.addRcgAllVizNode(replace2, "comb", allRcgNodesDict)
+                        g = self.defineCombConceptGroup(replace2, self.firstTName, self.secondTName)
+                        self.addRcgVizNode(replace2, g)
+                        self.addRcgAllVizNode(replace2, g, allRcgNodesDict)
                     else:
                         self.addRcgVizNode(re.match("(.*)\.(.*)", replace2).group(2), re.match("(.*)\.(.*)", replace2).group(1))
                         self.addRcgAllVizNode(re.match("(.*)\.(.*)", replace2).group(2), re.match("(.*)\.(.*)", replace2).group(1), allRcgNodesDict)
@@ -1100,6 +1105,20 @@ class TaxonomyMapping:
         newgetoutput("cat "+rcgYamlFile+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + rcgDotFile)
         newgetoutput("dot -Tpdf "+rcgDotFile+" -o "+rcgPdfFile)
         newgetoutput("dot -Tsvg "+rcgDotFile+" -o "+rcgSvgFile)
+        
+    def defineCombConceptGroup(self, conceptStr, firstTName, secondTName):
+        if "\\\\" in conceptStr or "*" in conceptStr:
+            return "comb"
+        taxNames = []
+        concepts = conceptStr.split("\\n")
+        for concept in concepts:
+            taxNames.append(concept.split(".")[0])
+        if firstTName in taxNames and secondTName not in taxNames:
+            return "combT1"
+        elif firstTName not in taxNames and secondTName in taxNames:
+            return "combT2"
+        else:
+            return "comb"
 
 
     def isCbInterTaxonomy(self, cbName):
