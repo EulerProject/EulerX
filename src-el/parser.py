@@ -70,6 +70,7 @@ class EulerParser:
 													vrve, use binary encoding, get valid euler regions
 													""")
             #EulerParser.inst.add_argument("-b", dest="dl", default=2, help="dl encoding spare parameter")
+            EulerParser.inst.add_argument("-n", dest="npw", default=None, help="output n possible worlds, by default output all")
             EulerParser.inst.add_argument("--reasoner", dest="reasoner", type=str, default="dlv",\
                                               help="choose a reasoner between dlv and gringo, by deafult using dlv")
             EulerParser.inst.add_argument("--repair", dest="repair", type=str, default=None,\
@@ -116,7 +117,7 @@ class EulerParser:
                                               help=argparse.SUPPRESS)
             EulerParser.inst.add_argument("-g", action="store_true", dest="generateCti", default=False,\
                                               help="artificial example generator, cannot be used with -I option")
-            EulerParser.inst.add_argument("-n", dest="nary", type=int, default=0, help="N-nary, used with -g")
+            EulerParser.inst.add_argument("-a", dest="nary", type=int, default=0, help="N-nary, used with -g")
             EulerParser.inst.add_argument("-m", dest="nnodes", type=int, default=0, help="#nodes, used with -g")
             EulerParser.inst.add_argument("-d", dest="depth", type=int, default=2, help="depth, used with -g")
             EulerParser.inst.add_argument("-t", dest="relation", type=str, default="<",\

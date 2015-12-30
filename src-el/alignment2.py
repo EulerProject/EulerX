@@ -249,6 +249,8 @@ class TaxonomyMapping:
         #        os.mkdir(self.mergeinputdir)
         
 #        self.ivpdf = os.path.join(self.pwspdfdir, self.name+"_iv.pdf")
+        if not self.args['-n']:
+            self.args['-n'] = '0'             # by default output all possible worlds
         if reasoner[self.args['-r']] == reasoner["gringo"]:
             # possible world command
             self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0 | "+self.path+"/muniq -u"
@@ -257,7 +259,7 @@ class TaxonomyMapping:
             self.con = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD --eq=1"
         elif reasoner[self.args['-r']] == reasoner["dlv"]:
             # possible world command
-            self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+self.path+"/muniq -u"
+            self.com = "dlv -silent -filter=rel -n="+ self.args['-n'] + " " +self.pwfile+" "+ self.pwswitch+ " | "+self.path+"/muniq -u"
             #self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch
             # consistency command
             self.con = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+ self.pwswitch
