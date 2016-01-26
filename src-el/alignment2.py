@@ -2104,6 +2104,7 @@ class TaxonomyMapping:
                 t = queue.pop(0)
                 # This is a nc flag
                 if t.abbrev == "nc":
+#                if t.abbrev.startswith("nc_"):
                     self.baseAsp += "ncf(" + t.dlvName() + ").\n"
                 if t.hasChildren():
                     #if self.args.verbose:
@@ -2125,7 +2126,8 @@ class TaxonomyMapping:
                             #self.baseAsp += "in(" + t.dlvName() + ", X) v out(" + t.dlvName() + ", X) :- out(" + t1.dlvName() + ", X).\n"
                             self.baseAsp += "ir(X, r" + ruleNum.__str__() +") :- in(" + t1.dlvName() + ", X), out(" + t.dlvName() + ", X), pw.\n"
                             self.baseAsp += "ir(X, prod(r" + ruleNum.__str__() + ",R)) :- in(" + t1.dlvName() + ",X), out3(" + t.dlvName() + ", X, R), ix.\n" 
-                            if t1.abbrev.find("nc") == -1:
+#                            if t1.abbrev.find("nc") == -1:
+                            if t1.abbrev.find("nc_") == -1:
                                 if reasoner[self.args['-r']] == reasoner["dlv"]:
                                     self.baseAsp += ":- #count{X: vrs(X), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0, pw.\n"
                                 elif reasoner[self.args['-r']] == reasoner["gringo"]:
@@ -2180,19 +2182,25 @@ class TaxonomyMapping:
                                         #self.baseAsp += "in(" + name2 + ", X) v out(" + name2 + ", X) :- out(" + name1 + ", X).\n"
                                         self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") :- in(" + name1 + ", X), in(" + name2+ ", X).\n"
                                         if reasoner[self.args['-r']] == reasoner["dlv"]:
-                                            if t.children[i].abbrev.find("nc") == -1:
+#                                            if t.children[i].abbrev.find("nc") == -1:
+                                            if t.children[i].abbrev.find("nc_") == -1:
                                                 self.baseAsp += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2+ ", X)} = 0, pw.\n"
-                                            if t.children[j].abbrev.find("nc") == -1:
+#                                            if t.children[j].abbrev.find("nc") == -1:
+                                            if t.children[i].abbrev.find("nc_") == -1:
                                                 self.baseAsp += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2+ ", X)} = 0, pw.\n"
                                         elif reasoner[self.args['-r']] == reasoner["gringo"]:
-                                            if t.children[i].abbrev.find("nc") == -1:
+#                                            if t.children[i].abbrev.find("nc") == -1:
+                                            if t.children[i].abbrev.find("nc_") == -1:
                                                 self.baseAsp += ":- [vrs(X): in(" + name1 + ", X): out(" + name2+ ", X)]0, pw.\n"
-                                            if t.children[j].abbrev.find("nc") == -1:
+#                                            if t.children[j].abbrev.find("nc") == -1:
+                                            if t.children[i].abbrev.find("nc_") == -1:
                                                 self.baseAsp += ":- [vrs(X): out(" + name1 + ", X): in(" + name2+ ", X)]0, pw.\n"
-                                        if t.children[i].abbrev.find("nc") == -1:
+#                                        if t.children[i].abbrev.find("nc") == -1:
+                                        if t.children[i].abbrev.find("nc_") == -1:
                                             self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
                                             self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
-                                        if t.children[j].abbrev.find("nc") == -1:
+#                                        if t.children[j].abbrev.find("nc") == -1:
+                                        if t.children[i].abbrev.find("nc_") == -1:
                                             self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 2) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                                             self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 2) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                     elif self.enc & encode["direct"]:

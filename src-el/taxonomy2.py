@@ -110,12 +110,17 @@ class Taxonomy:
             elements = re.split("\s", noParens)
             # no coverage
             nc = False
-            if elements[len(elements)-1] != "nc":
+#            if elements[len(elements)-1] != "nc":
+            if not elements[len(elements)-1].startswith("nc_"):
                 nchildren = len(elements)-1
             else:
                 nchildren = len(elements)-2
                 nc = True
-                elements[len(elements)-1] += elements[0]
+#                print "elementsZUIHOU", elements[len(elements)-1]
+#                print "elementsDIYIGE", elements[0]
+#                elements[len(elements)-1] += elements[0]
+#                print "elementsZUIHOU", elements[len(elements)-1]
+#                print ""
             self.addTaxon(elements[0])
             for index in range (1, len(elements)):
                 self.addDoubleTaxon(taxaMap, elements[0], elements[index], nchildren == 1 and not nc)
