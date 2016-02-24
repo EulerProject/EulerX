@@ -1,0 +1,67 @@
+taxonomy 2005 Groves
+(Primates Strepsirrhini Haplorrhini)
+(Strepsirrhini Lemuriformes Chiromyiformes Lorisiformes)
+(Lemuriformes Cheirogaleoidea Lemuroidea)
+(Cheirogaleoidea Cheirogaleoidae)
+(Lemuroidea Lemuridae Lepilemuridae Indriidae)
+(Chiromyiformes Daubentoniidae)
+(Lorisiformes Lorisidae Galagidae)
+(Haplorrhini Tarsiiformes Simiiformes)
+(Tarsiiformes Tarsiidae)
+(Simiiformes Platyrrhini Catarrhini)
+(Platyrrhini Cebidae Aotidae Pitheciidae Atelidae)
+(Cebidae Callitrichinae Cebinae Saimiriinae)
+(Pitheciidae Callicebinae Pitheciinae)
+(Atelidae Alouattinae Atelinae)
+(Catarrhini Cercopithecoidea Hominoidea)
+(Cercopithecoidea Cercopithecidae)
+(Cercopithecidae  Cercopithecinae Colobinae)
+(Hominoidea Hylobatidae Hominidae)
+
+taxonomy 1993 Groves
+(Primates Cheirogaleidae Lemuridae Megaladapidae Indridae Daubentoniidae Loridae Galagonidae Tarsiidae Callitrichidae Cebidae Cercopithecidae Hylobatidae Hominidae)
+(Cheirogaleidae Cheirogaleinae Phanerinae)
+(Cebidae Alouattinae Aotinae Atelinae Callicebinae Cebinae Pitheciinae)
+(Cercopithecidae Cercopithecinae Colobinae)
+
+articulation 2005-1993 Groves-Groves
+[2005.Primates equals 1993.Primates]
+[2005.Cheirogaleoidae includes 1993.Cheirogaleidae]
+[2005.Cheirogaleoidae includes 1993.Cheirogaleinae]
+[2005.Cheirogaleoidae includes 1993.Phanerinae]
+[2005.Lemuroidea is_included_in 1993.Primates]
+[2005.Lemuridae equals 1993.Lemuridae]
+[2005.Lepilemuridae equals 1993.Megaladapidae]
+[2005.Indriidae equals 1993.Indridae]
+[2005.Daubentoniidae equals 1993.Daubentoniidae]
+[2005.Lorisidae disjoint 1993.Lemuridae]
+[2005.Lorisidae includes 1993.Loridae]
+[2005.Galagidae includes 1993.Galagonidae]
+[2005.Tarsiidae equals 1993.Tarsiidae]
+[2005.Platyrrhini includes 1993.Cebidae]
+[2005.Cebidae overlaps 1993.Cebidae]
+[2005.Cebidae includes 1993.Cebinae]
+[2005.Callitrichinae overlaps 1993.Primates]
+[2005.Callitrichinae includes 1993.Callitrichidae]
+[2005.Callitrichinae disjoint 1993.Cebidae]
+[2005.Callitrichinae disjoint 1993.Cebinae]
+[2005.Cebinae is_included_in 1993.Cebinae]
+[2005.Saimiriinae is_included_in 1993.Cebinae]
+[2005.Aotidae equals 1993.Aotinae]
+[2005.Pitheciidae overlaps 1993.Cebidae]
+[2005.Pitheciidae includes 1993.Callicebinae]
+[2005.Pitheciidae includes 1993.Pitheciinae]
+[2005.Callicebinae includes 1993.Callicebinae]
+[2005.Pitheciinae equals 1993.Pitheciinae]
+[2005.Atelidae is_included_in 1993.Cebidae]
+[2005.Atelidae includes 1993.Alouattinae]
+[2005.Atelidae includes 1993.Atelinae]
+[2005.Alouattinae equals 1993.Alouattinae]
+[2005.Alouattinae disjoint 1993.Aotinae]
+[2005.Atelinae equals 1993.Atelinae]
+[2005.Cercopithecinae includes 1993.Cercopithecinae]
+[2005.Colobinae overlaps 1993.Cercopithecidae]
+[2005.Colobinae includes 1993.Colobinae]
+[2005.Hominoidea is_included_in 1993.Primates]
+[2005.Hylobatidae equals 1993.Hylobatidae]
+[2005.Hominidae equals 1993.Hominidae]
