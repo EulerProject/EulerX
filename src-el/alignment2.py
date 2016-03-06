@@ -99,6 +99,7 @@ class TaxonomyMapping:
         self.mus = []                          # MUS
         self.allPairsMir = {}                  # mir used in RCC reasoner 
         self.rccPreArts = []                   # RCC reasoner pre-processing articulation relations
+        self.descendMapping = {}               # RCC eq reasoning process to store descendants of taxa
         self.args = args
         if self.args['--ieo']:
             self.args['--ie'] = True
@@ -267,7 +268,7 @@ class TaxonomyMapping:
             #self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch
             # consistency command
             self.con = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+ self.pwswitch
-        elif reasoner[self.args['-r']] == reasoner["rcc"]:
+        elif reasoner[self.args['-r']] == reasoner["rcc"] or reasoner[self.args['-r']] == reasoner["rcceq"]:
             pass
         else:
             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")
@@ -312,6 +313,9 @@ class TaxonomyMapping:
     def run(self):
         if reasoner[self.args['-r']] == reasoner["rcc"]:
             self.runRCCReasoner()
+            return
+        if reasoner[self.args['-r']] ==  reasoner["rcceq"]:
+            self.runRCCEQReasoner()
             return
         if not self.enc:
             return
@@ -3229,7 +3233,7 @@ class TaxonomyMapping:
         
         step = 1
         while len(toDo) > 0:
-            print "------------ Step ", step, " ------------"
+#            print "------------ Step ", step, " ------------"
             taxonPair = toDo[0]
             del toDo[0]
             self.reasonOver(taxonPair, toDo, step)
@@ -3253,156 +3257,153 @@ class TaxonomyMapping:
         t1Parent = t1.parent
         t2Parent = t2.parent
         givenRel = self.allPairsMir[taxonPair]
-        print "Pick pair: ", t1.name, findkey(relation, givenRel), t2.name
+#        print "Pick pair: ", t1.name, findkey(relation, givenRel), t2.name
         
-        # visualize reasoning
-        fileName = os.path.join(self.rccfilesdir, "rccreasoningviz_step" + str(step) + ".dot")
-        f = open(fileName, "w")
-        f.write("digraph {\n\nrankdir = LR\n\n")
-        f.write('node [shape=box]\n')
-        f.write(t1.name + ' -> ' + t2.name + ' [color=blue, label="'+ findkey(relation,givenRel) +'"];\n')
+#        # visualize reasoning
+#        fileName = os.path.join(self.rccfilesdir, "rccreasoningviz_step" + str(step) + ".dot")
+#        f = open(fileName, "w")
+#        f.write("digraph {\n\nrankdir = LR\n\n")
+#        f.write('node [shape=box]\n')
+#        f.write(t1.name + ' -> ' + t2.name + ' [color=blue, label="'+ findkey(relation,givenRel) +'"];\n')
         
         
         # begin reason over
         if t2Parent != "":
             # update pair between t1 and t2's parent
-            print "\nPart (I):"
-            print t2.name + " has parent " + t2Parent.name + ", then look at pair (" + t1.name + ", " + t2Parent.name + ")"
+#            print "\nPart (I):"
+#            print t2.name + " has parent " + t2Parent.name + ", then look at pair (" + t1.name + ", " + t2Parent.name + ")"
             deducedPair = (t1, t2Parent)
-            print "Original relation: ", t1.name, findkey(relation, self.allPairsMir[deducedPair]), t2Parent.name
+#            print "Original relation: ", t1.name, findkey(relation, self.allPairsMir[deducedPair]), t2Parent.name
             deducedRel = comptab[givenRel][relation["<"]]
-            print "Using R32 comp table: ", t1.name, findkey(relation, givenRel), t2.name, "R32COMP", t2.name, "<", t2Parent.name, \
-                    "-->", t1.name, findkey(relation, deducedRel), t2Parent.name
-            f.write(t2.name + ' -> ' + t2Parent.name + ' [label="< (parent)"];\n')
-            f.write(t1.name + ' -> ' + t2Parent.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
+#            print "Using R32 comp table: ", t1.name, findkey(relation, givenRel), t2.name, "R32COMP", t2.name, "<", t2Parent.name, \
+#                    "-->", t1.name, findkey(relation, deducedRel), t2Parent.name
+#            f.write(t2.name + ' -> ' + t2Parent.name + ' [label="< (parent)"];\n')
+#            f.write(t1.name + ' -> ' + t2Parent.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
             part = '1'            
-            self.assertNew(deducedPair, deducedRel, toDo, f, part)
+            self.assertNew(deducedPair, deducedRel, toDo)
             
             
             # update pair between t1 and t2's siblings
-            print "\nPart (II)"
+#            print "\nPart (II)"
             t2Siblings = t2Parent.children
-            if t2Siblings:
-                print t2.name + " has the following siblings:"
-            else:
-                print t2.name + " has no siblings"
+#            if t2Siblings:
+#                print t2.name + " has the following siblings:"
+#            else:
+#                print t2.name + " has no siblings"
             for t2Sibling in t2Siblings:
                 if t2Sibling != t2:
-                    print "Sibling: " + t2Sibling.name + ", then look at pair (" + t1.name + ", " + t2Sibling.name + ")"
+#                    print "Sibling: " + t2Sibling.name + ", then look at pair (" + t1.name + ", " + t2Sibling.name + ")"
                     deducedPair = (t1, t2Sibling)
-                    print "Original relation: ", t1.name, findkey(relation, self.allPairsMir[deducedPair]), t2Sibling.name
+#                    print "Original relation: ", t1.name, findkey(relation, self.allPairsMir[deducedPair]), t2Sibling.name
                     deducedRel = comptab[givenRel][relation["!"]]
-                    print "Using R32 comp table: ", t1.name, findkey(relation, givenRel), t2.name, "R32COMP", t2.name, "!", t2Sibling.name, \
-                            "-->", t1.name, findkey(relation, deducedRel), t2Sibling.name
-                    f.write(t2.name + ' -> ' + t2Sibling.name + ' [label="! (sibling)"];\n')
-                    f.write(t1.name + ' -> ' + t2Sibling.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
+#                    print "Using R32 comp table: ", t1.name, findkey(relation, givenRel), t2.name, "R32COMP", t2.name, "!", t2Sibling.name, \
+#                            "-->", t1.name, findkey(relation, deducedRel), t2Sibling.name
+#                    f.write(t2.name + ' -> ' + t2Sibling.name + ' [label="! (sibling)"];\n')
+#                    f.write(t1.name + ' -> ' + t2Sibling.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
                     part = '2'
-                    self.assertNew(deducedPair, deducedRel, toDo, f, part)
-        else:
-            print "\nPart (I) and Part (II) no exist, " + t2.name + " has no parent or siblings"
+                    self.assertNew(deducedPair, deducedRel, toDo)
+#        else:
+#            print "\nPart (I) and Part (II) no exist, " + t2.name + " has no parent or siblings"
         
         # update pair between t1 and t2's children
-        print "\nPart (III)"
+#        print "\nPart (III)"
         t2Children = t2.children
-        if t2Children:
-            print t2.name + " has the following children:"
-        else:
-            print t2.name + " has no children"
+#        if t2Children:
+#            print t2.name + " has the following children:"
+#        else:
+#            print t2.name + " has no children"
         for t2Child in t2Children:
-            print "Child: " + t2Child.name + ", then look at pair (" + t1.name + ", " + t2Child.name + ")"
+#            print "Child: " + t2Child.name + ", then look at pair (" + t1.name + ", " + t2Child.name + ")"
             deducedPair = (t1, t2Child)
-            print "Original relation: ", t1.name, findkey(relation, self.allPairsMir[deducedPair]), t2Child.name
+#            print "Original relation: ", t1.name, findkey(relation, self.allPairsMir[deducedPair]), t2Child.name
             deducedRel = comptab[givenRel][relation[">"]]
-            print "Using R32 comp table: ", t1.name, findkey(relation, givenRel), t2.name, "R32COMP", t2.name, ">", t2Child.name, \
-                            "-->", t1.name, findkey(relation, deducedRel), t2Child.name
-            f.write(t2.name + ' -> ' + t2Child.name + ' [label="> (children)"];\n')
-            f.write(t1.name + ' -> ' + t2Child.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
+#            print "Using R32 comp table: ", t1.name, findkey(relation, givenRel), t2.name, "R32COMP", t2.name, ">", t2Child.name, \
+#                            "-->", t1.name, findkey(relation, deducedRel), t2Child.name
+#            f.write(t2.name + ' -> ' + t2Child.name + ' [label="> (children)"];\n')
+#            f.write(t1.name + ' -> ' + t2Child.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
             part = '3'
-            self.assertNew(deducedPair, deducedRel, toDo, f, part)
+            self.assertNew(deducedPair, deducedRel, toDo)
             
         if t1Parent != "":
             # update pair between t1's Parent and t2
-            print "\nPart (IV):"
-            print t1.name + " has parent " + t1Parent.name + ", then look at pair (" + t1Parent.name + ", " + t2.name + ")"
+#            print "\nPart (IV):"
+#            print t1.name + " has parent " + t1Parent.name + ", then look at pair (" + t1Parent.name + ", " + t2.name + ")"
             deducedPair = (t1Parent, t2)
-            print "Original relation: ", t1Parent.name, findkey(relation, self.allPairsMir[deducedPair]), t2.name
+#            print "Original relation: ", t1Parent.name, findkey(relation, self.allPairsMir[deducedPair]), t2.name
             deducedRel = comptab[relation[">"]][givenRel]
-            print "Using R32 comp table: ", t1Parent.name, ">", t1.name, "R32COMP", t1.name, findkey(relation, givenRel), t2.name, \
-                    "-->", t1Parent.name, findkey(relation, deducedRel), t2.name
-            f.write(t1Parent.name + ' -> ' + t1.name + ' [label="> (parent)"];\n')
-            f.write(t1Parent.name + ' -> ' + t2.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
+#            print "Using R32 comp table: ", t1Parent.name, ">", t1.name, "R32COMP", t1.name, findkey(relation, givenRel), t2.name, \
+#                    "-->", t1Parent.name, findkey(relation, deducedRel), t2.name
+#            f.write(t1Parent.name + ' -> ' + t1.name + ' [label="> (parent)"];\n')
+#            f.write(t1Parent.name + ' -> ' + t2.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
             part = '4'
-            self.assertNew(deducedPair, deducedRel, toDo, f, part)
+            self.assertNew(deducedPair, deducedRel, toDo)
             
             # update pair between t1's siblings and t2 siblings
-            print "\nPart (V):"
+#            print "\nPart (V):"
             t1Siblings = t1Parent.children
-            if t1Siblings:
-                print t1.name + " has the following siblings:"
-            else:
-                print t1.name + " has no siblings"
+#            if t1Siblings:
+#                print t1.name + " has the following siblings:"
+#            else:
+#                print t1.name + " has no siblings"
             for t1Sibling in t1Siblings:
                 if t1Sibling != t1:
-                    print "Sibling: " + t1Sibling.name + ", then look at pair (" + t1Sibling.name + ", " + t2.name + ")"
+#                    print "Sibling: " + t1Sibling.name + ", then look at pair (" + t1Sibling.name + ", " + t2.name + ")"
                     deducedPair = (t1Sibling, t2)
-                    print "Original relation: ", t1Sibling.name, findkey(relation, self.allPairsMir[deducedPair]), t2.name
+#                    print "Original relation: ", t1Sibling.name, findkey(relation, self.allPairsMir[deducedPair]), t2.name
                     deducedRel = comptab[relation["!"]][givenRel]
-                    print "Using R32 comp table: ", t1Sibling.name, "!", t1.name, "R32COMP", t1.name, findkey(relation, givenRel), t2.name, \
-                            "-->", t1Sibling.name, findkey(relation, deducedRel), t2.name
-                    f.write(t1Sibling.name + ' -> ' + t1.name + ' [label="! (sibling)"];\n')
-                    f.write(t1Sibling.name + ' -> ' + t2.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
+#                    print "Using R32 comp table: ", t1Sibling.name, "!", t1.name, "R32COMP", t1.name, findkey(relation, givenRel), t2.name, \
+#                            "-->", t1Sibling.name, findkey(relation, deducedRel), t2.name
+#                    f.write(t1Sibling.name + ' -> ' + t1.name + ' [label="! (sibling)"];\n')
+#                    f.write(t1Sibling.name + ' -> ' + t2.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
                     part = '5'
-                    self.assertNew(deducedPair, deducedRel, toDo, f, part)
-        else:
-            print "\nPart (IV) and Part (V) no exist, " + t1.name + " has no parent or siblings"
+                    self.assertNew(deducedPair, deducedRel, toDo)
+#        else:
+#            print "\nPart (IV) and Part (V) no exist, " + t1.name + " has no parent or siblings"
         
         # update pair between t1's children and t2
-        print "\nPart (VI)"
+#        print "\nPart (VI)"
         t1Children = t1.children
-        if t1Children:
-            print t1.name + " has the following children:"
-        else:
-            print t1.name + " has no children"
+#        if t1Children:
+#            print t1.name + " has the following children:"
+#        else:
+#            print t1.name + " has no children"
         for t1Child in t1Children:
-            print "Child: " + t1Child.name + ", then look at pair (" + t1Child.name + ", " + t2.name + ")"
+#            print "Child: " + t1Child.name + ", then look at pair (" + t1Child.name + ", " + t2.name + ")"
             deducedPair = (t1Child, t2)
-            print "Original relation: ", t1Child.name, findkey(relation, self.allPairsMir[deducedPair]), t2.name
+#            print "Original relation: ", t1Child.name, findkey(relation, self.allPairsMir[deducedPair]), t2.name
             deducedRel = comptab[relation["<"]][givenRel]
-            print "Using R32 comp table: ", t1Child.name, "<", t1.name, "R32COMP", t1.name, findkey(relation, givenRel), t2.name, \
-                            "-->", t1Child.name, findkey(relation, deducedRel), t2.name
-            f.write(t1Child.name + ' -> ' + t1.name + ' [label="< (children)"];\n')
-            f.write(t1Child.name + ' -> ' + t2.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
+#            print "Using R32 comp table: ", t1Child.name, "<", t1.name, "R32COMP", t1.name, findkey(relation, givenRel), t2.name, \
+#                            "-->", t1Child.name, findkey(relation, deducedRel), t2.name
+#            f.write(t1Child.name + ' -> ' + t1.name + ' [label="< (children)"];\n')
+#            f.write(t1Child.name + ' -> ' + t2.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
             part = '6'
-            self.assertNew(deducedPair, deducedRel, toDo, f, part)
+            self.assertNew(deducedPair, deducedRel, toDo)
             
-        print ""
+#        print ""
         
-        f.write("}\n")
-        f.close()
+#        f.write("}\n")
+#        f.close()
             
         
-    def assertNew(self, deducedPair, deducedRel, toDo, f, part):
-#        print "deducedPair=", deducedPair[0].name, deducedPair[1].name
+    def assertNew(self, deducedPair, deducedRel, toDo):
         oldRel = self.allPairsMir[deducedPair]
         newRel = oldRel & deducedRel
         if not newRel:
             print "Inconsisten pair", deducedPair[0].name, deducedPair[1].name
             exit(0)
         else:
-            print deducedPair[0].name + " " + findkey(relation, oldRel) + " " + deducedPair[1].name + " & " + \
-                deducedPair[0].name + " " + findkey(relation, deducedRel) + " " + deducedPair[1].name + " --> " + \
-                deducedPair[0].name + " " + findkey(relation, newRel) + " " + deducedPair[1].name
-            f.write('intersect' + part + ' [shape=point];\n')
-            f.write('node1'+part+'[label="'+ deducedPair[0].name + ' ' + findkey(relation, oldRel) + ' ' + deducedPair[1].name + '"];\n')
-            f.write('node2'+part+'[label="'+ deducedPair[0].name + ' ' + findkey(relation, deducedRel) + ' ' + deducedPair[1].name + '"];\n')
-            f.write('node3'+part+'[label="'+ deducedPair[0].name + ' ' + findkey(relation, newRel) + ' ' + deducedPair[1].name + '"];\n')
-            f.write('node1'+part+' -> intersect'+part+' [label="original"];\n')
-            f.write('node2'+part+' -> intersect'+part+' [label="deduced"];\n')
-            f.write('intersect'+part+' -> node3'+part+' [label="intersection"];\n')
-            #f.write('"' + deducedPair[0].name + ' ' + findkey(relation, deducedRel) + ' ' + deducedPair[1].name + '" -> intersect'+part+';\n')
-            #f.write('intersect'+part+' -> "' + deducedPair[0].name + ' ' + findkey(relation, newRel) + ' ' + deducedPair[1].name + '";\n')
+#            print deducedPair[0].name + " " + findkey(relation, oldRel) + " " + deducedPair[1].name + " & " + \
+#                deducedPair[0].name + " " + findkey(relation, deducedRel) + " " + deducedPair[1].name + " --> " + \
+#                deducedPair[0].name + " " + findkey(relation, newRel) + " " + deducedPair[1].name
+#            f.write('intersect' + part + ' [shape=point];\n')
+#            f.write('node1'+part+'[label="'+ deducedPair[0].name + ' ' + findkey(relation, oldRel) + ' ' + deducedPair[1].name + '"];\n')
+#            f.write('node2'+part+'[label="'+ deducedPair[0].name + ' ' + findkey(relation, deducedRel) + ' ' + deducedPair[1].name + '"];\n')
+#            f.write('node3'+part+'[label="'+ deducedPair[0].name + ' ' + findkey(relation, newRel) + ' ' + deducedPair[1].name + '"];\n')
+#            f.write('node1'+part+' -> intersect'+part+' [label="original"];\n')
+#            f.write('node2'+part+' -> intersect'+part+' [label="deduced"];\n')
+#            f.write('intersect'+part+' -> node3'+part+' [label="intersection"];\n')
             if newRel == relation["{=, >, <, !, ><}"] or oldRel == newRel:
-                print "No change..."
+#                print "No change..."
                 return
         self.allPairsMir[deducedPair] = newRel
         toDo.append(deducedPair)
@@ -3471,4 +3472,123 @@ class TaxonomyMapping:
                 for c2descedant in c2descedants:
                     self.rccPreArts.append([c1, c2descedant, relation['>']])
                     
+    def runRCCEQReasoner(self):
+        
+        # prepare for input
+        for pair in self.getAllArticulationPairs():
+            
+            # initialize uber-mir
+            if pair[0].taxonomy.abbrev == self.firstTName:
+                self.allPairsMir[(pair[0], pair[1])] = relation["{=, >, <, !, ><}"]
+            else:
+                self.allPairsMir[(pair[1], pair[0])] = relation["{=, >, <, !, ><}"]
+            
+            # records descendants
+            if pair[0] not in self.descendMapping:
+                descendants = []
+                self.findDescedants(pair[0], descendants)
+                self.descendMapping[pair[0]] = set(descendants)
+            if pair[1] not in self.descendMapping:
+                descendants = []
+                self.findDescedants(pair[1], descendants)
+                self.descendMapping[pair[1]] = set(descendants)
+                
+#        for k,v in self.descendMapping.iteritems():
+#            print "parent",k.taxonomy.abbrev + "." + k.name
+#            print "descendants"
+#            for d in v:
+#                print d.taxonomy.abbrev + "." + d.name
+#                
+#            print "-----\n"
+#            
+#        
+#        print "#####################################"
+        
+        leafNodes = sets.Set()
+        eqPairNodes = sets.Set()
+        for art in self.articulations:
+            leafNodes.add(art.taxon1)
+            leafNodes.add(art.taxon2)
+            eqPairNodes.add((art.taxon1, art.taxon2))
+            self.allPairsMir[(art.taxon1, art.taxon2)] = art.relations
+            
+        
+        for pair in self.getAllArticulationPairs():
+            if pair[0] in leafNodes and pair[1] in leafNodes:
+                if (pair[0], pair[1]) not in eqPairNodes:
+                    self.allPairsMir[(pair[0], pair[1])] = relation["!"]
+            
+            elif pair[0] in leafNodes and pair[1] not in leafNodes:
+                d1 = self.descendMapping[pair[1]].copy()
+                d1 = d1.intersection(leafNodes)
+                flag = False
+                for eqPair in eqPairNodes:
+                    if eqPair[0] == pair[0] and eqPair[1] in d1:
+                        flag = True
+                if flag:
+                    self.allPairsMir[(pair[0], pair[1])] = relation["<"]
+                else:
+                    self.allPairsMir[(pair[0], pair[1])] = relation["!"]
+
+                        
+            elif pair[1] in leafNodes and pair[0] not in leafNodes:
+                d0 = self.descendMapping[pair[0]].copy()
+                d0 = d0.intersection(leafNodes)
+                flag = False
+                for eqPair in eqPairNodes:
+                    if eqPair[1] == pair[1] and eqPair[0] in d0:
+                        flag = True
+                if flag:
+                    self.allPairsMir[(pair[0], pair[1])] = relation[">"]
+                else:
+                    self.allPairsMir[(pair[0], pair[1])] = relation["!"]
+                        
+#                print "pair is", pair[0].taxonomy.abbrev + "." + pair[0].name, pair[1].taxonomy.abbrev + "." + pair[1].name
+#                print "d0 are:"
+#                for d in d0:
+#                    print  d.taxonomy.abbrev + "." + d.name
+#                    
+#                print "-------------\n"
+            
+            else:
+                d0 = self.descendMapping[pair[0]].copy()
+                d1 = self.descendMapping[pair[1]].copy()
+                
+                d0 = d0.intersection(leafNodes)
+                d1 = d1.intersection(leafNodes)
+
+                
+                for eqPair in eqPairNodes:
+                    if eqPair[0] in d0 and eqPair[1] in d1:
+                        d0.remove(eqPair[0])
+                        d1.remove(eqPair[1])
+                
+                        
+#                print "pair is", pair[0].taxonomy.abbrev + "." + pair[0].name, pair[1].taxonomy.abbrev + "." + pair[1].name
+#                print "d0 are:"
+#                for d in d0:
+#                    print  d.taxonomy.abbrev + "." + d.name
+#                print "d1 are:"
+#                for d in d1:
+#                    print  d.taxonomy.abbrev + "." + d.name
+#                    
+#                print "-------------\n"
+                
+                if d0.issubset(d1) and d1.issubset(d0):
+                    self.allPairsMir[(pair[0], pair[1])] = relation["="]
+                elif d0.issubset(d1):
+                    self.allPairsMir[(pair[0], pair[1])] = relation["<"]
+                elif d1.issubset(d0):
+                    self.allPairsMir[(pair[0], pair[1])] = relation[">"]
+                elif len(d0.intersection(d1)) > 0:
+                    self.allPairsMir[(pair[0], pair[1])] = relation["><"]
+                else:
+                    self.allPairsMir[(pair[0], pair[1])] = relation["!"]
+        
+        self.rccGenMir()
+        
+        
+#        for k,v in self.allPairsMir.iteritems():
+#            print k[0].name, k[1].name, v
+#                    
         
