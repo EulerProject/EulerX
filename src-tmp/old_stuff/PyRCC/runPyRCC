@@ -85,7 +85,7 @@ def replace_art_names(s):
             outputs = outputs + "TPPI NTPPI "
         elif e == "overlaps":
             outputs = outputs + "PO "
-        elif e == "disjoints":
+        elif e == "disjoint":
             outputs = outputs + "DC EC "
     outputs = outputs[:-1]
     return outputs 
@@ -116,6 +116,7 @@ def findConcept(n, rep_list):
     
 
 def findRelation(s):
+    s = s.replace("\'", "").split(", ")
     relation = ""
     if "DC" in s and "EC" in s:
         relation = relation + "!"
@@ -123,7 +124,7 @@ def findRelation(s):
         relation = relation + "="
     if "PO" in s:
         relation = relation + "o"
-    if "TPP" in s and "NTPP" in s and "TPPI" not in s and "NTPPI" not in s:
+    if "TPP" in s and "NTPP" in s:
         relation = relation + "<"
     if "TPPI" in s and "NTPPI" in s:
         relation = relation + ">"
@@ -238,7 +239,7 @@ remove_duplicate_string(children_list)
 
 replace_list = replace_names(concept_list, pc_list1, pc_list2, art_list, children_list)
 #print "AFTERRRRRR"
-#print "replace_list=", replace_list
+print "replace_list=", replace_list
 #print "pc_list1=", pc_list1
 #print "pc_list2=", pc_list2
 #print "art_list=", art_list
@@ -289,7 +290,7 @@ f_in.close()
 f_out.close()
 
 # execute PyRCC8
-newgetoutput("rcc8 -d < " + pyrccFileName + " > output.txt")
+newgetoutput("src/rcc8.py -d < " + pyrccFileName + " > output.txt")
 
 mir = []
 f = open("output.txt", "r")

@@ -11,7 +11,7 @@ public class GlobalReasoner {
 	// articulations map for the decomposed taxnomies
 	private Map<TaxonPair, String> decomposedArticulations;
 	// list of microreasoners to run over each tiny tree in the decomposed taxonomies
-	private List<MicroReasoner> microreasoners;
+//	private List<MicroReasoner> microreasoners;
 	private Map<TaxonPair, String> provenance;
 
 	public GlobalReasoner(Taxonomy T1, Taxonomy T2){
@@ -27,9 +27,9 @@ public class GlobalReasoner {
 				decomposedArticulations.put(new TaxonPair(_t1, _t2), "<>=!o");
 
 		// create the ordered list of MicroReasoner objects
-		microreasoners = new LinkedList<MicroReasoner>();
-		for (TaxonPair _taxonPair : orderTaxonPairs(_T1, _T2))
-			microreasoners.add(new MicroReasoner(_taxonPair));
+//		microreasoners = new LinkedList<MicroReasoner>();
+//		for (TaxonPair _taxonPair : orderTaxonPairs(_T1, _T2))
+//			microreasoners.add(new MicroReasoner(_taxonPair));
 	}
 
 	/** Run the reasoner and return true if new information was found.
@@ -46,13 +46,13 @@ public class GlobalReasoner {
 
 		// run each microreasoner, storing new relations in decomposedArticulations
 		boolean foundNew = false;
-		for (MicroReasoner microreasoner : microreasoners){
-			microreasoner.updateRelations(decomposedArticulations);
-			if (foundNew |= microreasoner.runReasoner(provenance)){
-				microreasoner.putNewRelationsInMap(decomposedArticulations);
-				//microreasoner.putProvenanceInMap(provenance);
-			}
-		}
+//		for (MicroReasoner microreasoner : microreasoners){
+//			microreasoner.updateRelations(decomposedArticulations);
+//			if (foundNew |= microreasoner.runReasoner(provenance)){
+//				microreasoner.putNewRelationsInMap(decomposedArticulations);
+//				//microreasoner.putProvenanceInMap(provenance);
+//			}
+//		}
 
 		// store the new relations between the non-false taxa in the map of articulations
 		for (TaxonPair _t : decomposedArticulations.keySet())
