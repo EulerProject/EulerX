@@ -3274,7 +3274,12 @@ class TaxonomyMapping:
 #            print t2.name + " has parent " + t2Parent.name + ", then look at pair (" + t1.name + ", " + t2Parent.name + ")"
             deducedPair = (t1, t2Parent)
 #            print "Original relation: ", t1.name, findkey(relation, self.allPairsMir[deducedPair]), t2Parent.name
-            deducedRel = comptab[givenRel][relation["<"]]
+            if len(t2Parent.children) > 1:
+                deducedRel = comptab[givenRel][relation["<"]]
+            else:
+                deducedRel = comptab[givenRel][relation["="]]
+                #deducedRel = givenRel
+                #print "rel", findkey(relation, givenRel), t1.name, t2.name, t2.parent.name
 #            print "Using R32 comp table: ", t1.name, findkey(relation, givenRel), t2.name, "R32COMP", t2.name, "<", t2Parent.name, \
 #                    "-->", t1.name, findkey(relation, deducedRel), t2Parent.name
 #            f.write(t2.name + ' -> ' + t2Parent.name + ' [label="< (parent)"];\n')
@@ -3312,17 +3317,30 @@ class TaxonomyMapping:
 #            print t2.name + " has the following children:"
 #        else:
 #            print t2.name + " has no children"
-        for t2Child in t2Children:
-#            print "Child: " + t2Child.name + ", then look at pair (" + t1.name + ", " + t2Child.name + ")"
-            deducedPair = (t1, t2Child)
-#            print "Original relation: ", t1.name, findkey(relation, self.allPairsMir[deducedPair]), t2Child.name
-            deducedRel = comptab[givenRel][relation[">"]]
-#            print "Using R32 comp table: ", t1.name, findkey(relation, givenRel), t2.name, "R32COMP", t2.name, ">", t2Child.name, \
-#                            "-->", t1.name, findkey(relation, deducedRel), t2Child.name
-#            f.write(t2.name + ' -> ' + t2Child.name + ' [label="> (children)"];\n')
-#            f.write(t1.name + ' -> ' + t2Child.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
-            part = '3'
-            self.assertNew(deducedPair, deducedRel, toDo)
+        if len(t2Children) > 1:
+            for t2Child in t2Children:
+#                print "Child: " + t2Child.name + ", then look at pair (" + t1.name + ", " + t2Child.name + ")"
+                deducedPair = (t1, t2Child)
+#                print "Original relation: ", t1.name, findkey(relation, self.allPairsMir[deducedPair]), t2Child.name
+                deducedRel = comptab[givenRel][relation[">"]]
+#                print "Using R32 comp table: ", t1.name, findkey(relation, givenRel), t2.name, "R32COMP", t2.name, ">", t2Child.name, \
+#                                "-->", t1.name, findkey(relation, deducedRel), t2Child.name
+#                f.write(t2.name + ' -> ' + t2Child.name + ' [label="> (children)"];\n')
+#                f.write(t1.name + ' -> ' + t2Child.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
+                part = '3'
+                self.assertNew(deducedPair, deducedRel, toDo)
+        else:
+            for t2Child in t2Children:
+#                print "Child: " + t2Child.name + ", then look at pair (" + t1.name + ", " + t2Child.name + ")"
+                deducedPair = (t1, t2Child)
+#                print "Original relation: ", t1.name, findkey(relation, self.allPairsMir[deducedPair]), t2Child.name
+                deducedRel = comptab[givenRel][relation["="]]
+#                print "Using R32 comp table: ", t1.name, findkey(relation, givenRel), t2.name, "R32COMP", t2.name, ">", t2Child.name, \
+#                                "-->", t1.name, findkey(relation, deducedRel), t2Child.name
+#                f.write(t2.name + ' -> ' + t2Child.name + ' [label="> (children)"];\n')
+#                f.write(t1.name + ' -> ' + t2Child.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
+                part = '3'
+                self.assertNew(deducedPair, deducedRel, toDo)
             
         if t1Parent != "":
             # update pair between t1's Parent and t2
@@ -3330,7 +3348,10 @@ class TaxonomyMapping:
 #            print t1.name + " has parent " + t1Parent.name + ", then look at pair (" + t1Parent.name + ", " + t2.name + ")"
             deducedPair = (t1Parent, t2)
 #            print "Original relation: ", t1Parent.name, findkey(relation, self.allPairsMir[deducedPair]), t2.name
-            deducedRel = comptab[relation[">"]][givenRel]
+            if len(t1Parent.children) > 1:
+                deducedRel = comptab[relation[">"]][givenRel]
+            else:
+                deducedRel = comptab[relation["="]][givenRel]
 #            print "Using R32 comp table: ", t1Parent.name, ">", t1.name, "R32COMP", t1.name, findkey(relation, givenRel), t2.name, \
 #                    "-->", t1Parent.name, findkey(relation, deducedRel), t2.name
 #            f.write(t1Parent.name + ' -> ' + t1.name + ' [label="> (parent)"];\n')
@@ -3367,17 +3388,30 @@ class TaxonomyMapping:
 #            print t1.name + " has the following children:"
 #        else:
 #            print t1.name + " has no children"
-        for t1Child in t1Children:
-#            print "Child: " + t1Child.name + ", then look at pair (" + t1Child.name + ", " + t2.name + ")"
-            deducedPair = (t1Child, t2)
-#            print "Original relation: ", t1Child.name, findkey(relation, self.allPairsMir[deducedPair]), t2.name
-            deducedRel = comptab[relation["<"]][givenRel]
-#            print "Using R32 comp table: ", t1Child.name, "<", t1.name, "R32COMP", t1.name, findkey(relation, givenRel), t2.name, \
-#                            "-->", t1Child.name, findkey(relation, deducedRel), t2.name
-#            f.write(t1Child.name + ' -> ' + t1.name + ' [label="< (children)"];\n')
-#            f.write(t1Child.name + ' -> ' + t2.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
-            part = '6'
-            self.assertNew(deducedPair, deducedRel, toDo)
+        if len(t1Children) > 1:
+            for t1Child in t1Children:
+#                print "Child: " + t1Child.name + ", then look at pair (" + t1Child.name + ", " + t2.name + ")"
+                deducedPair = (t1Child, t2)
+#                print "Original relation: ", t1Child.name, findkey(relation, self.allPairsMir[deducedPair]), t2.name
+                deducedRel = comptab[relation["<"]][givenRel]
+#                print "Using R32 comp table: ", t1Child.name, "<", t1.name, "R32COMP", t1.name, findkey(relation, givenRel), t2.name, \
+#                                "-->", t1Child.name, findkey(relation, deducedRel), t2.name
+#                f.write(t1Child.name + ' -> ' + t1.name + ' [label="< (children)"];\n')
+#                f.write(t1Child.name + ' -> ' + t2.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
+                part = '6'
+                self.assertNew(deducedPair, deducedRel, toDo)
+        else:
+            for t1Child in t1Children:
+#                print "Child: " + t1Child.name + ", then look at pair (" + t1Child.name + ", " + t2.name + ")"
+                deducedPair = (t1Child, t2)
+#                print "Original relation: ", t1Child.name, findkey(relation, self.allPairsMir[deducedPair]), t2.name
+                deducedRel = comptab[relation["="]][givenRel]
+#                print "Using R32 comp table: ", t1Child.name, "<", t1.name, "R32COMP", t1.name, findkey(relation, givenRel), t2.name, \
+#                                "-->", t1Child.name, findkey(relation, deducedRel), t2.name
+#                f.write(t1Child.name + ' -> ' + t1.name + ' [label="< (children)"];\n')
+#                f.write(t1Child.name + ' -> ' + t2.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
+                part = '6'
+                self.assertNew(deducedPair, deducedRel, toDo)
             
 #        print ""
         
@@ -3389,7 +3423,7 @@ class TaxonomyMapping:
         oldRel = self.allPairsMir[deducedPair]
         newRel = oldRel & deducedRel
         if not newRel:
-            print "Inconsisten pair", deducedPair[0].name, deducedPair[1].name
+            print "Inconsisten pair", deducedPair[0].name, deducedPair[1].name, "oldRel", findkey(relation,oldRel), "deducedRel", findkey(relation,deducedRel), "newRel", findkey(relation,newRel)
             exit(0)
         else:
 #            print deducedPair[0].name + " " + findkey(relation, oldRel) + " " + deducedPair[1].name + " & " + \
@@ -3454,8 +3488,9 @@ class TaxonomyMapping:
             self.findDescedants(c2, c2descedants)
             # check rel(c1, c2) is "=" ==> rel(c1, c2's ancestor) is "<"
             if rel == relation["="]:
-                for c2ancestor in c2ancestors:
-                    self.rccPreArts.append([c1, c2ancestor, relation['<']])
+                if len(c2.parent.children) > 1:
+                    for c2ancestor in c2ancestors:
+                        self.rccPreArts.append([c1, c2ancestor, relation['<']])
             
             # check rel(c1, c2) is "!" ==> rel(c1, c2's descendant) is "!"
             if rel == relation["!"]:
