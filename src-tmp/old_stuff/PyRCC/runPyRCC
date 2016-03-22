@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright (c) 2014 University of California, Davis
 # 
 # 
@@ -41,13 +42,25 @@ def remove_duplicate_string(li):
                 last = li[i]
 
 # replace concepts names with integers (start from 0)
-def replace_names(c_li, li_1, li_2, a_li, ch_li):
+def replace_names(c_li, oc_1, oc_2, li_1, li_2, a_li, ch_li):
     rep_list = []
     i = 0
     for e in c_li:
         rep_tuple = (e, i)
         rep_list.append(rep_tuple)
         i = i + 1
+    for e1 in oc_1:
+        for e2 in rep_list:
+            if e1[0] == e2[0]:
+                e1[0] = e2[1]
+            if e1[1] == e2[0]:
+                e1[1] = e2[1]
+    for e1 in oc_2:
+        for e2 in rep_list:
+            if e1[0] == e2[0]:
+                e1[0] = e2[1]
+            if e1[1] == e2[0]:
+                e1[1] = e2[1]
     for e1 in li_1:
         for e2 in rep_list:
             if e1[0] == e2[0]:
@@ -116,8 +129,8 @@ def findConcept(n, rep_list):
     
 
 def findRelation(s):
-    s = s.replace("\'", "").split(", ")
     relation = ""
+    s = s.replace("\'","").split(", ")
     if "DC" in s and "EC" in s:
         relation = relation + "!"
     if "EQ" in s:
@@ -157,6 +170,8 @@ f_in = open(fileName, "r")
 f_out = open(pyrccFileName, "w")
 
 # initialize variables
+onechild_pc1 = []
+onechild_pc2 = []
 pc_list1 =[]
 pc_list2 = []
 art_list = []
@@ -193,7 +208,10 @@ for line in lines:
                 concept_list.append(child)
                 children.append(child)
                 pc_item = [parent, child]
-                pc_list1.append(pc_item)
+                if len(concepts) == 2:
+                    onechild_pc1.append(pc_item)
+                else:
+                    pc_list1.append(pc_item)
             for e in children:
                 children_list.append(children)
                 
@@ -207,7 +225,10 @@ for line in lines:
                 concept_list.append(child)
                 children.append(child)
                 pc_item = [parent, child]
-                pc_list2.append(pc_item)
+                if len(concepts) == 2:
+                    onechild_pc2.append(pc_item)
+                else:
+                    pc_list2.append(pc_item)
             for e in children:
                 children_list.append(children)
                 
@@ -237,12 +258,12 @@ remove_duplicate_string(children_list)
 #print "children_list=", children_list
 
 
-replace_list = replace_names(concept_list, pc_list1, pc_list2, art_list, children_list)
+replace_list = replace_names(concept_list, onechild_pc1, onechild_pc2, pc_list1, pc_list2, art_list, children_list)
 #print "AFTERRRRRR"
 print "replace_list=", replace_list
 #print "pc_list1=", pc_list1
 #print "pc_list2=", pc_list2
-#print "art_list=", art_list
+print "art_list=", art_list
 #print "children_list=", children_list
 
 
@@ -251,6 +272,12 @@ print "replace_list=", replace_list
 f_out.write(str(len(concept_list)-1) + " #" + fileName[:-4] + "\n")
 
 # write the parent-child relation
+for e in onechild_pc1:
+    s = str(e[0]) + " " + str(e[1]) + " ( EQ )\n"
+    f_out.write(s)
+for e in onechild_pc2:
+    s = str(e[0]) + " " + str(e[1]) + " ( EQ )\n"
+    f_out.write(s)
 for e in pc_list1:
     s = str(e[0]) + " " + str(e[1]) + " ( TPPI NTPPI )\n"
     f_out.write(s)
@@ -290,7 +317,7 @@ f_in.close()
 f_out.close()
 
 # execute PyRCC8
-newgetoutput("src/rcc8.py -d < " + pyrccFileName + " > output.txt")
+newgetoutput("rcc8 -d < " + pyrccFileName + " > output.txt")
 
 mir = []
 f = open("output.txt", "r")
