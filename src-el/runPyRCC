@@ -263,7 +263,7 @@ replace_list = replace_names(concept_list, onechild_pc1, onechild_pc2, pc_list1,
 print "replace_list=", replace_list
 #print "pc_list1=", pc_list1
 #print "pc_list2=", pc_list2
-print "art_list=", art_list
+#print "art_list=", art_list
 #print "children_list=", children_list
 
 
