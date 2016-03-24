@@ -3257,7 +3257,7 @@ class TaxonomyMapping:
         t1Parent = t1.parent
         t2Parent = t2.parent
         givenRel = self.allPairsMir[taxonPair]
-        print "Pick pair: ", t1.name, findkey(relation, givenRel), t2.name
+#        print "Pick pair: ", t1.name, findkey(relation, givenRel), t2.name
         
 #        # visualize reasoning
 #        fileName = os.path.join(self.rccfilesdir, "rccreasoningviz_step" + str(step) + ".dot")
