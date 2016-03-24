@@ -3257,7 +3257,7 @@ class TaxonomyMapping:
         t1Parent = t1.parent
         t2Parent = t2.parent
         givenRel = self.allPairsMir[taxonPair]
-#        print "Pick pair: ", t1.name, findkey(relation, givenRel), t2.name
+        print "Pick pair: ", t1.name, findkey(relation, givenRel), t2.name
         
 #        # visualize reasoning
 #        fileName = os.path.join(self.rccfilesdir, "rccreasoningviz_step" + str(step) + ".dot")
@@ -3488,9 +3488,10 @@ class TaxonomyMapping:
             self.findDescedants(c2, c2descedants)
             # check rel(c1, c2) is "=" ==> rel(c1, c2's ancestor) is "<"
             if rel == relation["="]:
-                if len(c2.parent.children) > 1:
-                    for c2ancestor in c2ancestors:
-                        self.rccPreArts.append([c1, c2ancestor, relation['<']])
+                if not type(c2.parent) is str:
+                    if len(c2.parent.children) > 1:
+                        for c2ancestor in c2ancestors:
+                            self.rccPreArts.append([c1, c2ancestor, relation['<']])
             
             # check rel(c1, c2) is "!" ==> rel(c1, c2's descendant) is "!"
             if rel == relation["!"]:
