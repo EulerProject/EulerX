@@ -43,6 +43,7 @@ import socket
 import fileinput
 import sys
 import csv
+import Queue
 from taxonomy2 import *  
 from alignment2 import * 
 from redCon import *
@@ -3226,16 +3227,15 @@ class TaxonomyMapping:
 #        for k,v in self.allPairsMir.iteritems():
 #            print k[0].name, k[1].name, v
         
-        toDo = []
+        toDo = Queue.Queue()
         for taxonPair,rel in self.allPairsMir.iteritems():
             if rel != relation["{=, >, <, !, ><}"]:
-                toDo.append(taxonPair)
+                toDo.put(taxonPair)
         
         step = 1
-        while len(toDo) > 0:
+        while not toDo.empty():
 #            print "------------ Step ", step, " ------------"
-            taxonPair = toDo[0]
-            del toDo[0]
+            taxonPair = toDo.get()
             self.reasonOver(taxonPair, toDo, step)
             step = step + 1
         
@@ -3440,7 +3440,7 @@ class TaxonomyMapping:
 #                print "No change..."
                 return
         self.allPairsMir[deducedPair] = newRel
-        toDo.append(deducedPair)
+        toDo.put(deducedPair)
         
     def rccGenMir(self):
         mirList = []
@@ -3455,6 +3455,19 @@ class TaxonomyMapping:
             print pair[0], pair[1], pair[2]
             fmir.write(pair[0] + ',' + pair[1] + ',' + pair[2] + '\n')            
         fmir.close()
+    
+    # function that get the sum of depths of a pair of taxa
+#    def getDepthFromPair(self, taxonPair):
+#        t1 = taxonPair[0]
+#        t2 = taxonPair[1]
+#        ctr = 0
+#        while not type(t1.parent) is str:
+#            ctr = ctr + 1
+#            t1 = t1.parent
+#        while not type(t2.parent) is str:
+#            ctr = ctr + 1
+#            t2 = t2.parent
+#        return ctr
         
     # function findAncestors that do not require recursion
 #    def findAncestors2(self, taxon):
