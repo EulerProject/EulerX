@@ -1968,12 +1968,12 @@ class TaxonomyMapping:
         idlv.write("ix.")
         if reasoner[self.args['-r']] == reasoner["gringo"]:
             if self.enc & encode["ob"]:
-                pdlv.write("\n#hide.\n#show pp/" + self.obslen.__str__() + ".")
+                pdlv.write("\n#show pp/" + self.obslen.__str__() + ".")
             elif self.enc & encode["pw"]:
-                pdlv.write("\n#hide.\n#show rel/3.")
+                pdlv.write("\n#show rel/3.")
             elif self.enc & encode["cb"]:
-                pdlv.write("\n#hide.\n#show relout/3.")
-            idlv.write("\n#hide.\n#show ie/1.")
+                pdlv.write("\n#show relout/3.")
+            idlv.write("\n#show ie/1.")
         pdlv.close()
         idlv.close()
 
@@ -2074,7 +2074,7 @@ class TaxonomyMapping:
                 
                 self.baseAsp += "%%% Euler Bit\n"
                 for i in range(len(couArray)):
-                    self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", V = M1 #mod " + couArray[i].__str__() + ".\n"
+                    self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", V = M1 \ " + couArray[i].__str__() + ".\n"
             self.baseAsp += template.getAspMnCon()
             
         elif self.enc & encode["vr"]:
@@ -2094,7 +2094,7 @@ class TaxonomyMapping:
                 self.baseAsp += "r(0.."+(maxint-1).__str__()+").\n\n"
                 self.baseAsp += "%%% count of concepts\n"
                 self.baseAsp += "count(0.."+(num-1).__str__()+").\n\n"
-                self.baseAsp += "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P, 0 = M1 #mod 2.\n"
+                self.baseAsp += "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P, 0 = M1 \ 2.\n"
                 self.baseAsp += con
             self.baseAsp += template.getAspVrCon()
                 
@@ -2142,7 +2142,8 @@ class TaxonomyMapping:
                                 if reasoner[self.args['-r']] == reasoner["dlv"]:
                                     self.baseAsp += ":- #count{X: vrs(X), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0, pw.\n"
                                 elif reasoner[self.args['-r']] == reasoner["gringo"]:
-                                    self.baseAsp += ":- [vrs(X): in(" + t1.dlvName() + ", X): in(" + t.dlvName() + ", X)]0.\n"
+
+                                    self.baseAsp += ":- #sum {vrs(X): in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)}0.\n"
                                 self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n"
                                 self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n\n"
                             coverage += ",out(" + t1.dlvName() + ", X)"
@@ -2202,10 +2203,10 @@ class TaxonomyMapping:
                                         elif reasoner[self.args['-r']] == reasoner["gringo"]:
 #                                            if t.children[i].abbrev.find("nc") == -1:
                                             if t.children[i].abbrev.find("nc_") == -1:
-                                                self.baseAsp += ":- [vrs(X): in(" + name1 + ", X): out(" + name2+ ", X)]0, pw.\n"
+                                                self.baseAsp += ":- #sum {vrs(X): in(" + name1 + ", X), out(" + name2+ ", X)}0, pw.\n"
 #                                            if t.children[j].abbrev.find("nc") == -1:
                                             if t.children[i].abbrev.find("nc_") == -1:
-                                                self.baseAsp += ":- [vrs(X): out(" + name1 + ", X): in(" + name2+ ", X)]0, pw.\n"
+                                                self.baseAsp += ":- #sum {vrs(X): out(" + name1 + ", X), in(" + name2+ ", X)}0, pw.\n"
 #                                        if t.children[i].abbrev.find("nc") == -1:
                                         if t.children[i].abbrev.find("nc_") == -1:
                                             self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
@@ -2352,7 +2353,7 @@ class TaxonomyMapping:
                 if reasoner[self.args['-r']] == reasoner["dlv"]:
                     self.baseAsp += ":- #count{X: present(X" + pair + "), " + tmp + "} = 0.\n"
                 elif reasoner[self.args['-r']] == reasoner["gringo"]:
-                    self.baseAsp += ":- [present(X" + pair + "): " + tmp + "]0.\n"
+                    self.baseAsp += ":- #sum {present(X" + pair + "): " + tmp + "}0.\n"
         self.baseAsp += "pinout(C, in, X" + appendd + ") :- present(X" + appendd + "), concept(C, _, N), in(C, X).\n"
         self.baseAsp += "pinout(C, out, X" + appendd + ") :- present(X" + appendd + "), concept(C, _, N), out(C, X).\n"
         

@@ -140,7 +140,19 @@ class Articulation:
                 
             self.taxon1 = mapping.getTaxon(taxon1taxonomy, taxon1taxon)
             self.taxon2 = mapping.getTaxon(taxon2taxonomy, taxon2taxon)
-            
+
+    # Generate Gringo aggregation rule
+    def getGringoAggrRule(self, firstIsIn, firstName, secondIsIn, secondName, withPW):
+        firstIO = "in" if firstIsIn else "out"
+        secondIO = "in" if secondIsIn else "out"
+        baseFormat = 'vrs(X): {}({},X), {}({},X)'
+        rule = baseFormat.format(firstIO, firstName, secondIO, secondName)
+        rule = ':- #sum {' + rule + '}0'
+        if (withPW):
+            return rule + ", pw.\n"
+        else:
+            return rule + ".\n"
+
     def toASP(self, enc, rnr, align):
         result = ""
         name1 = self.taxon1.dlvName()
@@ -154,7 +166,8 @@ class Articulation:
                 if reasoner[rnr] == reasoner["dlv"]:
                     result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
+                    align.basePw += self.getGringoAggrRule(True, name1, True, name2, True)
+                    #align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                 #result += "in(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
@@ -168,8 +181,10 @@ class Articulation:
                     result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
                     result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0, pw.\n" 
+                    align.basePw += self.getGringoAggrRule(True, name1, True, name2, True)
+                    align.basePw += self.getGringoAggrRule(True, name1, False, name2, True)
+                    # align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n"
+                    # align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0, pw.\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
@@ -183,8 +198,10 @@ class Articulation:
                     result = ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
                     result += ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+                    align.basePw += self.getGringoAggrRule(True, name1, True, name2, False)
+                    align.basePw += self.getGringoAggrRule(False, name1, True, name2, False)
+                    # align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n"
+                    # align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n"
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X), pw.\n" 
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
@@ -199,8 +216,10 @@ class Articulation:
                     result = ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n" 
                     result += ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+                    align.basePw += self.getGringoAggrRule(True, name1, False, name2, False)
+                    align.basePw += self.getGringoAggrRule(False, name1, True, name2, False)
+                    # align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n"
+                    # align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
@@ -216,9 +235,12 @@ class Articulation:
                     result += ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
                     result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+                    align.basePw += self.getGringoAggrRule(True, name1, False, name2, False)
+                    align.basePw += self.getGringoAggrRule(True, name1, False, name2, False)
+                    align.basePw += self.getGringoAggrRule(False, name1, True, name2, False)
+                    # align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n"
+                    # align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n"
+                    # align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
@@ -254,8 +276,9 @@ class Articulation:
                     result += "vr(X, r" + self.ruleNum.__str__() + ") v ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n" 
                     result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    result += "vr(X, r" + self.ruleNum.__str__() + ") | ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n" 
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
+                    result += "vr(X, r" + self.ruleNum.__str__() + ") | ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
+                    align.basePw += self.getGringoAggrRule(True, name1, True, name2, True)
+                    #align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                 #result += "in(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
@@ -269,8 +292,9 @@ class Articulation:
                     result += "vr(X, r" + self.ruleNum.__str__() +") v ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
                     result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    result += "vr(X, r" + self.ruleNum.__str__() +") | ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+                    result += "vr(X, r" + self.ruleNum.__str__() +") | ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
+                    align.basePw += self.getGringoAggrRule(True, name1, True, name2, False)
+                    # align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                 #result += "in(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
@@ -294,8 +318,10 @@ class Articulation:
                     result += ":- #count{X: vrs(X), in(" + name2 + ",X), out(" + name1 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
                     result  = "ir(X, r" + self.ruleNum.__str__() + ") | vr(X, r" + self.ruleNum.__str__() +") :- in(" + name1 + ",X), in(" + name2 + ",X).\n"
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+                    align.basePw += self.getGringoAggrRule(True, name1, False, name2, False)
+                    align.basePw += self.getGringoAggrRule(False, name1, True, name2, False)
+                    # align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n"
+                    # align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n"
                 #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
                 #result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
                 #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
@@ -312,9 +338,15 @@ class Articulation:
                     result += "pie(r" + self.ruleNum.__str__() + ", A, 3) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                     result += "c(r" + self.ruleNum.__str__() + ", A, 3) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    result  = ":- 1[vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)], [vr(Y, _): in(" + name2 + ",Y): out(" + name1 + ",Y)]0.\n"
-                    result += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0, 1[vr(Y, _): in(" + name2 + ",Y): out(" + name1 + ",Y)].\n"
-                    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n"
+
+                    firstRule = self.getGringoAggrRule(True, name1, False, name2, False).replace(":- ", ":- 1").replace("0.\n", ", ")
+                    result = firstRule + self.getGringoAggrRule(False, name2, True, name1, False).replace(":- ", "")
+                    secodRule = self.getGringoAggrRule(True, name1, False, name2, False).replace(".\n", ", ")
+                    result += secodRule + self.getGringoAggrRule(True, name2, False, name1, False).replace(":- ", "1").replace("0.", ".")
+                    result += self.getGringoAggrRule(True, name1, True, name2, False)
+                    # result  = ":- 1[vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)], [vr(Y, _): in(" + name2 + ",Y): out(" + name1 + ",Y)]0.\n"
+                    # result += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0, 1[vr(Y, _): in(" + name2 + ",Y): out(" + name1 + ",Y)].\n"
+                    # result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n"
                 #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
                 #result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
                 #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
@@ -330,8 +362,10 @@ class Articulation:
                     result += "c(r" + self.ruleNum.__str__() + ", A, 2) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                 elif reasoner[rnr] == reasoner["gringo"]:
                     result  = "vr(X, r" + self.ruleNum.__str__() + ") | ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+                    align.basePw += self.getGringoAggrRule(True, name1, True, name2, False)
+                    align.basePw += self.getGringoAggrRule(False, name1, True, name2, False)
+                    # align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n"
+                    # align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n"
                 #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
                 #result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
                 #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
@@ -342,7 +376,8 @@ class Articulation:
                     result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} > 0, #count{Y: vrs(Y), out(" + name2 + ",Y), in(" + name1 + ",Y)} > 0, pw.\n"
                     result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, #count{Y: vrs(Y), out(" + name2 + ",Y), in(" + name1 + ",Y)} = 0, pw.\n"
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+                    align.basePw += self.getGringoAggrRule(False, name1, True, name2, False)
+                    # align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n"
                     align.basePw += ":- rel(" + name1 + ", " + name2 + ", \"><\").\n" 
                     align.basePw += "rel(" + name1 + ", " + name2 + ", \"<\") | rel(" + name1 + ", " + name2 + ", \"!\").\n" 
                     result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
@@ -357,9 +392,11 @@ class Articulation:
                     result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
                     result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    align.basePw += "vrs(X) | irs(X) :- out(" + name1 + ",X): in(" + name2 + ",X).\n" 
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n" 
+                    align.basePw += "vrs(X) | irs(X) :- out(" + name1 + ",X): in(" + name2 + ",X).\n"
+                    align.basePw += self.getGringoAggrRule(True, name1, True, name2, False)
+                    align.basePw += self.getGringoAggrRule(True, name1, False, name2, False)
+                    # align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n"
+                    # align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n"
             elif self.relations == (rcc5["includes"] | rcc5["disjoint"]):
                 if reasoner[rnr] == reasoner["dlv"]:
                     result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n"
@@ -382,23 +419,37 @@ class Articulation:
                     result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ", X)} = 0.\n\n"
                 elif reasoner[rnr] == reasoner["gringo"]:
                     result += "vr(X, r" + self.ruleNum.__str__() + ") | ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n" 
-                    result += "vr(X, r" + self.ruleNum.__str__() + ") | ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
-                    result += ":- 1[vrs(X): in(" + name1 + ",X): out(" + name2 + ", X)], 1[vrs(X): out(" + name1 + ",X): in(" + name2 + ", X)].\n"
-                    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)]0.\n\n"
+                    result += "vr(X, r" + self.ruleNum.__str__() + ") | ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
+
+                    firstRule = self.getGringoAggrRule(True, name1, False, name2, False).replace(":- ", ":- 1").replace("0.\n", ", ")
+                    secodRule = self.getGringoAggrRule(False, name1, True, name2, False).replace(":- ", "1").replace("0.", ".")
+                    thirdRule = self.getGringoAggrRule(True, name1, True, name2, False).replace("0.\n", "0.\n\n")
+                    result += firstRule + secodRule + thirdRule
+                    # result += ":- 1[vrs(X): in(" + name1 + ",X): out(" + name2 + ", X)], 1[vrs(X): out(" + name1 + ",X): in(" + name2 + ", X)].\n"
+                    # result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)]0.\n\n"
             elif self.relations == (rcc5["is_included_in"] | rcc5["equals"] | rcc5["overlaps"]):
                 if reasoner[rnr] == reasoner["dlv"]:
                     result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ", X)} > 0, #count{Y: vrs(Y), out(" + name1 + ",Y), in(" + name2 + ", Y)} = 0.\n"
                     result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ", X)} = 0.\n\n"
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    result += ":- 1[vrs(X): in(" + name1 + ",X): out(" + name2 + ", X)], [vrs(X): out(" + name1 + ",X): in(" + name2 + ", X)]0.\n"
-                    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)]0.\n\n"
+
+                    firstRule = self.getGringoAggrRule(True, name1, False, name2, False).replace(":- ", ":- 1").replace("0.\n", ",")
+                    secodRule = self.getGringoAggrRule(False, name1, True, name2, False).replace(":- ", "")
+                    thirdRule = self.getGringoAggrRule(True, name1, True, name2, False).replace("0.\n", "0.\n\n")
+                    result += firstRule + secodRule + thirdRule
+                    # result += ":- 1[vrs(X): in(" + name1 + ",X): out(" + name2 + ", X)], [vrs(X): out(" + name1 + ",X): in(" + name2 + ", X)]0.\n"
+                    # result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)]0.\n\n"
             elif self.relations == (rcc5["includes"] | rcc5["equals"] | rcc5["overlaps"]):
                 if reasoner[rnr] == reasoner["dlv"]:
                     result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ", X)} = 0, #count{Y: vrs(Y), out(" + name1 + ",Y), in(" + name2 + ", Y)} > 0.\n"
                     result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ", X)} = 0.\n\n"
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    result += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ", X)]0, 1[vrs(X): out(" + name1 + ",X): in(" + name2 + ", X)].\n"
-                    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)]0.\n\n"
+                    firstRule = self.getGringoAggrRule(True, name1, False, name2, False).replace(".\n", ",")
+                    secodRule = self.getGringoAggrRule(False, name1, True, name2, False).replace(":- ", "1").replace("0.", ".")
+                    thirdRule = self.getGringoAggrRule(True, name1, True, name2, False).replace("0.\n", "0.\n\n")
+                    result += firstRule + secodRule + thirdRule
+                    # result += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ", X)]0, 1[vrs(X): out(" + name1 + ",X): in(" + name2 + ", X)].\n"
+                    # result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)]0.\n\n"
             elif self.relations == (rcc5["equals"] | rcc5["includes"] | rcc5["disjoint"]):
                 if reasoner[rnr] == reasoner["dlv"]:
                     result += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2 + ", X)} = 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} = 0.\n"
@@ -420,8 +471,14 @@ class Articulation:
                     result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ", X)} = 0, #count{Y: vrs(Y), out(" + name1 + ",Y), in(" + name2 + ", Y)} = 0, #count{Z: vrs(Z), in(" + name1 + ",Z), in(" + name2 + ", Z)} > 0.\n"
                     result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ", X)} = 0.\n\n"
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    result += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ", X)]0, [vrs(X): out(" + name1 + ",X): in(" + name2 + ", X)]0, 1[vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)].\n"
-                    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)]0.\n\n"
+
+                    firstRule = self.getGringoAggrRule(True, name1, False, name2, False).replace(".\n", ",")
+                    secodRule = self.getGringoAggrRule(False, name1, True, name2, False).replace(":- ", "").replace(".\n", ",")
+                    thirdRule = self.getGringoAggrRule(True, name1, True, name2, False).replace(":- ", "").replace("0.\n", ".\n")
+                    forthRule = self.getGringoAggrRule(True, name1, True, name2, False).replace(".\n", ".\n\n")
+                    result += firstRule + secodRule + thirdRule + forthRule
+                    # result += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ", X)]0, [vrs(X): out(" + name1 + ",X): in(" + name2 + ", X)]0, 1[vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)].\n"
+                    # result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)]0.\n\n"
             elif self.relations == (rcc5["disjoint"] | rcc5["equals"] | rcc5["overlaps"]):
                 if reasoner[rnr] == reasoner["dlv"]:
                     result  = ":- #count{X : vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y : vrs(Y), out(" + name1 + ", Y ), in(" + name2 + ", Y )} = 0.\n"
@@ -498,10 +555,14 @@ class Articulation:
                     result += ":- #count{X: vrs(X), out(" + name2 + ",X), in(" + name3 + ",X)} = 0, pw.\n" 
                     result += ":- #count{X: vrs(X), in(" + name2 + ",X), in(" + name3 + ",X)} = 0, pw.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name3 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name3 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): out(" + name2 + ",X): in(" + name3 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): in(" + name2 + ",X): in(" + name3 + ",X)]0.\n" 
+                    align.basePw += self.getGringoAggrRule(False, name1, True, name3, False)
+                    align.basePw += self.getGringoAggrRule(True, name1, True, name3, False)
+                    align.basePw += self.getGringoAggrRule(False, name2, True, name3, False)
+                    align.basePw += self.getGringoAggrRule(True, name2, True, name3, False)
+                    # align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name3 + ",X)]0.\n"
+                    # align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name3 + ",X)]0.\n"
+                    # align.basePw += ":- [vrs(X): out(" + name2 + ",X): in(" + name3 + ",X)]0.\n"
+                    # align.basePw += ":- [vrs(X): in(" + name2 + ",X): in(" + name3 + ",X)]0.\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), out(" + name1 + ", X), in(" + name3 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), out(" + name1 + ", X), in(" + name3 + ", X), ix.\n\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), in(" + name1 + ", X), in(" + name3 + ", X), ix.\n"
@@ -526,10 +587,14 @@ class Articulation:
                     result += ":- #count{X: vrs(X), out(" + name3 + ",X), in(" + name2 + ",X)} = 0.\n" 
                     result += ":- #count{X: vrs(X), in(" + name3 + ",X), in(" + name2 + ",X)} = 0.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    result  = ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
-                    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
-                    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name2 + ",X)]0.\n" 
-                    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name2 + ",X)]0.\n" 
+                    result = self.getGringoAggrRule(False, name1, True, name2, False)
+                    result += self.getGringoAggrRule(True, name1, True, name2, False)
+                    result += self.getGringoAggrRule(False, name3, True, name2, False)
+                    result += self.getGringoAggrRule(True, name3, True, name2, False)
+                    # result  = ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n"
+                    # result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n"
+                    # result += ":- [vrs(X): out(" + name3 + ",X): in(" + name2 + ",X)]0.\n"
+                    # result += ":- [vrs(X): in(" + name3 + ",X): in(" + name2 + ",X)]0.\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
@@ -551,12 +616,18 @@ class Articulation:
                     result += ":- #count{X: vrs(X), out(" + name3 + ",X), in(" + name4 + ",X)} = 0.\n" 
                     result += ":- #count{X: vrs(X), in(" + name3 + ",X), in(" + name4 + ",X)} = 0.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    result  = ":- [vrs(X): out(" + name1 + ",X): in(" + name4 + ",X)]0.\n" 
-                    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name4 + ",X)]0.\n" 
-                    result += ":- [vrs(X): out(" + name2 + ",X): in(" + name4 + ",X)]0.\n" 
-                    result += ":- [vrs(X): in(" + name2 + ",X): in(" + name4 + ",X)]0.\n"
-                    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name4 + ",X)]0.\n" 
-                    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name4 + ",X)]0.\n"
+                    result = self.getGringoAggrRule(False, name1, True, name4, False)
+                    result += self.getGringoAggrRule(True, name1, True, name4, False)
+                    result += self.getGringoAggrRule(False, name2, True, name4, False)
+                    result += self.getGringoAggrRule(True, name2, True, name4, False)
+                    result += self.getGringoAggrRule(False, name3, True, name4, False)
+                    result += self.getGringoAggrRule(True, name3, True, name4, False)
+                    # result  = ":- [vrs(X): out(" + name1 + ",X): in(" + name4 + ",X)]0.\n"
+                    # result += ":- [vrs(X): in(" + name1 + ",X): in(" + name4 + ",X)]0.\n"
+                    # result += ":- [vrs(X): out(" + name2 + ",X): in(" + name4 + ",X)]0.\n"
+                    # result += ":- [vrs(X): in(" + name2 + ",X): in(" + name4 + ",X)]0.\n"
+                    # result += ":- [vrs(X): out(" + name3 + ",X): in(" + name4 + ",X)]0.\n"
+                    # result += ":- [vrs(X): in(" + name3 + ",X): in(" + name4 + ",X)]0.\n"
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name4 + ",X).\n" 
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name4 + ",X).\n"
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name4 + ",X).\n"
@@ -576,14 +647,22 @@ class Articulation:
                     result += ":- #count{X: vrs(X), out(" + name4 + ",X), in(" + name5 + ",X)} = 0.\n" 
                     result += ":- #count{X: vrs(X), in(" + name4 + ",X), in(" + name5 + ",X)} = 0.\n"
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    result  = ":- [vrs(X): out(" + name1 + ",X): in(" + name5 + ",X)]0.\n" 
-                    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name5 + ",X)]0.\n" 
-                    result += ":- [vrs(X): out(" + name2 + ",X): in(" + name5 + ",X)]0.\n" 
-                    result += ":- [vrs(X): in(" + name2 + ",X): in(" + name5 + ",X)]0.\n"
-                    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name5 + ",X)]0.\n" 
-                    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name5 + ",X)]0.\n"
-                    result += ":- [vrs(X): out(" + name4 + ",X): in(" + name5 + ",X)]0.\n" 
-                    result += ":- [vrs(X): in(" + name4 + ",X): in(" + name5 + ",X)]0.\n"
+                    result = self.getGringoAggrRule(False, name1, True, name5, False)
+                    result += self.getGringoAggrRule(True, name1, True, name5, False)
+                    result += self.getGringoAggrRule(False, name2, True, name5, False)
+                    result += self.getGringoAggrRule(True, name2, True, name5, False)
+                    result += self.getGringoAggrRule(False, name3, True, name5, False)
+                    result += self.getGringoAggrRule(True, name3, True, name5, False)
+                    result += self.getGringoAggrRule(False, name4, True, name5, False)
+                    result += self.getGringoAggrRule(True, name4, True, name5, False)
+                    # result  = ":- [vrs(X): out(" + name1 + ",X): in(" + name5 + ",X)]0.\n"
+                    # result += ":- [vrs(X): in(" + name1 + ",X): in(" + name5 + ",X)]0.\n"
+                    # result += ":- [vrs(X): out(" + name2 + ",X): in(" + name5 + ",X)]0.\n"
+                    # result += ":- [vrs(X): in(" + name2 + ",X): in(" + name5 + ",X)]0.\n"
+                    # result += ":- [vrs(X): out(" + name3 + ",X): in(" + name5 + ",X)]0.\n"
+                    # result += ":- [vrs(X): in(" + name3 + ",X): in(" + name5 + ",X)]0.\n"
+                    # result += ":- [vrs(X): out(" + name4 + ",X): in(" + name5 + ",X)]0.\n"
+                    # result += ":- [vrs(X): in(" + name4 + ",X): in(" + name5 + ",X)]0.\n"
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name5 + ",X).\n" 
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name5 + ",X).\n"
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name5 + ",X).\n"
@@ -596,10 +675,14 @@ class Articulation:
                     result += ":- #count{X: vrs(X), out(" + name3 + ",X), in(" + name1 + ",X)} = 0.\n" 
                     result += ":- #count{X: vrs(X), in(" + name3 + ",X), in(" + name1 + ",X)} = 0.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    result  = ":- [vrs(X): out(" + name2 + ",X): in(" + name1 + ",X)]0.\n"
-                    result += ":- [vrs(X): in(" + name2 + ",X): in(" + name1 + ",X)]0.\n"            
-                    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
-                    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
+                    result = self.getGringoAggrRule(False, name2, True, name1, False)
+                    result += self.getGringoAggrRule(True, name2, True, name1, False)
+                    result += self.getGringoAggrRule(False, name3, True, name1, False)
+                    result += self.getGringoAggrRule(True, name3, True, name1, False)
+                    # result  = ":- [vrs(X): out(" + name2 + ",X): in(" + name1 + ",X)]0.\n"
+                    # result += ":- [vrs(X): in(" + name2 + ",X): in(" + name1 + ",X)]0.\n"
+                    # result += ":- [vrs(X): out(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
+                    # result += ":- [vrs(X): in(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name1 + ",X).\n" 
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name1 + ",X).\n"
             elif self.relations == relation["=3+"]:
@@ -613,12 +696,18 @@ class Articulation:
                     result += ":- #count{X: vrs(X), out(" + name4 + ",X), in(" + name1 + ",X)} = 0.\n" 
                     result += ":- #count{X: vrs(X), in(" + name4 + ",X), in(" + name1 + ",X)} = 0.\n" 
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    result  = ":- [vrs(X): out(" + name2 + ",X): in(" + name1 + ",X)]0.\n"
-                    result += ":- [vrs(X): in(" + name2 + ",X): in(" + name1 + ",X)]0.\n" 
-                    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
-                    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
-                    result += ":- [vrs(X): out(" + name4 + ",X): in(" + name1 + ",X)]0.\n"
-                    result += ":- [vrs(X): in(" + name4 + ",X): in(" + name1 + ",X)]0.\n"
+                    result = self.getGringoAggrRule(False, name2, True, name1, False)
+                    result += self.getGringoAggrRule(True, name2, True, name1, False)
+                    result += self.getGringoAggrRule(False, name3, True, name1, False)
+                    result += self.getGringoAggrRule(True, name3, True, name1, False)
+                    result += self.getGringoAggrRule(False, name4, True, name1, False)
+                    result += self.getGringoAggrRule(True, name4, True, name1, False)
+                    # result  = ":- [vrs(X): out(" + name2 + ",X): in(" + name1 + ",X)]0.\n"
+                    # result += ":- [vrs(X): in(" + name2 + ",X): in(" + name1 + ",X)]0.\n"
+                    # result += ":- [vrs(X): out(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
+                    # result += ":- [vrs(X): in(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
+                    # result += ":- [vrs(X): out(" + name4 + ",X): in(" + name1 + ",X)]0.\n"
+                    # result += ":- [vrs(X): in(" + name4 + ",X): in(" + name1 + ",X)]0.\n"
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name1 + ",X).\n" 
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name1 + ",X).\n"
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name4 + ",X), out(" + name1 + ",X).\n"
@@ -636,14 +725,22 @@ class Articulation:
             	    result += ":- #count{X: vrs(X), out(" + name5 + ",X), in(" + name1 + ",X)} = 0.\n" 
             	    result += ":- #count{X: vrs(X), in(" + name5 + ",X), in(" + name1 + ",X)} = 0.\n"
                 elif reasoner[rnr] == reasoner["gringo"]:
-                    result  = ":- [vrs(X): out(" + name2 + ",X): in(" + name1 + ",X)]0.\n" 
-            	    result += ":- [vrs(X): in(" + name2 + ",X): in(" + name1 + ",X)]0.\n" 
-            	    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name1 + ",X)]0.\n" 
-            	    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
-            	    result += ":- [vrs(X): out(" + name4 + ",X): in(" + name1 + ",X)]0.\n" 
-            	    result += ":- [vrs(X): in(" + name4 + ",X): in(" + name1 + ",X)]0.\n"
-            	    result += ":- [vrs(X): out(" + name5 + ",X): in(" + name1 + ",X)]0.\n" 
-            	    result += ":- [vrs(X): in(" + name5 + ",X): in(" + name1 + ",X)]0.\n"
+                    result = self.getGringoAggrRule(False, name2, True, name1, False)
+                    result += self.getGringoAggrRule(True, name2, True, name1, False)
+                    result += self.getGringoAggrRule(False, name3, True, name1, False)
+                    result += self.getGringoAggrRule(True, name3, True, name1, False)
+                    result += self.getGringoAggrRule(False, name4, True, name1, False)
+                    result += self.getGringoAggrRule(True, name4, True, name1, False)
+                    result += self.getGringoAggrRule(False, name5, True, name1, False)
+                    result += self.getGringoAggrRule(True, name5, True, name1, False)
+                    # result  = ":- [vrs(X): out(" + name2 + ",X): in(" + name1 + ",X)]0.\n"
+            	    # result += ":- [vrs(X): in(" + name2 + ",X): in(" + name1 + ",X)]0.\n"
+            	    # result += ":- [vrs(X): out(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
+            	    # result += ":- [vrs(X): in(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
+            	    # result += ":- [vrs(X): out(" + name4 + ",X): in(" + name1 + ",X)]0.\n"
+            	    # result += ":- [vrs(X): in(" + name4 + ",X): in(" + name1 + ",X)]0.\n"
+            	    # result += ":- [vrs(X): out(" + name5 + ",X): in(" + name1 + ",X)]0.\n"
+            	    # result += ":- [vrs(X): in(" + name5 + ",X): in(" + name1 + ",X)]0.\n"
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name1 + ",X).\n" 
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name1 + ",X).\n"
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name4 + ",X), out(" + name1 + ",X).\n"
