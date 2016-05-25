@@ -104,6 +104,7 @@ reasoner["gringo"] = 1 << 1
 reasoner["rcc"] = 1 << 2
 reasoner["rcceq"] = 1 << 3
 reasoner["rccpw"] = 1 << 4
+reasoner["shawn"] = 1 << 5
 
 encode = {}
 encode[0] = 0                                  # null encoding

@@ -224,9 +224,18 @@ class TaxonomyMapping:
         self.hvinternalfile = os.path.join(self.pwoutputfiledir, 'hv.internal')
         
         # files while using rcc reasoner
-        self.rccfilesdir = os.path.join(self.outputdir, "8-RCC-files")
-        if not os.path.exists(self.rccfilesdir):
-            os.mkdir(self.rccfilesdir)
+        if reasoner[self.args['-r']] == reasoner["rcc"] or reasoner[self.args['-r']] == reasoner["rcceq"] \
+            or reasoner[self.args['-r']] == reasoner["rccpw"]:
+            self.rccfilesdir = os.path.join(self.outputdir, "8-RCC-files")
+            if not os.path.exists(self.rccfilesdir):
+                os.mkdir(self.rccfilesdir)
+        
+        # files while using Shawn's reasoner
+        if reasoner[self.args['-r']] == reasoner["shawn"]:
+            self.shawnfilesdir = os.path.join(self.outputdir, "9-Shawn-output")
+            if not os.path.exists(self.shawnfilesdir):
+                os.mkdir(self.shawnfilesdir)
+            self.shawnoutput = os.path.join(self.shawnfilesdir, "output.txt")
         
         if self.enc & encode["ob"]:
             self.obsdir = os.path.join(self.outputdir, "obs")
@@ -270,7 +279,10 @@ class TaxonomyMapping:
             #self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch
             # consistency command
             self.con = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+ self.pwswitch
-        elif reasoner[self.args['-r']] == reasoner["rcc"] or reasoner[self.args['-r']] == reasoner["rcceq"] or reasoner[self.args['-r']] == reasoner["rccpw"]:
+        elif reasoner[self.args['-r']] == reasoner["shawn"]:
+            self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f t f"
+        elif reasoner[self.args['-r']] == reasoner["rcc"] or reasoner[self.args['-r']] == reasoner["rcceq"] \
+            or reasoner[self.args['-r']] == reasoner["rccpw"]:
             pass
         else:
             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")
@@ -313,6 +325,9 @@ class TaxonomyMapping:
         return taxa
 
     def run(self):
+        if reasoner[self.args['-r']] == reasoner["shawn"]:
+            self.runShawn()
+            return
         if reasoner[self.args['-r']] == reasoner["rcc"]:
             self.runRCCReasoner()
             return
@@ -3436,6 +3451,168 @@ class TaxonomyMapping:
         toDo.put(deducedPair)
         return True
 
+    def runShawn(self):
+        newgetoutput(self.com)
+        
+        # read shawn's input
+        pwIndex = 0
+        currentChunk = []
+        chunks = []
+        fIn = open(self.shawnoutput, "r")
+        lines = fIn.readlines()
+        for line in lines:
+            
+            if line.startswith("articulation") and currentChunk:
+                chunks.append(currentChunk[:])
+                currentChunk = []
+            
+            if re.match("\[.*?\]", line):
+                currentChunk.append(line)
+            
+        chunks.append(currentChunk)
+        
+        # for each PW
+        if len(chunks) == 1:
+            tmptr = copy.deepcopy(self.tr)
+            self.prepareShawnInternal(chunks[0], pwIndex, tmptr)
+        else:
+            for i in range(1, len(chunks)):
+                tmptr = copy.deepcopy(self.tr)
+                self.prepareShawnInternal(chunks[i], pwIndex, tmptr)
+                pwIndex = pwIndex + 1
+        
+        fIn.close()
+            
+#            if not singlePWFlag:
+#                if (re.match("\[.*?\]", line)) and not singlePWFlag:
+#                    tmpLines.append(lines)
+#                    items = re.match("\[(.*)\ (.*)\ (.*)\]", line)
+#                    node1 = items.group(1)
+#                    rel = items.group(2)
+#                    node2 = items.group(3)
+                    
+                    #f = open(self.pwinternalfile + (pwIndex-1).__str__(), "w")
+                    
+                
+                
+        
+#        for pair in self.getAllTaxonPairs():
+#            print "Pair are: ", pair[0].taxonomy.abbrev, pair[0].name, "and", pair[1].taxonomy.abbrev, pair[1].name, self.findRelWithinTaxonomy(pair[0], pair[1])
+    
+    def prepareShawnInternal(self, chunk, pwIndex, tmptr):
+        # create intra-mir
+        tmpmir = {}
+        tmpeq = copy.deepcopy(self.eq)
+        for pair in self.getAllTaxonPairs():
+            if pair[0].taxonomy.abbrev == pair[1].taxonomy.abbrev:
+                intraRel = self.findRelWithinTaxonomy(pair[0], pair[1])
+                name1 = pair[0].taxonomy.abbrev + "." + pair[0].name
+                name2 = pair[1].taxonomy.abbrev + "." + pair[1].name
+                tmpmir[name1+","+name2] = relation[intraRel]
+                
+        for line in chunk:
+            
+            items = re.match("\[(.*)\ (.*)\ (.*)\]", line)
+            node1 = items.group(1)
+            rel = items.group(2)
+            node2 = items.group(3)
+            
+            # create tr
+            if rel == "is_included_in" and self.notInTr(node1, node2):
+                tmptr.append([node1, node2, 1])
+            if rel == "includes" and self.notInTr(node2, node1):
+                tmptr.append([node2, node1, 1])
+                
+            # create inter-mir
+            tmpmir[node1+","+node2] = rcc5[rel]
+            
+        # create eq
+        for k,v in tmpmir.iteritems():
+            if v == relation["="]:
+                t1 = k.split(",")[0]
+                t2 = k.split(",")[1]
+                if t1 in tmpeq:
+                    tmpeq[t1].add(t2)
+                else:
+                    tmpeq[t1] = sets.Set([t2])
+                if t2 in tmpeq:
+                    tmpeq[t2].add(t1)
+                else:
+                    tmpeq[t2] = sets.Set([t1])
+            
+#        print "pwIndex= ", pwIndex
+#        print "tmptr= ", tmptr
+#        print "tmpmir=", tmpmir
+#        print "tmpeq=", tmpeq
+#        print ""
+        
+        # create internal file
+        f = open(self.pwinternalfile + pwIndex.__str__(), "w")
+        f.write('from sets import Set\n')
+        f.write('fileName = ' + repr(self.name + "_" + pwIndex.__str__() + "_" + self.args['-e']) + '\n')
+        f.write('pwIndex = ' + repr(pwIndex) + '\n')
+        f.write('eq = ' + repr(tmpeq) + '\n')
+        f.write('firstTName = ' + repr(self.firstTName) + '\n')
+        f.write('secondTName = ' + repr(self.secondTName) + '\n')
+        f.write('thirdTName = ' + repr(self.thirdTName) + '\n')
+        f.write('fourthTName = ' + repr(self.fourthTName) + '\n')
+        f.write('fifthTName = ' + repr(self.fifthTName) + '\n')
+        f.write('eqConLi = ' + repr(self.eqConLi) + '\n')
+        f.write('tr = ' + repr(tmptr) + '\n')
+        f.write('mir = ' + repr(tmpmir) + '\n')
+        f.close()
+        
+        return
+    
+    def notInTr(self, node1, node2):
+        notInTrFlag = True 
+        for pair in self.tr:
+            if node1 == pair[0] and node2 == pair[1]:
+                notInTrFlag = False
+                break
+        return notInTrFlag
+        
+    def findRelWithinTaxonomy(self, t1, t2):
+        rel = ""
+        ancestors = []
+        descendants = []
+        self.findAncestors(t1, ancestors)
+        self.findDescendants(t1, descendants)
+        
+        if t2 in ancestors:
+            alwaysHasOneChild = True
+            for ancestor in ancestors:
+                if len(ancestor.children) > 1:
+                    alwaysHasOneChild = False
+                    break
+            if alwaysHasOneChild:
+                rel = "="
+            else:
+                rel = "<"
+        elif t2 in descendants:
+            alwaysHasOneChild = True
+            if len(t1.children) > 1:
+                alwaysHasOneChild = False
+            else:
+                for descendant in descendants:
+                    if len(descendant.children) > 1:
+                        alwaysHasOneChild = False
+                        break
+            if alwaysHasOneChild:
+                rel = "="
+            else:
+                rel = ">"
+        else:
+            rel = "!"
+        
+        return rel
+    
+    def hasOnlyOneChild(self, taxon):
+        if len(taxon.children) == 1:
+            return True
+        else:
+            return False
+
     
     def runRCCReasoner(self):
 #        for pair in self.getAllArticulationPairs():
@@ -3444,13 +3621,13 @@ class TaxonomyMapping:
 #        a = []
 #        d = []
 #        self.findAncestors(t, a)
-#        self.findDescedants(t, d)
+#        self.findDescendants(t, d)
 #        print t.name
 #        print ""
 #        for eachD in d:
 #            print eachD.name 
 ##
-#        for pair in self.getAllArticulationPairs():
+#        for pair in self.getAllTaxonPairs():
 #            print "Pair are: ", pair[0].taxonomy.abbrev, pair[0].name, "and", pair[1].taxonomy.abbrev, pair[1].name
 #            print pair[0].taxonomy.abbrev, pair[0].name
 #            for child in pair[0].children:
@@ -3767,11 +3944,11 @@ class TaxonomyMapping:
             ancestors.append(taxon.parent)
             self.findAncestors(taxon.parent, ancestors)
     
-    def findDescedants(self, taxon, descedants):
+    def findDescendants(self, taxon, descendants):
         if len(taxon.children) > 0:
-            descedants.extend(taxon.children)
+            descendants.extend(taxon.children)
             for child in taxon.children:
-                self.findDescedants(child, descedants)
+                self.findDescendants(child, descendants)
     
     def rccPreProcessGuidedReference(self):
         for art in self.articulations:
