@@ -28,7 +28,7 @@ Usage:
 	euler2 (-h | --help)
 	euler2 --version
 	euler2 check <inputfile>
-	euler2 align <inputfile>... [-o OUTFOLDER] [-e METHOD] [-r TOOL] [-n NPW] [--consistency] [--hidemirdisjoint] [--disablecov] [--disablesib] [--repair=WAY] [--artRem] [--fourinone] [--xia] [--ur] [--ie] [--ieo]
+	euler2 align <inputfile>... [-o OUTFOLDER] [-e METHOD] [-r TOOL] [-n NPW] [--consistency] [--hidemirdisjoint] [--disablecov] [--disablesib] [--repair=WAY] [--artRem] [--fourinone] [--xia] [--ur] [--ie] [--ieo] [--ShawnOnlyMir]
 	euler2 show <name>
 	euler2 show [-o OUTFOLDER] <name>
 	euler2 show <inputfile> [-o OUTFOLDER] iv
@@ -41,6 +41,7 @@ Options:
     -r TOOl		  Set the reasoner, including dlv and gringo [default: dlv].
     -n NPW		  Set the number of possible worlds output, by default output all PWs.
     -o OUTFOLDER	  Set the output folder, ignore it to use the current folder.
+    --ShawnOnlyMir	  Only output MIR in Shawn's reasoner.
     --consistency	  Check consistency ONLY.
     --disablecov	  Disable coverage.
     --disablesib	  Disable sibling disjointness.

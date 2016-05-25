@@ -280,7 +280,10 @@ class TaxonomyMapping:
             # consistency command
             self.con = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+ self.pwswitch
         elif reasoner[self.args['-r']] == reasoner["shawn"]:
-            self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f t f"
+            if self.args['--ShawnOnlyMir']:
+                self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f f f"
+            else:
+                self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f t f"
         elif reasoner[self.args['-r']] == reasoner["rcc"] or reasoner[self.args['-r']] == reasoner["rcceq"] \
             or reasoner[self.args['-r']] == reasoner["rccpw"]:
             pass
@@ -3511,6 +3514,10 @@ class TaxonomyMapping:
                 tmpmir[name1+","+name2] = relation[intraRel]
                 
         for line in chunk:
+            
+            if "{" in line:
+                print "MIR contains disjunctions, NO visualization."
+                exit(0)
             
             items = re.match("\[(.*)\ (.*)\ (.*)\]", line)
             node1 = items.group(1)
