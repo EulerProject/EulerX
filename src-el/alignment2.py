@@ -224,14 +224,14 @@ class TaxonomyMapping:
         self.hvinternalfile = os.path.join(self.pwoutputfiledir, 'hv.internal')
         
         # files while using rcc reasoner
-        if reasoner[self.args['-r']] == reasoner["rcc"] or reasoner[self.args['-r']] == reasoner["rcceq"] \
-            or reasoner[self.args['-r']] == reasoner["rccpw"]:
+        if reasoner[self.args['-r']] == reasoner["rcc2"] or reasoner[self.args['-r']] == reasoner["rcc2eq"] \
+            or reasoner[self.args['-r']] == reasoner["rcc2pw"]:
             self.rccfilesdir = os.path.join(self.outputdir, "8-RCC-files")
             if not os.path.exists(self.rccfilesdir):
                 os.mkdir(self.rccfilesdir)
         
         # files while using Shawn's reasoner
-        if reasoner[self.args['-r']] == reasoner["shawn"]:
+        if reasoner[self.args['-r']] == reasoner["rcc1"]:
             self.shawnfilesdir = os.path.join(self.outputdir, "9-Shawn-output")
             if not os.path.exists(self.shawnfilesdir):
                 os.mkdir(self.shawnfilesdir)
@@ -279,13 +279,13 @@ class TaxonomyMapping:
             #self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch
             # consistency command
             self.con = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+ self.pwswitch
-        elif reasoner[self.args['-r']] == reasoner["shawn"]:
-            if self.args['--ShawnOnlyMir']:
-                self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f f f"
-            else:
+        elif reasoner[self.args['-r']] == reasoner["rcc1"]:
+            if self.args['--pw']:
                 self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f t f"
-        elif reasoner[self.args['-r']] == reasoner["rcc"] or reasoner[self.args['-r']] == reasoner["rcceq"] \
-            or reasoner[self.args['-r']] == reasoner["rccpw"]:
+            else:
+                self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f f f"
+        elif reasoner[self.args['-r']] == reasoner["rcc2"] or reasoner[self.args['-r']] == reasoner["rcc2eq"] \
+            or reasoner[self.args['-r']] == reasoner["rcc2pw"]:
             pass
         else:
             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")
@@ -328,16 +328,16 @@ class TaxonomyMapping:
         return taxa
 
     def run(self):
-        if reasoner[self.args['-r']] == reasoner["shawn"]:
+        if reasoner[self.args['-r']] == reasoner["rcc1"]:
             self.runShawn()
             return
-        if reasoner[self.args['-r']] == reasoner["rcc"]:
+        if reasoner[self.args['-r']] == reasoner["rcc2"]:
             self.runRCCReasoner()
             return
-        if reasoner[self.args['-r']] ==  reasoner["rcceq"]:
+        if reasoner[self.args['-r']] ==  reasoner["rcc2eq"]:
             self.runRCCEQReasoner()
             return
-        if reasoner[self.args['-r']] ==  reasoner["rccpw"]:
+        if reasoner[self.args['-r']] ==  reasoner["rcc2pw"]:
             originalUberMir = {}
             originalUberMir = self.processInputFile()
             self.handleRCCPW(originalUberMir)
