@@ -47,6 +47,7 @@ relation["="] = 1 << 2
 relation[">"] = 1 << 3
 #relation["<>"] = 1 << 3
 relation["><"] = 1 << 4
+relation["o"] = 1 << 4
 # Imfer bit
 relation["input"] = 1 << 5
 relation["infer"] = 1 << 6

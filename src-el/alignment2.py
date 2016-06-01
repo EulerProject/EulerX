@@ -235,6 +235,8 @@ class TaxonomyMapping:
             self.shawnfilesdir = os.path.join(self.outputdir, "9-Shawn-output")
             if not os.path.exists(self.shawnfilesdir):
                 os.mkdir(self.shawnfilesdir)
+            self.shawninputhashed = os.path.join(self.shawnfilesdir, "inputhashed.txt")
+            self.shawnoutputhashed = os.path.join(self.shawnfilesdir, "outputhashed.txt")
             self.shawnoutput = os.path.join(self.shawnfilesdir, "output.txt")
         
         if self.enc & encode["ob"]:
@@ -279,13 +281,13 @@ class TaxonomyMapping:
             #self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch
             # consistency command
             self.con = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+ self.pwswitch
-        elif reasoner[self.args['-r']] == reasoner["rcc1"]:
-            if self.args['--pw']:
-                self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f t f"
-            else:
-                self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f f f"
-        elif reasoner[self.args['-r']] == reasoner["rcc2"] or reasoner[self.args['-r']] == reasoner["rcc2eq"] \
-            or reasoner[self.args['-r']] == reasoner["rcc2pw"]:
+#        elif reasoner[self.args['-r']] == reasoner["rcc1"]:
+#            if self.args['--pw']:
+#                self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f t f"
+#            else:
+#                self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f f f"
+        elif reasoner[self.args['-r']] == reasoner["rcc1"] or reasoner[self.args['-r']] == reasoner["rcc2"] \
+            or reasoner[self.args['-r']] == reasoner["rcc2eq"] or reasoner[self.args['-r']] == reasoner["rcc2pw"]:
             pass
         else:
             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")
@@ -3455,9 +3457,22 @@ class TaxonomyMapping:
         return True
 
     def runShawn(self):
-        newgetoutput(self.com)
+        # hash the original file
+        cmd = "hash_names.py " + self.args['<inputfile>'][0] + " > " + self.shawninputhashed
+        newgetoutput(cmd)
         
-        # read shawn's input
+        # run Shawn's reasoner
+        if self.args['--pw']:
+            cmd = "mir.py " + self.shawninputhashed + " " + self.shawnoutputhashed + " f t f"
+        else:
+            cmd = "mir.py " + self.shawninputhashed + " " + self.shawnoutputhashed + " f f f"
+        newgetoutput(cmd)
+        
+        # unhash shawn's output
+        cmd = "unhash_names.py " + self.shawnoutputhashed + " hash_values.json > " + self.shawnoutput
+        newgetoutput(cmd)
+        
+        # read shawn's output
         pwIndex = 0
         currentChunk = []
         chunks = []
@@ -3485,20 +3500,7 @@ class TaxonomyMapping:
                 pwIndex = pwIndex + 1
         
         fIn.close()
-            
-#            if not singlePWFlag:
-#                if (re.match("\[.*?\]", line)) and not singlePWFlag:
-#                    tmpLines.append(lines)
-#                    items = re.match("\[(.*)\ (.*)\ (.*)\]", line)
-#                    node1 = items.group(1)
-#                    rel = items.group(2)
-#                    node2 = items.group(3)
-                    
-                    #f = open(self.pwinternalfile + (pwIndex-1).__str__(), "w")
-                    
                 
-                
-        
 #        for pair in self.getAllTaxonPairs():
 #            print "Pair are: ", pair[0].taxonomy.abbrev, pair[0].name, "and", pair[1].taxonomy.abbrev, pair[1].name, self.findRelWithinTaxonomy(pair[0], pair[1])
     

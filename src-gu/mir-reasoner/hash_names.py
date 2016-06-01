@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 import sys
 import string
 import json
@@ -52,10 +52,20 @@ def main(infile):
     ident = 1
     taxonomy = 0
     mapping = {}
+    taxonomy1id = ""
+    taxonomy2id = ""
+    taxonomy1desc = ""
+    taxonomy2desc = ""
     for line in inputfile:
         # taxonomy section start
         if is_taxonomy(line): 
             taxonomy = taxonomy_id(line)
+            if taxonomy1id == "":
+                taxonomy1id = line.split()[1]
+                taxonomy1desc = line.split()[2]
+            elif taxonomy2id == "":
+                taxonomy2id = line.split()[1]
+                taxonomy2desc = line.split()[2]
             sys.stdout.write(line)
         # hirearchical spec
         elif is_hierarchy(line):
@@ -77,8 +87,9 @@ def main(infile):
                     sys.stdout.write(' ')
             sys.stdout.write(')\n')
         # articulation section
-        elif is_articulation_header(line): 
-            sys.stdout.write(line)
+        elif is_articulation_header(line):
+            tmpStr = "\narticulation " + taxonomy1id+taxonomy2id + " " +  taxonomy1desc+taxonomy2desc + "\n"
+            sys.stdout.write(tmpStr)
         elif is_articulation(line):
             terms = articulation_terms(line)
             sys.stdout.write('[' + mapping[terms[0]] + ' ')
