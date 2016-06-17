@@ -528,7 +528,7 @@ class ProductsShowing:
                                     if ss not in it.eqConLi:
                                         it.eqConLi.append(ss)
                                     break
-        
+            
             # Equalities
             for T1 in it.eq.keys():
                 # it.eq is dynamically changed, so we need this check
@@ -574,6 +574,9 @@ class ProductsShowing:
                         if it.tr.count([T3, T4, P]) > 0:
                             it.tr.remove([T3, T4, P])
                             it.tr.append([T5,T4,0])
+            tmpTr = list(it.tr)
+            for [T3, T4, P] in tmpTr:
+                for T5 in it.eqConLi:
                     if(T4 != T5 and set(T4.split("\\n")).issubset(set(T5.split("\\n")))):
                         if it.tr.count([T3, T4, P]) > 0:
                             it.tr.remove([T3, T4, P])
