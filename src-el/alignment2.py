@@ -332,17 +332,21 @@ class TaxonomyMapping:
     def run(self):
         if reasoner[self.args['-r']] == reasoner["rcc1"]:
             self.runShawn()
+            self.updateReportFile(self.reportfile)
             return
         if reasoner[self.args['-r']] == reasoner["rcc2"]:
             self.runRCCReasoner()
+            self.updateReportFile(self.reportfile)
             return
         if reasoner[self.args['-r']] ==  reasoner["rcc2eq"]:
             self.runRCCEQReasoner()
+            self.updateReportFile(self.reportfile)
             return
         if reasoner[self.args['-r']] ==  reasoner["rcc2pw"]:
             originalUberMir = {}
             originalUberMir = self.processInputFile()
             self.handleRCCPW(originalUberMir)
+            self.updateReportFile(self.reportfile)
             return
         if not self.enc:
             return
