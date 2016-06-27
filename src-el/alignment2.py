@@ -330,6 +330,7 @@ class TaxonomyMapping:
         return taxa
 
     def run(self):
+        print "******* You are running example", self.name, "*******"
         if reasoner[self.args['-r']] == reasoner["rcc1"]:
             self.runShawn()
             self.updateReportFile(self.reportfile)
@@ -350,7 +351,6 @@ class TaxonomyMapping:
             return
         if not self.enc:
             return
-        print "******* You are running example", self.name, "*******"
         self.genASP()
         if self.args['--consistency']:
             if not self.testConsistency():
@@ -3286,7 +3286,7 @@ class TaxonomyMapping:
             # print Possible Worlds
             print "\n\nPossible Worlds: ", self.numPWsInRCC
             for k,v in newOutputUberMir.iteritems():
-                print k[0].taxonomy.abbrev, k[0].name, findkey(relation,v), k[1].taxonomy.abbrev, k[1].name
+                print k[0].taxonomy.abbrev+"."+k[0].name, findkey(relation,v), k[1].taxonomy.abbrev+"."+k[1].name
             self.numPWsInRCC = self.numPWsInRCC + 1
         return
     
@@ -3660,7 +3660,7 @@ class TaxonomyMapping:
         # prepare for input
         for pair in self.getAllArticulationPairs():
 #            print "pair[0].taxonomy", pair[0].taxonomy.abbrev, self.firstTName
-            if pair[0].taxonomy.abbrev == self.firstTName:
+            if pair[0].taxonomy.abbrev == self.firstTName or pair[0].taxonomy.abbrev < pair[1].taxonomy.abbrev:
                 self.allPairsMir[(pair[0], pair[1])] = relation["{=, >, <, !, ><}"]
             else:
                 self.allPairsMir[(pair[1], pair[0])] = relation["{=, >, <, !, ><}"]
@@ -3669,7 +3669,7 @@ class TaxonomyMapping:
             self.allPairsMir[(art.taxon1, art.taxon2)] = art.relations
         
 #        for k,v in self.allPairsMir.iteritems():
-#            print k[0].name, k[1].name, v
+#            print k[0].taxonomy.abbrev+"."+k[0].name, k[1].taxonomy.abbrev+"."+k[1].name, v
 
         # apply the RCC preprocessing
         #self.rccPreProcessGuidedReference()
@@ -3906,7 +3906,7 @@ class TaxonomyMapping:
         mirList = []
         fmir = open(self.mirfile, 'w')
         for k,v in finalMir.iteritems():
-            mirList.append([self.firstTName + "." + k[0].name, findkey(relation, v), self.secondTName + "." + k[1].name])
+            mirList.append([k[0].taxonomy.abbrev + "." + k[0].name, findkey(relation, v), k[1].taxonomy.abbrev + "." + k[1].name])
         
         # sorted the mirList
         print "#########"
@@ -3919,7 +3919,7 @@ class TaxonomyMapping:
         mirList = []
         fmir = open(self.mirfile, 'w')
         for k,v in self.allPairsMir.iteritems():
-            mirList.append([self.firstTName + "." + k[0].name, findkey(relation, v), self.secondTName + "." + k[1].name])
+            mirList.append([k[0].taxonomy.abbrev + "." + k[0].name, findkey(relation, v), k[1].taxonomy.abbrev + "." + k[1].name])
         
         # sorted the mirList
 #        for pair in sorted(mirList, key=itemgetter(3,0,2)):
