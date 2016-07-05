@@ -1992,12 +1992,12 @@ class TaxonomyMapping:
         idlv.write("ix.")
         if reasoner[self.args['-r']] == reasoner["gringo"]:
             if self.enc & encode["ob"]:
-                pdlv.write("\n#hide.\n#show pp/" + self.obslen.__str__() + ".")
+                pdlv.write("\n#show pp/" + self.obslen.__str__() + ".")
             elif self.enc & encode["pw"]:
-                pdlv.write("\n#hide.\n#show rel/3.")
+                pdlv.write("\n#show rel/3.")
             elif self.enc & encode["cb"]:
-                pdlv.write("\n#hide.\n#show relout/3.")
-            idlv.write("\n#hide.\n#show ie/1.")
+                pdlv.write("\n#show relout/3.")
+            idlv.write("\n#show ie/1.")
         pdlv.close()
         idlv.close()
 
@@ -2098,7 +2098,7 @@ class TaxonomyMapping:
                 
                 self.baseAsp += "%%% Euler Bit\n"
                 for i in range(len(couArray)):
-                    self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", V = M1 #mod " + couArray[i].__str__() + ".\n"
+                    self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", V = M1 \ " + couArray[i].__str__() + ".\n"
             self.baseAsp += template.getAspMnCon()
             
         elif self.enc & encode["vr"]:
@@ -2118,7 +2118,7 @@ class TaxonomyMapping:
                 self.baseAsp += "r(0.."+(maxint-1).__str__()+").\n\n"
                 self.baseAsp += "%%% count of concepts\n"
                 self.baseAsp += "count(0.."+(num-1).__str__()+").\n\n"
-                self.baseAsp += "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P, 0 = M1 #mod 2.\n"
+                self.baseAsp += "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P, 0 = M1 \ 2.\n"
                 self.baseAsp += con
             self.baseAsp += template.getAspVrCon()
                 
@@ -2155,18 +2155,12 @@ class TaxonomyMapping:
                             self.baseAsp += "% " + t1.dlvName() + " isa " + t.dlvName() + "\n"
                             ruleNum = len(self.rules)
                             self.rules["r" + ruleNum.__str__()] = t1.dotName() + " isa " + t.dotName()
-                            #self.baseAsp += "in(" + t.dlvName() + ", X) :- in(" + t1.dlvName() + ", X).\n"
-                            #self.baseAsp += "out(" + t1.dlvName() + ", X) :- out(" + t.dlvName() + ", X).\n"
-                            #self.baseAsp += "in(" + t1.dlvName() + ", X) v out(" + t1.dlvName() + ", X) :- in(" + t.dlvName() + ", X).\n"
-                            #self.baseAsp += "in(" + t.dlvName() + ", X) v out(" + t.dlvName() + ", X) :- out(" + t1.dlvName() + ", X).\n"
                             self.baseAsp += "ir(X, r" + ruleNum.__str__() +") :- in(" + t1.dlvName() + ", X), out(" + t.dlvName() + ", X), pw.\n"
                             self.baseAsp += "ir(X, prod(r" + ruleNum.__str__() + ",R)) :- in(" + t1.dlvName() + ",X), out3(" + t.dlvName() + ", X, R), ix.\n" 
 #                            if t1.abbrev.find("nc") == -1:
                             if t1.abbrev.find("nc_") == -1:
-                                if reasoner[self.args['-r']] == reasoner["dlv"]:
-                                    self.baseAsp += ":- #count{X: vrs(X), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0, pw.\n"
-                                elif reasoner[self.args['-r']] == reasoner["gringo"]:
-                                    self.baseAsp += ":- [vrs(X): in(" + t1.dlvName() + ", X): in(" + t.dlvName() + ", X)]0.\n"
+                                self.baseAsp += AggregationRule(firstVar=t1.dlvName(), secondVar=t.dlvName()).rule
+
                                 self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n"
                                 self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n\n"
                             coverage += ",out(" + t1.dlvName() + ", X)"
@@ -2211,31 +2205,16 @@ class TaxonomyMapping:
                                         ruleNum = len(self.rules)
                                         self.rules["r" + ruleNum.__str__()] = t.children[i].dotName() + " disjoint " + t.children[j].dotName()
                                         self.baseAsp += "% " + name1 + " ! " + name2+ "\n"
-                                        #self.baseAsp += "out(" + name1 + ", X) :- in(" + name2+ ", X).\n"
-                                        #self.baseAsp += "out(" + name2 + ", X) :- in(" + name1+ ", X).\n"
-                                        #self.baseAsp += "in(" + name1 + ", X) v out(" + name1 + ", X) :- out(" + name2 + ", X).\n"
-                                        #self.baseAsp += "in(" + name2 + ", X) v out(" + name2 + ", X) :- out(" + name1 + ", X).\n"
                                         self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") :- in(" + name1 + ", X), in(" + name2+ ", X).\n"
-                                        if reasoner[self.args['-r']] == reasoner["dlv"]:
-#                                            if t.children[i].abbrev.find("nc") == -1:
-                                            if t.children[i].abbrev.find("nc_") == -1:
-                                                self.baseAsp += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2+ ", X)} = 0, pw.\n"
-#                                            if t.children[j].abbrev.find("nc") == -1:
-                                            if t.children[i].abbrev.find("nc_") == -1:
-                                                self.baseAsp += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2+ ", X)} = 0, pw.\n"
-                                        elif reasoner[self.args['-r']] == reasoner["gringo"]:
-#                                            if t.children[i].abbrev.find("nc") == -1:
-                                            if t.children[i].abbrev.find("nc_") == -1:
-                                                self.baseAsp += ":- [vrs(X): in(" + name1 + ", X): out(" + name2+ ", X)]0, pw.\n"
-#                                            if t.children[j].abbrev.find("nc") == -1:
-                                            if t.children[i].abbrev.find("nc_") == -1:
-                                                self.baseAsp += ":- [vrs(X): out(" + name1 + ", X): in(" + name2+ ", X)]0, pw.\n"
-#                                        if t.children[i].abbrev.find("nc") == -1:
+
+                                        if t.children[i].abbrev.find("nc_") == -1:
+                                            self.baseAsp += AggregationRule(firstVar=name1, secondVar=name2, secondPredIsIn=False).rule
+                                            self.baseAsp += AggregationRule(firstVar=name1, secondVar=name2,
+                                                                            firstPredIsIn=False).rule
+
                                         if t.children[i].abbrev.find("nc_") == -1:
                                             self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
                                             self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
-#                                        if t.children[j].abbrev.find("nc") == -1:
-                                        if t.children[i].abbrev.find("nc_") == -1:
                                             self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 2) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                                             self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 2) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                     elif self.enc & encode["direct"]:
@@ -2330,7 +2309,7 @@ class TaxonomyMapping:
                     self.baseAsp += "subt(X, Z) :- subt(X, Y), subt(Y, Z).\n" 
                     for i in range(len(self.temporal)):
                         self.baseAsp += "l(" + self.temporal[i][0] + ").\n"
-                        for j in range(1, len(sef.temporal[i])):
+                        for j in range(1, len(self.temporal[i])):
                             self.baseAsp += "t(" + self.temporal[i][j] + ").\n"
                             self.baseAsp += "subt(" + self.temporal[i][j] + ", " + self.temporal[i][0] +").\n"
                 else:
@@ -2362,7 +2341,8 @@ class TaxonomyMapping:
                     pre = "in"
                 else:
                     pre = "out"
-                if tmp != "": tmp += self.connector
+                if tmp != "":
+                    tmp += self.connector
                 cpt = self.obs[i][0][j][0]
                 tmp += pre + "(" + cpt + ", X)"
             pair = ""
@@ -2373,10 +2353,8 @@ class TaxonomyMapping:
             if self.obs[i][1] == "N":
                 self.baseAsp += ":- present(X" + pair + ")," + tmp + ".\n" 
             else:
-                if reasoner[self.args['-r']] == reasoner["dlv"]:
-                    self.baseAsp += ":- #count{X: present(X" + pair + "), " + tmp + "} = 0.\n"
-                elif reasoner[self.args['-r']] == reasoner["gringo"]:
-                    self.baseAsp += ":- [present(X" + pair + "): " + tmp + "]0.\n"
+                self.baseAsp += ":- #count {X: present(X" + pair + "), " + tmp + "} <= 0.\n"
+
         self.baseAsp += "pinout(C, in, X" + appendd + ") :- present(X" + appendd + "), concept(C, _, N), in(C, X).\n"
         self.baseAsp += "pinout(C, out, X" + appendd + ") :- present(X" + appendd + "), concept(C, _, N), out(C, X).\n"
         
