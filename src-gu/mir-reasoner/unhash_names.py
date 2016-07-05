@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 import sys
 import string
 import json
@@ -47,6 +47,12 @@ def articulation_terms(line):
     return [s.replace('[','').replace(']','') for s in line.split()]
 
 
+""" return true if line is an Possible Worlds header """
+def is_pw_header(line):
+    words = line.split()
+    return len(words) > 0 and words[0] == 'Possible'
+
+
 def main(infile, hashfile): 
     inputfile = open(infile, 'r')
     hashedfile = open(hashfile, 'r')
@@ -71,13 +77,16 @@ def main(infile, hashfile):
             sys.stdout.write(')\n')
         # articulation section
         elif is_articulation_header(line): 
-            sys.stdout.write(line)
+            sys.stdout.write("\n"+line)
         elif is_articulation(line):
             terms = articulation_terms(line)
             sys.stdout.write('[' + inv_mapping[terms[0]] + ' ')
             for term in terms[1:-1]:
                 sys.stdout.write(term + ' ')
-            sys.stdout.write(inv_mapping[terms[-1]] + ']\n')            
+            sys.stdout.write(inv_mapping[terms[-1]] + ']\n')
+        # possible worlds section
+        elif is_pw_header(line): 
+            sys.stdout.write("\n"+line)            
     # write out the mapping
     inputfile.close()
 

@@ -475,8 +475,9 @@ class ProductsShowing:
             rcgVizEdges = {} # used for rcg edges visualization in stylesheet
 
             alias = {}
-        
-            # Equalities
+            
+            
+            # create it.eqConLi
             for T1 in it.eq.keys():
                 # it.eq is dynamically changed, so we need this check
                 if not it.eq.has_key(T1):
@@ -526,8 +527,33 @@ class ProductsShowing:
                                         it.eqConLi.remove(T11)
                                     if ss not in it.eqConLi:
                                         it.eqConLi.append(ss)
-                                    break 
+                                    break
+            
+            # Equalities
+            for T1 in it.eq.keys():
+                # it.eq is dynamically changed, so we need this check
+                if not it.eq.has_key(T1):
+                    continue
+                tmpStr = ""
     
+                T1s = T1.split(".")
+                for T2 in it.eq[T1]:
+                    T2s = T2.split(".")
+                    
+                    if tmpStr != "":
+                        tmpStr = "\\n" + tmpStr
+                    tmpStr = T2 + tmpStr
+                if tmpStr != "":
+                    tmpStr = "\\n" + tmpStr + "\\n"
+    
+                if T1s[0] == it.firstTName:
+                    tmpStr = T1 + tmpStr
+                else:
+                    tmpStr = tmpStr + T1
+                if tmpStr[0:2] == "\\n": tmpStr = tmpStr[2:]
+                if tmpStr[-2:] == "\\n": tmpStr = tmpStr[:-2]
+                
+                    
                 for T2 in it.eq[T1]:
 
                     tmpTr = list(it.tr)
@@ -540,15 +566,21 @@ class ProductsShowing:
                             if it.tr.count([T3, T4, P]) > 0:
                                 it.tr.remove([T3, T4, P])
                                 it.tr.append([T3, tmpStr, 0])
-                        for T5 in it.eqConLi:
-                            if(T3 != T5 and set(T3.split("\\n")).issubset(set(T5.split("\\n")))):
-                                if it.tr.count([T3, T4, P]) > 0:
-                                    it.tr.remove([T3, T4, P])
-                                    it.tr.append([T5,T4,0])
-                            elif(T4 != T5 and set(T4.split("\\n")).issubset(set(T5.split("\\n")))):
-                                if it.tr.count([T3, T4, P]) > 0:
-                                    it.tr.remove([T3, T4, P])
-                                    it.tr.append([T3,T5,0])
+            
+            tmpTr = list(it.tr)
+            for [T3, T4, P] in tmpTr:
+                for T5 in it.eqConLi:
+                    if(T3 != T5 and set(T3.split("\\n")).issubset(set(T5.split("\\n")))):
+                        if it.tr.count([T3, T4, P]) > 0:
+                            it.tr.remove([T3, T4, P])
+                            it.tr.append([T5,T4,0])
+            tmpTr = list(it.tr)
+            for [T3, T4, P] in tmpTr:
+                for T5 in it.eqConLi:
+                    if(T4 != T5 and set(T4.split("\\n")).issubset(set(T5.split("\\n")))):
+                        if it.tr.count([T3, T4, P]) > 0:
+                            it.tr.remove([T3, T4, P])
+                            it.tr.append([T3,T5,0])
             tmpeqConLi = []
             
             for T in it.eqConLi:
@@ -787,6 +819,11 @@ class ProductsShowing:
         concepts = conceptStr.split("\\n")
         for concept in concepts:
             taxNames.append(concept.split(".")[0])
+        if firstTName == "2" and secondTName == "1":
+            if firstTName in taxNames and secondTName not in taxNames:
+                return "combT2"
+            elif firstTName not in taxNames and secondTName in taxNames:
+                return "combT1"
         if firstTName in taxNames and secondTName not in taxNames:
             return "combT1"
         elif firstTName not in taxNames and secondTName in taxNames:
