@@ -142,18 +142,6 @@ class Articulation:
             self.taxon1 = mapping.getTaxon(taxon1taxonomy, taxon1taxon)
             self.taxon2 = mapping.getTaxon(taxon2taxonomy, taxon2taxon)
 
-    # Generate Gringo aggregation rule
-    def getGringoAggrRule(self, firstIsIn, firstName, secondIsIn, secondName, withPW):
-        firstIO = "in" if firstIsIn else "out"
-        secondIO = "in" if secondIsIn else "out"
-        baseFormat = 'X : vrs(X), {}({},X), {}({},X)'
-        rule = baseFormat.format(firstIO, firstName, secondIO, secondName)
-        rule = ':- #sum {' + rule + '} <= 0'
-        if (withPW):
-            return rule + ", pw.\n"
-        else:
-            return rule + ".\n"
-
     def toASP(self, enc, rnr, align):
         result = ""
         name1 = self.taxon1.dlvName()
@@ -217,7 +205,6 @@ class Articulation:
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 3) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 3) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
             elif self.relations == (rcc5["equals"] | rcc5["disjoint"]):
-
                 if reasoner[rnr] == reasoner["dlv"]:
                     result = ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} = 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} = 0, #count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} = 0.\n\n"
                     result += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} = 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} = 0, #count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} > 0.\n\n"
