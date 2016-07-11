@@ -235,8 +235,8 @@ class Articulation:
             elif self.relations == (rcc5["is_included_in"] | rcc5["includes"]):
                 result  = "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X), vr(Y, _), in(" + name2 + ",Y), out(" + name1 + ",Y).\n"
 
-                aggrExpression = AggregationRule(firstVar=name1, secondVar=name2, secondPredIsIn=False, addPW=False, isConstraint=False).rule
-                result += "ir(Y, r" + self.ruleNum.__str__() + ") :- 1 <" + aggrExpression + ", out(" + name2 + ",X)} > 0, in(" + name2 + ",Y), out(" + name1 + ",Y).\n"
+                aggrExpression = AggregationRule(firstVar=name1, secondVar=name2, secondPredIsIn=False, addPW=False, lowerBound="0 < ", isConstraint=False).rule
+                result += "ir(Y, r" + self.ruleNum.__str__() + ") :- " + aggrExpression + ", in(" + name2 + ",Y), out(" + name1 + ",Y).\n"
 
             elif self.relations == (rcc5["disjoint"] | rcc5["overlaps"]):
 
