@@ -3606,8 +3606,8 @@ class TaxonomyMapping:
 
     
     def runRCCReasoner(self):
-#        for pair in self.getAllArticulationPairs():
-#            print pair[0].name, pair[1].name
+#         for pair in self.getAllArticulationPairs():
+#             print "Pair are: ", pair[0].taxonomy.abbrev, pair[0].name, "and", pair[1].taxonomy.abbrev, pair[1].name
 #        t = self.getAllArticulationPairs()[20][0]
 #        a = []
 #        d = []
@@ -3642,12 +3642,21 @@ class TaxonomyMapping:
                 self.allPairsMir[(pair[0], pair[1])] = relation["{=, >, <, !, ><}"]
             else:
                 self.allPairsMir[(pair[1], pair[0])] = relation["{=, >, <, !, ><}"]
-                    
-        for art in self.articulations:
-            self.allPairsMir[(art.taxon1, art.taxon2)] = art.relations
+                
+#         print "--------"
+#         for k,v in self.allPairsMir.iteritems():
+#             print k[0].taxonomy.abbrev+"."+k[0].name, k[1].taxonomy.abbrev+"."+k[1].name, v
+
         
-#        for k,v in self.allPairsMir.iteritems():
-#            print k[0].taxonomy.abbrev+"."+k[0].name, k[1].taxonomy.abbrev+"."+k[1].name, v
+        for art in self.articulations:
+            if art.taxon1.taxonomy.abbrev == self.firstTName or art.taxon1.taxonomy.abbrev < art.taxon2.taxonomy.abbrev:
+                self.allPairsMir[(art.taxon1, art.taxon2)] = art.relations
+            else:
+                self.allPairsMir[(art.taxon2, art.taxon1)] = self.reverseArts(art.relations)
+        
+#         print "--------"
+#         for k,v in self.allPairsMir.iteritems():
+#             print k[0].taxonomy.abbrev+"."+k[0].name, k[1].taxonomy.abbrev+"."+k[1].name, v
 
         # apply the RCC preprocessing
         #self.rccPreProcessGuidedReference()
@@ -3688,6 +3697,16 @@ class TaxonomyMapping:
         
         return
     
+    def reverseArts(self, arts):
+        revArts = 0
+        if arts & relation["<"] and not arts & relation[">"]:
+            revArts = arts & relation["{=, >, !, ><}"] | relation[">"]
+        elif arts & relation[">"] and not arts & relation["<"]:
+            revArts = arts & relation["{=, <, !, ><}"] | relation["<"]
+        else:
+            revArts = arts
+        return revArts
+
     def reasonOver(self, taxonPair, toDo, step):
         t1 = taxonPair[0]
         t2 = taxonPair[1]
