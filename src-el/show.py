@@ -596,7 +596,7 @@ class ProductsShowing:
                 newT = self.restructureCbNames(T, it.firstTName)
                 tmpComLi.append(newT)
                 tmpCom += "  \""+newT+"\"\n"
-                g = self.defineCombConceptGroup(newT, it.firstTName, it.secondTName)
+                g = self.defineCombConceptGroup(newT, it.firstTName, it.secondTName, it.thirdTName, it.fourthTName, it.fifthTName)
                 #if self.isCbInterTaxonomy(newT):
                 self.addRcgVizNode(newT, g)
                 self.addRcgAllVizNode(newT, g)
@@ -655,7 +655,7 @@ class ProductsShowing:
                 else:
                     tmpComLi.append(T1)
                     tmpCom += "  \""+T1+"\"\n"
-                    g = self.defineCombConceptGroup(T1, it.firstTName, it.secondTName)
+                    g = self.defineCombConceptGroup(T1, it.firstTName, it.secondTName, it.thirdTName, it.fourthTName, it.fifthTName)
                     self.addRcgVizNode(T1, g)
                     self.addRcgAllVizNode(T1, g)
                 
@@ -670,7 +670,7 @@ class ProductsShowing:
                 else:
                     tmpComLi.append(T2)
                     tmpCom += "  \""+T2+"\"\n"
-                    g = self.defineCombConceptGroup(T2, it.firstTName, it.secondTName)
+                    g = self.defineCombConceptGroup(T2, it.firstTName, it.secondTName, it.thirdTName, it.fourthTName, it.fifthTName)
                     self.addRcgVizNode(T2, g)
                     self.addRcgAllVizNode(T2, g)
             
@@ -708,7 +708,7 @@ class ProductsShowing:
                                 break                            
                         if "\\n" in replace1 or "\\\\" in replace1 or "*" in replace1:
                             replace1 = self.restructureCbNames(replace1, it.firstTName)
-                            g = self.defineCombConceptGroup(replace1, it.firstTName, it.secondTName)
+                            g = self.defineCombConceptGroup(replace1, it.firstTName, it.secondTName, it.thirdTName, it.fourthTName, it.fifthTName)
                             self.addRcgVizNode(replace1, g)
                             self.addRcgAllVizNode(replace1, g)
                         else:
@@ -716,7 +716,7 @@ class ProductsShowing:
                             self.addRcgAllVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1))
                         if "\\n" in replace2 or "\\\\" in replace2 or "*" in replace2:
                             replace2 = self.restructureCbNames(replace2, it.firstTName)
-                            g = self.defineCombConceptGroup(replace2, it.firstTName, it.secondTName)
+                            g = self.defineCombConceptGroup(replace2, it.firstTName, it.secondTName, it.thirdTName, it.fourthTName, it.fifthTName)
                             self.addRcgVizNode(replace2, g)
                             self.addRcgAllVizNode(replace2, g)
                         else:
@@ -812,22 +812,28 @@ class ProductsShowing:
         #fcv.write('cvFlag = ' + repr(True) + '\n')
         #fcv.close()
         
-    def defineCombConceptGroup(self, conceptStr, firstTName, secondTName):
+    def defineCombConceptGroup(self, conceptStr, firstTName, secondTName, thirdTName, fourthTName, fifthTName):
         if "\\\\" in conceptStr or "*" in conceptStr:
             return "comb"
-        taxNames = []
+        taxNames = Set()
         concepts = conceptStr.split("\\n")
         for concept in concepts:
-            taxNames.append(concept.split(".")[0])
+            taxNames.add(concept.split(".")[0])
         if firstTName == "2" and secondTName == "1":
             if firstTName in taxNames and secondTName not in taxNames:
                 return "combT2"
             elif firstTName not in taxNames and secondTName in taxNames:
                 return "combT1"
-        if firstTName in taxNames and secondTName not in taxNames:
+        if firstTName in taxNames and len(taxNames) == 1:
             return "combT1"
-        elif firstTName not in taxNames and secondTName in taxNames:
+        if secondTName in taxNames and len(taxNames) == 1:
             return "combT2"
+        if thirdTName in taxNames and len(taxNames) == 1:
+            return "combT3"
+        if fourthTName in taxNames and len(taxNames) == 1:
+            return "combT4"
+        if fifthTName in taxNames and len(taxNames) == 1:
+            return "combT5"
         else:
             return "comb"
 
