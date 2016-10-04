@@ -22,10 +22,10 @@
 
 from subprocess import call
 import sys
+import os
 
 fileName = sys.argv[1]
 arts = []
-
 f = open(fileName, "r")
 lines = f.readlines()
 for line in lines:

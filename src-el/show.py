@@ -1318,11 +1318,12 @@ class ProductsShowing:
         
     def showInconLAT(self):
         
-        #if not os.path.exists(self.latticedir):
-        #    os.mkdir(self.latticedir)
+        if not os.path.exists(self.latticedir):
+            os.mkdir(self.latticedir)
 
-        fileName = self.name + ".txt"
-        call("lattice.sh " + fileName, shell=True)
+        inputFile = os.path.abspath(os.path.join(self.inputfilesdir, self.name+".txt"))
+        latticeFolder = os.path.abspath(self.latticedir)
+        call("lattice2.sh " + inputFile + " " + latticeFolder, shell=True)
         #call("maslattice.sh " + fileName, shell=True)
 
     def showAmbLAT(self):
