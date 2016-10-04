@@ -59,13 +59,15 @@ class ProductsShowing:
             f.close()
         
         if args['-o']:
-            self.lastrundir = self.userdir + args['-o']
+            if self.lastrundir == '':
+                self.lastrundir = self.userdir + args['-o']
             self.exampleName = os.path.join(args['-o'], 'lastrun.timestamp')
             if os.path.isfile(self.exampleName):
                 f = open(self.exampleName, "r")
                 self.name = f.readline().strip()
             else:
-                self.name = os.path.splitext(os.path.basename(sys.argv[2]))[0]
+                if self.name == '':
+                    self.name = os.path.splitext(os.path.basename(sys.argv[2]))[0]
         
         self.path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         self.stylesheetdir = os.path.join(self.projectdir, "stylesheets/")
@@ -252,12 +254,18 @@ class ProductsShowing:
                     fifthTName = taxName
             
             elif (re.match("\(.*\)", line)):
-
-                    if taxName in group2concepts:
-                        group2concepts[taxName].append(re.match("\((.*)\)", line).group(1).split(" "))
-                    else:
-                        group2concepts[taxName] = [re.match("\((.*)\)", line).group(1).split(" ")]
-              
+                
+                conceptsToAdd = re.match("\((.*)\)", line).group(1).split(" ")
+                # check multiple nc
+                for c in conceptsToAdd:
+                    if c == 'nc':
+                        conceptsToAdd[conceptsToAdd.index(c)] = 'nc_' + conceptsToAdd[0]
+                        
+                if taxName in group2concepts:
+                    group2concepts[taxName].append(conceptsToAdd)
+                else:
+                    group2concepts[taxName] = [conceptsToAdd]
+                    
             elif (re.match("\[.*?\]", line)):
                 art.append(re.match("\[(.*)\]", line).group(1))
                 
@@ -467,8 +475,9 @@ class ProductsShowing:
             rcgVizEdges = {} # used for rcg edges visualization in stylesheet
 
             alias = {}
-        
-            # Equalities
+            
+            
+            # create it.eqConLi
             for T1 in it.eq.keys():
                 # it.eq is dynamically changed, so we need this check
                 if not it.eq.has_key(T1):
@@ -518,8 +527,33 @@ class ProductsShowing:
                                         it.eqConLi.remove(T11)
                                     if ss not in it.eqConLi:
                                         it.eqConLi.append(ss)
-                                    break 
+                                    break
+            
+            # Equalities
+            for T1 in it.eq.keys():
+                # it.eq is dynamically changed, so we need this check
+                if not it.eq.has_key(T1):
+                    continue
+                tmpStr = ""
     
+                T1s = T1.split(".")
+                for T2 in it.eq[T1]:
+                    T2s = T2.split(".")
+                    
+                    if tmpStr != "":
+                        tmpStr = "\\n" + tmpStr
+                    tmpStr = T2 + tmpStr
+                if tmpStr != "":
+                    tmpStr = "\\n" + tmpStr + "\\n"
+    
+                if T1s[0] == it.firstTName:
+                    tmpStr = T1 + tmpStr
+                else:
+                    tmpStr = tmpStr + T1
+                if tmpStr[0:2] == "\\n": tmpStr = tmpStr[2:]
+                if tmpStr[-2:] == "\\n": tmpStr = tmpStr[:-2]
+                
+                    
                 for T2 in it.eq[T1]:
 
                     tmpTr = list(it.tr)
@@ -532,15 +566,21 @@ class ProductsShowing:
                             if it.tr.count([T3, T4, P]) > 0:
                                 it.tr.remove([T3, T4, P])
                                 it.tr.append([T3, tmpStr, 0])
-                        for T5 in it.eqConLi:
-                            if(T3 != T5 and set(T3.split("\\n")).issubset(set(T5.split("\\n")))):
-                                if it.tr.count([T3, T4, P]) > 0:
-                                    it.tr.remove([T3, T4, P])
-                                    it.tr.append([T5,T4,0])
-                            elif(T4 != T5 and set(T4.split("\\n")).issubset(set(T5.split("\\n")))):
-                                if it.tr.count([T3, T4, P]) > 0:
-                                    it.tr.remove([T3, T4, P])
-                                    it.tr.append([T3,T5,0])
+            
+            tmpTr = list(it.tr)
+            for [T3, T4, P] in tmpTr:
+                for T5 in it.eqConLi:
+                    if(T3 != T5 and set(T3.split("\\n")).issubset(set(T5.split("\\n")))):
+                        if it.tr.count([T3, T4, P]) > 0:
+                            it.tr.remove([T3, T4, P])
+                            it.tr.append([T5,T4,0])
+            tmpTr = list(it.tr)
+            for [T3, T4, P] in tmpTr:
+                for T5 in it.eqConLi:
+                    if(T4 != T5 and set(T4.split("\\n")).issubset(set(T5.split("\\n")))):
+                        if it.tr.count([T3, T4, P]) > 0:
+                            it.tr.remove([T3, T4, P])
+                            it.tr.append([T3,T5,0])
             tmpeqConLi = []
             
             for T in it.eqConLi:
@@ -556,9 +596,10 @@ class ProductsShowing:
                 newT = self.restructureCbNames(T, it.firstTName)
                 tmpComLi.append(newT)
                 tmpCom += "  \""+newT+"\"\n"
-                if self.isCbInterTaxonomy(newT):
-                    self.addRcgVizNode(newT, "comb")
-                self.addRcgAllVizNode(newT, "comb")
+                g = self.defineCombConceptGroup(newT, it.firstTName, it.secondTName, it.thirdTName, it.fourthTName, it.fifthTName)
+                #if self.isCbInterTaxonomy(newT):
+                self.addRcgVizNode(newT, g)
+                self.addRcgAllVizNode(newT, g)
                 
             # Duplicates
             tmpTr = list(it.tr)
@@ -614,8 +655,9 @@ class ProductsShowing:
                 else:
                     tmpComLi.append(T1)
                     tmpCom += "  \""+T1+"\"\n"
-                    self.addRcgVizNode(T1, "comb")
-                    self.addRcgAllVizNode(T1, "comb")
+                    g = self.defineCombConceptGroup(T1, it.firstTName, it.secondTName, it.thirdTName, it.fourthTName, it.fifthTName)
+                    self.addRcgVizNode(T1, g)
+                    self.addRcgAllVizNode(T1, g)
                 
                 if(T2.find("*") == -1 and T2.find("\\") == -1 and T2.find("\\n") == -1 and T2.find(".") != -1):
                     T2s = T2.split(".")
@@ -628,8 +670,9 @@ class ProductsShowing:
                 else:
                     tmpComLi.append(T2)
                     tmpCom += "  \""+T2+"\"\n"
-                    self.addRcgVizNode(T2, "comb")
-                    self.addRcgAllVizNode(T2, "comb")
+                    g = self.defineCombConceptGroup(T2, it.firstTName, it.secondTName, it.thirdTName, it.fourthTName, it.fifthTName)
+                    self.addRcgVizNode(T2, g)
+                    self.addRcgAllVizNode(T2, g)
             
             # prepare for pw2input
             fpw2input = open(pw2inputInternalFile + i.__str__(), "w")
@@ -665,15 +708,17 @@ class ProductsShowing:
                                 break                            
                         if "\\n" in replace1 or "\\\\" in replace1 or "*" in replace1:
                             replace1 = self.restructureCbNames(replace1, it.firstTName)
-                            self.addRcgVizNode(replace1, "comb")
-                            self.addRcgAllVizNode(replace1, "comb")
+                            g = self.defineCombConceptGroup(replace1, it.firstTName, it.secondTName, it.thirdTName, it.fourthTName, it.fifthTName)
+                            self.addRcgVizNode(replace1, g)
+                            self.addRcgAllVizNode(replace1, g)
                         else:
                             self.addRcgVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1))
                             self.addRcgAllVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1))
                         if "\\n" in replace2 or "\\\\" in replace2 or "*" in replace2:
                             replace2 = self.restructureCbNames(replace2, it.firstTName)
-                            self.addRcgVizNode(replace2, "comb")
-                            self.addRcgAllVizNode(replace2, "comb")
+                            g = self.defineCombConceptGroup(replace2, it.firstTName, it.secondTName, it.thirdTName, it.fourthTName, it.fifthTName)
+                            self.addRcgVizNode(replace2, g)
+                            self.addRcgAllVizNode(replace2, g)
                         else:
                             self.addRcgVizNode(re.match("(.*)\.(.*)", replace2).group(2), re.match("(.*)\.(.*)", replace2).group(1))
                             self.addRcgAllVizNode(re.match("(.*)\.(.*)", replace2).group(2), re.match("(.*)\.(.*)", replace2).group(1))
@@ -766,6 +811,31 @@ class ProductsShowing:
         #fcv = open(cvInternalFile, "a")
         #fcv.write('cvFlag = ' + repr(True) + '\n')
         #fcv.close()
+        
+    def defineCombConceptGroup(self, conceptStr, firstTName, secondTName, thirdTName, fourthTName, fifthTName):
+        if "\\\\" in conceptStr or "*" in conceptStr:
+            return "comb"
+        taxNames = Set()
+        concepts = conceptStr.split("\\n")
+        for concept in concepts:
+            taxNames.add(concept.split(".")[0])
+        if firstTName == "2" and secondTName == "1":
+            if firstTName in taxNames and secondTName not in taxNames:
+                return "combT2"
+            elif firstTName not in taxNames and secondTName in taxNames:
+                return "combT1"
+        if firstTName in taxNames and len(taxNames) == 1:
+            return "combT1"
+        if secondTName in taxNames and len(taxNames) == 1:
+            return "combT2"
+        if thirdTName in taxNames and len(taxNames) == 1:
+            return "combT3"
+        if fourthTName in taxNames and len(taxNames) == 1:
+            return "combT4"
+        if fifthTName in taxNames and len(taxNames) == 1:
+            return "combT5"
+        else:
+            return "comb"
 
 
     def restructureCbNames(self, cbName, firstTName):
@@ -1248,11 +1318,12 @@ class ProductsShowing:
         
     def showInconLAT(self):
         
-        #if not os.path.exists(self.latticedir):
-        #    os.mkdir(self.latticedir)
+        if not os.path.exists(self.latticedir):
+            os.mkdir(self.latticedir)
 
-        fileName = self.name + ".txt"
-        call("lattice.sh " + fileName, shell=True)
+        inputFile = os.path.abspath(os.path.join(self.inputfilesdir, self.name+".txt"))
+        latticeFolder = os.path.abspath(self.latticedir)
+        call("lattice2.sh " + inputFile + " " + latticeFolder, shell=True)
         #call("maslattice.sh " + fileName, shell=True)
 
     def showAmbLAT(self):

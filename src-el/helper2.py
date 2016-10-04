@@ -72,3 +72,19 @@ def createLastRunName(fileName, name):
     f = open(fileName, "w")
     f.write(name)
     f.close()
+
+# to create aggregation rule for articulation and alignment
+class AggregationRule:
+    def __init__(self, firstVar, secondVar, lowerBound="", startPred="vrs", firstPredIsIn=True, secondPredIsIn=True,
+                 isConstraint=True, addPW=True, variableName="X"):
+        baseFormat = '{}#count {{X : {}(X), {}({},X), {}({},X)}}{}{}'
+        firstPred = "in" if firstPredIsIn else "out"
+        secondPred = "in" if secondPredIsIn else "out"
+        # lowerBoundString = "" if lowerBound == -100 else str(lowerBound) + " <= "
+        upperBound = " <= 0" if lowerBound == "" else ""
+        addPWTail = ", pw" if addPW else ""
+        baseRule = baseFormat.format(lowerBound, startPred, firstPred, firstVar, secondPred, secondVar,
+                                     upperBound, addPWTail)
+        if variableName != "X":
+            baseRule = baseRule.replace("X", variableName)
+        self.rule = ":- " + baseRule + ".\n" if isConstraint else baseRule

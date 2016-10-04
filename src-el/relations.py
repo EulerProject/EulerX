@@ -47,6 +47,7 @@ relation["="] = 1 << 2
 relation[">"] = 1 << 3
 #relation["<>"] = 1 << 3
 relation["><"] = 1 << 4
+relation["o"] = 1 << 4
 # Imfer bit
 relation["input"] = 1 << 5
 relation["infer"] = 1 << 6
@@ -101,7 +102,10 @@ relss[1 << 4] = "overlaps"
 reasoner={}
 reasoner["dlv"] = 1 << 0
 reasoner["gringo"] = 1 << 1
-reasoner["rcc"] = 1 << 2
+reasoner["rcc2"] = 1 << 2
+reasoner["rcc2eq"] = 1 << 3
+reasoner["rcc2pw"] = 1 << 4
+reasoner["rcc1"] = 1 << 5
 
 encode = {}
 encode[0] = 0                                  # null encoding

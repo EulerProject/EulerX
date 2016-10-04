@@ -36,6 +36,8 @@ class CtiGenerator:
     # Currently only generate N-ary Cti input files
     def run(self, args):
         self.mednodes = []
+        self.leftMostLeaf = 0
+        self.secondLeftMostLeaf = 0
         projectname = "foo"
         if args.outputdir is None:
             args.outputdir = "./"
@@ -62,6 +64,8 @@ class CtiGenerator:
             nnodes = (args.nary**(args.depth+1) - 1)/(args.nary-1)
             self.mednodes = range((args.nary**args.depth - 1)/(args.nary-1) + 1,
                         (args.nary**args.depth - 1)/(args.nary-1) + args.nary + 1)
+            self.leftMostLeaf = (args.nary**args.depth - 1)/(args.nary-1) + 1
+            self.secondLeftMostLeaf = (args.nary**args.depth - 1)/(args.nary-1) + 1 + args.nary
         
         # Create a balanced tree
         elif args.nnodes != 0:
@@ -97,11 +101,24 @@ class CtiGenerator:
             myrel = int(math.log(relation[args.relation],2))
         # get rel string
         myrelstr = relstr[myrel]
-        for i in range(1, nnodes+1):
-            if args.incEx and i in self.mednodes:
-                fcti.write("\n[1."+i.__str__()+" equals 2."+i.__str__()+"]")
+        if args.incEx and args.relation == "=":
+            if args.depth < 2:
+                print 'Can not generate inconsistent complete trees with "=" for depth less than 2'
+                return
             else:
-                fcti.write("\n[1."+i.__str__()+" "+myrelstr+" 2."+i.__str__()+"]")
+                for i in range(1, nnodes+1):
+                    if i == self.leftMostLeaf:
+                        fcti.write("\n[1."+i.__str__()+" equals 2."+self.secondLeftMostLeaf.__str__()+"]")
+                    elif i == self.secondLeftMostLeaf:
+                        fcti.write("\n[1."+i.__str__()+" equals 2."+self.leftMostLeaf.__str__()+"]")
+                    else:
+                        fcti.write("\n[1."+i.__str__()+" "+myrelstr+" 2."+i.__str__()+"]")
+        else:
+            for i in range(1, nnodes+1):
+                if args.incEx and i in self.mednodes:
+                    fcti.write("\n[1."+i.__str__()+" equals 2."+i.__str__()+"]")
+                else:
+                    fcti.write("\n[1."+i.__str__()+" "+myrelstr+" 2."+i.__str__()+"]")
         fcti.close()
         
     def fillBalanced(self, noded, kids, args):

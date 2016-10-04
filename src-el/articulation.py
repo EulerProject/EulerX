@@ -25,6 +25,7 @@ import copy
 import commands
 from relations import *
 from taxonomy import *
+from helper2 import *
 
 class Articulation:
     
@@ -140,95 +141,69 @@ class Articulation:
                 
             self.taxon1 = mapping.getTaxon(taxon1taxonomy, taxon1taxon)
             self.taxon2 = mapping.getTaxon(taxon2taxonomy, taxon2taxon)
-            
+
     def toASP(self, enc, rnr, align):
         result = ""
         name1 = self.taxon1.dlvName()
         name2 = self.taxon2.dlvName()
+        disjointSymbol = "v" if reasoner[rnr] == reasoner["dlv"] else "|"
+        twoPredFormat = ":- {}, {}.\n"
+        threePredFormat = ":- {}, {}, {}.\n"
+
         if encode[enc] & encode["vr"] or encode[enc] & encode["dl"] or encode[enc] & encode["mn"]:
             if self.relations == rcc5["equals"]:
                 result  = "ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
                 result += "ir(X, prod(r" + self.ruleNum.__str__() + ",R)) :- out3(" + name1 + ", X, R), in(" + name2 + ",X), ix.\n"
-                result += "ir(X, prod(r" + self.ruleNum.__str__() + ",R)) :- in(" + name1 + ",X), out3(" + name2 + ", X, R), ix.\n" 
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
+                result += "ir(X, prod(r" + self.ruleNum.__str__() + ",R)) :- in(" + name1 + ",X), out3(" + name2 + ", X, R), ix.\n"
+
+                result += AggregationRule(firstVar=name1, secondVar=name2).rule
+
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
-                #result += "in(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
-                #result += "in(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
-                #result += "out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
-                #result += "out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
             elif self.relations == rcc5["includes"]:
                 result  = "ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X), pw.\n"
                 result += "ir(X, prod(r" + self.ruleNum.__str__() + ",R)) :- out3(" + name1 + ", X, R), in(" + name2 + ",X), ix.\n"
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n" 
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0, pw.\n" 
+
+                result += AggregationRule(firstVar=name1, secondVar=name2).rule
+                result += AggregationRule(firstVar=name1, secondVar=name2, secondPredIsIn=False).rule
+
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 2) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
-                #result += "in(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
-                #result += "out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
-                #result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
-                #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
             elif self.relations == rcc5["is_included_in"]:
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result = ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
-                    result += ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+
+                result = AggregationRule(firstVar=name1, secondVar=name2).rule
+                result += AggregationRule(firstVar=name1, secondVar=name2, firstPredIsIn=False).rule
+
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X), pw.\n" 
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 2) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
-                #result += "in(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
-                #result += "out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
-                #result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
-                #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
             elif self.relations == rcc5["disjoint"]:
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result = ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n" 
-                    result += ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+
+                result = AggregationRule(firstVar=name1, secondVar=name2, secondPredIsIn=False).rule
+                result += AggregationRule(firstVar=name1, secondVar=name2, firstPredIsIn=False).rule
+
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 2) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n\n"
-                result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), in(" + name2 + ",X).\n" 
-                #result += "out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
-                #result += "out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
-                #result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
-                #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
+                result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), in(" + name2 + ",X).\n"
             elif self.relations == rcc5["overlaps"]:
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result = ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
-                    result += ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n" 
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+
+                result = AggregationRule(firstVar=name1, secondVar=name2).rule
+                result += AggregationRule(firstVar=name1, secondVar=name2, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name1, secondVar=name2, secondPredIsIn=False).rule
+
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 2) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 3) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 3) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
-                #result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
-                #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
-                #result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
-                #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
             elif self.relations == (rcc5["equals"] | rcc5["disjoint"]):
                 if reasoner[rnr] == reasoner["dlv"]:
                     result = ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} = 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} = 0, #count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} = 0.\n\n"
@@ -237,137 +212,93 @@ class Articulation:
                     result += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} = 0, #count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} = 0.\n\n"
                     result += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} > 0, #count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} = 0.\n\n"
                     result += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} > 0, #count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} > 0.\n\n"
-#                    result = "vr(X, r" + self.ruleNum.__str__() + ") v ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
-#                    result += "vr(X, r" + self.ruleNum.__str__() + ") v ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
-#                    result += "vr(X, r" + self.ruleNum.__str__() + ") v ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), in(" + name2 + ",X).\n"  
-#                    result  = ":- #count{X : vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y : vrs(Y), out(" + name1 + ", Y), in(" + name2 + ", Y)} > 0.\n"
-#                    result += ":- #count{X : vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} = 0, #count{Y : vrs(Y), out(" + name1 + ", Y), in(" + name2 + ", Y)} = 0.\n"
-#                    result += ":- #count{X : vrs(X), in(" + name1 + ", X), in(" + name2 + ", X)} > 0, #count{Y : vrs(Y), out(" + name1 + ", Y), in(" + name2 + ", Y)} = 0.\n"
-#                    result += ":- #count{X : vrs(X), in(" + name1 + ", X), in(" + name2 +", X)} = 0, #count{Y : vrs(Y), out(" + name1 + ", Y), in(" + name2 + ", Y)} > 0.\n"
                 elif reasoner[rnr] == reasoner["gringo"]:
                     ## TODO
                     result = ""
             elif self.relations == (rcc5["equals"] | rcc5["is_included_in"]):
                 result  = "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
-                result += "ir(X, prod(r" + self.ruleNum.__str__() + ",R)) :- in(" + name1 + ",X), out3(" + name2 + ", X, R), ix.\n" 
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result += "vr(X, r" + self.ruleNum.__str__() + ") v ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n" 
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    result += "vr(X, r" + self.ruleNum.__str__() + ") | ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n" 
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0, pw.\n" 
+                result += "ir(X, prod(r" + self.ruleNum.__str__() + ",R)) :- in(" + name1 + ",X), out3(" + name2 + ", X, R), ix.\n"
+                result += AggregationRule(firstVar=name1, secondVar=name2).rule
+                result += "vr(X, r" + self.ruleNum.__str__() + ") " + disjointSymbol + " ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
+
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
-                #result += "in(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
-                #result += "out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
-                #result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
-                #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
             elif self.relations == (rcc5["equals"] | rcc5["includes"]):
                 result  = "ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
                 result += "ir(X, prod(r" + self.ruleNum.__str__() + ",R)) :- out3(" + name1 + ", X, R), in(" + name2 + ",X), ix.\n"
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result += "vr(X, r" + self.ruleNum.__str__() +") v ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    result += "vr(X, r" + self.ruleNum.__str__() +") | ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
+
+                result += "vr(X, r" + self.ruleNum.__str__() + ") " + disjointSymbol + " ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
+                result += AggregationRule(firstVar=name1, secondVar=name2).rule
+
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
-                #result += "in(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
-                #result += "out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
-                #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
-                #result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
             elif self.relations == (rcc5["is_included_in"] | rcc5["includes"]):
                 result  = "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X), vr(Y, _), in(" + name2 + ",Y), out(" + name1 + ",Y).\n"
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result += "ir(Y, r" + self.ruleNum.__str__() + ") :- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} > 0, in(" + name2 + ",Y), out(" + name1 + ",Y).\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    result += "ir(Y, r" + self.ruleNum.__str__() + ") :- 1[vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)], in(" + name2 + ",Y), out(" + name1 + ",Y).\n"
-                #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
-                #result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
-                #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
-                #result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
+
+                aggrExpression = AggregationRule(firstVar=name1, secondVar=name2, secondPredIsIn=False, addPW=False, lowerBound="0 < ", isConstraint=False).rule
+                result += "ir(Y, r" + self.ruleNum.__str__() + ") :- " + aggrExpression + ", in(" + name2 + ",Y), out(" + name1 + ",Y).\n"
+
             elif self.relations == (rcc5["disjoint"] | rcc5["overlaps"]):
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result  = "ir(X, r" + self.ruleNum.__str__() + ") v vr(X, r" + self.ruleNum.__str__() +") :- in(" + name1 + ",X), in(" + name2 + ",X).\n"
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name2 + ",X), out(" + name1 + ",X)} = 0, pw.\n" 
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    result  = "ir(X, r" + self.ruleNum.__str__() + ") | vr(X, r" + self.ruleNum.__str__() +") :- in(" + name1 + ",X), in(" + name2 + ",X).\n"
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
-                #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
-                #result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
-                #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
-                #result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
+
+                result = "ir(X, r" + self.ruleNum.__str__() + ") " + disjointSymbol + " (X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), in(" + name2 + ",X).\n"
+                result += AggregationRule(firstVar=name1, secondVar=name2, secondPredIsIn=False).rule
+
             elif self.relations == (rcc5["equals"] | rcc5["overlaps"]):
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result  = ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} > 0, #count{Y: vrs(Y), in(" + name2 + ",Y), out(" + name1 + ",Y)} = 0, pw.\n"
-                    result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name2 + ", X), out(" + name1 + ", X), #count{Y: vr(Y, _), in(" + name1 + ",Y), out(" + name2 + ",Y)} > 0, ix.\n"
-                    result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), #count{Y: vr(Y, _), in(" + name2 + ",Y), out(" + name1 + ",Y)} > 0, ix.\n\n"
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, #count{Y: vrs(Y), in(" + name2 + ",Y), out(" + name1 + ",Y)} > 0, pw.\n"
-                    result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), #count{Y: vr(Y, _), in(" + name2 + ",Y), out(" + name1 + ",Y)} > 0, ix.\n"
-                    result += "c(r" + self.ruleNum.__str__() + ", A, 2) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), #count{Y: vr(Y, _), in(" + name2 + ",Y), out(" + name1 + ",Y)} > 0, ix.\n\n"
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n"
-                    result += "pie(r" + self.ruleNum.__str__() + ", A, 3) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
-                    result += "c(r" + self.ruleNum.__str__() + ", A, 3) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    result  = ":- 1[vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)], [vr(Y, _): in(" + name2 + ",Y): out(" + name1 + ",Y)]0.\n"
-                    result += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0, 1[vr(Y, _): in(" + name2 + ",Y): out(" + name1 + ",Y)].\n"
-                    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n"
-                #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
-                #result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
-                #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
-                #result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
+                firstRule = AggregationRule(firstVar=name1, secondVar=name2, secondPredIsIn=False, lowerBound="0 < ", isConstraint=False, addPW=False).rule
+                secondRule = AggregationRule(firstVar=name2, secondVar=name1, secondPredIsIn=False, isConstraint=False, variableName="Y").rule
+                result = twoPredFormat.format(firstRule, secondRule)
+                firstRule = AggregationRule(firstVar=name1, secondVar=name2, secondPredIsIn=False, isConstraint=False, addPW=False).rule
+                secondRule = AggregationRule(firstVar=name2, secondVar=name1, secondPredIsIn=False, lowerBound="0 < ", isConstraint=False, addPW=False, variableName="Y").rule
+                result += twoPredFormat.format(firstRule, secondRule)
+                result += AggregationRule(firstVar=name1, secondVar=name2).rule
+
+                result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name2 + ", X), out(" + name1 + ", X), #count{Y: vr(Y, _), in(" + name1 + ",Y), out(" + name2 + ",Y)} > 0, ix.\n"
+                result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), #count{Y: vr(Y, _), in(" + name2 + ",Y), out(" + name1 + ",Y)} > 0, ix.\n\n"
+                result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), #count{Y: vr(Y, _), in(" + name2 + ",Y), out(" + name1 + ",Y)} > 0, ix.\n"
+                result += "c(r" + self.ruleNum.__str__() + ", A, 2) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), #count{Y: vr(Y, _), in(" + name2 + ",Y), out(" + name1 + ",Y)} > 0, ix.\n\n"
+                result += "pie(r" + self.ruleNum.__str__() + ", A, 3) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
+                result += "c(r" + self.ruleNum.__str__() + ", A, 3) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
+
             elif self.relations == (rcc5["is_included_in"] | rcc5["overlaps"]):
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result  = "vr(X, r" + self.ruleNum.__str__() + ") v ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
-                    result += ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
-                    result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
-                    result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
-                    result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
-                    result += "c(r" + self.ruleNum.__str__() + ", A, 2) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    result  = "vr(X, r" + self.ruleNum.__str__() + ") | ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
-                #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- in(" + name1 + ",X).\n" 
-                #result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- out(" + name2 + ",X).\n" 
-                #result += "in(" + name2 + ",X) v out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
-                #result += "in(" + name1 + ",X) v out(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
+
+                result = "vr(X, r" + self.ruleNum.__str__() + ") " + disjointSymbol + " ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
+
+                result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
+                result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
+                result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
+                result += "c(r" + self.ruleNum.__str__() + ", A, 2) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
+
+                result += AggregationRule(firstVar=name1, secondVar=name2).rule
+                result += AggregationRule(firstVar=name1, secondVar=name2, firstPredIsIn=False).rule
+
             elif self.relations == (rcc5["is_included_in"] | rcc5["disjoint"]):
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result += ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n"
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} > 0, #count{Y: vrs(Y), out(" + name2 + ",Y), in(" + name1 + ",Y)} > 0, pw.\n"
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, #count{Y: vrs(Y), out(" + name2 + ",Y), in(" + name1 + ",Y)} = 0, pw.\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
-                    align.basePw += ":- rel(" + name1 + ", " + name2 + ", \"><\").\n" 
-                    align.basePw += "rel(" + name1 + ", " + name2 + ", \"<\") | rel(" + name1 + ", " + name2 + ", \"!\").\n" 
-                    result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
-                    result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
-                    result += "pie(r" + self.ruleNum.__str__() + ", prod(A, B), 2) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), vr(Y, B), out("+ name2 + ",Y), in(" + name1 + ",Y), ix.\n"
-                    result += "pie(r" + self.ruleNum.__str__() + ", A, 3) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
-                    result += "c(r" + self.ruleNum.__str__() + ", A, 3) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
-                    result += "c(r" + self.ruleNum.__str__() + ", A, 3) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n\n"
+                result = AggregationRule(firstVar=name1, secondVar=name2, firstPredIsIn=False).rule
+                firstRule = AggregationRule(firstVar=name1, secondVar=name2, lowerBound="0 < ", isConstraint=False, addPW=False).rule
+                secondRule = AggregationRule(firstVar=name2, secondVar=name1, firstPredIsIn=False, lowerBound="0 < ", isConstraint=False, variableName="Y").rule
+                result += twoPredFormat.format(firstRule, secondRule)
+                firstRule = AggregationRule(firstVar=name1, secondVar=name2, isConstraint=False, addPW=False).rule
+                secondRule = AggregationRule(firstVar=name2, secondVar=name1, firstPredIsIn=False, isConstraint=False, variableName="Y").rule
+                result += twoPredFormat.format(firstRule, secondRule)
+
             elif self.relations == (rcc5["includes"] | rcc5["overlaps"]):
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result += "vrs(X) v irs(X) :- out(" + name1 + ",X), in(" + name2 + ",X), pw.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, pw.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n" 
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    align.basePw += "vrs(X) | irs(X) :- out(" + name1 + ",X): in(" + name2 + ",X).\n" 
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n" 
+                result += "vrs(X) " + disjointSymbol + " irs(X) :- out(" + name1 + ",X), in(" + name2 + ",X), pw.\n"
+                result += AggregationRule(firstVar=name1, secondVar=name2).rule
+                result += AggregationRule(firstVar=name1, secondVar=name2, secondPredIsIn=False).rule
+
+
             elif self.relations == (rcc5["includes"] | rcc5["disjoint"]):
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ",X)} = 0, pw.\n"
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} > 0, #count{Y: vrs(Y), in(" + name2 + ",Y), out(" + name1 + ",Y)} > 0, pw.\n"
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0, #count{Y: vrs(Y), in(" + name2 + ",Y), out(" + name1 + ",Y)} = 0, pw.\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    #align.basePw += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ",X)]0.\n" 
-                    align.basePw += "rel(" + name1 + ", " + name2 + ", \"!\") | rel(" + name1 + ", " + name2 + ", \">\").\n" 
+
+                result += AggregationRule(firstVar=name1, secondVar=name2, secondPredIsIn=False).rule
+                firstRule = AggregationRule(firstVar=name1, secondVar=name2, lowerBound="0 < ", isConstraint=False,
+                                            addPW=False).rule
+                secondRule = AggregationRule(firstVar=name2, secondVar=name1, secondPredIsIn=False, lowerBound="0 < ",
+                                             isConstraint=False, variableName="Y").rule
+                result += twoPredFormat.format(firstRule, secondRule)
+                firstRule = AggregationRule(firstVar=name1, secondVar=name2, isConstraint=False, addPW=False).rule
+                secondRule = AggregationRule(firstVar=name2, secondVar=name1, secondPredIsIn=False,
+                                             isConstraint=False, variableName="Y").rule
+                result += twoPredFormat.format(firstRule, secondRule)
+
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", prod(A, B), 2) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), vr(Y, B), in("+ name2 + ",Y), out(" + name1 + ",Y), ix.\n"
@@ -375,30 +306,30 @@ class Articulation:
                 result += "c(r" + self.ruleNum.__str__() + ", A, 3) :- vr(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 3) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
             elif self.relations == (rcc5["includes"] | rcc5["is_included_in"] | rcc5["equals"]):
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result += "vr(X, r" + self.ruleNum.__str__() + ") v ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n" 
-                    result += "vr(X, r" + self.ruleNum.__str__() + ") v ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ", X)} > 0, #count{Y: vrs(Y), out(" + name1 + ",Y), in(" + name2 + ", Y)} > 0.\n"
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ", X)} = 0.\n\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    result += "vr(X, r" + self.ruleNum.__str__() + ") | ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n" 
-                    result += "vr(X, r" + self.ruleNum.__str__() + ") | ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n" 
-                    result += ":- 1[vrs(X): in(" + name1 + ",X): out(" + name2 + ", X)], 1[vrs(X): out(" + name1 + ",X): in(" + name2 + ", X)].\n"
-                    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)]0.\n\n"
+
+                result += "vr(X, r" + self.ruleNum.__str__() + ") " + disjointSymbol + " ir(X, r" + self.ruleNum.__str__() + ") :- out(" + name1 + ",X), in(" + name2 + ",X).\n"
+                result += "vr(X, r" + self.ruleNum.__str__() + ") " + disjointSymbol + " ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name2 + ",X).\n"
+                firstRule = AggregationRule(firstVar=name1, secondVar=name2, secondPredIsIn=False, lowerBound="0 < ", isConstraint=False, addPW=False).rule
+                secondRule = AggregationRule(firstVar=name1, secondVar=name2, firstPredIsIn=False, lowerBound="0 < ", isConstraint=False, addPW=False, variableName="Y").rule
+                result += twoPredFormat.format(firstRule, secondRule)
+                result += AggregationRule(firstVar=name1, secondVar=name2).rule + "\n"
+
             elif self.relations == (rcc5["is_included_in"] | rcc5["equals"] | rcc5["overlaps"]):
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ", X)} > 0, #count{Y: vrs(Y), out(" + name1 + ",Y), in(" + name2 + ", Y)} = 0.\n"
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ", X)} = 0.\n\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    result += ":- 1[vrs(X): in(" + name1 + ",X): out(" + name2 + ", X)], [vrs(X): out(" + name1 + ",X): in(" + name2 + ", X)]0.\n"
-                    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)]0.\n\n"
+                firstRule = AggregationRule(firstVar=name1, secondVar=name2, secondPredIsIn=False, lowerBound="0 < ",
+                                            isConstraint=False, addPW=False).rule
+                secondRule = AggregationRule(firstVar=name1, secondVar=name2, firstPredIsIn=False,
+                                             isConstraint=False, addPW=False, variableName="Y").rule
+                result += twoPredFormat.format(firstRule, secondRule)
+                result += AggregationRule(firstVar=name1, secondVar=name2).rule + "\n"
+
             elif self.relations == (rcc5["includes"] | rcc5["equals"] | rcc5["overlaps"]):
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ", X)} = 0, #count{Y: vrs(Y), out(" + name1 + ",Y), in(" + name2 + ", Y)} > 0.\n"
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ", X)} = 0.\n\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    result += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ", X)]0, 1[vrs(X): out(" + name1 + ",X): in(" + name2 + ", X)].\n"
-                    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)]0.\n\n"
+                firstRule = AggregationRule(firstVar=name1, secondVar=name2, secondPredIsIn=False,
+                                            isConstraint=False, addPW=False).rule
+                secondRule = AggregationRule(firstVar=name1, secondVar=name2, firstPredIsIn=False, lowerBound="0 < ",
+                                             isConstraint=False, addPW=False, variableName="Y").rule
+                result += twoPredFormat.format(firstRule, secondRule)
+                result += AggregationRule(firstVar=name1, secondVar=name2).rule + "\n"
+
             elif self.relations == (rcc5["equals"] | rcc5["includes"] | rcc5["disjoint"]):
                 if reasoner[rnr] == reasoner["dlv"]:
                     result += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2 + ", X)} = 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} = 0.\n"
@@ -416,12 +347,16 @@ class Articulation:
                     # TODO
                     result = ""
             elif self.relations == (rcc5["includes"] | rcc5["is_included_in"] | rcc5["overlaps"]):
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), out(" + name2 + ", X)} = 0, #count{Y: vrs(Y), out(" + name1 + ",Y), in(" + name2 + ", Y)} = 0, #count{Z: vrs(Z), in(" + name1 + ",Z), in(" + name2 + ", Z)} > 0.\n"
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ", X)} = 0.\n\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    result += ":- [vrs(X): in(" + name1 + ",X): out(" + name2 + ", X)]0, [vrs(X): out(" + name1 + ",X): in(" + name2 + ", X)]0, 1[vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)].\n"
-                    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ", X)]0.\n\n"
+
+                firstRule = AggregationRule(firstVar=name1, secondVar=name2, secondPredIsIn=False,
+                                            isConstraint=False, addPW=False).rule
+                secondRule = AggregationRule(firstVar=name1, secondVar=name2, firstPredIsIn=False,
+                                             isConstraint=False, addPW=False, variableName="Y").rule
+                thirdRule = AggregationRule(firstVar=name1, secondVar=name2, lowerBound="0 < ",
+                                            isConstraint=False, addPW=False, variableName="Z").rule
+                result += threePredFormat.format(firstRule, secondRule, thirdRule)
+                result += AggregationRule(firstVar=name1, secondVar=name2).rule + "\n"
+
             elif self.relations == (rcc5["disjoint"] | rcc5["equals"] | rcc5["overlaps"]):
                 if reasoner[rnr] == reasoner["dlv"]:
                     result  = ":- #count{X : vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y : vrs(Y), out(" + name1 + ", Y ), in(" + name2 + ", Y )} = 0.\n"
@@ -492,16 +427,11 @@ class Articulation:
                     result = ""
             elif self.relations == relation["+="]: # lsum
                 name3 = self.taxon3.dlvName()
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result += ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name3 + ",X)} = 0, pw.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name3 + ",X)} = 0, pw.\n" 
-                    result += ":- #count{X: vrs(X), out(" + name2 + ",X), in(" + name3 + ",X)} = 0, pw.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name2 + ",X), in(" + name3 + ",X)} = 0, pw.\n" 
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    align.basePw += ":- [vrs(X): out(" + name1 + ",X): in(" + name3 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): in(" + name1 + ",X): in(" + name3 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): out(" + name2 + ",X): in(" + name3 + ",X)]0.\n" 
-                    align.basePw += ":- [vrs(X): in(" + name2 + ",X): in(" + name3 + ",X)]0.\n" 
+                result = AggregationRule(firstVar=name1, secondVar=name3, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name1, secondVar=name3).rule
+                result += AggregationRule(firstVar=name2, secondVar=name3, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name2, secondVar=name3).rule
+
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), out(" + name1 + ", X), in(" + name3 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), out(" + name1 + ", X), in(" + name3 + ", X), ix.\n\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), in(" + name1 + ", X), in(" + name3 + ", X), ix.\n"
@@ -511,25 +441,14 @@ class Articulation:
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 4) :- ir(X, A), in(" + name2 + ", X), in(" + name3 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 4) :- vr(X, A), in(" + name2 + ", X), in(" + name3 + ", X), ix.\n\n"
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name3 + ",X), pw.\n" 
-                result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name3 + ",X), pw.\n" 
-                #result += "in(" + name3 + ",X) :- in(" + name1 + ",X).\n" 
-                #result += "in(" + name3 + ",X) :- in(" + name2 + ",X).\n" 
-                #result += "out(" + name1 + ",X) :- out(" + name3 + ",X).\n" 
-                #result += "out(" + name2 + ",X) :- out(" + name3 + ",X).\n" 
-                #result += "in(" + name1 + ",X) v in(" + name2 + ",X) :- in(" + name3 + ",X).\n" 
-                #result += "out(" +name3 + ",X) :- out(" + name1 + ",X), out(" + name2 + ",X).\n"
+                result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name3 + ",X), pw.\n"
             elif self.relations == relation["=-"]: # rdiff
                 name3 = self.taxon3.dlvName()
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result  = ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name2 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), out(" + name3 + ",X), in(" + name2 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name3 + ",X), in(" + name2 + ",X)} = 0.\n" 
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    result  = ":- [vrs(X): out(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
-                    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name2 + ",X)]0.\n" 
-                    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name2 + ",X)]0.\n" 
-                    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name2 + ",X)]0.\n" 
+                result = AggregationRule(firstVar=name1, secondVar=name2, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name1, secondVar=name2).rule
+                result += AggregationRule(firstVar=name3, secondVar=name2, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name3, secondVar=name2).rule
+
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 1) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                 result += "c(r" + self.ruleNum.__str__() + ", A, 1) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                 result += "pie(r" + self.ruleNum.__str__() + ", A, 2) :- ir(X, A), in(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
@@ -543,20 +462,13 @@ class Articulation:
             elif self.relations == relation["+3="]:
                 name3 = self.taxon3.dlvName()
                 name4 = self.taxon4.dlvName()
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result  = ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name4 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name4 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), out(" + name2 + ",X), in(" + name4 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name2 + ",X), in(" + name4 + ",X)} = 0.\n"
-                    result += ":- #count{X: vrs(X), out(" + name3 + ",X), in(" + name4 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name3 + ",X), in(" + name4 + ",X)} = 0.\n" 
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    result  = ":- [vrs(X): out(" + name1 + ",X): in(" + name4 + ",X)]0.\n" 
-                    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name4 + ",X)]0.\n" 
-                    result += ":- [vrs(X): out(" + name2 + ",X): in(" + name4 + ",X)]0.\n" 
-                    result += ":- [vrs(X): in(" + name2 + ",X): in(" + name4 + ",X)]0.\n"
-                    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name4 + ",X)]0.\n" 
-                    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name4 + ",X)]0.\n"
+                result = AggregationRule(firstVar=name1, secondVar=name4, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name1, secondVar=name4).rule
+                result += AggregationRule(firstVar=name2, secondVar=name4, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name2, secondVar=name4).rule
+                result += AggregationRule(firstVar=name3, secondVar=name4, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name3, secondVar=name4).rule
+
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name4 + ",X).\n" 
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name4 + ",X).\n"
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name4 + ",X).\n"
@@ -566,59 +478,38 @@ class Articulation:
                 name3 = self.taxon3.dlvName()
                 name4 = self.taxon4.dlvName()
                 name5 = self.taxon5.dlvName()
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result  = ":- #count{X: vrs(X), out(" + name1 + ",X), in(" + name5 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name1 + ",X), in(" + name5 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), out(" + name2 + ",X), in(" + name5 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name2 + ",X), in(" + name5 + ",X)} = 0.\n"
-                    result += ":- #count{X: vrs(X), out(" + name3 + ",X), in(" + name5 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name3 + ",X), in(" + name5 + ",X)} = 0.\n"
-                    result += ":- #count{X: vrs(X), out(" + name4 + ",X), in(" + name5 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name4 + ",X), in(" + name5 + ",X)} = 0.\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    result  = ":- [vrs(X): out(" + name1 + ",X): in(" + name5 + ",X)]0.\n" 
-                    result += ":- [vrs(X): in(" + name1 + ",X): in(" + name5 + ",X)]0.\n" 
-                    result += ":- [vrs(X): out(" + name2 + ",X): in(" + name5 + ",X)]0.\n" 
-                    result += ":- [vrs(X): in(" + name2 + ",X): in(" + name5 + ",X)]0.\n"
-                    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name5 + ",X)]0.\n" 
-                    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name5 + ",X)]0.\n"
-                    result += ":- [vrs(X): out(" + name4 + ",X): in(" + name5 + ",X)]0.\n" 
-                    result += ":- [vrs(X): in(" + name4 + ",X): in(" + name5 + ",X)]0.\n"
+                result = AggregationRule(firstVar=name1, secondVar=name5, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name1, secondVar=name5).rule
+                result += AggregationRule(firstVar=name2, secondVar=name5, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name2, secondVar=name5).rule
+                result += AggregationRule(firstVar=name3, secondVar=name5, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name3, secondVar=name5).rule
+                result += AggregationRule(firstVar=name4, secondVar=name5, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name4, secondVar=name5).rule
+
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name1 + ",X), out(" + name5 + ",X).\n" 
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name5 + ",X).\n"
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name5 + ",X).\n"
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name4 + ",X), out(" + name5 + ",X).\n" 
             elif self.relations == relation["=+"] or self.relations == relation["-="]: # rsum and ldiff
                 name3 = self.taxon3.dlvName()
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result  = ":- #count{X: vrs(X), out(" + name2 + ",X), in(" + name1 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name2 + ",X), in(" + name1 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), out(" + name3 + ",X), in(" + name1 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name3 + ",X), in(" + name1 + ",X)} = 0.\n" 
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    result  = ":- [vrs(X): out(" + name2 + ",X): in(" + name1 + ",X)]0.\n"
-                    result += ":- [vrs(X): in(" + name2 + ",X): in(" + name1 + ",X)]0.\n"            
-                    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
-                    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
+                result = AggregationRule(firstVar=name2, secondVar=name1, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name2, secondVar=name1).rule
+                result += AggregationRule(firstVar=name3, secondVar=name1, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name3, secondVar=name1).rule
+
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name1 + ",X).\n" 
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name1 + ",X).\n"
             elif self.relations == relation["=3+"]:
                 name3 = self.taxon3.dlvName()
                 name4 = self.taxon4.dlvName()
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result  = ":- #count{X: vrs(X), out(" + name2 + ",X), in(" + name1 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name2 + ",X), in(" + name1 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), out(" + name3 + ",X), in(" + name1 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name3 + ",X), in(" + name1 + ",X)} = 0.\n"
-                    result += ":- #count{X: vrs(X), out(" + name4 + ",X), in(" + name1 + ",X)} = 0.\n" 
-                    result += ":- #count{X: vrs(X), in(" + name4 + ",X), in(" + name1 + ",X)} = 0.\n" 
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    result  = ":- [vrs(X): out(" + name2 + ",X): in(" + name1 + ",X)]0.\n"
-                    result += ":- [vrs(X): in(" + name2 + ",X): in(" + name1 + ",X)]0.\n" 
-                    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
-                    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
-                    result += ":- [vrs(X): out(" + name4 + ",X): in(" + name1 + ",X)]0.\n"
-                    result += ":- [vrs(X): in(" + name4 + ",X): in(" + name1 + ",X)]0.\n"
+                result = AggregationRule(firstVar=name2, secondVar=name1, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name2, secondVar=name1).rule
+                result += AggregationRule(firstVar=name3, secondVar=name1, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name3, secondVar=name1).rule
+                result += AggregationRule(firstVar=name4, secondVar=name1, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name4, secondVar=name1).rule
+
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name1 + ",X).\n" 
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name1 + ",X).\n"
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name4 + ",X), out(" + name1 + ",X).\n"
@@ -626,34 +517,19 @@ class Articulation:
                 name3 = self.taxon3.dlvName()
                 name4 = self.taxon4.dlvName()
                 name5 = self.taxon5.dlvName()
-                if reasoner[rnr] == reasoner["dlv"]:
-                    result  = ":- #count{X: vrs(X), out(" + name2 + ",X), in(" + name1 + ",X)} = 0.\n" 
-            	    result += ":- #count{X: vrs(X), in(" + name2 + ",X), in(" + name1 + ",X)} = 0.\n" 
-            	    result += ":- #count{X: vrs(X), out(" + name3 + ",X), in(" + name1 + ",X)} = 0.\n" 
-            	    result += ":- #count{X: vrs(X), in(" + name3 + ",X), in(" + name1 + ",X)} = 0.\n"
-            	    result += ":- #count{X: vrs(X), out(" + name4 + ",X), in(" + name1 + ",X)} = 0.\n" 
-            	    result += ":- #count{X: vrs(X), in(" + name4 + ",X), in(" + name1 + ",X)} = 0.\n"
-            	    result += ":- #count{X: vrs(X), out(" + name5 + ",X), in(" + name1 + ",X)} = 0.\n" 
-            	    result += ":- #count{X: vrs(X), in(" + name5 + ",X), in(" + name1 + ",X)} = 0.\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
-                    result  = ":- [vrs(X): out(" + name2 + ",X): in(" + name1 + ",X)]0.\n" 
-            	    result += ":- [vrs(X): in(" + name2 + ",X): in(" + name1 + ",X)]0.\n" 
-            	    result += ":- [vrs(X): out(" + name3 + ",X): in(" + name1 + ",X)]0.\n" 
-            	    result += ":- [vrs(X): in(" + name3 + ",X): in(" + name1 + ",X)]0.\n"
-            	    result += ":- [vrs(X): out(" + name4 + ",X): in(" + name1 + ",X)]0.\n" 
-            	    result += ":- [vrs(X): in(" + name4 + ",X): in(" + name1 + ",X)]0.\n"
-            	    result += ":- [vrs(X): out(" + name5 + ",X): in(" + name1 + ",X)]0.\n" 
-            	    result += ":- [vrs(X): in(" + name5 + ",X): in(" + name1 + ",X)]0.\n"
+                result = AggregationRule(firstVar=name2, secondVar=name1, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name2, secondVar=name1).rule
+                result += AggregationRule(firstVar=name3, secondVar=name1, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name3, secondVar=name1).rule
+                result = AggregationRule(firstVar=name4, secondVar=name1, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name4, secondVar=name1).rule
+                result += AggregationRule(firstVar=name5, secondVar=name1, firstPredIsIn=False).rule
+                result += AggregationRule(firstVar=name5, secondVar=name1).rule
+
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name2 + ",X), out(" + name1 + ",X).\n" 
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name3 + ",X), out(" + name1 + ",X).\n"
                 result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name4 + ",X), out(" + name1 + ",X).\n"
-                result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name5 + ",X), out(" + name1 + ",X).\n" 
-                #result += "in(" + name1 + ",X) :- in(" + name2 + ",X).\n" 
-                #result += "in(" + name1 + ",X) :- in(" + name3 + ",X).\n" 
-                #result += "out(" + name2 + ",X) :- out(" + name1 + ",X).\n" 
-                #result += "out(" + name3 + ",X) :- out(" + name1 + ",X).\n" 
-                #result += "in(" + name2 + ",X) v in(" + name3 + ",X) :- in(" + name1 + ",X).\n" 
-                #result += "out(" +name1 + ",X) :- out(" + name2 + ",X), out(" + name3 + ",X).\n" 
+                result += "ir(X, r" + self.ruleNum.__str__() + ") :- in(" + name5 + ",X), out(" + name1 + ",X).\n"
             else:
                 print "Relation ",self.relations," is not yet supported!!!!"
                 result = "\n"

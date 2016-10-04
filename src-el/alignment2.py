@@ -43,6 +43,7 @@ import socket
 import fileinput
 import sys
 import csv
+import Queue
 from taxonomy2 import *  
 from alignment2 import * 
 from redCon import *
@@ -99,6 +100,8 @@ class TaxonomyMapping:
         self.mus = []                          # MUS
         self.allPairsMir = {}                  # mir used in RCC reasoner 
         self.rccPreArts = []                   # RCC reasoner pre-processing articulation relations
+        self.descendMapping = {}               # RCC eq reasoning process to store descendants of taxa
+        self.numPWsInRCC = 0                   # RCCPW reasoning process to store the number of PWs
         self.args = args
         if self.args['--ieo']:
             self.args['--ie'] = True
@@ -220,6 +223,21 @@ class TaxonomyMapping:
         self.cvinternalfile = os.path.join(self.pwoutputfiledir, "cv.internal")
         self.hvinternalfile = os.path.join(self.pwoutputfiledir, 'hv.internal')
         
+        # files while using rcc reasoner
+        if reasoner[self.args['-r']] == reasoner["rcc2"] or reasoner[self.args['-r']] == reasoner["rcc2eq"] \
+            or reasoner[self.args['-r']] == reasoner["rcc2pw"]:
+            self.rccfilesdir = os.path.join(self.outputdir, "8-RCC-files")
+            if not os.path.exists(self.rccfilesdir):
+                os.mkdir(self.rccfilesdir)
+        
+        # files while using Shawn's reasoner
+        if reasoner[self.args['-r']] == reasoner["rcc1"]:
+            self.shawnfilesdir = os.path.join(self.outputdir, "9-Shawn-output")
+            if not os.path.exists(self.shawnfilesdir):
+                os.mkdir(self.shawnfilesdir)
+            self.shawninputhashed = os.path.join(self.shawnfilesdir, "inputhashed.txt")
+            self.shawnoutputhashed = os.path.join(self.shawnfilesdir, "outputhashed.txt")
+            self.shawnoutput = os.path.join(self.shawnfilesdir, "output.txt")
         
         if self.enc & encode["ob"]:
             self.obsdir = os.path.join(self.outputdir, "obs")
@@ -249,6 +267,8 @@ class TaxonomyMapping:
         #        os.mkdir(self.mergeinputdir)
         
 #        self.ivpdf = os.path.join(self.pwspdfdir, self.name+"_iv.pdf")
+        if not self.args['-n']:
+            self.args['-n'] = '0'             # by default output all possible worlds
         if reasoner[self.args['-r']] == reasoner["gringo"]:
             # possible world command
             self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0 | "+self.path+"/muniq -u"
@@ -257,11 +277,17 @@ class TaxonomyMapping:
             self.con = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD --eq=1"
         elif reasoner[self.args['-r']] == reasoner["dlv"]:
             # possible world command
-            self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch+ " | "+self.path+"/muniq -u"
+            self.com = "dlv -silent -filter=rel -n="+ self.args['-n'] + " " +self.pwfile+" "+ self.pwswitch+ " | "+self.path+"/muniq -u"
             #self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch
             # consistency command
             self.con = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+ self.pwswitch
-        elif reasoner[self.args['-r']] == reasoner["rcc"]:
+#        elif reasoner[self.args['-r']] == reasoner["rcc1"]:
+#            if self.args['--pw']:
+#                self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f t f"
+#            else:
+#                self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f f f"
+        elif reasoner[self.args['-r']] == reasoner["rcc1"] or reasoner[self.args['-r']] == reasoner["rcc2"] \
+            or reasoner[self.args['-r']] == reasoner["rcc2eq"] or reasoner[self.args['-r']] == reasoner["rcc2pw"]:
             pass
         else:
             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")
@@ -304,12 +330,27 @@ class TaxonomyMapping:
         return taxa
 
     def run(self):
-        if reasoner[self.args['-r']] == reasoner["rcc"]:
+        print "******* You are running example", self.name, "*******"
+        if reasoner[self.args['-r']] == reasoner["rcc1"]:
+            self.runShawn()
+            self.updateReportFile(self.reportfile)
+            return
+        if reasoner[self.args['-r']] == reasoner["rcc2"]:
             self.runRCCReasoner()
+            self.updateReportFile(self.reportfile)
+            return
+        if reasoner[self.args['-r']] ==  reasoner["rcc2eq"]:
+            self.runRCCEQReasoner()
+            self.updateReportFile(self.reportfile)
+            return
+        if reasoner[self.args['-r']] ==  reasoner["rcc2pw"]:
+            originalUberMir = {}
+            originalUberMir = self.processInputFile()
+            self.handleRCCPW(originalUberMir)
+            self.updateReportFile(self.reportfile)
             return
         if not self.enc:
             return
-        print "******* You are running example", self.name, "*******"
         self.genASP()
         if self.args['--consistency']:
             if not self.testConsistency():
@@ -684,18 +725,18 @@ class TaxonomyMapping:
                 if j != 0: outputstr += ", "
                 if dotc1.split(".")[0] == self.firstTName:
                     outputstr += dotc1+rel[2]+dotc2
-                    if self.args['--xia']:
-                        if dotc1 in self.leafConcepts and dotc2 in self.leafConcepts:
-                            tmpLeafRels.append([dotc1,rel[2],dotc2])
                 else:
                     if rel[2] == '">"':
-                        rel[2] = '"<"'
+                        #rel[2] = '"<"'
+                        outputstr += dotc2+'"<"'+dotc1
                     elif rel[2] == '"<"':
-                        rel[2] = '">"'
-                    outputstr += dotc2+rel[2]+dotc1
-                    if self.args['--xia']:
-                        if dotc1 in self.leafConcepts and dotc2 in self.leafConcepts:
-                            tmpLeafRels.append([dotc2,rel[2],dotc1])
+                        #rel[2] = '">"'
+                        outputstr += dotc2+'">"'+dotc1
+                    else:
+                        outputstr += dotc2+rel[2]+dotc1
+                if self.args['--xia']:
+                    if dotc1 in self.leafConcepts and dotc2 in self.leafConcepts:
+                        tmpLeafRels.append([dotc1,rel[2],dotc2])
                 pair = dotc1+","+dotc2
                 pwmirs[i][pair] = rcc5[rel[2]]
                 
@@ -1951,12 +1992,12 @@ class TaxonomyMapping:
         idlv.write("ix.")
         if reasoner[self.args['-r']] == reasoner["gringo"]:
             if self.enc & encode["ob"]:
-                pdlv.write("\n#hide.\n#show pp/" + self.obslen.__str__() + ".")
+                pdlv.write("\n#show pp/" + self.obslen.__str__() + ".")
             elif self.enc & encode["pw"]:
-                pdlv.write("\n#hide.\n#show rel/3.")
+                pdlv.write("\n#show rel/3.")
             elif self.enc & encode["cb"]:
-                pdlv.write("\n#hide.\n#show relout/3.")
-            idlv.write("\n#hide.\n#show ie/1.")
+                pdlv.write("\n#show relout/3.")
+            idlv.write("\n#show ie/1.")
         pdlv.close()
         idlv.close()
 
@@ -2057,7 +2098,7 @@ class TaxonomyMapping:
                 
                 self.baseAsp += "%%% Euler Bit\n"
                 for i in range(len(couArray)):
-                    self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", V = M1 #mod " + couArray[i].__str__() + ".\n"
+                    self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", V = M1 \ " + couArray[i].__str__() + ".\n"
             self.baseAsp += template.getAspMnCon()
             
         elif self.enc & encode["vr"]:
@@ -2077,7 +2118,7 @@ class TaxonomyMapping:
                 self.baseAsp += "r(0.."+(maxint-1).__str__()+").\n\n"
                 self.baseAsp += "%%% count of concepts\n"
                 self.baseAsp += "count(0.."+(num-1).__str__()+").\n\n"
-                self.baseAsp += "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P, 0 = M1 #mod 2.\n"
+                self.baseAsp += "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P, 0 = M1 \ 2.\n"
                 self.baseAsp += con
             self.baseAsp += template.getAspVrCon()
                 
@@ -2098,6 +2139,7 @@ class TaxonomyMapping:
                 t = queue.pop(0)
                 # This is a nc flag
                 if t.abbrev == "nc":
+#                if t.abbrev.startswith("nc_"):
                     self.baseAsp += "ncf(" + t.dlvName() + ").\n"
                 if t.hasChildren():
                     #if self.args.verbose:
@@ -2113,17 +2155,12 @@ class TaxonomyMapping:
                             self.baseAsp += "% " + t1.dlvName() + " isa " + t.dlvName() + "\n"
                             ruleNum = len(self.rules)
                             self.rules["r" + ruleNum.__str__()] = t1.dotName() + " isa " + t.dotName()
-                            #self.baseAsp += "in(" + t.dlvName() + ", X) :- in(" + t1.dlvName() + ", X).\n"
-                            #self.baseAsp += "out(" + t1.dlvName() + ", X) :- out(" + t.dlvName() + ", X).\n"
-                            #self.baseAsp += "in(" + t1.dlvName() + ", X) v out(" + t1.dlvName() + ", X) :- in(" + t.dlvName() + ", X).\n"
-                            #self.baseAsp += "in(" + t.dlvName() + ", X) v out(" + t.dlvName() + ", X) :- out(" + t1.dlvName() + ", X).\n"
                             self.baseAsp += "ir(X, r" + ruleNum.__str__() +") :- in(" + t1.dlvName() + ", X), out(" + t.dlvName() + ", X), pw.\n"
                             self.baseAsp += "ir(X, prod(r" + ruleNum.__str__() + ",R)) :- in(" + t1.dlvName() + ",X), out3(" + t.dlvName() + ", X, R), ix.\n" 
-                            if t1.abbrev.find("nc") == -1:
-                                if reasoner[self.args['-r']] == reasoner["dlv"]:
-                                    self.baseAsp += ":- #count{X: vrs(X), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X)} = 0, pw.\n"
-                                elif reasoner[self.args['-r']] == reasoner["gringo"]:
-                                    self.baseAsp += ":- [vrs(X): in(" + t1.dlvName() + ", X): in(" + t.dlvName() + ", X)]0.\n"
+#                            if t1.abbrev.find("nc") == -1:
+                            if t1.abbrev.find("nc_") == -1:
+                                self.baseAsp += AggregationRule(firstVar=t1.dlvName(), secondVar=t.dlvName()).rule
+
                                 self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n"
                                 self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + t1.dlvName() + ", X), in(" + t.dlvName() + ", X), ix.\n\n"
                             coverage += ",out(" + t1.dlvName() + ", X)"
@@ -2168,25 +2205,16 @@ class TaxonomyMapping:
                                         ruleNum = len(self.rules)
                                         self.rules["r" + ruleNum.__str__()] = t.children[i].dotName() + " disjoint " + t.children[j].dotName()
                                         self.baseAsp += "% " + name1 + " ! " + name2+ "\n"
-                                        #self.baseAsp += "out(" + name1 + ", X) :- in(" + name2+ ", X).\n"
-                                        #self.baseAsp += "out(" + name2 + ", X) :- in(" + name1+ ", X).\n"
-                                        #self.baseAsp += "in(" + name1 + ", X) v out(" + name1 + ", X) :- out(" + name2 + ", X).\n"
-                                        #self.baseAsp += "in(" + name2 + ", X) v out(" + name2 + ", X) :- out(" + name1 + ", X).\n"
                                         self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") :- in(" + name1 + ", X), in(" + name2+ ", X).\n"
-                                        if reasoner[self.args['-r']] == reasoner["dlv"]:
-                                            if t.children[i].abbrev.find("nc") == -1:
-                                                self.baseAsp += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2+ ", X)} = 0, pw.\n"
-                                            if t.children[j].abbrev.find("nc") == -1:
-                                                self.baseAsp += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2+ ", X)} = 0, pw.\n"
-                                        elif reasoner[self.args['-r']] == reasoner["gringo"]:
-                                            if t.children[i].abbrev.find("nc") == -1:
-                                                self.baseAsp += ":- [vrs(X): in(" + name1 + ", X): out(" + name2+ ", X)]0, pw.\n"
-                                            if t.children[j].abbrev.find("nc") == -1:
-                                                self.baseAsp += ":- [vrs(X): out(" + name1 + ", X): in(" + name2+ ", X)]0, pw.\n"
-                                        if t.children[i].abbrev.find("nc") == -1:
+
+                                        if t.children[i].abbrev.find("nc_") == -1:
+                                            self.baseAsp += AggregationRule(firstVar=name1, secondVar=name2, secondPredIsIn=False).rule
+                                            self.baseAsp += AggregationRule(firstVar=name1, secondVar=name2,
+                                                                            firstPredIsIn=False).rule
+
+                                        if t.children[i].abbrev.find("nc_") == -1:
                                             self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
                                             self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
-                                        if t.children[j].abbrev.find("nc") == -1:
                                             self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 2) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                                             self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 2) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                     elif self.enc & encode["direct"]:
@@ -2281,7 +2309,7 @@ class TaxonomyMapping:
                     self.baseAsp += "subt(X, Z) :- subt(X, Y), subt(Y, Z).\n" 
                     for i in range(len(self.temporal)):
                         self.baseAsp += "l(" + self.temporal[i][0] + ").\n"
-                        for j in range(1, len(sef.temporal[i])):
+                        for j in range(1, len(self.temporal[i])):
                             self.baseAsp += "t(" + self.temporal[i][j] + ").\n"
                             self.baseAsp += "subt(" + self.temporal[i][j] + ", " + self.temporal[i][0] +").\n"
                 else:
@@ -2313,7 +2341,8 @@ class TaxonomyMapping:
                     pre = "in"
                 else:
                     pre = "out"
-                if tmp != "": tmp += self.connector
+                if tmp != "":
+                    tmp += self.connector
                 cpt = self.obs[i][0][j][0]
                 tmp += pre + "(" + cpt + ", X)"
             pair = ""
@@ -2324,10 +2353,8 @@ class TaxonomyMapping:
             if self.obs[i][1] == "N":
                 self.baseAsp += ":- present(X" + pair + ")," + tmp + ".\n" 
             else:
-                if reasoner[self.args['-r']] == reasoner["dlv"]:
-                    self.baseAsp += ":- #count{X: present(X" + pair + "), " + tmp + "} = 0.\n"
-                elif reasoner[self.args['-r']] == reasoner["gringo"]:
-                    self.baseAsp += ":- [present(X" + pair + "): " + tmp + "]0.\n"
+                self.baseAsp += ":- #count {X: present(X" + pair + "), " + tmp + "} <= 0.\n"
+
         self.baseAsp += "pinout(C, in, X" + appendd + ") :- present(X" + appendd + "), concept(C, _, N), in(C, X).\n"
         self.baseAsp += "pinout(C, out, X" + appendd + ") :- present(X" + appendd + "), concept(C, _, N), out(C, X).\n"
         
@@ -3159,61 +3186,504 @@ class TaxonomyMapping:
             f.write(str.strip())
             f.write(')\n')
         f.close()
+        
+    # In rccpw, process the input file
+    def processInputFile(self):
+        originalUberMir = {}
+        for pair in self.getAllArticulationPairs():
+            if pair[0].taxonomy.abbrev == self.firstTName:
+                originalUberMir[(pair[0], pair[1])] = relation["{=, >, <, !, ><}"]
+            else:
+                originalUberMir[(pair[1], pair[0])] = relation["{=, >, <, !, ><}"]
+                    
+        for art in self.articulations:
+            originalUberMir[(art.taxon1, art.taxon2)] = art.relations
+        
+        return originalUberMir
+    
+    def handleRCCPW(self, originalUberMir):
+#        for pair in originalUberMir:
+#            print "Pair are: ", pair[0].taxonomy.abbrev, pair[0].name, "and", pair[1].taxonomy.abbrev, pair[1].name
+#            print pair[0].taxonomy.abbrev, pair[0].name
+#            for child in pair[0].children:
+#                print child.taxonomy.abbrev, child.name            
+#            print ""
+#            
+#            print pair[1].taxonomy.abbrev, pair[1].name
+#            for child in pair[1].children:
+#                print child.taxonomy.abbrev, child.name
+#            print "----------------------"
+#            
+#        for art in self.articulations:
+#            print art.taxon1.taxonomy.abbrev, art.taxon1.name, art.relations, art.taxon2.taxonomy.abbrev, art.taxon2.name
+#        
+#        print ""
+        isConsistent = False
+        outputUberMir = {}
+        
+        isConsistent = self.runRCCReasonerPW(originalUberMir, outputUberMir)
+        if isConsistent:
+            numWorlds = self.countUberMirPW(outputUberMir)
+            if numWorlds != 1:
+                worlds = self.createUberMirWorlds(originalUberMir, outputUberMir)
+                for world in worlds:
+                    newOutputUberMir = {}
+                    isConsistent = self.runRCCReasonerPW(world, newOutputUberMir)
+                    if isConsistent:
+                        self.runPW(world, newOutputUberMir)
+                    
+#        print self.countUberMirPW(finalMir)
+#        worlds = self.createUberMirWorlds(finalMir, finalMir)
+#        for world in worlds:
+#            print "\n\nWorld are following:"
+#            for k,v in world.iteritems():
+#                print k[0].taxonomy.abbrev, k[0].name, findkey(relation,v), k[1].taxonomy.abbrev, k[1].name
+#        
+#        if isConsistent:
+#            self.rccGenMirPW(finalMir)
+        return
+    
+    def runPW(self, OWorld, newOutputUberMir):
+        isConsistent = False
+        numWorlds = self.countUberMirPW(newOutputUberMir)
+        
+#        print "========START==========="
+#        print "NUMWORLDS", numWorlds
+#        for k,v in newOutputUberMir.iteritems():
+#                print k[0].taxonomy.abbrev, k[0].name, findkey(relation,v), k[1].taxonomy.abbrev, k[1].name
+#        print "=========END=========\n"        
+                
+        if numWorlds != 1:
+            worlds = self.createUberMirWorlds(newOutputUberMir, newOutputUberMir)
+            for world in worlds:
+                anotherNewOutputUberMir = {}
+                isConsistent = self.runRCCReasonerPW(world, anotherNewOutputUberMir)
+                if isConsistent:
+                    self.runPW(OWorld, anotherNewOutputUberMir)
+        else:
+            # print Possible Worlds
+            print "\n\nPossible Worlds: ", self.numPWsInRCC
+            for k,v in newOutputUberMir.iteritems():
+                print k[0].taxonomy.abbrev+"."+k[0].name, findkey(relation,v), k[1].taxonomy.abbrev+"."+k[1].name
+            self.numPWsInRCC = self.numPWsInRCC + 1
+        return
+    
+    def countUberMirPW(self, uberMir):
+        num = 1
+        for taxonPair, rel in uberMir.iteritems():
+            if rel != relation["!"] and rel != relation["<"] and rel != relation["="] and rel != relation[">"] and rel != relation["><"]:
+                relstr = findkey(relation, rel)
+                numOfDisjunction = relstr.count(",") + 1
+                num = num * numOfDisjunction
+        return num
+    
+    def createUberMirWorlds(self, uberMir, disjunctiveUberMir):
+        disjunctiveTaxonPair = None
+        disjunctiveRel = 0
+#        print "\nSTART================"
+        for taxonPair, rel in disjunctiveUberMir.iteritems():
+#            print "rel:", findkey(relation, rel)
+            if rel != relation["!"] and rel != relation["<"] and rel != relation["="] and rel != relation[">"] and rel != relation["><"]:
+                # found a disjunctive relation 
+#                print "YES"
+                disjunctiveTaxonPair = taxonPair
+                disjunctiveRel = rel
+                break
+#            else:
+#                print "NO"
+        
+#        print "disjunctiveTaxonPair", disjunctiveTaxonPair[0].taxonomy.abbrev, disjunctiveTaxonPair[0].name, disjunctiveTaxonPair[1].taxonomy.abbrev, disjunctiveTaxonPair[1].name
+#        print "disjunctiveRel", findkey(relation,disjunctiveRel)
+        worlds = []
+        if disjunctiveRel & relation["!"]:
+            aNewWorld = {}
+            for t, r in uberMir.iteritems():
+                aNewWorld[t] = r
+            aNewWorld[disjunctiveTaxonPair] = relation["!"]
+            worlds.append(aNewWorld)
+        if disjunctiveRel & relation["<"]:
+            aNewWorld = {}
+            for t, r in uberMir.iteritems():
+                aNewWorld[t] = r
+            aNewWorld[disjunctiveTaxonPair] = relation["<"]
+            worlds.append(aNewWorld)
+        if disjunctiveRel & relation["="]:
+            aNewWorld = {}
+            for t, r in uberMir.iteritems():
+                aNewWorld[t] = r
+            aNewWorld[disjunctiveTaxonPair] = relation["="]
+            worlds.append(aNewWorld)
+        if disjunctiveRel & relation[">"]:
+            aNewWorld = {}
+            for t, r in uberMir.iteritems():
+                aNewWorld[t] = r
+            aNewWorld[disjunctiveTaxonPair] = relation[">"]
+            worlds.append(aNewWorld)
+        if disjunctiveRel & relation["><"]:
+            aNewWorld = {}
+            for t, r in uberMir.iteritems():
+                aNewWorld[t] = r
+            aNewWorld[disjunctiveTaxonPair] = relation["><"]
+            worlds.append(aNewWorld)
+        
+        return worlds
+            
 
 
+    def runRCCReasonerPW(self, inputUberMir, outputUberMir):
+        outputUberMir.clear()
+        toDo = Queue.Queue()
+        for taxonPair,rel in inputUberMir.iteritems():
+            outputUberMir[taxonPair] = rel
+            if rel != relation["{=, >, <, !, ><}"]:
+                toDo.put(taxonPair)
+        
+        while not toDo.empty():
+            taxonPair = toDo.get()
+            if not self.reasonOverPW(taxonPair, toDo, inputUberMir, outputUberMir):
+                return False
+        
+        return True
+        #return consistent or not
+            
+    def reasonOverPW(self, taxonPair, toDo, inputUberMir, outputUberMir):
+        t1 = taxonPair[0]
+        t2 = taxonPair[1]
+        t1Parent = t1.parent
+        t2Parent = t2.parent
+        givenRel = outputUberMir[taxonPair]
+#        givenRel = self.allPairsMir[taxonPair]
+        
+        # begin reason over
+        if t2Parent != "":
+            deducedPair = (t1, t2Parent)
+            if len(t2Parent.children) > 1:
+                deducedRel = comptab[givenRel][relation["<"]]
+            else:
+                deducedRel = comptab[givenRel][relation["="]]
+            if not self.assertNewPW(deducedPair, deducedRel, toDo, inputUberMir, outputUberMir):
+                return False
+            
+            
+            # update pair between t1 and t2's siblings
+            t2Siblings = t2Parent.children
+            for t2Sibling in t2Siblings:
+                if t2Sibling != t2:
+                    deducedPair = (t1, t2Sibling)
+                    deducedRel = comptab[givenRel][relation["!"]]
+                    if not self.assertNewPW(deducedPair, deducedRel, toDo, inputUberMir, outputUberMir):
+                        return False
+        
+        # update pair between t1 and t2's children
+        t2Children = t2.children
+        if len(t2Children) > 1:
+            for t2Child in t2Children:
+                deducedPair = (t1, t2Child)
+                deducedRel = comptab[givenRel][relation[">"]]
+                if not self.assertNewPW(deducedPair, deducedRel, toDo, inputUberMir, outputUberMir):
+                    return False
+        else:
+            for t2Child in t2Children:
+                deducedPair = (t1, t2Child)
+                deducedRel = comptab[givenRel][relation["="]]
+                if not self.assertNewPW(deducedPair, deducedRel, toDo, inputUberMir, outputUberMir):
+                    return False
+            
+        if t1Parent != "":
+            deducedPair = (t1Parent, t2)
+            if len(t1Parent.children) > 1:
+                deducedRel = comptab[relation[">"]][givenRel]
+            else:
+                deducedRel = comptab[relation["="]][givenRel]
+            if not self.assertNewPW(deducedPair, deducedRel, toDo, inputUberMir, outputUberMir):
+                return False
+            
+            # update pair between t1's siblings and t2 siblings
+            t1Siblings = t1Parent.children
+            for t1Sibling in t1Siblings:
+                if t1Sibling != t1:
+                    deducedPair = (t1Sibling, t2)
+                    deducedRel = comptab[relation["!"]][givenRel]
+                    if not self.assertNewPW(deducedPair, deducedRel, toDo, inputUberMir, outputUberMir):
+                        return False
+        
+        # update pair between t1's children and t2
+        t1Children = t1.children
+        if len(t1Children) > 1:
+            for t1Child in t1Children:
+                deducedPair = (t1Child, t2)
+                deducedRel = comptab[relation["<"]][givenRel]
+                if not self.assertNewPW(deducedPair, deducedRel, toDo, inputUberMir, outputUberMir):
+                    return False
+        else:
+            for t1Child in t1Children:
+                deducedPair = (t1Child, t2)
+                deducedRel = comptab[relation["="]][givenRel]
+                if not self.assertNewPW(deducedPair, deducedRel, toDo, inputUberMir, outputUberMir):
+                    return False
+            
+        return True
+    
+    def assertNewPW(self, deducedPair, deducedRel, toDo, inputUberMir, outputUberMir):
+        oldRel = outputUberMir[deducedPair]
+        newRel = oldRel & deducedRel
+        if not newRel:
+            print "Inconsisten pair", deducedPair[0].name, deducedPair[1].name, "oldRel", findkey(relation,oldRel), "deducedRel", findkey(relation,deducedRel), "newRel", findkey(relation,newRel)
+            return False
+#            exit(0)
+        else:
+            if newRel == relation["{=, >, <, !, ><}"] or oldRel == newRel:
+                return True
+        outputUberMir[deducedPair] = newRel
+        toDo.put(deducedPair)
+        return True
+
+    def runShawn(self):
+        # hash the original file
+        cmd = "hash_names.py " + self.args['<inputfile>'][0] + " > " + self.shawninputhashed
+        newgetoutput(cmd)
+        
+        # run Shawn's reasoner
+        if self.args['--pw']:
+            cmd = "mir.py " + self.shawninputhashed + " " + self.shawnoutputhashed + " f t f"
+        else:
+            cmd = "mir.py " + self.shawninputhashed + " " + self.shawnoutputhashed + " f f f"
+        newgetoutput(cmd)
+        
+        # unhash shawn's output
+        cmd = "unhash_names.py " + self.shawnoutputhashed + " hash_values.json > " + self.shawnoutput
+        newgetoutput(cmd)
+        
+        # read shawn's output
+        pwIndex = 0
+        currentChunk = []
+        chunks = []
+        fIn = open(self.shawnoutput, "r")
+        lines = fIn.readlines()
+        for line in lines:
+            
+            if line.startswith("articulation") and currentChunk:
+                chunks.append(currentChunk[:])
+                currentChunk = []
+            
+            if re.match("\[.*?\]", line):
+                currentChunk.append(line)
+            
+        chunks.append(currentChunk)
+        
+        # for each PW
+        if len(chunks) == 1:
+            tmptr = copy.deepcopy(self.tr)
+            self.prepareShawnInternal(chunks[0], pwIndex, tmptr)
+        else:
+            for i in range(1, len(chunks)):
+                tmptr = copy.deepcopy(self.tr)
+                self.prepareShawnInternal(chunks[i], pwIndex, tmptr)
+                pwIndex = pwIndex + 1
+        
+        fIn.close()
+                
+#        for pair in self.getAllTaxonPairs():
+#            print "Pair are: ", pair[0].taxonomy.abbrev, pair[0].name, "and", pair[1].taxonomy.abbrev, pair[1].name, self.findRelWithinTaxonomy(pair[0], pair[1])
+    
+    def prepareShawnInternal(self, chunk, pwIndex, tmptr):
+        # create intra-mir
+        tmpmir = {}
+        tmpeq = copy.deepcopy(self.eq)
+        for pair in self.getAllTaxonPairs():
+            if pair[0].taxonomy.abbrev == pair[1].taxonomy.abbrev:
+                intraRel = self.findRelWithinTaxonomy(pair[0], pair[1])
+                name1 = pair[0].taxonomy.abbrev + "." + pair[0].name
+                name2 = pair[1].taxonomy.abbrev + "." + pair[1].name
+                tmpmir[name1+","+name2] = relation[intraRel]
+                
+        for line in chunk:
+            
+            if "{" in line:
+                print "MIR contains disjunctions, NO visualization."
+                exit(0)
+            
+            items = re.match("\[(.*)\ (.*)\ (.*)\]", line)
+            node1 = items.group(1)
+            rel = items.group(2)
+            node2 = items.group(3)
+            
+            # create tr
+            if rel == "is_included_in" and self.notInTr(node1, node2):
+                tmptr.append([node1, node2, 1])
+            if rel == "includes" and self.notInTr(node2, node1):
+                tmptr.append([node2, node1, 1])
+                
+            # create inter-mir
+            tmpmir[node1+","+node2] = rcc5[rel]
+            
+        # create eq
+        for k,v in tmpmir.iteritems():
+            if v == relation["="]:
+                t1 = k.split(",")[0]
+                t2 = k.split(",")[1]
+                if t1 in tmpeq:
+                    tmpeq[t1].add(t2)
+                else:
+                    tmpeq[t1] = sets.Set([t2])
+                if t2 in tmpeq:
+                    tmpeq[t2].add(t1)
+                else:
+                    tmpeq[t2] = sets.Set([t1])
+            
+#        print "pwIndex= ", pwIndex
+#        print "tmptr= ", tmptr
+#        print "tmpmir=", tmpmir
+#        print "tmpeq=", tmpeq
+#        print ""
+        
+        # create internal file
+        f = open(self.pwinternalfile + pwIndex.__str__(), "w")
+        f.write('from sets import Set\n')
+        f.write('fileName = ' + repr(self.name + "_" + pwIndex.__str__() + "_" + self.args['-e']) + '\n')
+        f.write('pwIndex = ' + repr(pwIndex) + '\n')
+        f.write('eq = ' + repr(tmpeq) + '\n')
+        f.write('firstTName = ' + repr(self.firstTName) + '\n')
+        f.write('secondTName = ' + repr(self.secondTName) + '\n')
+        f.write('thirdTName = ' + repr(self.thirdTName) + '\n')
+        f.write('fourthTName = ' + repr(self.fourthTName) + '\n')
+        f.write('fifthTName = ' + repr(self.fifthTName) + '\n')
+        f.write('eqConLi = ' + repr(self.eqConLi) + '\n')
+        f.write('tr = ' + repr(tmptr) + '\n')
+        f.write('mir = ' + repr(tmpmir) + '\n')
+        f.close()
+        
+        return
+    
+    def notInTr(self, node1, node2):
+        notInTrFlag = True 
+        for pair in self.tr:
+            if node1 == pair[0] and node2 == pair[1]:
+                notInTrFlag = False
+                break
+        return notInTrFlag
+        
+    def findRelWithinTaxonomy(self, t1, t2):
+        rel = ""
+        ancestors = []
+        descendants = []
+        self.findAncestors(t1, ancestors)
+        self.findDescendants(t1, descendants)
+        
+        if t2 in ancestors:
+            alwaysHasOneChild = True
+            for ancestor in ancestors:
+                if len(ancestor.children) > 1:
+                    alwaysHasOneChild = False
+                    break
+            if alwaysHasOneChild:
+                rel = "="
+            else:
+                rel = "<"
+        elif t2 in descendants:
+            alwaysHasOneChild = True
+            if len(t1.children) > 1:
+                alwaysHasOneChild = False
+            else:
+                for descendant in descendants:
+                    if len(descendant.children) > 1:
+                        alwaysHasOneChild = False
+                        break
+            if alwaysHasOneChild:
+                rel = "="
+            else:
+                rel = ">"
+        else:
+            rel = "!"
+        
+        return rel
+    
+    def hasOnlyOneChild(self, taxon):
+        if len(taxon.children) == 1:
+            return True
+        else:
+            return False
+
+    
     def runRCCReasoner(self):
-#        for pair in self.getAllArticulationPairs():
-#            print pair[0].name, pair[1].name
+#         for pair in self.getAllArticulationPairs():
+#             print "Pair are: ", pair[0].taxonomy.abbrev, pair[0].name, "and", pair[1].taxonomy.abbrev, pair[1].name
 #        t = self.getAllArticulationPairs()[20][0]
 #        a = []
 #        d = []
 #        self.findAncestors(t, a)
-#        self.findDescedants(t, d)
+#        self.findDescendants(t, d)
 #        print t.name
 #        print ""
 #        for eachD in d:
 #            print eachD.name 
 ##
-#        for pair in self.getAllArticulationPairs():
-#            print pair[0].name
+#        for pair in self.getAllTaxonPairs():
+#            print "Pair are: ", pair[0].taxonomy.abbrev, pair[0].name, "and", pair[1].taxonomy.abbrev, pair[1].name
+#            print pair[0].taxonomy.abbrev, pair[0].name
 #            for child in pair[0].children:
-#                print child.name            
+#                print child.taxonomy.abbrev, child.name            
 #            print ""
 #            
+#            print pair[1].taxonomy.abbrev, pair[1].name
+#            for child in pair[1].children:
+#                print child.taxonomy.abbrev, child.name
+#            print "----------------------"
+#            
 #        for art in self.articulations:
-#            print art.taxon1.name, art.relations, art.taxon2.name
+#            print art.taxon1.taxonomy.abbrev, art.taxon1.name, art.relations, art.taxon2.taxonomy.abbrev, art.taxon2.name
 #        
 #        print ""
         
         # prepare for input
         for pair in self.getAllArticulationPairs():
 #            print "pair[0].taxonomy", pair[0].taxonomy.abbrev, self.firstTName
-            if pair[0].taxonomy.abbrev == self.firstTName:
+            if pair[0].taxonomy.abbrev == self.firstTName or pair[0].taxonomy.abbrev < pair[1].taxonomy.abbrev:
                 self.allPairsMir[(pair[0], pair[1])] = relation["{=, >, <, !, ><}"]
             else:
                 self.allPairsMir[(pair[1], pair[0])] = relation["{=, >, <, !, ><}"]
-                    
-        for art in self.articulations:
-            self.allPairsMir[(art.taxon1, art.taxon2)] = art.relations
+                
+#         print "--------"
+#         for k,v in self.allPairsMir.iteritems():
+#             print k[0].taxonomy.abbrev+"."+k[0].name, k[1].taxonomy.abbrev+"."+k[1].name, v
+
         
+        for art in self.articulations:
+            if art.taxon1.taxonomy.abbrev == self.firstTName or art.taxon1.taxonomy.abbrev < art.taxon2.taxonomy.abbrev:
+                self.allPairsMir[(art.taxon1, art.taxon2)] = art.relations
+            else:
+                self.allPairsMir[(art.taxon2, art.taxon1)] = self.reverseArts(art.relations)
+        
+#         print "--------"
+#         for k,v in self.allPairsMir.iteritems():
+#             print k[0].taxonomy.abbrev+"."+k[0].name, k[1].taxonomy.abbrev+"."+k[1].name, v
+
         # apply the RCC preprocessing
-        self.rccPreProcessGuidedReference()
-        for art in self.rccPreArts:
-            if (art[0], art[1]) in self.allPairsMir:
-                self.allPairsMir[(art[0], art[1])] = art[2]
+        #self.rccPreProcessGuidedReference()
+        #for art in self.rccPreArts:
+        #    if (art[0], art[1]) in self.allPairsMir:
+        #        self.allPairsMir[(art[0], art[1])] = art[2]
         
 #        for k,v in self.allPairsMir.iteritems():
 #            print k[0].name, k[1].name, v
         
-        toDo = []
+        toDo = Queue.Queue()
+#        toDo = []
         for taxonPair,rel in self.allPairsMir.iteritems():
             if rel != relation["{=, >, <, !, ><}"]:
-                toDo.append(taxonPair)
+                toDo.put(taxonPair)
+#                toDo.append(taxonPair)
         
-        while len(toDo) > 0:
-            taxonPair = toDo[0]
-            del toDo[0]
-            self.reasonOver(taxonPair, toDo)
+        step = 1
+        while not toDo.empty():
+#        while len(toDo) > 0:
+#            print "------------ Step ", step, " ------------"
+            taxonPair = toDo.get()
+#            randomIndex = randint(0,len(toDo)-1)
+#            taxonPair = toDo[randomIndex]
+#            del toDo[randomIndex]
+            self.reasonOver(taxonPair, toDo, step)
+            step = step + 1
         
         # output all mirs
         self.rccGenMir()
@@ -3227,73 +3697,226 @@ class TaxonomyMapping:
         
         return
     
-    def reasonOver(self, taxonPair, toDo):
+    def reverseArts(self, arts):
+        revArts = 0
+        if arts & relation["<"] and not arts & relation[">"]:
+            revArts = arts & relation["{=, >, !, ><}"] | relation[">"]
+        elif arts & relation[">"] and not arts & relation["<"]:
+            revArts = arts & relation["{=, <, !, ><}"] | relation["<"]
+        else:
+            revArts = arts
+        return revArts
+
+    def reasonOver(self, taxonPair, toDo, step):
         t1 = taxonPair[0]
         t2 = taxonPair[1]
         t1Parent = t1.parent
         t2Parent = t2.parent
         givenRel = self.allPairsMir[taxonPair]
+#        print "Pick pair: ", t1.name, findkey(relation, givenRel), t2.name
         
+#        # visualize reasoning
+#        fileName = os.path.join(self.rccfilesdir, "rccreasoningviz_step" + str(step) + ".dot")
+#        f = open(fileName, "w")
+#        f.write("digraph {\n\nrankdir = LR\n\n")
+#        f.write('node [shape=box]\n')
+#        f.write(t1.name + ' -> ' + t2.name + ' [color=blue, label="'+ findkey(relation,givenRel) +'"];\n')
+        
+        
+        # begin reason over
         if t2Parent != "":
             # update pair between t1 and t2's parent
+#            print "\nPart (I):"
+#            print t2.name + " has parent " + t2Parent.name + ", then look at pair (" + t1.name + ", " + t2Parent.name + ")"
             deducedPair = (t1, t2Parent)
-            deducedRel = comptab[givenRel][relation["<"]]
+#            print "Original relation: ", t1.name, findkey(relation, self.allPairsMir[deducedPair]), t2Parent.name
+            if len(t2Parent.children) > 1:
+                deducedRel = comptab[givenRel][relation["<"]]
+            else:
+                deducedRel = comptab[givenRel][relation["="]]
+                #deducedRel = givenRel
+                #print "rel", findkey(relation, givenRel), t1.name, t2.name, t2.parent.name
+#            print "Using R32 comp table: ", t1.name, findkey(relation, givenRel), t2.name, "R32COMP", t2.name, "<", t2Parent.name, \
+#                    "-->", t1.name, findkey(relation, deducedRel), t2Parent.name
+#            f.write(t2.name + ' -> ' + t2Parent.name + ' [label="< (parent)"];\n')
+#            f.write(t1.name + ' -> ' + t2Parent.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
+            part = '1'            
             self.assertNew(deducedPair, deducedRel, toDo)
             
+            
             # update pair between t1 and t2's siblings
+#            print "\nPart (II)"
             t2Siblings = t2Parent.children
+#            if t2Siblings:
+#                print t2.name + " has the following siblings:"
+#            else:
+#                print t2.name + " has no siblings"
             for t2Sibling in t2Siblings:
                 if t2Sibling != t2:
+#                    print "Sibling: " + t2Sibling.name + ", then look at pair (" + t1.name + ", " + t2Sibling.name + ")"
                     deducedPair = (t1, t2Sibling)
+#                    print "Original relation: ", t1.name, findkey(relation, self.allPairsMir[deducedPair]), t2Sibling.name
                     deducedRel = comptab[givenRel][relation["!"]]
+#                    print "Using R32 comp table: ", t1.name, findkey(relation, givenRel), t2.name, "R32COMP", t2.name, "!", t2Sibling.name, \
+#                            "-->", t1.name, findkey(relation, deducedRel), t2Sibling.name
+#                    f.write(t2.name + ' -> ' + t2Sibling.name + ' [label="! (sibling)"];\n')
+#                    f.write(t1.name + ' -> ' + t2Sibling.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
+                    part = '2'
                     self.assertNew(deducedPair, deducedRel, toDo)
+#        else:
+#            print "\nPart (I) and Part (II) no exist, " + t2.name + " has no parent or siblings"
         
         # update pair between t1 and t2's children
+#        print "\nPart (III)"
         t2Children = t2.children
-        for t2Child in t2Children:
-            deducedPair = (t1, t2Child)
-            deducedRel = comptab[givenRel][relation[">"]]
-            self.assertNew(deducedPair, deducedRel, toDo)
+#        if t2Children:
+#            print t2.name + " has the following children:"
+#        else:
+#            print t2.name + " has no children"
+        if len(t2Children) > 1:
+            for t2Child in t2Children:
+#                print "Child: " + t2Child.name + ", then look at pair (" + t1.name + ", " + t2Child.name + ")"
+                deducedPair = (t1, t2Child)
+#                print "Original relation: ", t1.name, findkey(relation, self.allPairsMir[deducedPair]), t2Child.name
+                deducedRel = comptab[givenRel][relation[">"]]
+#                print "Using R32 comp table: ", t1.name, findkey(relation, givenRel), t2.name, "R32COMP", t2.name, ">", t2Child.name, \
+#                                "-->", t1.name, findkey(relation, deducedRel), t2Child.name
+#                f.write(t2.name + ' -> ' + t2Child.name + ' [label="> (children)"];\n')
+#                f.write(t1.name + ' -> ' + t2Child.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
+                part = '3'
+                self.assertNew(deducedPair, deducedRel, toDo)
+        else:
+            for t2Child in t2Children:
+#                print "Child: " + t2Child.name + ", then look at pair (" + t1.name + ", " + t2Child.name + ")"
+                deducedPair = (t1, t2Child)
+#                print "Original relation: ", t1.name, findkey(relation, self.allPairsMir[deducedPair]), t2Child.name
+                deducedRel = comptab[givenRel][relation["="]]
+#                print "Using R32 comp table: ", t1.name, findkey(relation, givenRel), t2.name, "R32COMP", t2.name, ">", t2Child.name, \
+#                                "-->", t1.name, findkey(relation, deducedRel), t2Child.name
+#                f.write(t2.name + ' -> ' + t2Child.name + ' [label="> (children)"];\n')
+#                f.write(t1.name + ' -> ' + t2Child.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
+                part = '3'
+                self.assertNew(deducedPair, deducedRel, toDo)
             
         if t1Parent != "":
             # update pair between t1's Parent and t2
+#            print "\nPart (IV):"
+#            print t1.name + " has parent " + t1Parent.name + ", then look at pair (" + t1Parent.name + ", " + t2.name + ")"
             deducedPair = (t1Parent, t2)
-            deducedRel = comptab[relation[">"]][givenRel]
+#            print "Original relation: ", t1Parent.name, findkey(relation, self.allPairsMir[deducedPair]), t2.name
+            if len(t1Parent.children) > 1:
+                deducedRel = comptab[relation[">"]][givenRel]
+            else:
+                deducedRel = comptab[relation["="]][givenRel]
+#            print "Using R32 comp table: ", t1Parent.name, ">", t1.name, "R32COMP", t1.name, findkey(relation, givenRel), t2.name, \
+#                    "-->", t1Parent.name, findkey(relation, deducedRel), t2.name
+#            f.write(t1Parent.name + ' -> ' + t1.name + ' [label="> (parent)"];\n')
+#            f.write(t1Parent.name + ' -> ' + t2.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
+            part = '4'
             self.assertNew(deducedPair, deducedRel, toDo)
             
             # update pair between t1's siblings and t2 siblings
+#            print "\nPart (V):"
             t1Siblings = t1Parent.children
+#            if t1Siblings:
+#                print t1.name + " has the following siblings:"
+#            else:
+#                print t1.name + " has no siblings"
             for t1Sibling in t1Siblings:
                 if t1Sibling != t1:
+#                    print "Sibling: " + t1Sibling.name + ", then look at pair (" + t1Sibling.name + ", " + t2.name + ")"
                     deducedPair = (t1Sibling, t2)
+#                    print "Original relation: ", t1Sibling.name, findkey(relation, self.allPairsMir[deducedPair]), t2.name
                     deducedRel = comptab[relation["!"]][givenRel]
+#                    print "Using R32 comp table: ", t1Sibling.name, "!", t1.name, "R32COMP", t1.name, findkey(relation, givenRel), t2.name, \
+#                            "-->", t1Sibling.name, findkey(relation, deducedRel), t2.name
+#                    f.write(t1Sibling.name + ' -> ' + t1.name + ' [label="! (sibling)"];\n')
+#                    f.write(t1Sibling.name + ' -> ' + t2.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
+                    part = '5'
                     self.assertNew(deducedPair, deducedRel, toDo)
+#        else:
+#            print "\nPart (IV) and Part (V) no exist, " + t1.name + " has no parent or siblings"
         
         # update pair between t1's children and t2
+#        print "\nPart (VI)"
         t1Children = t1.children
-        for t1Child in t1Children:
-            deducedPair = (t1Child, t2)
-            deducedRel = comptab[relation["<"]][givenRel]
-            self.assertNew(deducedPair, deducedRel, toDo)
+#        if t1Children:
+#            print t1.name + " has the following children:"
+#        else:
+#            print t1.name + " has no children"
+        if len(t1Children) > 1:
+            for t1Child in t1Children:
+#                print "Child: " + t1Child.name + ", then look at pair (" + t1Child.name + ", " + t2.name + ")"
+                deducedPair = (t1Child, t2)
+#                print "Original relation: ", t1Child.name, findkey(relation, self.allPairsMir[deducedPair]), t2.name
+                deducedRel = comptab[relation["<"]][givenRel]
+#                print "Using R32 comp table: ", t1Child.name, "<", t1.name, "R32COMP", t1.name, findkey(relation, givenRel), t2.name, \
+#                                "-->", t1Child.name, findkey(relation, deducedRel), t2.name
+#                f.write(t1Child.name + ' -> ' + t1.name + ' [label="< (children)"];\n')
+#                f.write(t1Child.name + ' -> ' + t2.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
+                part = '6'
+                self.assertNew(deducedPair, deducedRel, toDo)
+        else:
+            for t1Child in t1Children:
+#                print "Child: " + t1Child.name + ", then look at pair (" + t1Child.name + ", " + t2.name + ")"
+                deducedPair = (t1Child, t2)
+#                print "Original relation: ", t1Child.name, findkey(relation, self.allPairsMir[deducedPair]), t2.name
+                deducedRel = comptab[relation["="]][givenRel]
+#                print "Using R32 comp table: ", t1Child.name, "<", t1.name, "R32COMP", t1.name, findkey(relation, givenRel), t2.name, \
+#                                "-->", t1Child.name, findkey(relation, deducedRel), t2.name
+#                f.write(t1Child.name + ' -> ' + t1.name + ' [label="< (children)"];\n')
+#                f.write(t1Child.name + ' -> ' + t2.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
+                part = '6'
+                self.assertNew(deducedPair, deducedRel, toDo)
+            
+#        print ""
+        
+#        f.write("}\n")
+#        f.close()
+            
         
     def assertNew(self, deducedPair, deducedRel, toDo):
-#        print "deducedPair=", deducedPair[0].name, deducedPair[1].name
         oldRel = self.allPairsMir[deducedPair]
         newRel = oldRel & deducedRel
         if not newRel:
-            print "Inconsisten pair", deducedPair
+            print "Inconsisten pair", deducedPair[0].name, deducedPair[1].name, "oldRel", findkey(relation,oldRel), "deducedRel", findkey(relation,deducedRel), "newRel", findkey(relation,newRel)
             exit(0)
         else:
+#            print deducedPair[0].name + " " + findkey(relation, oldRel) + " " + deducedPair[1].name + " & " + \
+#                deducedPair[0].name + " " + findkey(relation, deducedRel) + " " + deducedPair[1].name + " --> " + \
+#                deducedPair[0].name + " " + findkey(relation, newRel) + " " + deducedPair[1].name
+#            f.write('intersect' + part + ' [shape=point];\n')
+#            f.write('node1'+part+'[label="'+ deducedPair[0].name + ' ' + findkey(relation, oldRel) + ' ' + deducedPair[1].name + '"];\n')
+#            f.write('node2'+part+'[label="'+ deducedPair[0].name + ' ' + findkey(relation, deducedRel) + ' ' + deducedPair[1].name + '"];\n')
+#            f.write('node3'+part+'[label="'+ deducedPair[0].name + ' ' + findkey(relation, newRel) + ' ' + deducedPair[1].name + '"];\n')
+#            f.write('node1'+part+' -> intersect'+part+' [label="original"];\n')
+#            f.write('node2'+part+' -> intersect'+part+' [label="deduced"];\n')
+#            f.write('intersect'+part+' -> node3'+part+' [label="intersection"];\n')
             if newRel == relation["{=, >, <, !, ><}"] or oldRel == newRel:
+#                print "No change..."
                 return
         self.allPairsMir[deducedPair] = newRel
-        toDo.append(deducedPair)
+        toDo.put(deducedPair)
+#        toDo.append(deducedPair)
+
+    def rccGenMirPW(self, finalMir):
+        mirList = []
+        fmir = open(self.mirfile, 'w')
+        for k,v in finalMir.iteritems():
+            mirList.append([k[0].taxonomy.abbrev + "." + k[0].name, findkey(relation, v), k[1].taxonomy.abbrev + "." + k[1].name])
         
+        # sorted the mirList
+        print "#########"
+        for pair in sorted(mirList, key=itemgetter(0,2)):
+            print pair[0], pair[1], pair[2]
+            fmir.write(pair[0] + ',' + pair[1] + ',' + pair[2] + '\n')            
+        fmir.close()
+
     def rccGenMir(self):
         mirList = []
         fmir = open(self.mirfile, 'w')
         for k,v in self.allPairsMir.iteritems():
-            mirList.append([self.firstTName + "." + k[0].name, findkey(relation, v), self.secondTName + "." + k[1].name])
+            mirList.append([k[0].taxonomy.abbrev + "." + k[0].name, findkey(relation, v), k[1].taxonomy.abbrev + "." + k[1].name])
         
         # sorted the mirList
 #        for pair in sorted(mirList, key=itemgetter(3,0,2)):
@@ -3302,6 +3925,19 @@ class TaxonomyMapping:
             print pair[0], pair[1], pair[2]
             fmir.write(pair[0] + ',' + pair[1] + ',' + pair[2] + '\n')            
         fmir.close()
+    
+    # function that get the sum of depths of a pair of taxa
+#    def getDepthFromPair(self, taxonPair):
+#        t1 = taxonPair[0]
+#        t2 = taxonPair[1]
+#        ctr = 0
+#        while not type(t1.parent) is str:
+#            ctr = ctr + 1
+#            t1 = t1.parent
+#        while not type(t2.parent) is str:
+#            ctr = ctr + 1
+#            t2 = t2.parent
+#        return ctr
         
     # function findAncestors that do not require recursion
 #    def findAncestors2(self, taxon):
@@ -3318,11 +3954,11 @@ class TaxonomyMapping:
             ancestors.append(taxon.parent)
             self.findAncestors(taxon.parent, ancestors)
     
-    def findDescedants(self, taxon, descedants):
+    def findDescendants(self, taxon, descendants):
         if len(taxon.children) > 0:
-            descedants.extend(taxon.children)
+            descendants.extend(taxon.children)
             for child in taxon.children:
-                self.findDescedants(child, descedants)
+                self.findDescendants(child, descendants)
     
     def rccPreProcessGuidedReference(self):
         for art in self.articulations:
@@ -3335,8 +3971,10 @@ class TaxonomyMapping:
             self.findDescedants(c2, c2descedants)
             # check rel(c1, c2) is "=" ==> rel(c1, c2's ancestor) is "<"
             if rel == relation["="]:
-                for c2ancestor in c2ancestors:
-                    self.rccPreArts.append([c1, c2ancestor, relation['<']])
+                if not type(c2.parent) is str:
+                    if len(c2.parent.children) > 1:
+                        for c2ancestor in c2ancestors:
+                            self.rccPreArts.append([c1, c2ancestor, relation['<']])
             
             # check rel(c1, c2) is "!" ==> rel(c1, c2's descendant) is "!"
             if rel == relation["!"]:
@@ -3353,4 +3991,123 @@ class TaxonomyMapping:
                 for c2descedant in c2descedants:
                     self.rccPreArts.append([c1, c2descedant, relation['>']])
                     
+    def runRCCEQReasoner(self):
+        
+        # prepare for input
+        for pair in self.getAllArticulationPairs():
+            
+            # initialize uber-mir
+            if pair[0].taxonomy.abbrev == self.firstTName:
+                self.allPairsMir[(pair[0], pair[1])] = relation["{=, >, <, !, ><}"]
+            else:
+                self.allPairsMir[(pair[1], pair[0])] = relation["{=, >, <, !, ><}"]
+            
+            # records descendants
+            if pair[0] not in self.descendMapping:
+                descendants = []
+                self.findDescedants(pair[0], descendants)
+                self.descendMapping[pair[0]] = set(descendants)
+            if pair[1] not in self.descendMapping:
+                descendants = []
+                self.findDescedants(pair[1], descendants)
+                self.descendMapping[pair[1]] = set(descendants)
+                
+#        for k,v in self.descendMapping.iteritems():
+#            print "parent",k.taxonomy.abbrev + "." + k.name
+#            print "descendants"
+#            for d in v:
+#                print d.taxonomy.abbrev + "." + d.name
+#                
+#            print "-----\n"
+#            
+#        
+#        print "#####################################"
+        
+        leafNodes = sets.Set()
+        eqPairNodes = sets.Set()
+        for art in self.articulations:
+            leafNodes.add(art.taxon1)
+            leafNodes.add(art.taxon2)
+            eqPairNodes.add((art.taxon1, art.taxon2))
+            self.allPairsMir[(art.taxon1, art.taxon2)] = art.relations
+            
+        
+        for pair in self.getAllArticulationPairs():
+            if pair[0] in leafNodes and pair[1] in leafNodes:
+                if (pair[0], pair[1]) not in eqPairNodes:
+                    self.allPairsMir[(pair[0], pair[1])] = relation["!"]
+            
+            elif pair[0] in leafNodes and pair[1] not in leafNodes:
+                d1 = self.descendMapping[pair[1]].copy()
+                d1 = d1.intersection(leafNodes)
+                flag = False
+                for eqPair in eqPairNodes:
+                    if eqPair[0] == pair[0] and eqPair[1] in d1:
+                        flag = True
+                if flag:
+                    self.allPairsMir[(pair[0], pair[1])] = relation["<"]
+                else:
+                    self.allPairsMir[(pair[0], pair[1])] = relation["!"]
+
+                        
+            elif pair[1] in leafNodes and pair[0] not in leafNodes:
+                d0 = self.descendMapping[pair[0]].copy()
+                d0 = d0.intersection(leafNodes)
+                flag = False
+                for eqPair in eqPairNodes:
+                    if eqPair[1] == pair[1] and eqPair[0] in d0:
+                        flag = True
+                if flag:
+                    self.allPairsMir[(pair[0], pair[1])] = relation[">"]
+                else:
+                    self.allPairsMir[(pair[0], pair[1])] = relation["!"]
+                        
+#                print "pair is", pair[0].taxonomy.abbrev + "." + pair[0].name, pair[1].taxonomy.abbrev + "." + pair[1].name
+#                print "d0 are:"
+#                for d in d0:
+#                    print  d.taxonomy.abbrev + "." + d.name
+#                    
+#                print "-------------\n"
+            
+            else:
+                d0 = self.descendMapping[pair[0]].copy()
+                d1 = self.descendMapping[pair[1]].copy()
+                
+                d0 = d0.intersection(leafNodes)
+                d1 = d1.intersection(leafNodes)
+
+                
+                for eqPair in eqPairNodes:
+                    if eqPair[0] in d0 and eqPair[1] in d1:
+                        d0.remove(eqPair[0])
+                        d1.remove(eqPair[1])
+                
+                        
+#                print "pair is", pair[0].taxonomy.abbrev + "." + pair[0].name, pair[1].taxonomy.abbrev + "." + pair[1].name
+#                print "d0 are:"
+#                for d in d0:
+#                    print  d.taxonomy.abbrev + "." + d.name
+#                print "d1 are:"
+#                for d in d1:
+#                    print  d.taxonomy.abbrev + "." + d.name
+#                    
+#                print "-------------\n"
+                
+                if d0.issubset(d1) and d1.issubset(d0):
+                    self.allPairsMir[(pair[0], pair[1])] = relation["="]
+                elif d0.issubset(d1):
+                    self.allPairsMir[(pair[0], pair[1])] = relation["<"]
+                elif d1.issubset(d0):
+                    self.allPairsMir[(pair[0], pair[1])] = relation[">"]
+                elif len(d0.intersection(d1)) > 0:
+                    self.allPairsMir[(pair[0], pair[1])] = relation["><"]
+                else:
+                    self.allPairsMir[(pair[0], pair[1])] = relation["!"]
+        
+        self.rccGenMir()
+        
+        
+#        for k,v in self.allPairsMir.iteritems():
+#            print k[0].name, k[1].name, v
+#                    
         

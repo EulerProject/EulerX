@@ -15,6 +15,11 @@
     "3": "shape=box style=filled fillcolor=\"#CCCCFF\""
     "4": "shape=box style=filled fillcolor=\"#FFCCCC\""
     "5": "shape=box style=filled fillcolor=\"#CCFFFF\""
+    "combT1": "shape=box style=\"filled,rounded\" fillcolor=\"#CCFFCC\""
+    "combT2": "shape=box style=\"filled,rounded\" fillcolor=\"#FFFFCC\""
+    "combT3": "shape=box style=\"filled,rounded\" fillcolor=\"#CCCCFF\""
+    "combT4": "shape=box style=\"filled,rounded\" fillcolor=\"#FFCCCC\""
+    "combT5": "shape=box style=\"filled,rounded\" fillcolor=\"#CCFFFF\""
     "comb": "shape=box style=\"filled,rounded\" fillcolor=\"#EEEEEE\""
   edgestyle: 
     - 

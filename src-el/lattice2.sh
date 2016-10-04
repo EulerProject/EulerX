@@ -20,13 +20,18 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-curdir=$(pwd)
+#curdir=$(pwd)
 euler=$(which euler)
 srcdir=$(dirname $euler)
 prodir=$(dirname $srcdir)
 cd $prodir
 cd bbox-lattice
-input=$curdir/$1
+#input=$curdir/$1
+input=$1
+latticedir=$2
+
+#echo $curdir
+#echo $input
 
 echo "preprocessing..."
 echo "creating the lattice without color...";
@@ -37,5 +42,6 @@ python awf.py -filter=i,o expWorlds.asp;
 echo "running euler to get MIS...";
 euler2 align $input -e mnpw --repair=HST > output.txt;
 echo "from MIS to MAC and get lattice..."
-python lattice.py $input $curdir;
+#python lattice.py $input $curdir;
+python lattice.py $input $latticedir;
 echo "finish";

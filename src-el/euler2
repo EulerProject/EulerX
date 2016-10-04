@@ -28,7 +28,7 @@ Usage:
 	euler2 (-h | --help)
 	euler2 --version
 	euler2 check <inputfile>
-	euler2 align <inputfile>... [-o OUTFOLDER] [-e METHOD] [-r TOOL] [--consistency] [--hidemirdisjoint] [--disablecov] [--disablesib] [--repair=WAY] [--artRem] [--fourinone] [--xia] [--ur] [--ie] [--ieo]
+	euler2 align <inputfile>... [-o OUTFOLDER] [-e METHOD] [-r TOOL] [-n NPW] [--consistency] [--hidemirdisjoint] [--disablecov] [--disablesib] [--repair=WAY] [--artRem] [--fourinone] [--xia] [--ur] [--ie] [--ieo] [--pw]
 	euler2 show <name>
 	euler2 show [-o OUTFOLDER] <name>
 	euler2 show <inputfile> [-o OUTFOLDER] iv
@@ -39,6 +39,7 @@ Options:
     --version		  Show version.
     -e METHOD		  Set the encoding method, including mnpw, mncb, mnve, vrpw, vrve [default: mnpw].
     -r TOOl		  Set the reasoner, including dlv and gringo [default: dlv].
+    -n NPW		  Set the number of possible worlds output, by default output all PWs.
     -o OUTFOLDER	  Set the output folder, ignore it to use the current folder.
     --consistency	  Check consistency ONLY.
     --disablecov	  Disable coverage.
@@ -48,6 +49,7 @@ Options:
     --fourinone		  Four in one lattice.
     --xia		  Extract input file.
     --ur		  Uncertainty reduction.
+    --pw		  Output also possible worlds in Shawn's reasoner, used with -r rcc1.
     <name>		  The knowledge product you want to show, including: 
     				iv (input visualization)
     				pw (possible worlds)
