@@ -156,8 +156,21 @@ class TaxonomyMapping:
             os.mkdir(self.inputfilesdir)
 
         # copy input file to output dir
-        copyfile(os.path.join(self.projectdir, self.args['<inputfile>'][0]),\
-                 os.path.join(self.inputfilesdir, self.name+".txt"))
+        with open(os.path.join(self.inputfilesdir, self.name+".txt"), "w") as outFile:
+            for eachFile in self.args['<inputfile>']:
+                with open(eachFile) as inFile:
+                    for line in inFile:
+                        outFile.write(line)
+#         filenames = ['file1.txt', 'file2.txt', ...]
+#         with open('path/to/output/file', 'w') as outfile:
+#             for fname in filenames:
+#                 with open(fname) as infile:
+#                     for line in infile:
+#                         outfile.write(line)
+        
+#         for i in range(len(self.args['<inputfile>'])): 
+#             copyfile(os.path.join(self.projectdir, self.args['<inputfile>'][i]),\
+#                  os.path.join(self.inputfilesdir, self.args['<inputfile>'][i]))
         # set up stylesheets folder
         self.path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         self.stylesheetdir = os.path.join(self.projectdir, "stylesheets/")
