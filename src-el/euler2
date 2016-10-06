@@ -27,11 +27,11 @@
 Usage:
 	euler2 (-h | --help)
 	euler2 --version
-	euler2 check <inputfile>
+	euler2 check <inputfile>...
 	euler2 align <inputfile>... [-o OUTFOLDER] [-e METHOD] [-r TOOL] [-n NPW] [--consistency] [--hidemirdisjoint] [--disablecov] [--disablesib] [--repair=WAY] [--artRem] [--fourinone] [--xia] [--ur] [--ie] [--ieo] [--pw]
 	euler2 show <name>
 	euler2 show [-o OUTFOLDER] <name>
-	euler2 show <inputfile> [-o OUTFOLDER] iv
+	euler2 show iv <inputfile>... [-o OUTFOLDER]
 
 
 Options:

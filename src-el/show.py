@@ -36,6 +36,8 @@ from random import randint
 from helper import *
 from subprocess import call
 from sets import Set
+from fileinput import filename
+from CodeWarrior.Standard_Suite import lines
 
 class ProductsShowing:
     
@@ -211,10 +213,15 @@ class ProductsShowing:
     def showIV(self):
         print "******input visualization******"
         if self.args['<inputfile>'] and self.args['iv']:
-            inputFile = self.args['<inputfile>'][0]
+            inputData = []
+            for eachFile in self.args['<inputfile>']:
+                inputData += open(eachFile).readlines()
         else:
             inputFile = os.path.join(self.inputfilesdir, self.name+".txt")
-        fileName = os.path.splitext(os.path.basename(inputFile))[0]
+        fileName = ""
+        for i in range(len(self.args['<inputfile>'])):
+            fileName += os.path.splitext(os.path.basename(self.args['<inputfile>'][i]))[0] + "-"
+        fileName = fileName[:-1] 
         
         group2concepts = {}
         art = []
@@ -225,9 +232,12 @@ class ProductsShowing:
         fifthTName = ""
         taxName = ""
         
-        f = open(inputFile, 'r')
-        lines = f.readlines()
-        f.close()
+        if self.args['<inputfile>'] and self.args['iv']:
+            lines = inputData
+        else:
+            f = open(inputFile, 'r')
+            lines = f.readlines()
+            f.close()
         
         for line in lines:
             
