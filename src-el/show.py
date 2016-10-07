@@ -36,8 +36,6 @@ from random import randint
 from helper import *
 from subprocess import call
 from sets import Set
-from fileinput import filename
-from CodeWarrior.Standard_Suite import lines
 
 class ProductsShowing:
     
