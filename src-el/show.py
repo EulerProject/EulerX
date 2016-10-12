@@ -128,6 +128,11 @@ class ProductsShowing:
             if self.args['<name>'] == 'pw':    # possible worlds
                 self.showPW()
             if self.args['<name>'] == 'sv':    # summary view, including av (stable and labile), cv, hv
+                # if this is an inconsistent example (there is no PW)
+                if not os.path.isfile(os.path.join(self.pwinternalfilesdir, self.name+".pw")):
+                    print "This is an inconsistent example, no summary view of possible worlds."
+                    return
+                # if not run align first
                 if not self.checkPwFlag():
                     print 'Need to run "euler2 show pw" first.'
                     return
@@ -454,6 +459,11 @@ class ProductsShowing:
             return 2
 
     def showPW(self):
+        # if this is an inconsistent example (there is no PW)
+        if not os.path.isfile(os.path.join(self.pwinternalfilesdir, self.name+".pw")):
+            print "This is an inconsistent example, no possible worlds generated."
+            return
+        
         print "******pw visualization******"   
         
         if not os.path.exists(self.pwsvizdir):
@@ -1326,6 +1336,11 @@ class ProductsShowing:
         
     def showInconLAT(self):
         
+        # if this is a consistent example (there is at least one PW)
+        if os.path.isfile(os.path.join(self.pwinternalfilesdir, self.name+".pw")):
+            print "This is a consistent example, no diagnostic lattice generated."
+            return
+        
         if not os.path.exists(self.latticedir):
             os.mkdir(self.latticedir)
 
@@ -1344,6 +1359,11 @@ class ProductsShowing:
         #call("maslattice.sh " + fileName, shell=True)
         
     def showPW2INPUT(self):
+        # if this is an inconsistent example (there is no PW)
+        if not os.path.isfile(os.path.join(self.pwinternalfilesdir, self.name+".pw")):
+            print "This is an inconsistent example, no possible worlds generated."
+            return
+        
         print "******transfer possible worlds to input file******"
         
         if not os.path.isfile(os.path.join(self.pwinternalfilesdir, 'pw2input.internal0')):
