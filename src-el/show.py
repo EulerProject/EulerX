@@ -430,8 +430,10 @@ class ProductsShowing:
             newgetoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"singletoninputstyle.yaml" + ">" + inputDotFile)
         else:
             newgetoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"inputstyle.yaml" + ">" + inputDotFile)
-        newgetoutput("dot -Tpdf "+inputDotFile+" -o "+inputPdfFile)
-        #newgetoutput("dot -Tsvg "+inputDotFile+" -o "+inputSvgFile)
+        if self.args['--svg']:
+            newgetoutput("dot -Tsvg "+inputDotFile+" -o "+inputSvgFile)
+        else:
+            newgetoutput("dot -Tpdf "+inputDotFile+" -o "+inputPdfFile)
         
     def addInputVizNode(self, concept, group, pathlen):
         node = {}
@@ -810,8 +812,10 @@ class ProductsShowing:
             
             # apply the rcgviz stylesheet
             newgetoutput("cat "+rcgYamlFile+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + rcgDotFile)
-            newgetoutput("dot -Tpdf "+rcgDotFile+" -o "+rcgPdfFile)
-            #newgetoutput("dot -Tsvg "+rcgDotFile+" -o "+rcgSvgFile)
+            if self.args['--svg']:
+                newgetoutput("dot -Tsvg "+rcgDotFile+" -o "+rcgSvgFile)
+            else:
+                newgetoutput("dot -Tpdf "+rcgDotFile+" -o "+rcgPdfFile)
             
             # prepare for aggregate view
             for e in it.tr:
@@ -1066,8 +1070,11 @@ class ProductsShowing:
         
         
         newgetoutput("cat "+rcgAllYamlFile+" | y2d -s "+self.stylesheetdir+"aggregatestyle.yaml" + ">" + rcgAllDotFile)
-        newgetoutput("dot -Tpdf "+rcgAllDotFile+" -o "+rcgAllPdfFile)
-        #newgetoutput("dot -Tsvg "+rcgAllDotFile+" -o "+rcgAllSvgFile)
+        if self.args['--svg']:
+            newgetoutput("dot -Tsvg "+rcgAllDotFile+" -o "+rcgAllSvgFile)
+        else:
+            newgetoutput("dot -Tpdf "+rcgAllDotFile+" -o "+rcgAllPdfFile)
+        
         
     
     def addRcgAllVizNode(self, concept, group):
@@ -1182,10 +1189,12 @@ class ProductsShowing:
         fclyaml.close()
         
         newgetoutput("cat "+clyaml+" | y2d -s "+self.stylesheetdir+"clusterstyle.yaml" + ">" + cldot)
-        newgetoutput("neato -Tpdf "+cldot+" -o "+clneatopdf)
+        if self.args['--svg']:
+            newgetoutput("neato -Tsvg "+cldot+" -o "+clneatosvg)
+        else:
+            newgetoutput("neato -Tpdf "+cldot+" -o "+clneatopdf)
         #newgetoutput("dot -Tpdf "+cldot+" -o "+cldotpdf)
-        #newgetoutput("dot -Tsvg "+cldot+" -o "+cldotsvg)
-        #newgetoutput("neato -Tsvg "+cldot+" -o "+clneatosvg)        
+        #newgetoutput("dot -Tsvg "+cldot+" -o "+cldotsvg)        
 
         
         
@@ -1299,7 +1308,7 @@ class ProductsShowing:
 #        hvyaml = os.path.join(self.pwsaggregatedir, self.name+"_hv.yaml")
         hvdot = os.path.join(self.pwsaggregatedir, self.name+"_hv.gv")
         hvdotpdf = os.path.join(self.pwsaggregatedir, self.name+"_hv.pdf")
-#        hvdotsvg = os.path.join(self.pwsaggregatedir, self.name+"_hv.svg")
+        hvdotsvg = os.path.join(self.pwsaggregatedir, self.name+"_hv.svg")
 #        
 #        fhvyaml = open(hvyaml, 'w')
 #        if self.hierarchyVizNodes:
@@ -1309,8 +1318,10 @@ class ProductsShowing:
 #        fhvyaml.close()
 #        
 #        newgetoutput("cat "+hvyaml+" | y2d -s "+self.stylesheetdir+"hierarchystyle.yaml" + ">" + hvdot)
-        newgetoutput("dot -Tpdf "+hvdot+" -o "+hvdotpdf)
-#        newgetoutput("dot -Tsvg "+hvdot+" -o "+hvdotsvg)
+        if self.args['--svg']:
+            newgetoutput("dot -Tsvg "+hvdot+" -o "+hvdotsvg)
+        else:
+            newgetoutput("dot -Tpdf "+hvdot+" -o "+hvdotpdf)
 
         
     def getCollapsedNode(self, mergedNode):
