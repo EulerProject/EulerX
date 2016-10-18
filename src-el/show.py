@@ -1359,6 +1359,23 @@ class ProductsShowing:
         latticeFolder = os.path.abspath(self.latticedir)
         call("lattice2.sh " + inputFile + " " + latticeFolder, shell=True)
         #call("maslattice.sh " + fileName, shell=True)
+        
+        fileDot = os.path.join(self.latticedir, self.name+"_lat.dot")
+        filePdf = os.path.join(self.latticedir, self.name+"_lat.pdf")
+        fileSvg = os.path.join(self.latticedir, self.name+"_lat.svg")
+        fileFullDot = os.path.join(self.latticedir, self.name+"_fulllat.dot")
+        fileFullPdf = os.path.join(self.latticedir, self.name+"_fulllat.pdf")
+        fileFullSvg = os.path.join(self.latticedir, self.name+"_fulllat.svg")
+        if os.path.isfile(fileDot):
+            if self.args['--svg']:
+                newgetoutput("dot -Tsvg "+fileDot+" -o "+fileSvg)
+            else:
+                newgetoutput("dot -Tpdf "+fileDot+" -o "+filePdf)
+        if os.path.isfile(fileFullDot):
+            if self.args['--svg']:
+                newgetoutput("dot -Tsvg "+fileFullDot+" -o "+fileFullSvg)
+            else:
+                newgetoutput("dot -Tpdf "+fileFullDot+" -o "+fileFullPdf)        
 
     def showAmbLAT(self):
         
