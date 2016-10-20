@@ -439,7 +439,6 @@ class ProductsShowing:
         node = {}
         node.update({"concept": concept})
         node.update({"group": group})
-        node.update({"name": "test" + str(randint(0,100))})
         #if self.args.withrank:
         #    node.update({"pathlen": pathlen})
         if group != "(+)":
@@ -909,7 +908,6 @@ class ProductsShowing:
         node = {}
         node.update({"concept": concept})
         node.update({"group": group})
-        node.update({"name": "test" + str(randint(0,100))})
         self.rcgVizNodes.update({group + "." + concept: node})
     
     def addRcgVizEdge(self, s, t, label):
@@ -1081,7 +1079,6 @@ class ProductsShowing:
         node = {}
         node.update({"concept": concept})
         node.update({"group": group})
-        node.update({"name": "test" + str(randint(0,100))})
         self.allRcgNodesDict.update({group + "." + concept: node})
 
     def addRcgAllVizEdge(self, s, t, label, numOfPws): #here label is the frequency of the edge among all PWs
@@ -1202,7 +1199,6 @@ class ProductsShowing:
         node = {}
         node.update({"concept": concept})
         node.update({"group": "cluster"})
-        node.update({"name": "test" + str(randint(0,100))})
         self.clusterVizNodes.update({concept: node})
 
     def addClusterVizEdge(self, s, t, label):
@@ -1334,7 +1330,6 @@ class ProductsShowing:
         node = {}
         node.update({"concept": concept})
         node.update({"group": group})
-        node.update({"name": "test" + str(randint(0,100))})
         self.hierarchyVizNodes.update({group + "." + concept: node})
 
     def addHierarchyVizEdge(self, s, t, label):

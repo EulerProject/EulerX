@@ -2952,7 +2952,6 @@ class TaxonomyMapping:
         node = {}
         node.update({"concept": concept})
         node.update({"group": group})
-        node.update({"name": "test" + str(randint(0,100))})
         self.rcgVizNodes.update({group + "." + concept: node})
     
     def addRcgVizEdge(self, s, t, label):
@@ -2966,7 +2965,6 @@ class TaxonomyMapping:
         node = {}
         node.update({"concept": concept})
         node.update({"group": group})
-        node.update({"name": "test" + str(randint(0,100))})
         allRcgNodesDict.update({group + "." + concept: node})
 
     def addRcgAllVizEdge(self, s, t, label, numOfPws, allRcgEdgesDict): #here label is the frequency of the edge among all PWs
@@ -2986,7 +2984,6 @@ class TaxonomyMapping:
         node = {}
         node.update({"concept": concept})
         node.update({"group": "cluster"})
-        node.update({"name": "test" + str(randint(0,100))})
         self.clusterVizNodes.update({concept: node})
 
     def addClusterVizEdge(self, s, t, label):
