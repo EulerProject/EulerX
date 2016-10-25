@@ -659,7 +659,8 @@ class TaxonomyMapping:
         if self.isPwNone():
             print "************************************"
             print "Input is inconsistent\n"
-            print 'You can use "--repair=WAY" to do the repairing, see details in "euler2 -h"'
+            print "Here lists MIS:"
+            #print 'You can use "--repair=WAY" to do the repairing, see details in "euler2 -h"'
             if self.args['--ie']:
                 self.inconsistencyExplanation()
             self.updateReportFile(self.reportfile)

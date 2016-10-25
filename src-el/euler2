@@ -44,7 +44,7 @@ Options:
     --consistency	  Check consistency ONLY.
     --disablecov	  Disable coverage.
     --disablesib	  Disable sibling disjointness.
-    --repair WAY	  Repair inconsistency.
+    --repair WAY	  Repair inconsistency [default: HST].
     --artRem		  Articulation remover.
     --fourinone		  Four in one lattice.
     --xia		  Extract input file.
