@@ -53,9 +53,10 @@ fileName = os.path.splitext(os.path.basename(sys.argv[1]))[0]
 fileFullDot = sys.argv[2]+"/"+fileName+"_fulllat.dot"
 fileDot = sys.argv[2]+"/"+fileName+"_lat.dot"
 fileName = sys.argv[1]
+fileOutputMIS = sys.argv[3]
 misArts = []
 arts = []
-f = open("output.txt","r")
+f = open(fileOutputMIS,"r")
 lines = f.readlines()
 for line in lines:
     if line.split(" ")[0] == "Min":
@@ -234,7 +235,8 @@ for mac in macList:
     solidGreenWs.append(solidGreenW[:-1])
 
 # get full lattice
-fIn = open("up.dlv","r")
+uncoloredGraph = os.path.join(sys.argv[2], "uncolored.dlv")
+fIn = open(uncoloredGraph,"r")
 line = fIn.readline()
 ups = line[1:-1].split(", ")
 fOut = open(fileFullDot,"w")
@@ -320,3 +322,13 @@ f.close()
 
 #com = "dot -Tpdf " + fileDot + " -o " + filePdf
 #call(com, shell=True)
+
+# remove unnecessary files
+os.remove('expWorlds.asp')
+os.remove('expWorlds.asp.out')
+os.remove('expWorlds_aw.asp')
+os.remove('query.asp')
+os.remove('result.txt')
+os.remove('resultRed.txt')
+os.remove('resultRed_new.txt')
+os.remove('result_new.txt')

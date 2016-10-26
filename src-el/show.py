@@ -101,6 +101,8 @@ class ProductsShowing:
         
         self.mergeinputdir = os.path.join(self.lastrundir, "7-Merge-input")
         
+        self.logdir = os.path.join(self.lastrundir, "logs")
+        self.output = os.path.join(self.logdir, self.name + ".stdout")
         
     def remove_duplicate_string(self,li):
         if li:
@@ -1352,7 +1354,8 @@ class ProductsShowing:
 
         inputFile = os.path.abspath(os.path.join(self.inputfilesdir, self.name+".txt"))
         latticeFolder = os.path.abspath(self.latticedir)
-        call("lattice2.sh " + inputFile + " " + latticeFolder, shell=True)
+        outputMIS = os.path.abspath(self.output)
+        call("lattice2.sh " + inputFile + " " + latticeFolder + " " + outputMIS, shell=True)
         #call("maslattice.sh " + fileName, shell=True)
         
         fileDot = os.path.join(self.latticedir, self.name+"_lat.dot")

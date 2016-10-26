@@ -25,6 +25,7 @@ import sys
 import os
 
 fileName = sys.argv[1]
+latticedir = os.path.abspath(sys.argv[2])
 arts = []
 f = open(fileName, "r")
 lines = f.readlines()
@@ -41,5 +42,5 @@ f.write("i(X) :- u(X), not o(X).\n")
 f.write("o(X) :- u(X), not i(X).\n")
 f.close()
 
-com = "python powerset.py " + len(arts).__str__()
+com = "python powerset.py " + len(arts).__str__() + " " + latticedir
 call(com, shell=True)
