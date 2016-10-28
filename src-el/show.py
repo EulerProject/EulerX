@@ -36,6 +36,7 @@ from random import randint
 from helper import *
 from subprocess import call
 from sets import Set
+from diaglattice import *
 
 class ProductsShowing:
     
@@ -54,7 +55,7 @@ class ProductsShowing:
         if os.path.isfile(self.lastruntimestamp):
             f = open(self.lastruntimestamp, "r")
             self.lastrundir = f.readline().strip()
-            self.userdir =  re.match('(.*)/(.*)', self.lastrundir).group(1)
+            self.userdir = re.match('(.*)/(.*)', self.lastrundir).group(1)
             self.name = f.readline()
             f.close()
         
@@ -1349,31 +1350,76 @@ class ProductsShowing:
             print "This is a consistent example, no diagnostic lattice generated."
             return
         
+        # read mis internal files
+        misInternalFile = os.path.join(self.pwinternalfilesdir, 'mis.internal')
+        if not os.path.isfile(misInternalFile):
+            print 'No MIS generated for this example, run "euler2 align" first'
+            return
+
+        # create 6-Lattice/ folder
         if not os.path.exists(self.latticedir):
             os.mkdir(self.latticedir)
-
         inputFile = os.path.abspath(os.path.join(self.inputfilesdir, self.name+".txt"))
-        latticeFolder = os.path.abspath(self.latticedir)
-        outputMIS = os.path.abspath(self.output)
-        call("lattice2.sh " + inputFile + " " + latticeFolder + " " + outputMIS, shell=True)
-        #call("maslattice.sh " + fileName, shell=True)
         
-        fileDot = os.path.join(self.latticedir, self.name+"_lat.dot")
-        filePdf = os.path.join(self.latticedir, self.name+"_lat.pdf")
-        fileSvg = os.path.join(self.latticedir, self.name+"_lat.svg")
-        fileFullDot = os.path.join(self.latticedir, self.name+"_fulllat.dot")
-        fileFullPdf = os.path.join(self.latticedir, self.name+"_fulllat.pdf")
-        fileFullSvg = os.path.join(self.latticedir, self.name+"_fulllat.svg")
-        if os.path.isfile(fileDot):
-            if self.args['--svg']:
-                newgetoutput("dot -Tsvg "+fileDot+" -o "+fileSvg)
-            else:
-                newgetoutput("dot -Tpdf "+fileDot+" -o "+filePdf)
-        if os.path.isfile(fileFullDot):
-            if self.args['--svg']:
-                newgetoutput("dot -Tsvg "+fileFullDot+" -o "+fileFullSvg)
-            else:
-                newgetoutput("dot -Tpdf "+fileFullDot+" -o "+fileFullPdf)        
+        allMIS = set()
+        fMIS = open(misInternalFile, "r")
+        lines = fMIS.readlines()
+        for line in lines:
+            aMISString = re.match("(.*)\[(.*)\](.*)", line).group(2).split(",")
+            aMIS = frozenset(map(int, aMISString))
+            allMIS.add(aMIS)
+        
+        diagShower = DiagnosticLattice(allMIS, inputFile)
+        diagShower.genLattice()
+        fullLatstr = diagShower.fullLatViz()
+        #redLatstr = diagShower.reducedLatViz()
+        
+        # create the visualization file
+        fullLatDotFile = os.path.join(self.latticedir, self.name+"_fulllat.gv")
+        fullLatPdfFile = os.path.join(self.latticedir, self.name+"_fulllat.pdf")
+        fullLatSvgFile = os.path.join(self.latticedir, self.name+"_fulllat.svg")
+        fullLatViz = open(fullLatDotFile, 'w')
+        fullLatViz.write(fullLatstr)
+        fullLatViz.close()
+        if self.args['--svg']:
+            newgetoutput("dot -Tsvg "+fullLatDotFile+" -o "+fullLatSvgFile)
+        else:
+            newgetoutput("dot -Tpdf "+fullLatDotFile+" -o "+fullLatPdfFile)
+            
+        #redLatDotFile = os.path.join(self.latticedir, self.name+"_lat.gv")
+        #redLatPdfFile = os.path.join(self.latticedir, self.name+"_lat.pdf")
+        #redLatSvgFile = os.path.join(self.latticedir, self.name+"_lat.svg")
+        #redLatViz = open(redLatDotFile, 'w')
+        #redLatViz.write(redLatstr)
+        #redLatViz.close()
+        #if self.args['--svg']:
+        #    newgetoutput("dot -Tsvg "+redLatDotFile+" -o "+redLatSvgFile)
+        #else:
+        #    newgetoutput("dot -Tpdf "+redLatDotFile+" -o "+redLatPdfFile)
+        
+#         inputFile = os.path.abspath(os.path.join(self.inputfilesdir, self.name+".txt"))
+#         latticeFolder = os.path.abspath(self.latticedir)
+#         outputMIS = os.path.abspath(self.output)
+#         call("lattice2.sh " + inputFile + " " + latticeFolder + " " + outputMIS, shell=True)
+#         #call("maslattice.sh " + fileName, shell=True)
+#         
+#         # visualization transform
+#         fileDot = os.path.join(self.latticedir, self.name+"_lat.dot")
+#         filePdf = os.path.join(self.latticedir, self.name+"_lat.pdf")
+#         fileSvg = os.path.join(self.latticedir, self.name+"_lat.svg")
+#         fileFullDot = os.path.join(self.latticedir, self.name+"_fulllat.dot")
+#         fileFullPdf = os.path.join(self.latticedir, self.name+"_fulllat.pdf")
+#         fileFullSvg = os.path.join(self.latticedir, self.name+"_fulllat.svg")
+#         if os.path.isfile(fileDot):
+#             if self.args['--svg']:
+#                 newgetoutput("dot -Tsvg "+fileDot+" -o "+fileSvg)
+#             else:
+#                 newgetoutput("dot -Tpdf "+fileDot+" -o "+filePdf)
+#         if os.path.isfile(fileFullDot):
+#             if self.args['--svg']:
+#                 newgetoutput("dot -Tsvg "+fileFullDot+" -o "+fileFullSvg)
+#             else:
+#                 newgetoutput("dot -Tpdf "+fileFullDot+" -o "+fileFullPdf)        
 
     def showAmbLAT(self):
         

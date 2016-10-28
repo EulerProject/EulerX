@@ -92,6 +92,7 @@ class TaxonomyMapping:
         self.leafConcepts = []                 # concepts from input that are leaf nodes
         self.nonleafConcepts = []              # concepts from input that are not leaf nodes
         self.nosiblingdisjointness = []        # pairs that has no sibling disjointness
+        self.artIndex = []                     # articulations string with index
         self.artDict = {}                      # dictionary map articulation with articulation index
         self.artDictBin = {}                   # dictionary map articulation with binary index
         self.arts2NumPW = {}                   # dictionary map articulation sets to number of PW
@@ -187,6 +188,7 @@ class TaxonomyMapping:
             os.mkdir(self.pwoutputfiledir)
         self.pwoutputfile = os.path.join(self.pwoutputfiledir, self.name+".pw")
         self.pwinternalfile = os.path.join(self.pwoutputfiledir, "pw.internal")
+        self.misinternalfiles = os.path.join(self.pwoutputfiledir, "mis.internal")
         
         self.logsdir = os.path.join(self.outputdir, "logs")
         if not os.path.exists(self.logsdir):
@@ -1239,6 +1241,7 @@ class TaxonomyMapping:
         self.computeAllJust(artSet, s, curpath, allpaths)
         
     def computeAllJust(self, artSet, justSet, curpath, allpaths):
+        f = open(self.misinternalfiles, "a")
         for path in allpaths:
             if path.issubset(curpath):
                 return
@@ -1254,10 +1257,15 @@ class TaxonomyMapping:
             if len(j) != 0:
                 lj = list(j)
                 print "************************************"
+                f.write("MIS "+str(self.fixedCnt)+": [",)
                 print "Min inconsistent subset ",self.fixedCnt,": [",
                 for i in range(len(lj)):
-                    if i != 0: print ",",
+                    if i != 0:
+                        f.write(",")
+                        print ",",
+                    f.write(self.artIndex.index(lj[i].string.strip()).__str__())
                     print lj[i].ruleNum,":",lj[i].string,
+                f.write("]\n")
                 print "]"
                 print "************************************"
                 self.fixedCnt += 1
@@ -2375,7 +2383,6 @@ class TaxonomyMapping:
         
         # used for input viz
         group2concepts = {}
-        art = []
         
         for line in lines:
 
@@ -2465,7 +2472,7 @@ class TaxonomyMapping:
             elif (re.match("\[.*?\]", line)):
                 inside = re.match("\[(.*)\]", line).group(1)
                 self.addArticulation(inside)
-                art.append(re.match("\[(.*)\]", line).group(1)) # used for input viz
+                self.artIndex.append(re.match("\[(.*)\]", line).group(1)) # used for input viz
                               
             elif (re.match("\<.*\>", line)):
                 inside = re.match("\<(.*)\>", line).group(1)
@@ -2491,10 +2498,10 @@ class TaxonomyMapping:
         
         # used for dict map articulation to index
         if self.args['--artRem']:
-            for a in art:
-                self.artDict[a] = art.index(a)+1
-        for a in art:
-            self.artDictBin[a] = 1 << art.index(a)
+            for a in self.artIndex:
+                self.artDict[a] = self.artIndex.index(a)+1
+        for a in self.artIndex:
+            self.artDictBin[a] = 1 << self.artIndex.index(a)
                 
         # update leaf concepts
         self.leafConcepts = list(set(self.leafConcepts).difference(self.nonleafConcepts))
