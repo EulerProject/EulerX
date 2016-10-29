@@ -132,7 +132,7 @@ class DiagnosticLattice:
         # find other red or green nodes
         for aMIS in self.allMIS:
             supSets = self.findSupSets(aMIS, self.nodesBin)
-            self.otherRed.union(supSets)
+            self.otherRed.update(supSets)
          
         self.allGreen = self.nodesBin.difference(self.otherRed).difference(self.allMIS)        
         self.allMCS = set(self.eliminate_subsets(self.allGreen))
@@ -240,6 +240,22 @@ class DiagnosticLattice:
                 else:
                     end = ','.join(str(s) for s in solidGreen)
                 outstr += '"' + start + '" -> "' + end +'" [dir=back color="#006400" style=dashed]\n'
+        for edge in self.edgesBin:
+            if edge[0] in self.allMCS and edge[1] in self.allMIS:
+                if len(edge[0]) == 0:
+                    start = 'None'
+                else:
+                    start = ','.join(str(s) for s in edge[0])
+                end = ','.join(str(s) for s in edge[1])
+                outstr += '"' + start + '" -> "' + end +'" [arrowhead=none color="#0000FF" style=filled]\n'
+        for mis in self.allMIS:
+            start = 'AllOtherGreen'
+            end = ','.join(str(s) for s in mis)
+            outstr += '"' + start + '" -> "' + end +'" [arrowhead=none color="#0000FF" style=filled]\n'
+        for mcs in self.allMCS:
+            start = ','.join(str(s) for s in mcs)
+            end = 'AllOtherRed'
+            outstr += '"' + start + '" -> "' + end +'" [arrowhead=none color="#0000FF" style=filled]\n'
         
         # add legend
         artsLabels = ""
