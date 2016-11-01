@@ -92,6 +92,7 @@ class TaxonomyMapping:
         self.leafConcepts = []                 # concepts from input that are leaf nodes
         self.nonleafConcepts = []              # concepts from input that are not leaf nodes
         self.nosiblingdisjointness = []        # pairs that has no sibling disjointness
+        self.artIndex = []                     # articulations string with index
         self.artDict = {}                      # dictionary map articulation with articulation index
         self.artDictBin = {}                   # dictionary map articulation with binary index
         self.arts2NumPW = {}                   # dictionary map articulation sets to number of PW
@@ -161,16 +162,7 @@ class TaxonomyMapping:
                 with open(eachFile) as inFile:
                     for line in inFile:
                         outFile.write(line)
-#         filenames = ['file1.txt', 'file2.txt', ...]
-#         with open('path/to/output/file', 'w') as outfile:
-#             for fname in filenames:
-#                 with open(fname) as infile:
-#                     for line in infile:
-#                         outfile.write(line)
-        
-#         for i in range(len(self.args['<inputfile>'])): 
-#             copyfile(os.path.join(self.projectdir, self.args['<inputfile>'][i]),\
-#                  os.path.join(self.inputfilesdir, self.args['<inputfile>'][i]))
+                        
         # set up stylesheets folder
         self.path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         self.stylesheetdir = os.path.join(self.projectdir, "stylesheets/")
@@ -196,6 +188,7 @@ class TaxonomyMapping:
             os.mkdir(self.pwoutputfiledir)
         self.pwoutputfile = os.path.join(self.pwoutputfiledir, self.name+".pw")
         self.pwinternalfile = os.path.join(self.pwoutputfiledir, "pw.internal")
+        self.misinternalfiles = os.path.join(self.pwoutputfiledir, "mis.internal")
         
         self.logsdir = os.path.join(self.outputdir, "logs")
         if not os.path.exists(self.logsdir):
@@ -668,7 +661,8 @@ class TaxonomyMapping:
         if self.isPwNone():
             print "************************************"
             print "Input is inconsistent\n"
-            print 'You can use "--repair=WAY" to do the repairing, see details in "euler2 -h"'
+            print "Here lists MIS:"
+            #print 'You can use "--repair=WAY" to do the repairing, see details in "euler2 -h"'
             if self.args['--ie']:
                 self.inconsistencyExplanation()
             self.updateReportFile(self.reportfile)
@@ -1247,6 +1241,7 @@ class TaxonomyMapping:
         self.computeAllJust(artSet, s, curpath, allpaths)
         
     def computeAllJust(self, artSet, justSet, curpath, allpaths):
+        f = open(self.misinternalfiles, "a")
         for path in allpaths:
             if path.issubset(curpath):
                 return
@@ -1262,10 +1257,15 @@ class TaxonomyMapping:
             if len(j) != 0:
                 lj = list(j)
                 print "************************************"
+                f.write("MIS "+str(self.fixedCnt)+": [",)
                 print "Min inconsistent subset ",self.fixedCnt,": [",
                 for i in range(len(lj)):
-                    if i != 0: print ",",
+                    if i != 0:
+                        f.write(",")
+                        print ",",
+                    f.write(self.artIndex.index(lj[i].string.strip()).__str__())
                     print lj[i].ruleNum,":",lj[i].string,
+                f.write("]\n")
                 print "]"
                 print "************************************"
                 self.fixedCnt += 1
@@ -2383,7 +2383,6 @@ class TaxonomyMapping:
         
         # used for input viz
         group2concepts = {}
-        art = []
         
         for line in lines:
 
@@ -2473,7 +2472,7 @@ class TaxonomyMapping:
             elif (re.match("\[.*?\]", line)):
                 inside = re.match("\[(.*)\]", line).group(1)
                 self.addArticulation(inside)
-                art.append(re.match("\[(.*)\]", line).group(1)) # used for input viz
+                self.artIndex.append(re.match("\[(.*)\]", line).group(1)) # used for input viz
                               
             elif (re.match("\<.*\>", line)):
                 inside = re.match("\<(.*)\>", line).group(1)
@@ -2499,10 +2498,10 @@ class TaxonomyMapping:
         
         # used for dict map articulation to index
         if self.args['--artRem']:
-            for a in art:
-                self.artDict[a] = art.index(a)+1
-        for a in art:
-            self.artDictBin[a] = 1 << art.index(a)
+            for a in self.artIndex:
+                self.artDict[a] = self.artIndex.index(a)+1
+        for a in self.artIndex:
+            self.artDictBin[a] = 1 << self.artIndex.index(a)
                 
         # update leaf concepts
         self.leafConcepts = list(set(self.leafConcepts).difference(self.nonleafConcepts))
@@ -2961,7 +2960,6 @@ class TaxonomyMapping:
         node = {}
         node.update({"concept": concept})
         node.update({"group": group})
-        node.update({"name": "test" + str(randint(0,100))})
         self.rcgVizNodes.update({group + "." + concept: node})
     
     def addRcgVizEdge(self, s, t, label):
@@ -2975,7 +2973,6 @@ class TaxonomyMapping:
         node = {}
         node.update({"concept": concept})
         node.update({"group": group})
-        node.update({"name": "test" + str(randint(0,100))})
         allRcgNodesDict.update({group + "." + concept: node})
 
     def addRcgAllVizEdge(self, s, t, label, numOfPws, allRcgEdgesDict): #here label is the frequency of the edge among all PWs
@@ -2995,7 +2992,6 @@ class TaxonomyMapping:
         node = {}
         node.update({"concept": concept})
         node.update({"group": "cluster"})
-        node.update({"name": "test" + str(randint(0,100))})
         self.clusterVizNodes.update({concept: node})
 
     def addClusterVizEdge(self, s, t, label):
