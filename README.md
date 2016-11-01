@@ -45,7 +45,7 @@ Before using Euler/X, you need to download it from this git repo. You can first 
 
 If you are a first-time user for git, please download and install it [http://git-scm.com/downloads/].
 
-##### 2. Download the repository. You may also clone the repository of git into local disk, including two branches.
+##### 2. Download the source. 
 The latest version is v2.0. Download it from the [release][release] page. 
 
 To use the development version, which has the latest code, clone the `master` branch:
