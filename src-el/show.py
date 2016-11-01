@@ -36,6 +36,7 @@ from random import randint
 from helper import *
 from subprocess import call
 from sets import Set
+from diaglattice import *
 
 class ProductsShowing:
     
@@ -54,7 +55,7 @@ class ProductsShowing:
         if os.path.isfile(self.lastruntimestamp):
             f = open(self.lastruntimestamp, "r")
             self.lastrundir = f.readline().strip()
-            self.userdir =  re.match('(.*)/(.*)', self.lastrundir).group(1)
+            self.userdir = re.match('(.*)/(.*)', self.lastrundir).group(1)
             self.name = f.readline()
             f.close()
         
@@ -101,6 +102,8 @@ class ProductsShowing:
         
         self.mergeinputdir = os.path.join(self.lastrundir, "7-Merge-input")
         
+        self.logdir = os.path.join(self.lastrundir, "logs")
+        self.output = os.path.join(self.logdir, self.name + ".stdout")
         
     def remove_duplicate_string(self,li):
         if li:
@@ -128,6 +131,11 @@ class ProductsShowing:
             if self.args['<name>'] == 'pw':    # possible worlds
                 self.showPW()
             if self.args['<name>'] == 'sv':    # summary view, including av (stable and labile), cv, hv
+                # if this is an inconsistent example (there is no PW)
+                if not os.path.isfile(os.path.join(self.pwinternalfilesdir, self.name+".pw")):
+                    print "This is an inconsistent example, no summary view of possible worlds."
+                    return
+                # if not run align first
                 if not self.checkPwFlag():
                     print 'Need to run "euler2 show pw" first.'
                     return
@@ -211,10 +219,15 @@ class ProductsShowing:
     def showIV(self):
         print "******input visualization******"
         if self.args['<inputfile>'] and self.args['iv']:
-            inputFile = self.args['<inputfile>'][0]
+            inputData = []
+            for eachFile in self.args['<inputfile>']:
+                inputData += open(eachFile).readlines()
         else:
             inputFile = os.path.join(self.inputfilesdir, self.name+".txt")
-        fileName = os.path.splitext(os.path.basename(inputFile))[0]
+        fileName = ""
+        for i in range(len(self.args['<inputfile>'])):
+            fileName += os.path.splitext(os.path.basename(self.args['<inputfile>'][i]))[0] + "-"
+        fileName = fileName[:-1] 
         
         group2concepts = {}
         art = []
@@ -225,9 +238,12 @@ class ProductsShowing:
         fifthTName = ""
         taxName = ""
         
-        f = open(inputFile, 'r')
-        lines = f.readlines()
-        f.close()
+        if self.args['<inputfile>'] and self.args['iv']:
+            lines = inputData
+        else:
+            f = open(inputFile, 'r')
+            lines = f.readlines()
+            f.close()
         
         for line in lines:
             
@@ -417,14 +433,15 @@ class ProductsShowing:
             newgetoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"singletoninputstyle.yaml" + ">" + inputDotFile)
         else:
             newgetoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"inputstyle.yaml" + ">" + inputDotFile)
-        newgetoutput("dot -Tpdf "+inputDotFile+" -o "+inputPdfFile)
-        #newgetoutput("dot -Tsvg "+inputDotFile+" -o "+inputSvgFile)
+        if self.args['--svg']:
+            newgetoutput("dot -Tsvg "+inputDotFile+" -o "+inputSvgFile)
+        else:
+            newgetoutput("dot -Tpdf "+inputDotFile+" -o "+inputPdfFile)
         
     def addInputVizNode(self, concept, group, pathlen):
         node = {}
         node.update({"concept": concept})
         node.update({"group": group})
-        node.update({"name": "test" + str(randint(0,100))})
         #if self.args.withrank:
         #    node.update({"pathlen": pathlen})
         if group != "(+)":
@@ -446,6 +463,11 @@ class ProductsShowing:
             return 2
 
     def showPW(self):
+        # if this is an inconsistent example (there is no PW)
+        if not os.path.isfile(os.path.join(self.pwinternalfilesdir, self.name+".pw")):
+            print "This is an inconsistent example, no possible worlds generated."
+            return
+        
         print "******pw visualization******"   
         
         if not os.path.exists(self.pwsvizdir):
@@ -792,8 +814,10 @@ class ProductsShowing:
             
             # apply the rcgviz stylesheet
             newgetoutput("cat "+rcgYamlFile+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + rcgDotFile)
-            newgetoutput("dot -Tpdf "+rcgDotFile+" -o "+rcgPdfFile)
-            #newgetoutput("dot -Tsvg "+rcgDotFile+" -o "+rcgSvgFile)
+            if self.args['--svg']:
+                newgetoutput("dot -Tsvg "+rcgDotFile+" -o "+rcgSvgFile)
+            else:
+                newgetoutput("dot -Tpdf "+rcgDotFile+" -o "+rcgPdfFile)
             
             # prepare for aggregate view
             for e in it.tr:
@@ -887,7 +911,6 @@ class ProductsShowing:
         node = {}
         node.update({"concept": concept})
         node.update({"group": group})
-        node.update({"name": "test" + str(randint(0,100))})
         self.rcgVizNodes.update({group + "." + concept: node})
     
     def addRcgVizEdge(self, s, t, label):
@@ -1048,15 +1071,17 @@ class ProductsShowing:
         
         
         newgetoutput("cat "+rcgAllYamlFile+" | y2d -s "+self.stylesheetdir+"aggregatestyle.yaml" + ">" + rcgAllDotFile)
-        newgetoutput("dot -Tpdf "+rcgAllDotFile+" -o "+rcgAllPdfFile)
-        #newgetoutput("dot -Tsvg "+rcgAllDotFile+" -o "+rcgAllSvgFile)
+        if self.args['--svg']:
+            newgetoutput("dot -Tsvg "+rcgAllDotFile+" -o "+rcgAllSvgFile)
+        else:
+            newgetoutput("dot -Tpdf "+rcgAllDotFile+" -o "+rcgAllPdfFile)
+        
         
     
     def addRcgAllVizNode(self, concept, group):
         node = {}
         node.update({"concept": concept})
         node.update({"group": group})
-        node.update({"name": "test" + str(randint(0,100))})
         self.allRcgNodesDict.update({group + "." + concept: node})
 
     def addRcgAllVizEdge(self, s, t, label, numOfPws): #here label is the frequency of the edge among all PWs
@@ -1164,10 +1189,12 @@ class ProductsShowing:
         fclyaml.close()
         
         newgetoutput("cat "+clyaml+" | y2d -s "+self.stylesheetdir+"clusterstyle.yaml" + ">" + cldot)
-        newgetoutput("neato -Tpdf "+cldot+" -o "+clneatopdf)
+        if self.args['--svg']:
+            newgetoutput("neato -Tsvg "+cldot+" -o "+clneatosvg)
+        else:
+            newgetoutput("neato -Tpdf "+cldot+" -o "+clneatopdf)
         #newgetoutput("dot -Tpdf "+cldot+" -o "+cldotpdf)
-        #newgetoutput("dot -Tsvg "+cldot+" -o "+cldotsvg)
-        #newgetoutput("neato -Tsvg "+cldot+" -o "+clneatosvg)        
+        #newgetoutput("dot -Tsvg "+cldot+" -o "+cldotsvg)        
 
         
         
@@ -1175,7 +1202,6 @@ class ProductsShowing:
         node = {}
         node.update({"concept": concept})
         node.update({"group": "cluster"})
-        node.update({"name": "test" + str(randint(0,100))})
         self.clusterVizNodes.update({concept: node})
 
     def addClusterVizEdge(self, s, t, label):
@@ -1281,7 +1307,7 @@ class ProductsShowing:
 #        hvyaml = os.path.join(self.pwsaggregatedir, self.name+"_hv.yaml")
         hvdot = os.path.join(self.pwsaggregatedir, self.name+"_hv.gv")
         hvdotpdf = os.path.join(self.pwsaggregatedir, self.name+"_hv.pdf")
-#        hvdotsvg = os.path.join(self.pwsaggregatedir, self.name+"_hv.svg")
+        hvdotsvg = os.path.join(self.pwsaggregatedir, self.name+"_hv.svg")
 #        
 #        fhvyaml = open(hvyaml, 'w')
 #        if self.hierarchyVizNodes:
@@ -1291,8 +1317,10 @@ class ProductsShowing:
 #        fhvyaml.close()
 #        
 #        newgetoutput("cat "+hvyaml+" | y2d -s "+self.stylesheetdir+"hierarchystyle.yaml" + ">" + hvdot)
-        newgetoutput("dot -Tpdf "+hvdot+" -o "+hvdotpdf)
-#        newgetoutput("dot -Tsvg "+hvdot+" -o "+hvdotsvg)
+        if self.args['--svg']:
+            newgetoutput("dot -Tsvg "+hvdot+" -o "+hvdotsvg)
+        else:
+            newgetoutput("dot -Tpdf "+hvdot+" -o "+hvdotpdf)
 
         
     def getCollapsedNode(self, mergedNode):
@@ -1305,7 +1333,6 @@ class ProductsShowing:
         node = {}
         node.update({"concept": concept})
         node.update({"group": group})
-        node.update({"name": "test" + str(randint(0,100))})
         self.hierarchyVizNodes.update({group + "." + concept: node})
 
     def addHierarchyVizEdge(self, s, t, label):
@@ -1318,13 +1345,81 @@ class ProductsShowing:
         
     def showInconLAT(self):
         
+        # if this is a consistent example (there is at least one PW)
+        if os.path.isfile(os.path.join(self.pwinternalfilesdir, self.name+".pw")):
+            print "This is a consistent example, no diagnostic lattice generated."
+            return
+        
+        # read mis internal files
+        misInternalFile = os.path.join(self.pwinternalfilesdir, 'mis.internal')
+        if not os.path.isfile(misInternalFile):
+            print 'No MIS generated for this example, run "euler2 align" first'
+            return
+
+        # create 6-Lattice/ folder
         if not os.path.exists(self.latticedir):
             os.mkdir(self.latticedir)
-
         inputFile = os.path.abspath(os.path.join(self.inputfilesdir, self.name+".txt"))
-        latticeFolder = os.path.abspath(self.latticedir)
-        call("lattice2.sh " + inputFile + " " + latticeFolder, shell=True)
-        #call("maslattice.sh " + fileName, shell=True)
+        
+        allMIS = set()
+        fMIS = open(misInternalFile, "r")
+        lines = fMIS.readlines()
+        for line in lines:
+            aMISString = re.match("(.*)\[(.*)\](.*)", line).group(2).split(",")
+            aMIS = frozenset(map(int, aMISString))
+            allMIS.add(aMIS)
+        
+        diagShower = DiagnosticLattice(allMIS, inputFile)
+        diagShower.genLattice()
+        fullLatstr = diagShower.fullLatViz()
+        redLatstr = diagShower.reducedLatViz()
+        
+        # create the visualization file
+        fullLatDotFile = os.path.join(self.latticedir, self.name+"_fulllat.gv")
+        fullLatPdfFile = os.path.join(self.latticedir, self.name+"_fulllat.pdf")
+        fullLatSvgFile = os.path.join(self.latticedir, self.name+"_fulllat.svg")
+        fullLatViz = open(fullLatDotFile, 'w')
+        fullLatViz.write(fullLatstr)
+        fullLatViz.close()
+        if self.args['--svg']:
+            newgetoutput("dot -Tsvg "+fullLatDotFile+" -o "+fullLatSvgFile)
+        else:
+            newgetoutput("dot -Tpdf "+fullLatDotFile+" -o "+fullLatPdfFile)
+            
+        redLatDotFile = os.path.join(self.latticedir, self.name+"_lat.gv")
+        redLatPdfFile = os.path.join(self.latticedir, self.name+"_lat.pdf")
+        redLatSvgFile = os.path.join(self.latticedir, self.name+"_lat.svg")
+        redLatViz = open(redLatDotFile, 'w')
+        redLatViz.write(redLatstr)
+        redLatViz.close()
+        if self.args['--svg']:
+            newgetoutput("dot -Tsvg "+redLatDotFile+" -o "+redLatSvgFile)
+        else:
+            newgetoutput("dot -Tpdf "+redLatDotFile+" -o "+redLatPdfFile)
+        
+#         inputFile = os.path.abspath(os.path.join(self.inputfilesdir, self.name+".txt"))
+#         latticeFolder = os.path.abspath(self.latticedir)
+#         outputMIS = os.path.abspath(self.output)
+#         call("lattice2.sh " + inputFile + " " + latticeFolder + " " + outputMIS, shell=True)
+#         #call("maslattice.sh " + fileName, shell=True)
+#         
+#         # visualization transform
+#         fileDot = os.path.join(self.latticedir, self.name+"_lat.dot")
+#         filePdf = os.path.join(self.latticedir, self.name+"_lat.pdf")
+#         fileSvg = os.path.join(self.latticedir, self.name+"_lat.svg")
+#         fileFullDot = os.path.join(self.latticedir, self.name+"_fulllat.dot")
+#         fileFullPdf = os.path.join(self.latticedir, self.name+"_fulllat.pdf")
+#         fileFullSvg = os.path.join(self.latticedir, self.name+"_fulllat.svg")
+#         if os.path.isfile(fileDot):
+#             if self.args['--svg']:
+#                 newgetoutput("dot -Tsvg "+fileDot+" -o "+fileSvg)
+#             else:
+#                 newgetoutput("dot -Tpdf "+fileDot+" -o "+filePdf)
+#         if os.path.isfile(fileFullDot):
+#             if self.args['--svg']:
+#                 newgetoutput("dot -Tsvg "+fileFullDot+" -o "+fileFullSvg)
+#             else:
+#                 newgetoutput("dot -Tpdf "+fileFullDot+" -o "+fileFullPdf)        
 
     def showAmbLAT(self):
         
@@ -1336,6 +1431,11 @@ class ProductsShowing:
         #call("maslattice.sh " + fileName, shell=True)
         
     def showPW2INPUT(self):
+        # if this is an inconsistent example (there is no PW)
+        if not os.path.isfile(os.path.join(self.pwinternalfilesdir, self.name+".pw")):
+            print "This is an inconsistent example, no possible worlds generated."
+            return
+        
         print "******transfer possible worlds to input file******"
         
         if not os.path.isfile(os.path.join(self.pwinternalfilesdir, 'pw2input.internal0')):

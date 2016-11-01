@@ -22,11 +22,13 @@
 
 
 import sys
+import os
 
 def is_power2(num):
     return num != 0 and ((num & (num - 1)) == 0)
 
 n = int(sys.argv[1])
+latticedir = sys.argv[2]
 numOfNodes = 2**n
 nodes = []
 edges = []
@@ -45,7 +47,8 @@ for edge in edges:
     tmp = "up(" + edge[1].__str__() + "," + edge[0].__str__() + ")"
     ups.append(tmp)
 
-f = open("up.dlv","w")
+fileName = os.path.join(latticedir, "uncolored.dlv")
+f = open(fileName,"w")
 f.write("{")
 for up in ups:
     f.write(up)

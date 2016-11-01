@@ -61,7 +61,7 @@ while not_EOF:
     preds = []
     #print "i=", i, "line=", line[1:-2]
     preds = line[1:-2].split(", ")
-    # print preds
+    #print preds
     
     for pred in preds:
         try:
@@ -82,8 +82,4 @@ for e in outList:
     f_out.write(e+".\n")
 
 f_in.close()
-f_out.close()    
-
-
-
-
+f_out.close()
