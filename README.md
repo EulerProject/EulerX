@@ -46,13 +46,11 @@ Before using Euler/X, you need to download it from this git repo. You can first 
 If you are a first-time user for git, please download and install it [http://git-scm.com/downloads/].
 
 ##### 2. Download the repository. You may also clone the repository of git into local disk, including two branches.
-The `master` is the released branch, which is stable and tested, but may not be the latest. To use the master branch: 
+The latest version is v2.0. Download it from the [release][release] page. 
+
+To use the development version, which has the latest code, clone the `master` branch:
 
     $ git clone -b “master” https://github.com/EulerProject/EulerX.git
-
-The `main` is the development branch, which has latest code. To use the main branch:
-
-    $ git clone -b “main” https://github.com/EulerProject/EulerX.git
 
 ##### 3. Check the installation of Python
 Euler/X is written in **Python**, so it requires Python2.X or later installed in your computer. 
@@ -187,6 +185,7 @@ Here are examples under `example/` directory,
 
 # Contact
 If you have any question or comments, please contact Bertram Ludäscher at ludaesch@illinois.edu.
+[release]: https://github.com/EulerProject/EulerX/releases/tag/v2.0
 [wiki]: https://github.com/EulerProject/EulerX/wiki
 [p9m4]: http://www.cs.unm.edu/~mccune/mace4/
 [dlv]: http://www.dlvsystem.com/dlv/#1
