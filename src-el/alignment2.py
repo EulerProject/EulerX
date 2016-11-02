@@ -698,7 +698,6 @@ class TaxonomyMapping:
         self.outPW(name, pws, pwflag, "rel")
 
     def outPW(self, name, pws, pwflag, ss):
-        print "pws", pws, len(pws)
         outputstr = ""
         pwmirs = []
         
