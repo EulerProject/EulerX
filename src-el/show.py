@@ -150,6 +150,8 @@ class ProductsShowing:
             #    self.showHV()
             if self.args['<name>'] == 'inconLat':   # inconsistency lattice 
                 self.showInconLAT()
+            if self.args['<name>'] == 'fourinone':   # 4-in-1 lattice 
+                self.showFourinoneLAT()
             if self.args['<name>'] == 'ambLat':   # ambiguity lattice 
                 self.showAmbLAT()
             if self.args['<name>'] == 'pw2input':   # transfer PW to input 
@@ -1420,6 +1422,98 @@ class ProductsShowing:
 #                 newgetoutput("dot -Tsvg "+fileFullDot+" -o "+fileFullSvg)
 #             else:
 #                 newgetoutput("dot -Tpdf "+fileFullDot+" -o "+fileFullPdf)        
+
+    def showFourinoneLAT(self):
+        # if this is a consistent example (there is at least one PW)
+        if os.path.isfile(os.path.join(self.pwinternalfilesdir, self.name+".pw")):
+            print "This is a consistent example, no 4-in-1 lattice generated."
+            return
+        
+        # read fourinone internal files
+        fourinoneInternalFile = os.path.join(self.pwinternalfilesdir, 'fourinone.internal')
+        if not os.path.isfile(fourinoneInternalFile):
+            print 'Need to run "euler2 align" with option "--fourinone" first'
+            return
+
+        # create 6-Lattice/ folder
+        if not os.path.exists(self.latticedir):
+            os.mkdir(self.latticedir)
+            
+        it = imp.load_source('it', fourinoneInternalFile)
+    
+        nodesBin = []
+        for node in it.nodes:
+            nodeBin = bin(node)[2:]
+            tmp = ""
+            if len(nodeBin) < it.power:
+                for k in range(it.power-len(nodeBin)):
+                    tmp = '0' + tmp
+            nodeBin = tmp + nodeBin
+            nodesBin.append(nodeBin)
+        #print "nodesBin", nodesBin
+        
+        fourinoneLatDotFile = os.path.join(self.latticedir, self.name+"_fourinonelat.gv")
+        fDot = open(fourinoneLatDotFile, 'w')
+        fDot.write("digraph {\n\nrankdir = BT\n\n")
+         
+        for nodeBin in nodesBin:
+            if nodeBin in it.misBin:
+                fDot.write(self.convertToIndex(nodeBin, it.power) + ' [shape=box style="filled" fillcolor="#FF0000"];\n')
+            elif nodeBin in it.mcsBin and nodeBin in it.musBin:
+                fDot.write(self.convertToIndex(nodeBin, it.power) + ' [shape=octagon style="filled" fillcolor="#00FF00"];\n')
+            elif nodeBin in it.mcsBin and nodeBin in it.maaBin:
+                fDot.write(self.convertToIndex(nodeBin, it.power) + ' [shape=diamond style="filled" fillcolor="#00FFCC"];\n')
+            elif nodeBin in it.mcsBin:
+                fDot.write(self.convertToIndex(nodeBin, it.power) + ' [shape=box style="filled" fillcolor="#00FF00"];\n')
+            elif nodeBin in it.musBin:
+                fDot.write(self.convertToIndex(nodeBin, it.power) + ' [shape=octagon style="filled" fillcolor="#00FF00"];\n')
+            elif nodeBin in it.maaBin:
+                fDot.write(self.convertToIndex(nodeBin, it.power) + ' [shape=diamond style="filled" fillcolor="#00FFCC"];\n')
+            else:
+                fDot.write(self.convertToIndex(nodeBin, it.power) + ' [shape=box style="filled" fillcolor="#FFFFFF"];\n')
+        
+        for edge in it.edges:
+            fDot.write(self.convertToIndex(edge[0], it.power) +  ' -> ' + self.convertToIndex(edge[1], it.power) + ' [arrowhead=none]\n')
+        
+        # lengend
+        artsLabels = ""
+        for art, binN in it.artDictbin.iteritems():
+            artsLabels += "<TR> \n <TD>" + self.convertToIndex(str(bin(binN)[2:]),it.power) + "</TD> \n <TD>" + art + "</TD> \n </TR> \n"
+        fDot.write("node[shape=box] \n")
+        fDot.write('{rank=top Legend [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
+        fDot.write(artsLabels)
+        fDot.write("</TABLE> \n >] } \n")
+        fDot.write('Legend -> "None" [style=invis]\n')
+        fDot.write("node[shape=box] \n")
+        fDot.write('{rank=top Intro [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
+        intro = "<TR> \n <TD> Minimal Inconsistent Subsets (MIS) </TD> \n <TD> Red box </TD> \n </TR> \n" \
+              + "<TR> \n <TD> Maximal Consistent Subsets </TD> \n <TD> Green box </TD> \n </TR> \n" \
+              + "<TR> \n <TD> Minimal Unique Subsets </TD> \n <TD> Green octagon</TD> \n </TR> \n" \
+              + "<TR> \n <TD> Maximal Ambiguous Subsets </TD> \n <TD> Cyan diamond </TD> \n </TR> \n"
+        fDot.write(intro)
+        fDot.write("</TABLE> \n >] } \n")
+        fDot.write('}')
+        fDot.close()
+        
+        # create the visualization file
+        fourinoneLatPdfFile = os.path.join(self.latticedir, self.name+"_fourinonelat.pdf")
+        fourinoneLatSvgFile = os.path.join(self.latticedir, self.name+"_fourinonelat.svg")
+        if self.args['--svg']:
+            newgetoutput("dot -Tsvg "+fourinoneLatDotFile+" -o "+fourinoneLatSvgFile)
+        else:
+            newgetoutput("dot -Tpdf "+fourinoneLatDotFile+" -o "+fourinoneLatPdfFile)
+
+    def convertToIndex(self, s, power):
+        result = ""
+        num = int(s,2)
+        for i in range(power):
+            if num & 1 << i:
+                result += str(i) + ','
+        if len(result) == 0:
+            result = 'None'
+        else:
+            result = '"' + result[:-1] + '"'
+        return result
 
     def showAmbLAT(self):
         

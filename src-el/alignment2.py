@@ -189,6 +189,7 @@ class TaxonomyMapping:
         self.pwoutputfile = os.path.join(self.pwoutputfiledir, self.name+".pw")
         self.pwinternalfile = os.path.join(self.pwoutputfiledir, "pw.internal")
         self.misinternalfiles = os.path.join(self.pwoutputfiledir, "mis.internal")
+        self.fourinoneinternalfile = os.path.join(self.pwoutputfiledir, "fourinone.internal")
         
         self.logsdir = os.path.join(self.outputdir, "logs")
         if not os.path.exists(self.logsdir):
@@ -644,8 +645,8 @@ class TaxonomyMapping:
             #self.allMinimalArtSubsets(sets.Set(tmpArticulations), 'Consistency')
             #self.allMinimalArtSubsets(sets.Set(tmpArticulations), 'Both')
             
-            if not os.path.exists(self.latticedir):
-                os.mkdir(self.latticedir)
+#             if not os.path.exists(self.latticedir):
+#                 os.mkdir(self.latticedir)
             self.allJustificationsFourinone(sets.Set(self.articulations))
             self.postFourinone()
             return
@@ -697,6 +698,7 @@ class TaxonomyMapping:
         self.outPW(name, pws, pwflag, "rel")
 
     def outPW(self, name, pws, pwflag, ss):
+        print "pws", pws, len(pws)
         outputstr = ""
         pwmirs = []
         
@@ -1649,12 +1651,12 @@ class TaxonomyMapping:
             if self.mus.count(e) > 0:
                 self.mus.remove(e)
         
-#        print "self.mis", self.mis
-#        print "self.misANDmus", self.misANDmus
-#        print "self.mus", self.mus
-#        print "self.artDictBin", self.artDictBin
+#         print "self.mis", self.mis
+#         print "self.misANDmus", self.misANDmus
+#         print "self.mus", self.mus
+#         print "self.artDictBin", self.artDictBin
         
-        genFourinone(self.latticedir, self.stylesheetdir, self.artDictBin, self.mis, self.mus)
+        genFourinone(self.latticedir, self.stylesheetdir, self.artDictBin, self.mis, self.mus, self.fourinoneinternalfile)
                  
         return
 

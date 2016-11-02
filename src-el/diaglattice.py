@@ -200,7 +200,8 @@ class DiagnosticLattice:
         outstr += '{rank=top Legend [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" \
                     CELLPADDING="4"> \n'
         outstr += artsLabels
-        outstr += "</TABLE> \n >] } \n"    
+        outstr += "</TABLE> \n >] } \n"
+        outstr += 'Legend -> "None" [style=invis]\n'   
         outstr += "}"
         return outstr
     
@@ -210,9 +211,9 @@ class DiagnosticLattice:
         outstr += "rankdir=BT\n"
         
         # add nodes
-        if len(self.otherRed) > 1:
+        if len(self.otherRed) > 0:
             outstr += '"AllOtherRed" [shape=octagon color="#FFB0B0" style=dashed]\n'
-        if len(self.otherGreen) > 1:
+        if len(self.otherGreen) > 0:
             outstr += '"AllOtherGreen" [shape=box color="#006400" style="rounded,dashed"]\n'
         outstr += 'node[shape=octagon color="#FF0000" fillcolor="#FFB0B0" style=filled]\n'
         for solidRed in self.allMIS:
@@ -248,14 +249,16 @@ class DiagnosticLattice:
                     start = ','.join(str(s) for s in edge[0])
                 end = ','.join(str(s) for s in edge[1])
                 outstr += '"' + start + '" -> "' + end +'" [arrowhead=none color="#0000FF" style=filled]\n'
-        for mis in self.allMIS:
-            start = 'AllOtherGreen'
-            end = ','.join(str(s) for s in mis)
-            outstr += '"' + start + '" -> "' + end +'" [arrowhead=none color="#0000FF" style=filled]\n'
-        for mcs in self.allMCS:
-            start = ','.join(str(s) for s in mcs)
-            end = 'AllOtherRed'
-            outstr += '"' + start + '" -> "' + end +'" [arrowhead=none color="#0000FF" style=filled]\n'
+        if len(self.otherGreen) > 0:
+            for mis in self.allMIS:
+                start = 'AllOtherGreen'
+                end = ','.join(str(s) for s in mis)
+                outstr += '"' + start + '" -> "' + end +'" [arrowhead=none color="#0000FF" style=filled]\n'
+        if len(self.otherRed) > 0:
+            for mcs in self.allMCS:
+                start = ','.join(str(s) for s in mcs)
+                end = 'AllOtherRed'
+                outstr += '"' + start + '" -> "' + end +'" [arrowhead=none color="#0000FF" style=filled]\n'
         
         # add legend
         artsLabels = ""
@@ -265,7 +268,11 @@ class DiagnosticLattice:
         outstr += '{rank=top Legend [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" \
                     CELLPADDING="4"> \n'
         outstr += artsLabels
-        outstr += "</TABLE> \n >] } \n"    
+        outstr += "</TABLE> \n >] } \n"
+        if len(self.otherGreen) > 0:
+            outstr += 'Legend -> "AllOtherGreen" [style=invis]\n'
+        else:
+            outstr += 'Legend -> "None" [style=invis]\n'
         outstr += "}"
         return outstr
         
