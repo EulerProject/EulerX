@@ -50,7 +50,7 @@ The latest version is v2.0. Download it from the [release][release] page.
 
 To use the development version, which has the latest code, clone the `master` branch:
 
-    $ git clone -b “master” https://github.com/EulerProject/EulerX.git
+    $ git clone -b master https://github.com/EulerProject/EulerX.git
 
 ##### 3. Check the installation of Python
 Euler/X is written in **Python**, so it requires Python2.X or later installed in your computer. 
