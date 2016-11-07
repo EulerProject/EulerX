@@ -275,7 +275,73 @@ class DiagnosticLattice:
             outstr += 'Legend -> "None" [style=invis]\n'
         outstr += "}"
         return outstr
+    
+    # generate the full ambiguity lattice
+    def fullAmbLatViz(self):
+        outstr = ""
+        outstr += "digraph{\n"
+        outstr += "rankdir=BT\n"
         
+        # add nodes
+        outstr += 'node[shape=octagon color="#9f1684" fillcolor="#df77cb" style=filled]\n'
+        for solidRed in self.allMIS:
+            label = ','.join(str(s) for s in solidRed)
+            outstr += '"' + label +'"\n'
+        outstr += 'node[shape=octagon color="#9f1684" fillcolor="#df77cb" style=dashed]\n'
+        for otherRed in self.otherRed:
+            label = ','.join(str(s) for s in otherRed)
+            outstr += '"' + label +'"\n'
+        outstr += 'node[shape=box color="#134d9c" fillcolor="#68b5e3" style="rounded,filled"]\n'
+        for solidGreen in self.allMCS:
+            if len(solidGreen) == 0:
+                outstr += '"None"\n'
+            else:
+                label = ','.join(str(s) for s in solidGreen)
+                outstr += '"' + label +'"\n'
+        outstr += 'node[shape=box color="#134d9c" style=dashed]\n'
+        for otherGreen in self.otherGreen:
+            if len(otherGreen) == 0:
+                outstr += '"None"\n'
+            else:
+                label = ','.join(str(s) for s in otherGreen)
+                outstr += '"' + label +'"\n'
+        
+        # add edges
+        for edge in self.edgesBin:
+            if (edge[0] in self.allMIS or edge[0] in self.otherRed) \
+                and (edge[1] in self.allMIS or edge[1] in self.otherRed):
+                start = ','.join(str(s) for s in edge[0])
+                end = ','.join(str(s) for s in edge[1])
+                outstr += '"' + start + '" -> "' + end +'" [color="#9c1382" style=dashed]\n'
+            if (edge[0] in self.allMCS or edge[0] in self.otherGreen) \
+                and (edge[1] in self.allMCS or edge[1] in self.otherGreen):
+                if len(edge[0]) == 0:
+                    start = 'None'
+                else:
+                    start = ','.join(str(s) for s in edge[0])
+                end = ','.join(str(s) for s in edge[1])
+                outstr += '"' + start + '" -> "' + end +'" [dir=back color="#134d9c" style=dashed]\n'
+            if (edge[0] in self.allMCS or edge[0] in self.otherGreen) \
+                and (edge[1] in self.allMIS or edge[1] in self.otherRed):
+                if len(edge[0]) == 0:
+                    start = 'None'
+                else:
+                    start = ','.join(str(s) for s in edge[0])
+                end = ','.join(str(s) for s in edge[1])
+                outstr += '"' + start + '" -> "' + end +'" [arrowhead=none color="#0000FF" style=filled]\n'
+                
+        # add legend
+        artsLabels = ""
+        for art in self.art:
+            artsLabels += "<TR> \n <TD>" + str(self.art.index(art)) + "</TD> \n <TD>" + art + "</TD> \n </TR> \n"
+        outstr += "node[shape=box] \n"
+        outstr += '{rank=top Legend [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" \
+                    CELLPADDING="4"> \n'
+        outstr += artsLabels
+        outstr += "</TABLE> \n >] } \n"
+        outstr += 'Legend -> "None" [style=invis]\n'   
+        outstr += "}"
+        return outstr
          
 #         # generate the full lattice
 #         for solidRed in self.allMIS:

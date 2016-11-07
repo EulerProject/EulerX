@@ -1346,7 +1346,6 @@ class ProductsShowing:
         self.hierarchyVizEdges.update({s + "_" + t : edge})
         
     def showInconLAT(self):
-        
         # if this is a consistent example (there is at least one PW)
         if os.path.isfile(os.path.join(self.pwinternalfilesdir, self.name+".pw")):
             print "This is a consistent example, no diagnostic lattice generated."
@@ -1370,6 +1369,7 @@ class ProductsShowing:
             aMISString = re.match("(.*)\[(.*)\](.*)", line).group(2).split(",")
             aMIS = frozenset(map(int, aMISString))
             allMIS.add(aMIS)
+        fMIS.close()
         
         diagShower = DiagnosticLattice(allMIS, inputFile)
         diagShower.genLattice()
@@ -1516,13 +1516,46 @@ class ProductsShowing:
         return result
 
     def showAmbLAT(self):
+        # if this is a inconsistent example (there is at least one PW)
+        if os.path.isfile(os.path.join(self.pwinternalfilesdir, 'mis.internal')):
+            print "This is an inconsistent example, no ambiguity lattice generated."
+            return
         
-        #if not os.path.exists(self.latticedir):
-        #    os.mkdir(self.latticedir)
+        # read mas internal files
+        masInternalFile = os.path.join(self.pwinternalfilesdir, 'mas.internal')
+        if not os.path.isfile(masInternalFile):
+            print 'No MUS generated for this example, run "euler2 align" with --artRem first'
+            return
 
-        fileName = self.name + ".txt"
-        call("maslattice.sh " + fileName, shell=True)
-        #call("maslattice.sh " + fileName, shell=True)
+        # create 6-Lattice/ folder
+        if not os.path.exists(self.latticedir):
+            os.mkdir(self.latticedir)
+        inputFile = os.path.abspath(os.path.join(self.inputfilesdir, self.name+".txt"))
+        
+        allMUS = set()
+        fMUS = open(masInternalFile, "r")
+        lines = fMUS.readlines()
+        for line in lines:
+            aMUSString = re.match("(.*)\[(.*)\](.*)", line).group(2).split(",")
+            aMUS = frozenset(map(int, aMUSString))
+            allMUS.add(aMUS)
+        fMUS.close()
+
+        diagShower = DiagnosticLattice(allMUS, inputFile)
+        diagShower.genLattice()
+        fullAmbLatstr = diagShower.fullAmbLatViz()
+        
+        # create the visualization file
+        fullAmbLatDotFile = os.path.join(self.latticedir, self.name+"_amblat.gv")
+        fullAmbLatPdfFile = os.path.join(self.latticedir, self.name+"_amblat.pdf")
+        fullAmbLatSvgFile = os.path.join(self.latticedir, self.name+"_amblat.svg")
+        fullAmbLatViz = open(fullAmbLatDotFile, 'w')
+        fullAmbLatViz.write(fullAmbLatstr)
+        fullAmbLatViz.close()
+        if self.args['--svg']:
+            newgetoutput("dot -Tsvg "+fullAmbLatDotFile+" -o "+fullAmbLatSvgFile)
+        else:
+            newgetoutput("dot -Tpdf "+fullAmbLatDotFile+" -o "+fullAmbLatPdfFile)
         
     def showPW2INPUT(self):
         # if this is an inconsistent example (there is no PW)

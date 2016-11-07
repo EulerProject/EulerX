@@ -189,6 +189,7 @@ class TaxonomyMapping:
         self.pwoutputfile = os.path.join(self.pwoutputfiledir, self.name+".pw")
         self.pwinternalfile = os.path.join(self.pwoutputfiledir, "pw.internal")
         self.misinternalfiles = os.path.join(self.pwoutputfiledir, "mis.internal")
+        self.masinternalfiles = os.path.join(self.pwoutputfiledir, "mas.internal")
         self.fourinoneinternalfile = os.path.join(self.pwoutputfiledir, "fourinone.internal")
         
         self.logsdir = os.path.join(self.outputdir, "logs")
@@ -650,14 +651,14 @@ class TaxonomyMapping:
             self.allJustificationsFourinone(sets.Set(self.articulations))
             self.postFourinone()
             return
-        if self.isPwUnique():
-            if self.args['--artRem']:
+        if self.args['--artRem']:
+            if self.isPwUnique():
                 print "************************************"
-                print "UNIQUE POSSIBLE WORLD"
+                print "Unique possible world generated"
                 self.allMinimalArtSubsets(sets.Set(self.articulations), 'Ambiguity')
-                fArt = open("arts2NumPW.py", "w")
-                fArt.write("artD = "+repr(self.arts2NumPW) + "\n")
-                fArt.close()
+                #fArt = open("arts2NumPW.py", "w")
+                #fArt.write("artD = "+repr(self.arts2NumPW) + "\n")
+                #fArt.close()
                 return
         if self.isPwNone():
             print "************************************"
@@ -1462,6 +1463,7 @@ class TaxonomyMapping:
         self.computeAllMAS(artSet, s, curpath, allpaths, flag)
         
     def computeAllMAS(self, artSet, justSet, curpath, allpaths, flag):
+        f = open(self.masinternalfiles, "a")
         for path in allpaths:
             if path.issubset(curpath):
                 return
@@ -1478,9 +1480,13 @@ class TaxonomyMapping:
                 lj = list(j)
                 tmplist = []
                 print "************************************"
+                f.write("MAS "+str(self.fixedCnt)+": [",)
                 print "Min articulation subset that makes unique PW ",self.fixedCnt,": [",
                 for i in range(len(lj)):
-                    if i != 0: print ",",
+                    if i != 0:
+                        f.write(",") 
+                        print ",",
+                    f.write(self.artIndex.index(lj[i].string.strip()).__str__())
                     print lj[i].ruleNum,":",lj[i].string,
                     
                     # store for fourinone lattice
@@ -1493,6 +1499,7 @@ class TaxonomyMapping:
                     if tmplist not in self.misANDmus:
                         self.misANDmus.append(tmplist)
                     
+                f.write("]\n")
                 print "]"
                 print "************************************"
                 self.fixedCnt += 1
