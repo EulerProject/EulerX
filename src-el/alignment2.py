@@ -44,8 +44,7 @@ import fileinput
 import sys
 import csv
 import Queue
-from taxonomy2 import *  
-from alignment2 import * 
+from taxonomy2 import *
 from redCon import *
 from template import *
 from helper2 import *
