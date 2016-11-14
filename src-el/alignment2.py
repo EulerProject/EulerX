@@ -189,6 +189,7 @@ class TaxonomyMapping:
         self.pwinternalfile = os.path.join(self.pwoutputfiledir, "pw.internal")
         self.misinternalfiles = os.path.join(self.pwoutputfiledir, "mis.internal")
         self.masinternalfiles = os.path.join(self.pwoutputfiledir, "mas.internal")
+        self.arts2NumPWinternalfiles = os.path.join(self.pwoutputfiledir, "arts2NumPW.internal")
         self.fourinoneinternalfile = os.path.join(self.pwoutputfiledir, "fourinone.internal")
         
         self.logsdir = os.path.join(self.outputdir, "logs")
@@ -655,9 +656,6 @@ class TaxonomyMapping:
                 print "************************************"
                 print "Unique possible world generated"
                 self.allMinimalArtSubsets(sets.Set(self.articulations), 'Ambiguity')
-                #fArt = open("arts2NumPW.py", "w")
-                #fArt.write("artD = "+repr(self.arts2NumPW) + "\n")
-                #fArt.close()
                 return
         if self.isPwNone():
             print "************************************"
@@ -1533,12 +1531,15 @@ class TaxonomyMapping:
         else:
             self.pw = newgetoutput(self.com)
 
-        # TO-FIX: add the number of PWs visited
-        #tmpList = []
-        #for e in self.articulations:
-        #    tmpList.append(self.artDict[e.string].__str__())
-        #tmpTuple = tuple(sorted(tmpList))
-        #self.arts2NumPW[tmpTuple] = self.pw.strip().count("{")
+        # add the number of PWs visited
+        tmpSet = set()
+        for e in self.articulations:
+            aIndex = self.artIndex.index(str(e.string).strip())
+            tmpSet.add(aIndex)
+        self.arts2NumPW[frozenset(tmpSet)] = self.pw.strip().count("{")
+        f = open(self.arts2NumPWinternalfiles, "w")
+        f.write('arts2NumPW = ' + repr(self.arts2NumPW) + '\n')
+        f.close()
 
         self.articulations = tmpart1
         self.mir = tmpmir

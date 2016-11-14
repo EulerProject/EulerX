@@ -279,7 +279,7 @@ class DiagnosticLattice:
         return outstr
     
     # generate the full ambiguity lattice
-    def fullAmbLatViz(self):
+    def fullAmbLatViz(self, arts2NumPW):
         outstr = ""
         outstr += "digraph{\n"
         outstr += "rankdir=BT\n"
@@ -289,25 +289,41 @@ class DiagnosticLattice:
         outstr += 'node[shape=octagon color="#9f1684" fillcolor="#df77cb" style=filled]\n'
         for solidRed in self.allMIS:
             label = ','.join(str(s+1) for s in solidRed)
-            outstr += '"' + label +'"\n'
+            if solidRed in arts2NumPW:
+                label = '"' + label +'" [label="' + label + '\\n(' + str(arts2NumPW[solidRed]) +')"]\n'
+            else:
+                label = '"' + label +'" [label="' + label + '"]\n'
+            outstr += label
         outstr += 'node[shape=octagon color="#9f1684" fillcolor="#df77cb" style=solid penwidth=0.4]\n'
         for otherRed in self.otherRed:
             label = ','.join(str(s+1) for s in otherRed)
-            outstr += '"' + label +'"\n'
+            if otherRed in arts2NumPW:
+                label = '"' + label +'" [label="' + label + '\\n(' + str(arts2NumPW[otherRed]) +')"]\n'
+            else:
+                label = '"' + label +'" [label="' + label + '"]\n'
+            outstr += label
         outstr += 'node[shape=box color="#134d9c" fillcolor="#68b5e3" style="rounded,filled"]\n'
         for solidGreen in self.allMCS:
             if len(solidGreen) == 0:
                 outstr += '"None"\n'
             else:
                 label = ','.join(str(s+1) for s in solidGreen)
-                outstr += '"' + label +'"\n'
+                if solidGreen in arts2NumPW:
+                    label = '"' + label +'" [label="' + label + '\\n(' + str(arts2NumPW[solidGreen]) +')"]\n'
+                else:
+                    label = '"' + label +'" [label="' + label + '"]\n'
+                outstr += label
         outstr += 'node[shape=box color="#134d9c" style=rounded penwidth=0.4]\n'
         for otherGreen in self.otherGreen:
             if len(otherGreen) == 0:
                 outstr += '"None"\n'
             else:
                 label = ','.join(str(s+1) for s in otherGreen)
-                outstr += '"' + label +'"\n'
+                if otherGreen in arts2NumPW:
+                    label = '"' + label +'" [label="' + label + '\\n(' + str(arts2NumPW[otherGreen]) +')"]\n'
+                else:
+                    label = '"' + label +'" [label="' + label + '"]\n'
+                outstr += label
         
         # add edges
         outstr += '\nedge[style=dotted penwidth=0.4]\n\n'

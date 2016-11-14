@@ -1540,10 +1540,14 @@ class ProductsShowing:
             aMUS = frozenset(map(int, aMUSString))
             allMUS.add(aMUS)
         fMUS.close()
+        
+        # prepare the arts2NumPW
+        arts2NumPWinternalfiles = os.path.join(self.pwinternalfilesdir, 'arts2NumPW.internal')
+        it = imp.load_source('it', arts2NumPWinternalfiles)
 
         diagShower = DiagnosticLattice(allMUS, inputFile)
         diagShower.genLattice()
-        fullAmbLatstr = diagShower.fullAmbLatViz()
+        fullAmbLatstr = diagShower.fullAmbLatViz(it.arts2NumPW)
         
         # create the visualization file
         fullAmbLatDotFile = os.path.join(self.latticedir, self.name+"_amblat.gv")
