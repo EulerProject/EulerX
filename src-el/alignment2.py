@@ -248,6 +248,7 @@ class TaxonomyMapping:
             self.shawnoutput = os.path.join(self.shawnfilesdir, "output.txt")
             self.shawnbase = ""
             self.shawnarticulations = []
+            self.shawntmpinput = os.path.join(self.shawnfilesdir, "tmpinput.txt")
         
         if self.enc & encode["ob"]:
             self.obsdir = os.path.join(self.outputdir, "obs")
@@ -1261,28 +1262,48 @@ class TaxonomyMapping:
             if self.isConsistent(artSet):
                 allpaths.add(curpath)
                 return
+        else:
+            if self.isShawnConsistent(artSet):
+                allpaths.add(curpath)
+                return
         j = sets.Set()
         for s in justSet:
             if len(s.intersection(curpath)) == 0:
                 j = s
         if len(j) == 0:
-            if not reasoner[self.args['-r']] == reasoner["rcc1"]:
-                j = self.computeOneJust(artSet)
+            j = self.computeOneJust(artSet)
             if len(j) != 0:
-                lj = list(j)
-                print "************************************"
-                f.write("MIS "+str(self.fixedCnt)+": [",)
-                print "Min inconsistent subset ",self.fixedCnt,": [",
-                for i in range(len(lj)):
-                    if i != 0:
-                        f.write(",")
-                        print ",",
-                    f.write(self.artIndex.index(lj[i].string.strip()).__str__())
-                    print lj[i].ruleNum,":",lj[i].string,
-                f.write("]\n")
-                print "]"
-                print "************************************"
-                self.fixedCnt += 1
+                # output mis
+                if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+                    lj = list(j)
+                    print "************************************"
+                    f.write("MIS "+str(self.fixedCnt)+": [",)
+                    print "Min inconsistent subset ",self.fixedCnt,": [",
+                    for i in range(len(lj)):
+                        if i != 0:
+                            f.write(",")
+                            print ",",
+                        f.write(self.artIndex.index(lj[i].string.strip()).__str__())
+                        print lj[i].ruleNum,":",lj[i].string,
+                    f.write("]\n")
+                    print "]"
+                    print "************************************"
+                    self.fixedCnt += 1
+                else:
+                    lj = list(j)
+                    print "************************************"
+                    f.write("MIS "+str(self.fixedCnt)+": [",)
+                    print "Min inconsistent subset ",self.fixedCnt,": [",
+                    for i in range(len(lj)):
+                        if i != 0:
+                            f.write(",")
+                            print ",",
+                        f.write(self.shawnarticulations.index(lj[i].strip()).__str__())
+                        print lj[i],
+                    f.write("]\n")
+                    print "]"
+                    print "************************************"
+                    self.fixedCnt += 1
         if len(j) != 0:
             justSet.add(j)
         for a in j:
@@ -1317,6 +1338,24 @@ class TaxonomyMapping:
         self.eq = tmpeq
 
         if not self.isPwNone():
+            return True
+        return False
+    
+    def isShawnConsistent(self, artSet):
+        if len(artSet) == 0:
+            return True
+        
+        # create new input file
+        f = open(self.shawntmpinput, "w")
+        f.write(self.shawnbase)
+        for art in artSet:
+            f.write('[' + art + ']\n')
+        f.close()
+        
+        # Run the reasoner again
+        result = self.runShawnMir(self.shawntmpinput)
+        
+        if not self.isNone(result):
             return True
         return False
 
@@ -1578,6 +1617,9 @@ class TaxonomyMapping:
         if not reasoner[self.args['-r']] == reasoner["rcc1"]:
             if self.isConsistent(artSet):
                 return sets.Set()
+        else:
+            if self.isShawnConsistent(artSet):
+                return sets.Set()
         return self.computeJust(sets.Set(), artSet)
 
     def computeOneMAS(self, artSet, flag):
@@ -1614,8 +1656,14 @@ class TaxonomyMapping:
         if not reasoner[self.args['-r']] == reasoner["rcc1"]:
             if not self.isConsistent(s.union(f1)):
                 return self.computeJust(s, f1)
+        else:
+            if not self.isShawnConsistent(s.union(f1)):
+                return self.computeJust(s, f1)
         if not reasoner[self.args['-r']] == reasoner["rcc1"]:
             if not self.isConsistent(s.union(f2)):
+                return self.computeJust(s, f2)
+        else:
+            if not self.isShawnConsistent(s.union(f2)):
                 return self.computeJust(s, f2)
         sl = self.computeJust(s.union(f1), f2)
         sr = self.computeJust(s.union(sl), f1)
