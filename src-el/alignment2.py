@@ -246,6 +246,8 @@ class TaxonomyMapping:
             self.shawninputhashed = os.path.join(self.shawnfilesdir, "inputhashed.txt")
             self.shawnoutputhashed = os.path.join(self.shawnfilesdir, "outputhashed.txt")
             self.shawnoutput = os.path.join(self.shawnfilesdir, "output.txt")
+            self.shawnbase = ""
+            self.shawnarticulations = []
         
         if self.enc & encode["ob"]:
             self.obsdir = os.path.join(self.outputdir, "obs")
@@ -340,7 +342,16 @@ class TaxonomyMapping:
     def run(self):
         print "******* You are running example", self.name, "*******"
         if reasoner[self.args['-r']] == reasoner["rcc1"]:
-            self.runShawn()
+            self.hashShawn()
+            if self.args['--pw']:
+                result = self.runShawnMirPW(self.shawninputhashed)
+            else:
+                result = self.runShawnMir(self.shawninputhashed)
+            if not self.isNone(result):
+                self.postShawn()
+            else:
+                print "Input is inconsistent!"
+                self.diagnosisShawn()
             self.updateReportFile(self.reportfile)
             return
         if reasoner[self.args['-r']] == reasoner["rcc2"]:
@@ -619,6 +630,8 @@ class TaxonomyMapping:
             return output.find("Models     : 0 ") != -1
         elif reasoner[self.args['-r']] == reasoner["dlv"]:
             return output.strip() == ""
+        elif reasoner[self.args['-r']] == reasoner["rcc1"]:
+            return output.find("Consistent") == -1
         else:
             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")
         
@@ -1244,15 +1257,17 @@ class TaxonomyMapping:
         for path in allpaths:
             if path.issubset(curpath):
                 return
-        if self.isConsistent(artSet):
-            allpaths.add(curpath)
-            return
+        if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+            if self.isConsistent(artSet):
+                allpaths.add(curpath)
+                return
         j = sets.Set()
         for s in justSet:
             if len(s.intersection(curpath)) == 0:
                 j = s
         if len(j) == 0:
-            j = self.computeOneJust(artSet)
+            if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+                j = self.computeOneJust(artSet)
             if len(j) != 0:
                 lj = list(j)
                 print "************************************"
@@ -1560,8 +1575,9 @@ class TaxonomyMapping:
             return False
 
     def computeOneJust(self, artSet):
-        if self.isConsistent(artSet):
-            return sets.Set()
+        if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+            if self.isConsistent(artSet):
+                return sets.Set()
         return self.computeJust(sets.Set(), artSet)
 
     def computeOneMAS(self, artSet, flag):
@@ -1595,10 +1611,12 @@ class TaxonomyMapping:
         f2 = sets.Set()
         for i in range(len(f) /2):
             f2.add(f1.pop())
-        if not self.isConsistent(s.union(f1)):
-            return self.computeJust(s, f1)
-        if not self.isConsistent(s.union(f2)):
-            return self.computeJust(s, f2)
+        if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+            if not self.isConsistent(s.union(f1)):
+                return self.computeJust(s, f1)
+        if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+            if not self.isConsistent(s.union(f2)):
+                return self.computeJust(s, f2)
         sl = self.computeJust(s.union(f1), f2)
         sr = self.computeJust(s.union(sl), f1)
         return sl.union(sr)
@@ -3455,18 +3473,36 @@ class TaxonomyMapping:
         toDo.put(deducedPair)
         return True
 
-    def runShawn(self):
+    
+    def hashShawn(self):
         # hash the original file
-        cmd = "hash_names.py " + self.args['<inputfile>'][0] + " > " + self.shawninputhashed
+        cmd = "hash_names.py " + os.path.join(self.inputfilesdir, self.name+".txt") + " > " + self.shawninputhashed
         newgetoutput(cmd)
+    
+    def runShawnMir(self, input):
+        cmd = "mir.py " + input + " " + self.shawnoutputhashed + " f f f"
+        return newgetoutput(cmd)
+
+    def runShawnMirPW(self, input):
+        cmd = "mir.py " + input + " " + self.shawnoutputhashed + " f t f"
+        return newgetoutput(cmd)
+    
+    def diagnosisShawn(self):
+        # divide the input
+        f = open(self.shawninputhashed, "r")
+        lines = f.readlines()
+        for line in lines:
+            if (re.match("\[.*?\]", line)):
+                self.shawnarticulations.append(re.match("\[(.*)\]", line).group(1))
+            else:
+                self.shawnbase += line
+        f.close()
         
-        # run Shawn's reasoner
-        if self.args['--pw']:
-            cmd = "mir.py " + self.shawninputhashed + " " + self.shawnoutputhashed + " f t f"
-        else:
-            cmd = "mir.py " + self.shawninputhashed + " " + self.shawnoutputhashed + " f f f"
-        newgetoutput(cmd)
+        self.allJustifications(sets.Set(self.shawnarticulations))
         
+        return
+        
+    def postShawn(self):
         # unhash shawn's output
         cmd = "unhash_names.py " + self.shawnoutputhashed + " hash_values.json > " + self.shawnoutput
         newgetoutput(cmd)

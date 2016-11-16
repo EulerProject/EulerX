@@ -466,7 +466,8 @@ class ProductsShowing:
 
     def showPW(self):
         # if this is an inconsistent example (there is no PW)
-        if not os.path.isfile(os.path.join(self.pwinternalfilesdir, self.name+".pw")):
+        if not os.path.isfile(os.path.join(self.pwinternalfilesdir, self.name+".pw")) \
+        and not os.path.isfile(os.path.join(self.pwinternalfilesdir, "pw.internal0")):
             print "This is an inconsistent example, no possible worlds generated."
             return
         
