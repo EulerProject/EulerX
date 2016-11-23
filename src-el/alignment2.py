@@ -2281,9 +2281,9 @@ class TaxonomyMapping:
                                     name_a = t.children[i].dotName()
                                     name_b = t.children[j].dotName()
                                     gotPairWithNoSD = False
-                                    # D' enter into the mode that disable sibling disjointness locally, by default is OFF
+                                    # D' enter into the mode that disable sibling disjointness locally, by default is ON
                                     #if self.args.disableSDP:
-                                    if False:
+                                    if True:
                                         for pair in self.nosiblingdisjointness:
                                             if name_a in pair and name_b in pair:
                                                 gotPairWithNoSD = True
