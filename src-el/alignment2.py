@@ -581,7 +581,7 @@ class TaxonomyMapping:
             rs = rs.union(raw.pop())
         print rs
         artSet = self.getArtSetFromN(rs)
-        self.allJustifications(artSet)
+        self.allJustifications(artSet, "Consistency")
 
     def getArtSetFromN(self, rs):
         artSet = sets.Set()
@@ -669,7 +669,7 @@ class TaxonomyMapping:
             if self.isPwUnique():
                 print "************************************"
                 print "Unique possible world generated"
-                self.allMinimalArtSubsets(sets.Set(self.articulations), 'Ambiguity')
+                self.allJustifications(sets.Set(self.articulations), 'Ambiguity')
                 return
         if self.isPwNone():
             print "************************************"
@@ -1247,63 +1247,114 @@ class TaxonomyMapping:
             print "************************************"
         return True
 
-    def allJustifications(self, artSet):
+    def allJustifications(self, artSet, flag):
         s = sets.Set()
         curpath = sets.Set()
         allpaths = sets.Set()
-        self.computeAllJust(artSet, s, curpath, allpaths)
+        self.computeAllJust(artSet, s, curpath, allpaths, flag)
         
-    def computeAllJust(self, artSet, justSet, curpath, allpaths):
-        f = open(self.misinternalfiles, "a")
+    def computeAllJust(self, artSet, justSet, curpath, allpaths, flag):
+        # prepare the internal files
+        if flag == 'Consistency':
+            f = open(self.misinternalfiles, "a")
+        elif flag == 'Ambiguity':
+            f = open(self.masinternalfiles, "a")
+        
+        # prepare cashed path
         for path in allpaths:
             if path.issubset(curpath):
                 return
-        if not reasoner[self.args['-r']] == reasoner["rcc1"]:
-            if self.isConsistent(artSet):
+        
+        # ask oracle question
+        if flag == 'Consistency':
+            if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+                if self.isConsistent(artSet):
+                    allpaths.add(curpath)
+                    return
+            else:
+                if self.isShawnConsistent(artSet):
+                    allpaths.add(curpath)
+                    return
+        elif flag == 'Ambiguity':
+            if self.isResultAmbiguous(artSet, flag):
                 allpaths.add(curpath)
                 return
-        else:
-            if self.isShawnConsistent(artSet):
-                allpaths.add(curpath)
-                return
+        
+        # prepare the justification set
         j = sets.Set()
         for s in justSet:
             if len(s.intersection(curpath)) == 0:
                 j = s
+                
+        # check the justification set
         if len(j) == 0:
-            j = self.computeOneJust(artSet)
+            j = self.computeOneJust(artSet, flag)
             if len(j) != 0:
-                # output mis
-                if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+                
+                # Consistency check
+                if flag == 'Consistency':
+                    # output mis
+                    if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+                        lj = list(j)
+                        print "************************************"
+                        f.write("MIS "+str(self.fixedCnt)+": [",)
+                        print "Min inconsistent subset ",self.fixedCnt,": [",
+                        for i in range(len(lj)):
+                            if i != 0:
+                                f.write(",")
+                                print ",",
+                            f.write(self.artIndex.index(lj[i].string.strip()).__str__())
+                            print lj[i].ruleNum,":",lj[i].string,
+                        f.write("]\n")
+                        print "]"
+                        print "************************************"
+                        self.fixedCnt += 1
+                    else:
+                        lj = list(j)
+                        print "************************************"
+                        f.write("MIS "+str(self.fixedCnt)+": [",)
+                        print "Min inconsistent subset ",self.fixedCnt,": [",
+                        for i in range(len(lj)):
+                            if i != 0:
+                                f.write(",")
+                                print ",",
+                            f.write(self.shawnarticulations.index(lj[i].strip()).__str__())
+                            print lj[i],
+                        f.write("]\n")
+                        print "]"
+                        print "************************************"
+                        self.fixedCnt += 1
+                        
+                # Ambiguity check
+                elif flag == 'Ambiguity':
                     lj = list(j)
+                    tmplist = []
                     print "************************************"
-                    f.write("MIS "+str(self.fixedCnt)+": [",)
-                    print "Min inconsistent subset ",self.fixedCnt,": [",
+                    f.write("MAS "+str(self.fixedCnt)+": [",)
+                    print "Min articulation subset that makes unique PW ",self.fixedCnt,": [",
                     for i in range(len(lj)):
                         if i != 0:
-                            f.write(",")
+                            f.write(",") 
                             print ",",
                         f.write(self.artIndex.index(lj[i].string.strip()).__str__())
                         print lj[i].ruleNum,":",lj[i].string,
+                        
+                        # store for fourinone lattice
+                        tmplist.append(lj[i].string)
+    
+                    if flag == 'Consistency':
+                        if tmplist not in self.mis:
+                            self.mis.append(tmplist)
+                    else:
+                        if tmplist not in self.misANDmus:
+                            self.misANDmus.append(tmplist)
+                        
                     f.write("]\n")
                     print "]"
                     print "************************************"
                     self.fixedCnt += 1
-                else:
-                    lj = list(j)
-                    print "************************************"
-                    f.write("MIS "+str(self.fixedCnt)+": [",)
-                    print "Min inconsistent subset ",self.fixedCnt,": [",
-                    for i in range(len(lj)):
-                        if i != 0:
-                            f.write(",")
-                            print ",",
-                        f.write(self.shawnarticulations.index(lj[i].strip()).__str__())
-                        print lj[i],
-                    f.write("]\n")
-                    print "]"
-                    print "************************************"
-                    self.fixedCnt += 1
+        
+        # update justification set
         if len(j) != 0:
             justSet.add(j)
         for a in j:
@@ -1311,7 +1362,7 @@ class TaxonomyMapping:
             tmpcur.add(a)
             tmpart = copy.copy(artSet)
             tmpart.remove(a)
-            self.computeAllJust(tmpart, justSet, tmpcur, allpaths)
+            self.computeAllJust(tmpart, justSet, tmpcur, allpaths, flag)
             
     def isConsistent(self, artSet):
         tmpart1 = copy.copy(self.articulations)
@@ -1507,61 +1558,61 @@ class TaxonomyMapping:
         return result
 
     # compute all Minimal Articulation Subsets (MAS) that have the unique PW
-    def allMinimalArtSubsets(self, artSet, flag):
-        s = sets.Set()
-        curpath = sets.Set()
-        allpaths = sets.Set()
-        self.computeAllMAS(artSet, s, curpath, allpaths, flag)
-        
-    def computeAllMAS(self, artSet, justSet, curpath, allpaths, flag):
-        f = open(self.masinternalfiles, "a")
-        for path in allpaths:
-            if path.issubset(curpath):
-                return
-        if self.isResultAmbiguous(artSet, flag):
-            allpaths.add(curpath)
-            return
-        j = sets.Set()
-        for s in justSet:
-            if len(s.intersection(curpath)) == 0:
-                j = s
-        if len(j) == 0:
-            j = self.computeOneMAS(artSet, flag)
-            if len(j) != 0:
-                lj = list(j)
-                tmplist = []
-                print "************************************"
-                f.write("MAS "+str(self.fixedCnt)+": [",)
-                print "Min articulation subset that makes unique PW ",self.fixedCnt,": [",
-                for i in range(len(lj)):
-                    if i != 0:
-                        f.write(",") 
-                        print ",",
-                    f.write(self.artIndex.index(lj[i].string.strip()).__str__())
-                    print lj[i].ruleNum,":",lj[i].string,
-                    
-                    # store for fourinone lattice
-                    tmplist.append(lj[i].string)
-
-                if flag == 'Consistency':
-                    if tmplist not in self.mis:
-                        self.mis.append(tmplist)
-                else:
-                    if tmplist not in self.misANDmus:
-                        self.misANDmus.append(tmplist)
-                    
-                f.write("]\n")
-                print "]"
-                print "************************************"
-                self.fixedCnt += 1
-        if len(j) != 0:
-            justSet.add(j)
-        for a in j:
-            tmpcur = copy.copy(curpath)
-            tmpcur.add(a)
-            tmpart = copy.copy(artSet)
-            tmpart.remove(a)
-            self.computeAllMAS(tmpart, justSet, tmpcur, allpaths, flag)
+#     def allMinimalArtSubsets(self, artSet, flag):
+#         s = sets.Set()
+#         curpath = sets.Set()
+#         allpaths = sets.Set()
+#         self.computeAllMAS(artSet, s, curpath, allpaths, flag)
+#         
+#     def computeAllMAS(self, artSet, justSet, curpath, allpaths, flag):
+#         f = open(self.masinternalfiles, "a")
+#         for path in allpaths:
+#             if path.issubset(curpath):
+#                 return
+#         if self.isResultAmbiguous(artSet, flag):
+#             allpaths.add(curpath)
+#             return
+#         j = sets.Set()
+#         for s in justSet:
+#             if len(s.intersection(curpath)) == 0:
+#                 j = s
+#         if len(j) == 0:
+#             j = self.computeOneMAS(artSet, flag)
+#             if len(j) != 0:
+#                 lj = list(j)
+#                 tmplist = []
+#                 print "************************************"
+#                 f.write("MAS "+str(self.fixedCnt)+": [",)
+#                 print "Min articulation subset that makes unique PW ",self.fixedCnt,": [",
+#                 for i in range(len(lj)):
+#                     if i != 0:
+#                         f.write(",") 
+#                         print ",",
+#                     f.write(self.artIndex.index(lj[i].string.strip()).__str__())
+#                     print lj[i].ruleNum,":",lj[i].string,
+#                     
+#                     # store for fourinone lattice
+#                     tmplist.append(lj[i].string)
+# 
+#                 if flag == 'Consistency':
+#                     if tmplist not in self.mis:
+#                         self.mis.append(tmplist)
+#                 else:
+#                     if tmplist not in self.misANDmus:
+#                         self.misANDmus.append(tmplist)
+#                     
+#                 f.write("]\n")
+#                 print "]"
+#                 print "************************************"
+#                 self.fixedCnt += 1
+#         if len(j) != 0:
+#             justSet.add(j)
+#         for a in j:
+#             tmpcur = copy.copy(curpath)
+#             tmpcur.add(a)
+#             tmpart = copy.copy(artSet)
+#             tmpart.remove(a)
+#             self.computeAllMAS(tmpart, justSet, tmpcur, allpaths, flag)
 
     def isResultAmbiguous(self, artSet, flag):
         tmpart1 = copy.copy(self.articulations)
@@ -1613,19 +1664,23 @@ class TaxonomyMapping:
                 return True
             return False
 
-    def computeOneJust(self, artSet):
-        if not reasoner[self.args['-r']] == reasoner["rcc1"]:
-            if self.isConsistent(artSet):
+    def computeOneJust(self, artSet, flag):
+        if flag == 'Consistency':
+            if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+                if self.isConsistent(artSet):
+                    return sets.Set()
+            else:
+                if self.isShawnConsistent(artSet):
+                    return sets.Set()
+        elif flag == 'Ambiguity':
+            if self.isResultAmbiguous(artSet, flag):
                 return sets.Set()
-        else:
-            if self.isShawnConsistent(artSet):
-                return sets.Set()
-        return self.computeJust(sets.Set(), artSet)
+        return self.computeJust(sets.Set(), artSet, flag)
 
-    def computeOneMAS(self, artSet, flag):
-        if self.isResultAmbiguous(artSet, flag):
-            return sets.Set()
-        return self.computeMAS(sets.Set(), artSet, flag)
+#     def computeOneMAS(self, artSet, flag):
+#         if self.isResultAmbiguous(artSet, flag):
+#             return sets.Set()
+#         return self.computeMAS(sets.Set(), artSet, flag)
 
     # Fourinone approach
     def computeOneJustInc(self, artSet):
@@ -1646,28 +1701,39 @@ class TaxonomyMapping:
         print ""
 
     # s is consistent, f is inconsistent
-    def computeJust(self, s, f):
+    def computeJust(self, s, f, flag):
         if len(f) <= 1:
             return f
         f1 = copy.copy(f)
         f2 = sets.Set()
         for i in range(len(f) /2):
             f2.add(f1.pop())
-        if not reasoner[self.args['-r']] == reasoner["rcc1"]:
-            if not self.isConsistent(s.union(f1)):
-                return self.computeJust(s, f1)
-        else:
-            if not self.isShawnConsistent(s.union(f1)):
-                return self.computeJust(s, f1)
-        if not reasoner[self.args['-r']] == reasoner["rcc1"]:
-            if not self.isConsistent(s.union(f2)):
-                return self.computeJust(s, f2)
-        else:
-            if not self.isShawnConsistent(s.union(f2)):
-                return self.computeJust(s, f2)
-        sl = self.computeJust(s.union(f1), f2)
-        sr = self.computeJust(s.union(sl), f1)
-        return sl.union(sr)
+            
+        if flag == 'Consistency':
+            if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+                if not self.isConsistent(s.union(f1)):
+                    return self.computeJust(s, f1, flag)
+            else:
+                if not self.isShawnConsistent(s.union(f1)):
+                    return self.computeJust(s, f1, flag)
+            if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+                if not self.isConsistent(s.union(f2)):
+                    return self.computeJust(s, f2, flag)
+            else:
+                if not self.isShawnConsistent(s.union(f2)):
+                    return self.computeJust(s, f2, flag)
+            sl = self.computeJust(s.union(f1), f2, flag)
+            sr = self.computeJust(s.union(sl), f1, flag)
+            return sl.union(sr)
+        
+        elif flag == 'Ambiguity':
+            if not self.isResultAmbiguous(s.union(f1), flag):
+                return self.computeJust(s, f1, flag)
+            if not self.isResultAmbiguous(s.union(f2), flag):
+                return self.computeJust(s, f2, flag)
+            sl = self.computeJust(s.union(f1), f2, flag)
+            sr = self.computeJust(s.union(sl), f1, flag)
+            return sl.union(sr)
 
     # Fourinone approach
     def computeJustInc(self, s, f):
@@ -1824,7 +1890,7 @@ class TaxonomyMapping:
         elif self.args['--repair'] == "minIncSubset":
             self.minInconsRemedy()
         elif self.args['--repair'] == "HST":
-            self.allJustifications(sets.Set(self.articulations))
+            self.allJustifications(sets.Set(self.articulations), "Consistency")
         # By default, we use top down remedy to repair
         else:
             self.topdownRemedy()
@@ -3546,7 +3612,7 @@ class TaxonomyMapping:
                 self.shawnbase += line
         f.close()
         
-        self.allJustifications(sets.Set(self.shawnarticulations))
+        self.allJustifications(sets.Set(self.shawnarticulations), "Consistency")
         
         return
         
