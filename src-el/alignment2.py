@@ -344,6 +344,10 @@ class TaxonomyMapping:
         print "******* You are running example", self.name, "*******"
         if reasoner[self.args['-r']] == reasoner["rcc1"]:
             self.hashShawn()
+            if self.args['--fourinone']:
+                self.allJustificationsFourinone(sets.Set(self.shawnarticulations))
+                self.postFourinone()
+                return
             if self.args['--pw']:
                 result = self.runShawnMirPW(self.shawninputhashed)
             else:
@@ -669,12 +673,6 @@ class TaxonomyMapping:
     def genPW(self):
         self.pw = newgetoutput(self.com)
         if self.args['--fourinone']:
-            #tmpArticulations = copy.deepcopy(self.articulations)
-            #self.allMinimalArtSubsets(sets.Set(tmpArticulations), 'Consistency')
-            #self.allMinimalArtSubsets(sets.Set(tmpArticulations), 'Both')
-            
-#             if not os.path.exists(self.latticedir):
-#                 os.mkdir(self.latticedir)
             self.allJustificationsFourinone(sets.Set(self.articulations))
             self.postFourinone()
             return
@@ -1536,7 +1534,10 @@ class TaxonomyMapping:
                     #print ljInc[i].ruleNum,":",ljInc[i].string,
                     
                     # store for fourinone
-                    tmplist.append(ljInc[i].string)
+                    if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+                        tmplist.append(ljInc[i].string)
+                    else:
+                        tmplist.append(ljInc[i])
                 
                 if tmplist not in self.mis:
                     self.mis.append(tmplist)
@@ -1571,7 +1572,10 @@ class TaxonomyMapping:
                         #print ljAmb[i].ruleNum,":",ljAmb[i].string,
                         
                         # store for fourinone
-                        tmplist2.append(ljAmb[i].string)
+                        if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+                            tmplist2.append(ljAmb[i].string)
+                        else:
+                            tmplist2.append(ljAmb[i])
                     
                     if tmplist2 not in self.misANDmus:
                         self.misANDmus.append(tmplist2)
@@ -1590,47 +1594,54 @@ class TaxonomyMapping:
 
             
     def checkFourinone(self, artSet):
-        tmpart1 = copy.copy(self.articulations)
-        tmpmir = copy.deepcopy(self.mir)
-        tmptr = copy.deepcopy(self.tr)
-        tmpeq = copy.deepcopy(self.eq)
-        if len(artSet) == 0:
-            return True
-        self.articulations = []
-        self.mir = copy.deepcopy(self.basemir)
-        self.tr = copy.deepcopy(self.basetr)
-        self.eq = {}
-        tmpart = copy.copy(artSet)
-        for i in range(len(artSet)):
-            self.addArticulation(tmpart.pop().string)
-        # Now refresh the input file
-        self.genASP()
-        # Run the reasoner again
-        self.pw = newgetoutput(self.com)
-
-        self.articulations = tmpart1
-        self.mir = tmpmir
-        self.tr = tmptr
-        self.eq = tmpeq
-        
-        result = ''
-        if reasoner[self.args['-r']] == reasoner["gringo"]:
-            if self.pw.find("Models     : 0 ") != -1:
-                result = 'inconsistent'
-            elif self.pw.find("Models     : 1") != -1 and self.pw.find("Models     : 1+") == -1:
-                result = 'unique'
-            else:
-                result = 'ambiguous'        
-        elif reasoner[self.args['-r']] == reasoner["dlv"]:
-            if self.pw.strip() == "":
-                result = 'inconsistent'
-            elif self.pw.strip() != "" and self.pw.strip().count("{") == 1:
-                result = 'unique'
-            else:
-                result = 'ambiguous'
+        if not self.diagnosisAskOracle(artSet, 'Consistency'):
+            return 'inconsistent'
+        elif not self.diagnosisAskOracle(artSet, 'Ambiguity'):
+            return 'unique'
         else:
-            raise Exception("Reasoner:", self.args['-r'], " is not supported !!")
-        return result
+            return 'ambiguous'
+        
+#         tmpart1 = copy.copy(self.articulations)
+#         tmpmir = copy.deepcopy(self.mir)
+#         tmptr = copy.deepcopy(self.tr)
+#         tmpeq = copy.deepcopy(self.eq)
+#         if len(artSet) == 0:
+#             return True
+#         self.articulations = []
+#         self.mir = copy.deepcopy(self.basemir)
+#         self.tr = copy.deepcopy(self.basetr)
+#         self.eq = {}
+#         tmpart = copy.copy(artSet)
+#         for i in range(len(artSet)):
+#             self.addArticulation(tmpart.pop().string)
+#         # Now refresh the input file
+#         self.genASP()
+#         # Run the reasoner again
+#         self.pw = newgetoutput(self.com)
+# 
+#         self.articulations = tmpart1
+#         self.mir = tmpmir
+#         self.tr = tmptr
+#         self.eq = tmpeq
+#         
+#         result = ''
+#         if reasoner[self.args['-r']] == reasoner["gringo"]:
+#             if self.pw.find("Models     : 0 ") != -1:
+#                 result = 'inconsistent'
+#             elif self.pw.find("Models     : 1") != -1 and self.pw.find("Models     : 1+") == -1:
+#                 result = 'unique'
+#             else:
+#                 result = 'ambiguous'        
+#         elif reasoner[self.args['-r']] == reasoner["dlv"]:
+#             if self.pw.strip() == "":
+#                 result = 'inconsistent'
+#             elif self.pw.strip() != "" and self.pw.strip().count("{") == 1:
+#                 result = 'unique'
+#             else:
+#                 result = 'ambiguous'
+#         else:
+#             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")
+#         return result
 
     def isResultAmbiguous(self, artSet):
         tmpart1 = copy.copy(self.articulations)
@@ -3561,7 +3572,10 @@ class TaxonomyMapping:
             else:
                 self.shawnbase += line
         f.close()
-
+        
+        self.artDictBin = {}
+        for a in self.shawnarticulations:
+            self.artDictBin[a] = 1 << self.shawnarticulations.index(a)
     
     def runShawnMir(self, input):
         cmd = "mir.py " + input + " " + self.shawnoutputhashed + " f f f"
@@ -3572,19 +3586,8 @@ class TaxonomyMapping:
         return newgetoutput(cmd)
     
     def diagnosisShawn(self):
-#         # divide the input
-#         f = open(self.shawninputhashed, "r")
-#         lines = f.readlines()
-#         for line in lines:
-#             if (re.match("\[.*?\]", line)):
-#                 self.shawnarticulations.append(re.match("\[(.*)\]", line).group(1))
-#             else:
-#                 self.shawnbase += line
-#         f.close()
-        
         # run diagnosis Shawn
-        self.allJustifications(sets.Set(self.shawnarticulations), "Consistency")
-        
+        self.allJustifications(sets.Set(self.shawnarticulations), "Consistency")        
         return
         
     def postShawn(self):
