@@ -1299,21 +1299,7 @@ class TaxonomyMapping:
         if self.diagnosisAskOracle(artSet, flag):
             allpaths.add(curpath)
             return
-        
-#         if flag == 'Consistency':
-#             if not reasoner[self.args['-r']] == reasoner["rcc1"]:
-#                 if self.isConsistent(artSet):
-#                     allpaths.add(curpath)
-#                     return
-#             else:
-#                 if self.isShawnConsistent(artSet):
-#                     allpaths.add(curpath)
-#                     return
-#         elif flag == 'Ambiguity':
-#             if self.isResultAmbiguous(artSet):
-#                 allpaths.add(curpath)
-#                 return
-        
+                
         # prepare the justification set
         j = sets.Set()
         for s in justSet:
