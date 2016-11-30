@@ -350,6 +350,13 @@ class TaxonomyMapping:
                 result = self.runShawnMir(self.shawninputhashed)
             if not self.isNone(result):
                 self.postShawn()
+                if self.args['--artRem']:
+                    if self.isPwUnique():
+                        print "************************************"
+                        print "Unique possible world generated"
+                        self.allJustifications(sets.Set(self.shawnarticulations), 'Ambiguity')
+                    else:
+                        print "Multiple possible worlds generated, no ambiguity lattice."
             else:
                 print "Input is inconsistent!"
                 self.diagnosisShawn()
@@ -641,6 +648,12 @@ class TaxonomyMapping:
             return output.find("Models     : 1") != -1 and output.find("Models     : 1+") == -1
         elif reasoner[self.args['-r']] == reasoner["dlv"]:
             return output.strip() != "" and output.strip().count("{") == 1
+        elif reasoner[self.args['-r']] == reasoner["rcc1"]:
+            with open(self.shawnoutputhashed, 'r') as f:
+                for line in f:
+                    if '{' in line:
+                        return False
+                return True
         else:
             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")    
 
@@ -1246,6 +1259,23 @@ class TaxonomyMapping:
             print "]"
             print "************************************"
         return True
+    
+    # return consistent or ambiguous
+    def diagnosisAskOracle(self, artSet, flag):
+        # Consistency check
+        if flag == 'Consistency':
+            if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+                return self.isConsistent(artSet)
+            else:
+                return self.isShawnConsistent(artSet)
+            
+        # Ambiguity check
+        if flag == 'Ambiguity':
+            if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+                return self.isResultAmbiguous(artSet)
+            else:
+                return self.isShawnAmbiguous(artSet)
+            
 
     def allJustifications(self, artSet, flag):
         s = sets.Set()
@@ -1266,19 +1296,23 @@ class TaxonomyMapping:
                 return
         
         # ask oracle question
-        if flag == 'Consistency':
-            if not reasoner[self.args['-r']] == reasoner["rcc1"]:
-                if self.isConsistent(artSet):
-                    allpaths.add(curpath)
-                    return
-            else:
-                if self.isShawnConsistent(artSet):
-                    allpaths.add(curpath)
-                    return
-        elif flag == 'Ambiguity':
-            if self.isResultAmbiguous(artSet, flag):
-                allpaths.add(curpath)
-                return
+        if self.diagnosisAskOracle(artSet, flag):
+            allpaths.add(curpath)
+            return
+        
+#         if flag == 'Consistency':
+#             if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+#                 if self.isConsistent(artSet):
+#                     allpaths.add(curpath)
+#                     return
+#             else:
+#                 if self.isShawnConsistent(artSet):
+#                     allpaths.add(curpath)
+#                     return
+#         elif flag == 'Ambiguity':
+#             if self.isResultAmbiguous(artSet):
+#                 allpaths.add(curpath)
+#                 return
         
         # prepare the justification set
         j = sets.Set()
@@ -1291,7 +1325,7 @@ class TaxonomyMapping:
             j = self.computeOneJust(artSet, flag)
             if len(j) != 0:
                 
-                # Consistency check
+                # Consistency output
                 if flag == 'Consistency':
                     # output mis
                     if not reasoner[self.args['-r']] == reasoner["rcc1"]:
@@ -1325,34 +1359,51 @@ class TaxonomyMapping:
                         print "************************************"
                         self.fixedCnt += 1
                         
-                # Ambiguity check
+                # Ambiguity output
                 elif flag == 'Ambiguity':
-                    lj = list(j)
-                    tmplist = []
-                    print "************************************"
-                    f.write("MAS "+str(self.fixedCnt)+": [",)
-                    print "Min articulation subset that makes unique PW ",self.fixedCnt,": [",
-                    for i in range(len(lj)):
-                        if i != 0:
-                            f.write(",") 
-                            print ",",
-                        f.write(self.artIndex.index(lj[i].string.strip()).__str__())
-                        print lj[i].ruleNum,":",lj[i].string,
-                        
-                        # store for fourinone lattice
-                        tmplist.append(lj[i].string)
-    
-                    if flag == 'Consistency':
-                        if tmplist not in self.mis:
-                            self.mis.append(tmplist)
+                    # output mas
+                    if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+                        lj = list(j)
+                        tmplist = []
+                        print "************************************"
+                        f.write("MAS "+str(self.fixedCnt)+": [",)
+                        print "Min articulation subset that makes unique PW ",self.fixedCnt,": [",
+                        for i in range(len(lj)):
+                            if i != 0:
+                                f.write(",") 
+                                print ",",
+                            f.write(self.artIndex.index(lj[i].string.strip()).__str__())
+                            print lj[i].ruleNum,":",lj[i].string,
+                            
+    #                         # store for fourinone lattice
+    #                         tmplist.append(lj[i].string)
+    #     
+    #                     if flag == 'Consistency':
+    #                         if tmplist not in self.mis:
+    #                             self.mis.append(tmplist)
+    #                     else:
+    #                         if tmplist not in self.misANDmus:
+    #                             self.misANDmus.append(tmplist)
+    #                         
+                        f.write("]\n")
+                        print "]"
+                        print "************************************"
+                        self.fixedCnt += 1
                     else:
-                        if tmplist not in self.misANDmus:
-                            self.misANDmus.append(tmplist)
-                        
-                    f.write("]\n")
-                    print "]"
-                    print "************************************"
-                    self.fixedCnt += 1
+                        lj = list(j)
+                        print "************************************"
+                        f.write("MAS "+str(self.fixedCnt)+": [",)
+                        print "Min articulation subset that makes unique PW ",self.fixedCnt,": [",
+                        for i in range(len(lj)):
+                            if i != 0:
+                                f.write(",")
+                                print ",",
+                            f.write(self.shawnarticulations.index(lj[i].strip()).__str__())
+                            print lj[i],
+                        f.write("]\n")
+                        print "]"
+                        print "************************************"
+                        self.fixedCnt += 1
         
         # update justification set
         if len(j) != 0:
@@ -1409,6 +1460,44 @@ class TaxonomyMapping:
         if not self.isNone(result):
             return True
         return False
+
+    def isShawnAmbiguous(self, artSet):
+        # create new input file
+        f = open(self.shawntmpinput, "w")
+        f.write(self.shawnbase)
+        for art in artSet:
+            f.write('[' + art + ']\n')
+        f.close()
+        
+#         # Run the reasoner again, check self.shawnoutputhashed
+#         self.runShawnMir(self.shawntmpinput)
+#         with open(self.shawnoutputhashed, 'r') as f:
+#             for line in f:
+#                 if '{' in line:
+#                     return True
+#         return False
+        
+        # Run the reasoner again with pw generated, prepare the arts2pw
+        numOfPw = 0
+        self.runShawnMirPW(self.shawntmpinput)
+        with open(self.shawnoutputhashed, 'r') as f:
+            for line in f:
+                if (re.match("Possible World(.*)", line)):
+                    numOfPw = numOfPw + 1
+        if numOfPw == 0:
+            numOfPw = 1
+        
+        # add the number of PWs visited
+        tmpSet = set()
+        for e in artSet:
+            aIndex = self.shawnarticulations.index(str(e).strip())
+            tmpSet.add(aIndex)
+        self.arts2NumPW[frozenset(tmpSet)] = numOfPw
+        f = open(self.arts2NumPWinternalfiles, "w")
+        f.write('arts2NumPW = ' + repr(self.arts2NumPW) + '\n')
+        f.close()
+        
+        return numOfPw > 1
 
     # Compute all justifications in FOURINONE, contains two appraoches: inc and amb
     def allJustificationsFourinone(self, artSet):
@@ -1557,64 +1646,7 @@ class TaxonomyMapping:
             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")
         return result
 
-    # compute all Minimal Articulation Subsets (MAS) that have the unique PW
-#     def allMinimalArtSubsets(self, artSet, flag):
-#         s = sets.Set()
-#         curpath = sets.Set()
-#         allpaths = sets.Set()
-#         self.computeAllMAS(artSet, s, curpath, allpaths, flag)
-#         
-#     def computeAllMAS(self, artSet, justSet, curpath, allpaths, flag):
-#         f = open(self.masinternalfiles, "a")
-#         for path in allpaths:
-#             if path.issubset(curpath):
-#                 return
-#         if self.isResultAmbiguous(artSet, flag):
-#             allpaths.add(curpath)
-#             return
-#         j = sets.Set()
-#         for s in justSet:
-#             if len(s.intersection(curpath)) == 0:
-#                 j = s
-#         if len(j) == 0:
-#             j = self.computeOneMAS(artSet, flag)
-#             if len(j) != 0:
-#                 lj = list(j)
-#                 tmplist = []
-#                 print "************************************"
-#                 f.write("MAS "+str(self.fixedCnt)+": [",)
-#                 print "Min articulation subset that makes unique PW ",self.fixedCnt,": [",
-#                 for i in range(len(lj)):
-#                     if i != 0:
-#                         f.write(",") 
-#                         print ",",
-#                     f.write(self.artIndex.index(lj[i].string.strip()).__str__())
-#                     print lj[i].ruleNum,":",lj[i].string,
-#                     
-#                     # store for fourinone lattice
-#                     tmplist.append(lj[i].string)
-# 
-#                 if flag == 'Consistency':
-#                     if tmplist not in self.mis:
-#                         self.mis.append(tmplist)
-#                 else:
-#                     if tmplist not in self.misANDmus:
-#                         self.misANDmus.append(tmplist)
-#                     
-#                 f.write("]\n")
-#                 print "]"
-#                 print "************************************"
-#                 self.fixedCnt += 1
-#         if len(j) != 0:
-#             justSet.add(j)
-#         for a in j:
-#             tmpcur = copy.copy(curpath)
-#             tmpcur.add(a)
-#             tmpart = copy.copy(artSet)
-#             tmpart.remove(a)
-#             self.computeAllMAS(tmpart, justSet, tmpcur, allpaths, flag)
-
-    def isResultAmbiguous(self, artSet, flag):
+    def isResultAmbiguous(self, artSet):
         tmpart1 = copy.copy(self.articulations)
         tmpmir = copy.deepcopy(self.mir)
         tmptr = copy.deepcopy(self.tr)
@@ -1631,10 +1663,7 @@ class TaxonomyMapping:
         # Now refresh the input file
         self.genASP()
         # Run the reasoner again
-        if flag == 'Consistency':
-            self.pw = newgetoutput(self.con)
-        else:
-            self.pw = newgetoutput(self.com)
+        self.pw = newgetoutput(self.com)
 
         # add the number of PWs visited
         tmpSet = set()
@@ -1651,36 +1680,14 @@ class TaxonomyMapping:
         self.tr = tmptr
         self.eq = tmpeq
 
-        if flag == 'Consistency':
-            if not self.isPwNone():
-                return True
-            return False
-        elif flag == "Ambiguity":
-            if not self.isPwUnique():
-                return True
-            return False                    
-        else:
-            if not self.isPwUniqueOrIncon():
-                return True
-            return False
+        if not self.isPwUnique():
+            return True
+        return False                    
 
     def computeOneJust(self, artSet, flag):
-        if flag == 'Consistency':
-            if not reasoner[self.args['-r']] == reasoner["rcc1"]:
-                if self.isConsistent(artSet):
-                    return sets.Set()
-            else:
-                if self.isShawnConsistent(artSet):
-                    return sets.Set()
-        elif flag == 'Ambiguity':
-            if self.isResultAmbiguous(artSet, flag):
-                return sets.Set()
+        if self.diagnosisAskOracle(artSet, flag):
+            return sets.Set()
         return self.computeJust(sets.Set(), artSet, flag)
-
-#     def computeOneMAS(self, artSet, flag):
-#         if self.isResultAmbiguous(artSet, flag):
-#             return sets.Set()
-#         return self.computeMAS(sets.Set(), artSet, flag)
 
     # Fourinone approach
     def computeOneJustInc(self, artSet):
@@ -1709,32 +1716,14 @@ class TaxonomyMapping:
         for i in range(len(f) /2):
             f2.add(f1.pop())
             
-        if flag == 'Consistency':
-            if not reasoner[self.args['-r']] == reasoner["rcc1"]:
-                if not self.isConsistent(s.union(f1)):
-                    return self.computeJust(s, f1, flag)
-            else:
-                if not self.isShawnConsistent(s.union(f1)):
-                    return self.computeJust(s, f1, flag)
-            if not reasoner[self.args['-r']] == reasoner["rcc1"]:
-                if not self.isConsistent(s.union(f2)):
-                    return self.computeJust(s, f2, flag)
-            else:
-                if not self.isShawnConsistent(s.union(f2)):
-                    return self.computeJust(s, f2, flag)
-            sl = self.computeJust(s.union(f1), f2, flag)
-            sr = self.computeJust(s.union(sl), f1, flag)
-            return sl.union(sr)
+        if not self.diagnosisAskOracle(s.union(f1), flag):
+            return self.computeJust(s, f1, flag)
+        if not self.diagnosisAskOracle(s.union(f2), flag):
+            return self.computeJust(s, f2, flag)
+        sl = self.computeJust(s.union(f1), f2, flag)
+        sr = self.computeJust(s.union(sl), f1, flag)
+        return sl.union(sr)
         
-        elif flag == 'Ambiguity':
-            if not self.isResultAmbiguous(s.union(f1), flag):
-                return self.computeJust(s, f1, flag)
-            if not self.isResultAmbiguous(s.union(f2), flag):
-                return self.computeJust(s, f2, flag)
-            sl = self.computeJust(s.union(f1), f2, flag)
-            sr = self.computeJust(s.union(sl), f1, flag)
-            return sl.union(sr)
-
     # Fourinone approach
     def computeJustInc(self, s, f):
         if len(f) <= 1:
@@ -1764,22 +1753,6 @@ class TaxonomyMapping:
             return self.computeJustAmb(s, f2)
         sl = self.computeJustAmb(s.union(f1), f2)
         sr = self.computeJustAmb(s.union(sl), f1)
-        return sl.union(sr)
-
-    # s is non-unique, f is unique
-    def computeMAS(self, s, f, flag):
-        if len(f) <= 1:
-            return f
-        f1 = copy.copy(f)
-        f2 = sets.Set()
-        for i in range(len(f) /2):
-            f2.add(f1.pop())
-        if not self.isResultAmbiguous(s.union(f1), flag):
-            return self.computeMAS(s, f1, flag)
-        if not self.isResultAmbiguous(s.union(f2), flag):
-            return self.computeMAS(s, f2, flag)
-        sl = self.computeMAS(s.union(f1), f2, flag)
-        sr = self.computeMAS(s.union(sl), f1, flag)
         return sl.union(sr)
     
     def postFourinone(self):
@@ -3592,6 +3565,17 @@ class TaxonomyMapping:
         # hash the original file
         cmd = "hash_names.py " + os.path.join(self.inputfilesdir, self.name+".txt") + " > " + self.shawninputhashed
         newgetoutput(cmd)
+        
+        # divide the input
+        f = open(self.shawninputhashed, "r")
+        lines = f.readlines()
+        for line in lines:
+            if (re.match("\[.*?\]", line)):
+                self.shawnarticulations.append(re.match("\[(.*)\]", line).group(1))
+            else:
+                self.shawnbase += line
+        f.close()
+
     
     def runShawnMir(self, input):
         cmd = "mir.py " + input + " " + self.shawnoutputhashed + " f f f"
@@ -3602,16 +3586,17 @@ class TaxonomyMapping:
         return newgetoutput(cmd)
     
     def diagnosisShawn(self):
-        # divide the input
-        f = open(self.shawninputhashed, "r")
-        lines = f.readlines()
-        for line in lines:
-            if (re.match("\[.*?\]", line)):
-                self.shawnarticulations.append(re.match("\[(.*)\]", line).group(1))
-            else:
-                self.shawnbase += line
-        f.close()
+#         # divide the input
+#         f = open(self.shawninputhashed, "r")
+#         lines = f.readlines()
+#         for line in lines:
+#             if (re.match("\[.*?\]", line)):
+#                 self.shawnarticulations.append(re.match("\[(.*)\]", line).group(1))
+#             else:
+#                 self.shawnbase += line
+#         f.close()
         
+        # run diagnosis Shawn
         self.allJustifications(sets.Set(self.shawnarticulations), "Consistency")
         
         return
