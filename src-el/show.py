@@ -32,6 +32,7 @@ import yaml
 import re
 import copy
 import relations
+import operator
 from random import randint
 from helper import *
 from subprocess import call
@@ -1478,8 +1479,9 @@ class ProductsShowing:
         
         # lengend
         artsLabels = ""
-        for art, binN in it.artDictbin.iteritems():
-            artsLabels += "<TR> \n <TD>" + self.convertToIndex(str(bin(binN)[2:]),it.power) + "</TD> \n <TD>" + art + "</TD> \n </TR> \n"
+        sorted_artDictbin = sorted(it.artDictbin.items(), key=operator.itemgetter(1))
+        for pair in sorted_artDictbin:
+            artsLabels += "<TR> \n <TD>" + self.convertToIndex(str(bin(pair[1])[2:]),it.power)[1:-1] + "</TD> \n <TD>" + pair[0] + "</TD> \n </TR> \n"
         fDot.write("node[shape=box] \n")
         fDot.write('{rank=top Legend [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
         fDot.write(artsLabels)
