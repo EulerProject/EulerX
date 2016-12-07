@@ -61,8 +61,7 @@ class ProductsShowing:
             f.close()
         
         if args['-o']:
-            if self.lastrundir == '':
-                self.lastrundir = self.userdir + args['-o']
+            self.lastrundir = args['-o']
             self.exampleName = os.path.join(args['-o'], 'lastrun.timestamp')
             if os.path.isfile(self.exampleName):
                 f = open(self.exampleName, "r")
