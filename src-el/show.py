@@ -1523,10 +1523,14 @@ class ProductsShowing:
             print "This is an inconsistent example, no ambiguity lattice generated."
             return
         
-        # read mas internal files
+        # read mas internal files or pw files
         masInternalFile = os.path.join(self.pwinternalfilesdir, 'mas.internal')
+        secondPwInternalFile = os.path.join(self.pwinternalfilesdir, 'pw.internal1')
         if not os.path.isfile(masInternalFile):
-            print 'No MUS generated for this example, run "euler2 align" with --artRem first'
+            if os.path.isfile(secondPwInternalFile):
+                print 'This example has more than one possible world, no ambiguity lattice generated.'
+            else:
+                print 'No MUS generated for this example, run "euler2 align" with --artRem first.'
             return
 
         # create 6-Lattice/ folder
