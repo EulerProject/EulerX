@@ -757,8 +757,17 @@ class ProductsShowing:
                     if it.mir[key] == self.rcc5["disjoint"]:
                         concept1 = key.split(",")[0]
                         concept2 = key.split(",")[1]
-                        self.addRcgVizNode(concept1.split(".")[1], concept1.split(".")[0])
-                        self.addRcgVizNode(concept2.split(".")[1], concept2.split(".")[0])
+                        flagConcept1 = False
+                        flagConcept2 = False
+                        for k,v in self.rcgVizNodes.iteritems():
+                            if concept1 in k:
+                                flagConcept1 = True
+                            if concept2 in k:
+                                flagConcept2 = True
+                        if not flagConcept1:
+                            self.addRcgVizNode(concept1.split(".")[1], concept1.split(".")[0])
+                        if not flagConcept2:
+                            self.addRcgVizNode(concept2.split(".")[1], concept2.split(".")[0])
             
             
             # create the visualization file
