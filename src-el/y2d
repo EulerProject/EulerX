@@ -85,7 +85,7 @@ def apply_style(data_file, f):
                     wList.append(data[key]["w"])
                 else:
                     wList.append("1")
-                if value["label"] in ["==", "><", "!", ">" , "<","?"] or "OR" in str(value["label"]):
+                if value["label"] in ["==", "><", "!", ">" , "<","?","in","out"] or "OR" in str(value["label"]):
                     edges["Art."].append(value.items())
                 elif value["label"] == "isa":
                     # separate "isa" edges based on their group
@@ -167,7 +167,10 @@ def apply_style(data_file, f):
         else:
             lbl = l
         if len(edges[l]) > 0:
-            glabel = glabel + "<TR> \n <TD><font color =" + color + ">" + lbl + "</font></TD> \n <TD>" + str(len(edges[l])) + "</TD> \n </TR> \n"
+        	num = len(edges[l])
+        	if lbl == 'Art.' and len(nodes['(+)']) > 0:
+        		num = num - len(nodes['(+)'])*2
+        	glabel = glabel + "<TR> \n <TD><font color =" + color + ">" + lbl + "</font></TD> \n <TD>" + str(num) + "</TD> \n </TR> \n"
         for e in edges[l]:
             if (styles["graphstyle"]["face2face"] == "on" and l in sources) or (l=="out" and e[1][1].split(".")[0] in sources) or (l == "in" and e[0][1].split(".")[0] not in sources):
                 f.write('"' + e[1][1] + '" -> "' + e[0][1] + '"')
