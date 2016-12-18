@@ -344,6 +344,13 @@ class TaxonomyMapping:
         print "******* You are running example", self.name, "*******"
         if reasoner[self.args['-r']] == reasoner["rcc1"]:
             self.hashShawn()
+            if self.args['--ambiguity']: # quick check for ambiguity
+                self.runShawnMir(self.shawninputhashed)
+                if self.isPwUnique():
+                    print "This example is unique"
+                else:
+                    print "This example is ambiguous"
+                return
             if self.args['--fourinone']:
                 self.allJustificationsFourinone(sets.Set(self.shawnarticulations))
                 self.postFourinone()
