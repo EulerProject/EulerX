@@ -72,10 +72,8 @@ Euler/X use either **DLV** or **Gringo** as underlining reasoner. Please install
     
     
     $ gringo --version
-    gringo 3.0.3
+    gringo version 4.5.4
     
-    Copyright (C) Arne König
-    Copyright (C) Benjamin Kaufmann
     Copyright (C) Roland Kaminski
     License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
     Gringo is free software: you are free to change and redistribute it.
@@ -88,7 +86,7 @@ Euler/X use either **DLV** or **Gringo** as underlining reasoner. Please install
     and with no claim as to its suitability for any purpose.
 
 To install DLV, please use the version `static no ODBC support` from [DLV download page][dlv].
-To install Gringo, please use the version [3.0.3][gringo303] (avoid the latest one to change the syntax).
+To install Gringo, please use the version [4.5.4][gringo454] (avoid the latest one to change the syntax).
 To install ClaspD, please use the version [1.1.4][claspD114] (avoid the latest one to change the syntax).
 Note: You do not need to install all to use Euler/X, either DLV or Gringo+ClaspD will do the job.
 
@@ -192,6 +190,6 @@ If you have any question or comments, please contact Bertram Ludäscher at ludae
 [potassco]: http://potassco.sourceforge.net/
 [pyyaml]: http://pyyaml.org/
 [jira]: https://opensource.ncsa.illinois.edu/jira/projects/EULER/issues/
-[gringo303]: http://sourceforge.net/projects/potassco/files/gringo/3.0.3/
+[gringo454]: http://sourceforge.net/projects/potassco/files/gringo/4.5.4/
 [claspD114]: http://sourceforge.net/projects/potassco/files/claspD/1.1.4/
 [abstract4eg]: https://github.com/EulerProject/EulerX/blob/master/example/abstract4/abstract4.txt
