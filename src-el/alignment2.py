@@ -670,10 +670,9 @@ class TaxonomyMapping:
 
     def isUniqueOrIncon(self, output):
         if reasoner[self.args['-r']] == reasoner["gringo"]:
-            return (output.find("Models     : 1") != -1 and output.find("Models     : 1+") == -1) \
-                or output.find("Models     : 0 ") != -1
+            return output.find("Models     : 0 ") != -1 or output.find("Models     : 1") != -1
         elif reasoner[self.args['-r']] == reasoner["dlv"]:
-            return (output.strip() != "" and output.strip().count("{") == 1) or output.strip() == ""
+            return output.strip() == "" or (output.strip() != "" and output.strip().count("{") == 1)
         else:
             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")    
 
@@ -1498,7 +1497,9 @@ class TaxonomyMapping:
         curpathAmb = sets.Set()
         allpathsInc = sets.Set()
         allpathsAmb = sets.Set()
-        self.computeAllJustFourinone(artSet, artSet, sInc, sAmb, curpathInc, curpathAmb, allpathsInc, allpathsAmb)
+        self.computeAllJust(artSet, sInc, curpathInc, allpathsInc, 'Consistency')
+        self.computeAllJust(artSet, sAmb, curpathAmb, allpathsAmb, 'Ambiguity')
+#         self.computeAllJustFourinone(artSet, artSet, sInc, sAmb, curpathInc, curpathAmb, allpathsInc, allpathsAmb)
         
     def computeAllJustFourinone(self, artSetInc, artSetAmb, justSetInc, justSetAmb, curpathInc, curpathAmb, allpathsInc, allpathsAmb):
         terminateInc1 = False
@@ -1684,9 +1685,14 @@ class TaxonomyMapping:
         self.tr = tmptr
         self.eq = tmpeq
 
-        if not self.isPwUnique():
-            return True
-        return False                    
+        if self.args['--fourinone']:
+            if not self.isPwUniqueOrIncon():
+                return True
+            return False
+        else:
+            if not self.isPwUnique():
+                return True
+            return False                                
 
     def computeOneJust(self, artSet, flag):
         if self.diagnosisAskOracle(artSet, flag):
@@ -1760,6 +1766,26 @@ class TaxonomyMapping:
         return sl.union(sr)
     
     def postFourinone(self):
+        fMIS = open(self.misinternalfiles, "r")
+        lines = fMIS.readlines()
+        for line in lines:
+            aMISString = re.match("(.*)\[(.*)\](.*)", line).group(2).split(",")
+            aMIS = map(int, aMISString)
+            tmplist = []
+            for relIndex in aMIS:
+                tmplist.append(self.artIndex[relIndex])
+            self.mis.append(tmplist)
+        
+        fMUS = open(self.masinternalfiles, "r")
+        lines = fMUS.readlines()
+        for line in lines:
+            aMUSString = re.match("(.*)\[(.*)\](.*)", line).group(2).split(",")
+            aMUS = map(int, aMUSString)
+            tmplist = []
+            for relIndex in aMUS:
+                tmplist.append(self.artIndex[relIndex])
+            self.misANDmus.append(tmplist)
+        
         print "You have ..."
         self.mus = copy.deepcopy(self.misANDmus)
         for e in self.mis:
