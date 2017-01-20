@@ -1501,113 +1501,113 @@ class TaxonomyMapping:
         self.computeAllJust(artSet, sAmb, curpathAmb, allpathsAmb, 'Ambiguity')
 #         self.computeAllJustFourinone(artSet, artSet, sInc, sAmb, curpathInc, curpathAmb, allpathsInc, allpathsAmb)
         
-    def computeAllJustFourinone(self, artSetInc, artSetAmb, justSetInc, justSetAmb, curpathInc, curpathAmb, allpathsInc, allpathsAmb):
-        terminateInc1 = False
-        terminateAmb1 = False
-        terminateInc2 = False
-        terminateAmb2 = False        
-        for pathInc in allpathsInc:
-            if pathInc.issubset(curpathInc):
-                terminateInc1 = True
-        for pathAmb in allpathsAmb:
-            if pathAmb.issubset(curpathAmb):
-                terminateAmb1 = True
-        if terminateInc1 and terminateAmb1:
-            return
-
-        if self.checkFourinone(artSetInc) != 'inconsistent':
-            allpathsInc.add(curpathInc)
-            terminateInc2 = True
-        if self.checkFourinone(artSetAmb) == 'ambiguous':
-            allpathsAmb.add(curpathAmb)
-            terminateAmb2 = True
-        if terminateInc2 and terminateAmb2:
-            return
-        
-        # inconsistency approach paths
-        if not terminateInc1 and not terminateInc2:
-            jInc = sets.Set()
-            for s in justSetInc:
-                if len(s.intersection(curpathInc)) == 0:
-                    jInc = s
-            if len(jInc) == 0:
-                jInc = self.computeOneJustInc(artSetInc)
-            if len(jInc) != 0:
-                ljInc = list(jInc)
-                tmplist = []
-                #print "************************************"
-                #print "MIS ",self.fixedCnt,": [",
-                for i in range(len(ljInc)):
-                    #if i != 0: print ",",
-                    #print ljInc[i].ruleNum,":",ljInc[i].string,
-                    
-                    # store for fourinone
-                    if not reasoner[self.args['-r']] == reasoner["rcc1"]:
-                        tmplist.append(ljInc[i].string)
-                    else:
-                        tmplist.append(ljInc[i])
-                
-                if tmplist not in self.mis:
-                    self.mis.append(tmplist)
-                
-                #print "]"
-                #print "************************************"
-                self.fixedCnt += 1
-            if len(jInc) != 0:
-                justSetInc.add(jInc)
-            for aInc in jInc:
-                tmpcurInc = copy.copy(curpathInc)
-                tmpcurInc.add(aInc)
-                tmpartInc = copy.copy(artSetInc)
-                tmpartInc.remove(aInc)
-                self.computeAllJustFourinone(tmpartInc, artSetAmb, justSetInc, justSetAmb, tmpcurInc, curpathAmb, allpathsInc, allpathsAmb)
-        
-        # ambiguity approach paths
-        if not terminateAmb1 and not terminateAmb2:
-            jAmb = sets.Set()
-            for s in justSetAmb:
-                if len(s.intersection(curpathAmb)) == 0:
-                    jAmb = s
-            if len(jAmb) == 0:
-                jAmb = self.computeOneJustAmb(artSetAmb)
-                if len(jAmb) != 0:
-                    ljAmb = list(jAmb)
-                    tmplist2 = []
-                    #print "************************************"
-                    #print "MUS ",self.fixedCnt,": [",
-                    for i in range(len(ljAmb)):
-                        #if i != 0: print ",",
-                        #print ljAmb[i].ruleNum,":",ljAmb[i].string,
-                        
-                        # store for fourinone
-                        if not reasoner[self.args['-r']] == reasoner["rcc1"]:
-                            tmplist2.append(ljAmb[i].string)
-                        else:
-                            tmplist2.append(ljAmb[i])
-                    
-                    if tmplist2 not in self.misANDmus:
-                        self.misANDmus.append(tmplist2)
-                    
-                    #print "]"
-                    #print "************************************"
-                    self.fixedCnt += 1
-            if len(jAmb) != 0:
-                justSetAmb.add(jAmb)
-            for aAmb in jAmb:
-                tmpcurAmb = copy.copy(curpathAmb)
-                tmpcurAmb.add(aAmb)
-                tmpartAmb = copy.copy(artSetAmb)
-                tmpartAmb.remove(aAmb)
-                self.computeAllJustFourinone(artSetInc, tmpartAmb, justSetInc, justSetAmb, curpathInc, tmpcurAmb, allpathsInc, allpathsAmb)
+#     def computeAllJustFourinone(self, artSetInc, artSetAmb, justSetInc, justSetAmb, curpathInc, curpathAmb, allpathsInc, allpathsAmb):
+#         terminateInc1 = False
+#         terminateAmb1 = False
+#         terminateInc2 = False
+#         terminateAmb2 = False        
+#         for pathInc in allpathsInc:
+#             if pathInc.issubset(curpathInc):
+#                 terminateInc1 = True
+#         for pathAmb in allpathsAmb:
+#             if pathAmb.issubset(curpathAmb):
+#                 terminateAmb1 = True
+#         if terminateInc1 and terminateAmb1:
+#             return
+# 
+#         if self.checkFourinone(artSetInc) != 'inconsistent':
+#             allpathsInc.add(curpathInc)
+#             terminateInc2 = True
+#         if self.checkFourinone(artSetAmb) == 'ambiguous':
+#             allpathsAmb.add(curpathAmb)
+#             terminateAmb2 = True
+#         if terminateInc2 and terminateAmb2:
+#             return
+#         
+#         # inconsistency approach paths
+#         if not terminateInc1 and not terminateInc2:
+#             jInc = sets.Set()
+#             for s in justSetInc:
+#                 if len(s.intersection(curpathInc)) == 0:
+#                     jInc = s
+#             if len(jInc) == 0:
+#                 jInc = self.computeOneJustInc(artSetInc)
+#             if len(jInc) != 0:
+#                 ljInc = list(jInc)
+#                 tmplist = []
+#                 #print "************************************"
+#                 #print "MIS ",self.fixedCnt,": [",
+#                 for i in range(len(ljInc)):
+#                     #if i != 0: print ",",
+#                     #print ljInc[i].ruleNum,":",ljInc[i].string,
+#                     
+#                     # store for fourinone
+#                     if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+#                         tmplist.append(ljInc[i].string)
+#                     else:
+#                         tmplist.append(ljInc[i])
+#                 
+#                 if tmplist not in self.mis:
+#                     self.mis.append(tmplist)
+#                 
+#                 #print "]"
+#                 #print "************************************"
+#                 self.fixedCnt += 1
+#             if len(jInc) != 0:
+#                 justSetInc.add(jInc)
+#             for aInc in jInc:
+#                 tmpcurInc = copy.copy(curpathInc)
+#                 tmpcurInc.add(aInc)
+#                 tmpartInc = copy.copy(artSetInc)
+#                 tmpartInc.remove(aInc)
+#                 self.computeAllJustFourinone(tmpartInc, artSetAmb, justSetInc, justSetAmb, tmpcurInc, curpathAmb, allpathsInc, allpathsAmb)
+#         
+#         # ambiguity approach paths
+#         if not terminateAmb1 and not terminateAmb2:
+#             jAmb = sets.Set()
+#             for s in justSetAmb:
+#                 if len(s.intersection(curpathAmb)) == 0:
+#                     jAmb = s
+#             if len(jAmb) == 0:
+#                 jAmb = self.computeOneJustAmb(artSetAmb)
+#                 if len(jAmb) != 0:
+#                     ljAmb = list(jAmb)
+#                     tmplist2 = []
+#                     #print "************************************"
+#                     #print "MUS ",self.fixedCnt,": [",
+#                     for i in range(len(ljAmb)):
+#                         #if i != 0: print ",",
+#                         #print ljAmb[i].ruleNum,":",ljAmb[i].string,
+#                         
+#                         # store for fourinone
+#                         if not reasoner[self.args['-r']] == reasoner["rcc1"]:
+#                             tmplist2.append(ljAmb[i].string)
+#                         else:
+#                             tmplist2.append(ljAmb[i])
+#                     
+#                     if tmplist2 not in self.misANDmus:
+#                         self.misANDmus.append(tmplist2)
+#                     
+#                     #print "]"
+#                     #print "************************************"
+#                     self.fixedCnt += 1
+#             if len(jAmb) != 0:
+#                 justSetAmb.add(jAmb)
+#             for aAmb in jAmb:
+#                 tmpcurAmb = copy.copy(curpathAmb)
+#                 tmpcurAmb.add(aAmb)
+#                 tmpartAmb = copy.copy(artSetAmb)
+#                 tmpartAmb.remove(aAmb)
+#                 self.computeAllJustFourinone(artSetInc, tmpartAmb, justSetInc, justSetAmb, curpathInc, tmpcurAmb, allpathsInc, allpathsAmb)
 
             
-    def checkFourinone(self, artSet):
-        if not self.diagnosisAskOracle(artSet, 'Consistency'):
-            return 'inconsistent'
-        elif not self.diagnosisAskOracle(artSet, 'Ambiguity'):
-            return 'unique'
-        else:
-            return 'ambiguous'
+#     def checkFourinone(self, artSet):
+#         if not self.diagnosisAskOracle(artSet, 'Consistency'):
+#             return 'inconsistent'
+#         elif not self.diagnosisAskOracle(artSet, 'Ambiguity'):
+#             return 'unique'
+#         else:
+#             return 'ambiguous'
         
 #         tmpart1 = copy.copy(self.articulations)
 #         tmpmir = copy.deepcopy(self.mir)
