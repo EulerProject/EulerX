@@ -656,7 +656,7 @@ class TaxonomyMapping:
         
     def isUnique(self, output):
         if reasoner[self.args['-r']] == reasoner["gringo"]:
-            return output.find("Models     : 1") != -1 and output.find("Models     : 1+") == -1
+            return output.find("Models     : 1 ") != -1
         elif reasoner[self.args['-r']] == reasoner["dlv"]:
             return output.strip() != "" and output.strip().count("{") == 1
         elif reasoner[self.args['-r']] == reasoner["rcc1"]:
@@ -670,7 +670,7 @@ class TaxonomyMapping:
 
     def isUniqueOrIncon(self, output):
         if reasoner[self.args['-r']] == reasoner["gringo"]:
-            return output.find("Models     : 0 ") != -1 or output.find("Models     : 1") != -1
+            return output.find("Models     : 0 ") != -1 or output.find("Models     : 1 ") != -1
         elif reasoner[self.args['-r']] == reasoner["dlv"]:
             return output.strip() == "" or (output.strip() != "" and output.strip().count("{") == 1)
         else:
