@@ -1383,31 +1383,33 @@ class ProductsShowing:
         
         diagShower = DiagnosticLattice(allMIS, inputFile)
         diagShower.genLattice()
-        fullLatstr = diagShower.fullLatViz()
-        redLatstr = diagShower.reducedLatViz()
         
         # create the visualization file
-        fullLatDotFile = os.path.join(self.latticedir, self.name+"_fulllat.gv")
-        fullLatPdfFile = os.path.join(self.latticedir, self.name+"_fulllat.pdf")
-        fullLatSvgFile = os.path.join(self.latticedir, self.name+"_fulllat.svg")
-        fullLatViz = open(fullLatDotFile, 'w')
-        fullLatViz.write(fullLatstr)
-        fullLatViz.close()
-        if self.args['--svg']:
-            newgetoutput("dot -Tsvg "+fullLatDotFile+" -o "+fullLatSvgFile)
-        else:
-            newgetoutput("dot -Tpdf "+fullLatDotFile+" -o "+fullLatPdfFile)
+        if self.args['--full'] or (not self.args['--full'] and not self.args['--reduced']):
+            fullLatstr = diagShower.fullLatViz()
+            fullLatDotFile = os.path.join(self.latticedir, self.name+"_fulllat.gv")
+            fullLatPdfFile = os.path.join(self.latticedir, self.name+"_fulllat.pdf")
+            fullLatSvgFile = os.path.join(self.latticedir, self.name+"_fulllat.svg")
+            fullLatViz = open(fullLatDotFile, 'w')
+            fullLatViz.write(fullLatstr)
+            fullLatViz.close()
+            if self.args['--svg']:
+                newgetoutput("dot -Tsvg "+fullLatDotFile+" -o "+fullLatSvgFile)
+            else:
+                newgetoutput("dot -Tpdf "+fullLatDotFile+" -o "+fullLatPdfFile)
             
-        redLatDotFile = os.path.join(self.latticedir, self.name+"_lat.gv")
-        redLatPdfFile = os.path.join(self.latticedir, self.name+"_lat.pdf")
-        redLatSvgFile = os.path.join(self.latticedir, self.name+"_lat.svg")
-        redLatViz = open(redLatDotFile, 'w')
-        redLatViz.write(redLatstr)
-        redLatViz.close()
-        if self.args['--svg']:
-            newgetoutput("dot -Tsvg "+redLatDotFile+" -o "+redLatSvgFile)
-        else:
-            newgetoutput("dot -Tpdf "+redLatDotFile+" -o "+redLatPdfFile)
+        if self.args['--reduced'] or (not self.args['--full'] and not self.args['--reduced']):
+            redLatstr = diagShower.reducedLatViz()    
+            redLatDotFile = os.path.join(self.latticedir, self.name+"_lat.gv")
+            redLatPdfFile = os.path.join(self.latticedir, self.name+"_lat.pdf")
+            redLatSvgFile = os.path.join(self.latticedir, self.name+"_lat.svg")
+            redLatViz = open(redLatDotFile, 'w')
+            redLatViz.write(redLatstr)
+            redLatViz.close()
+            if self.args['--svg']:
+                newgetoutput("dot -Tsvg "+redLatDotFile+" -o "+redLatSvgFile)
+            else:
+                newgetoutput("dot -Tpdf "+redLatDotFile+" -o "+redLatPdfFile)
         
 #         inputFile = os.path.abspath(os.path.join(self.inputfilesdir, self.name+".txt"))
 #         latticeFolder = os.path.abspath(self.latticedir)

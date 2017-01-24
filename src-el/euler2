@@ -29,7 +29,7 @@ Usage:
 	euler2 --version
 	euler2 check <inputfile>...
 	euler2 align <inputfile>... [-o OUTFOLDER] [-e METHOD] [-r TOOL] [-n NPW] [--consistency] [--ambiguity] [--hidemirdisjoint] [--disablecov] [--disablesib] [--repair=WAY] [--artRem] [--fourinone] [--xia] [--ur] [--ie] [--ieo] [--pw]
-	euler2 show <name> [--svg]
+	euler2 show <name> [--svg] [--full] [--reduced]
 	euler2 show [-o OUTFOLDER] <name> [--svg]
 	euler2 show iv <inputfile>... [-o OUTFOLDER] [--svg]
 
@@ -44,7 +44,7 @@ Options:
     --consistency	  Check consistency ONLY.
     --disablecov	  Disable coverage.
     --disablesib	  Disable sibling disjointness.
-    --repair WAY	  Repair inconsistency [default: HST].
+    --repair WAY	  Repair inconsistency.
     --artRem		  Articulation remover.
     --fourinone		  Four in one lattice.
     --xia		  Extract input file.

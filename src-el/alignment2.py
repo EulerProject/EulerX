@@ -370,7 +370,8 @@ class TaxonomyMapping:
                         print "Multiple possible worlds generated, no ambiguity lattice."
             else:
                 print "Input is inconsistent!"
-                self.diagnosisShawn()
+                if self.args['--repair'] == "HST": 
+                    self.diagnosisShawn()
             self.updateReportFile(self.reportfile)
             return
         if reasoner[self.args['-r']] == reasoner["rcc2"]:
@@ -691,7 +692,6 @@ class TaxonomyMapping:
         if self.isPwNone():
             print "************************************"
             print "Input is inconsistent\n"
-            print "Here lists MIS:"
             #print 'You can use "--repair=WAY" to do the repairing, see details in "euler2 -h"'
             if self.args['--ie']:
                 self.inconsistencyExplanation()
@@ -1446,6 +1446,10 @@ class TaxonomyMapping:
         
         # Run the reasoner again
         result = self.runShawnMir(self.shawntmpinput)
+        if result.find("ERROR") != -1:
+            print result
+            print "Exiting..."
+            exit(0)
         
         if not self.isNone(result):
             return True
@@ -1893,6 +1897,7 @@ class TaxonomyMapping:
         elif self.args['--repair'] == "minIncSubset":
             self.minInconsRemedy()
         elif self.args['--repair'] == "HST":
+            print "Here lists MIS:"
             self.allJustifications(sets.Set(self.articulations), "Consistency")
         # By default, we use top down remedy to repair
         else:
@@ -3612,11 +3617,21 @@ class TaxonomyMapping:
     
     def runShawnMir(self, input):
         cmd = "mir.py " + input + " " + self.shawnoutputhashed + " f f f"
-        return newgetoutput(cmd)
+        result = newgetoutput(cmd)
+        if result.find("ERROR") == 1:
+            return result
+        else:
+            print result
+            exit(0)
 
     def runShawnMirPW(self, input):
         cmd = "mir.py " + input + " " + self.shawnoutputhashed + " f t f"
-        return newgetoutput(cmd)
+        result = newgetoutput(cmd)
+        if result.find("ERROR") == 1:
+            return result
+        else:
+            print result
+            exit(0)
     
     def diagnosisShawn(self):
         # run diagnosis Shawn
