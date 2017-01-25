@@ -16,13 +16,20 @@ def checkInputFiles(iFiles):
     parents = list()
     leaves = list()
     errors = list()
+    flag = False
     for f in iFiles:
         inputData += open(f).readlines()
     for line in inputData:
         if (re.match("taxonomy", line)):
-           g = re.match("taxonomy\s+(\S+)\s(.*)", line).group(1)
-           if g not in taxonDict:
-               taxonDict.update({g:{'parents':[], 'leaves': [], 'arts': []}})
+            if flag:
+                taxonDict[g]['parents'] += list(set(parents) - set(leaves))
+                taxonDict[g]['leaves'] += list(set(leaves) - set(parents))
+                leaves = []
+                parents = []
+            g = re.match("taxonomy\s+(\S+)\s(.*)", line).group(1)
+            if g not in taxonDict:
+                taxonDict.update({g:{'parents':[], 'leaves': [], 'arts': []}})
+            flag = True
         if (re.match("\(.*\)", line)):
             elements = re.match("\((.*)\)", line).group(1).split(" ")
             parents.append(elements[0])
@@ -31,7 +38,7 @@ def checkInputFiles(iFiles):
                     errors.append('Child with multiple parents in taxonomy ' + str(g) + ": " + str(e))
                 else:
                     leaves.append(e)
-        if line == "\n":
+        if (re.match("articulations", line)):
                 taxonDict[g]['parents'] += list(set(parents) - set(leaves))
                 taxonDict[g]['leaves'] += list(set(leaves) - set(parents))
                 leaves = []
