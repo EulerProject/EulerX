@@ -670,12 +670,15 @@ class TaxonomyMapping:
             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")    
 
     def isUniqueOrIncon(self, output):
-        if reasoner[self.args['-r']] == reasoner["gringo"]:
-            return output.find("Models     : 0 ") != -1 or output.find("Models     : 1 ") != -1
-        elif reasoner[self.args['-r']] == reasoner["dlv"]:
-            return output.strip() == "" or (output.strip() != "" and output.strip().count("{") == 1)
-        else:
-            raise Exception("Reasoner:", self.args['-r'], " is not supported !!")    
+        return self.isNone(output) or self.isUnique(output)
+#         if reasoner[self.args['-r']] == reasoner["gringo"]:
+#             return output.find("Models     : 0 ") != -1 or output.find("Models     : 1 ") != -1
+#         elif reasoner[self.args['-r']] == reasoner["dlv"]:
+#             return output.strip() == "" or (output.strip() != "" and output.strip().count("{") == 1)
+#         elif reasoner[self.args['-r']] == reasoner["rcc1"]:
+#             
+#         else:
+#             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")    
 
     def genPW(self):
         self.pw = newgetoutput(self.com)
@@ -2650,7 +2653,7 @@ class TaxonomyMapping:
                 self.artDict[a] = self.artIndex.index(a)+1
         for a in self.artIndex:
             self.artDictBin[a] = 1 << self.artIndex.index(a)
-                
+        
         # update leaf concepts
         self.leafConcepts = list(set(self.leafConcepts).difference(self.nonleafConcepts))
         
@@ -3602,11 +3605,13 @@ class TaxonomyMapping:
         newgetoutput(cmd)
         
         # divide the input
+        self.artIndex = []
         f = open(self.shawninputhashed, "r")
         lines = f.readlines()
         for line in lines:
             if (re.match("\[.*?\]", line)):
                 self.shawnarticulations.append(re.match("\[(.*)\]", line).group(1))
+                self.artIndex.append(re.match("\[(.*)\]", line).group(1))
             else:
                 self.shawnbase += line
         f.close()
@@ -3614,11 +3619,12 @@ class TaxonomyMapping:
         self.artDictBin = {}
         for a in self.shawnarticulations:
             self.artDictBin[a] = 1 << self.shawnarticulations.index(a)
+        
     
     def runShawnMir(self, input):
         cmd = "mir.py " + input + " " + self.shawnoutputhashed + " f f f"
         result = newgetoutput(cmd)
-        if result.find("ERROR") == 1:
+        if result.find("ERROR") == -1:
             return result
         else:
             print result
@@ -3627,7 +3633,7 @@ class TaxonomyMapping:
     def runShawnMirPW(self, input):
         cmd = "mir.py " + input + " " + self.shawnoutputhashed + " f t f"
         result = newgetoutput(cmd)
-        if result.find("ERROR") == 1:
+        if result.find("ERROR") == -1:
             return result
         else:
             print result
