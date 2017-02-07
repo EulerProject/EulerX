@@ -1436,10 +1436,10 @@ class ProductsShowing:
 #                 newgetoutput("dot -Tpdf "+fileFullDot+" -o "+fileFullPdf)        
 
     def showFourinoneLAT(self):
-        # if this is a consistent example (there is at least one PW)
-        if os.path.isfile(os.path.join(self.pwinternalfilesdir, self.name+".pw")):
-            print "This is a consistent example, no 4-in-1 lattice generated."
-            return
+#         # if this is a consistent example (there is at least one PW)
+#         if os.stat(os.path.join(self.pwinternalfilesdir, "mis.internal")).st_size == 0:
+#             print "This is a consistent example, no 4-in-1 lattice generated."
+#             return
         
         # read fourinone internal files
         fourinoneInternalFile = os.path.join(self.pwinternalfilesdir, 'fourinone.internal')
