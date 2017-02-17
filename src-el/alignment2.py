@@ -3833,7 +3833,7 @@ class TaxonomyMapping:
         # prepare for input
         for pair in self.getAllArticulationPairs():
 #            print "pair[0].taxonomy", pair[0].taxonomy.abbrev, self.firstTName
-            if pair[0].taxonomy.abbrev == self.firstTName or pair[0].taxonomy.abbrev < pair[1].taxonomy.abbrev:
+            if pair[0].taxonomy.abbrev == self.firstTName:
                 self.allPairsMir[(pair[0], pair[1])] = relation["{=, >, <, !, ><}"]
             else:
                 self.allPairsMir[(pair[1], pair[0])] = relation["{=, >, <, !, ><}"]
@@ -3844,7 +3844,7 @@ class TaxonomyMapping:
 
         
         for art in self.articulations:
-            if art.taxon1.taxonomy.abbrev == self.firstTName or art.taxon1.taxonomy.abbrev < art.taxon2.taxonomy.abbrev:
+            if art.taxon1.taxonomy.abbrev == self.firstTName:
                 self.allPairsMir[(art.taxon1, art.taxon2)] = art.relations
             else:
                 self.allPairsMir[(art.taxon2, art.taxon1)] = self.reverseArts(art.relations)
