@@ -3624,7 +3624,7 @@ class TaxonomyMapping:
     def runShawnMir(self, input):
         cmd = "mir.py " + input + " " + self.shawnoutputhashed + " f f f"
         result = newgetoutput(cmd)
-        if result.find("ERROR") == -1:
+        if result.find("ERROR") == -1 and result.find("Error") == -1:
             return result
         else:
             print result
