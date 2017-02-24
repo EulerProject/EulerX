@@ -849,7 +849,21 @@ class ProductsShowing:
         #fcv.close()
         
     def defineCombConceptGroup(self, conceptStr, firstTName, secondTName, thirdTName, fourthTName, fifthTName):
-        if "\\\\" in conceptStr or "*" in conceptStr:
+        if conceptStr.count("\\\\") == 1 and "\\n" not in conceptStr:
+            taxName = conceptStr.split(".")[0]
+            if taxName == firstTName:
+                return "subT1"
+            if taxName == secondTName:
+                return "subT2"
+            if taxName == thirdTName:
+                return "subT3"
+            if taxName == fourthTName:
+                return "subT4"
+            if taxName == fifthTName:
+                return "subT5"
+        elif "*" in conceptStr and "\\n" not in conceptStr:
+            return "intersectComb"
+        elif "\\\\" in conceptStr or "*" in conceptStr:
             return "comb"
         taxNames = Set()
         concepts = conceptStr.split("\\n")

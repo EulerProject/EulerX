@@ -66,6 +66,21 @@ def read_stylesheet(stylefile):
     with open(stylefile) as style_file:    
         styles = yaml.load(style_file)          
 def apply_style(data_file, f):
+    presetGroups = []
+    presetGroups.append("comb")
+    presetGroups.append("combT1")
+    presetGroups.append("combT2")
+    presetGroups.append("combT3")
+    presetGroups.append("combT4")
+    presetGroups.append("combT5")
+    presetGroups.append("(+)")
+    presetGroups.append("cluster")
+    presetGroups.append("subT1")
+    presetGroups.append("subT2")
+    presetGroups.append("subT3")
+    presetGroups.append("subT4")
+    presetGroups.append("subT5")
+    presetGroups.append("intersectComb")
     firstGroup = ""
     f.write("digraph{\n")
     f.write(str(styles["graphstyle"]["graph"]) + "\n")
@@ -108,7 +123,8 @@ def apply_style(data_file, f):
     glabel = '<TR> <TD COLSPAN="2"><font face="Arial Black"> Nodes</font></TD> </TR> \n'
     mapp = ""
     for g in nodes:
-        if (g!= "comb" and g!= "combT1" and g!= "combT2" and g!= "(+)" and g != "cluster"):
+#         if (g!= "comb" and g!= "combT1" and g!= "combT2" and g!= "(+)" and g != "cluster"):
+        if g not in presetGroups:
             mapp = mapp + '<TR> <TD COLSPAN="2"><font face="Arial Black"> Taxonomy' + g + '</font></TD> </TR> \n'
     # if the style is not defined use the default
         if (styles["graphstyle"]["subgraph"] == "on" and g!="(+)"):
@@ -123,7 +139,8 @@ def apply_style(data_file, f):
         	f.write("node[" + styles["nodestyle"]["all"] + '] \n')
         f.write("node[" + styles["nodestyle"][group] + '] \n')
         for n in nodes[g]:
-            if (g!= "comb" and g!= "combT1" and g!= "combT2" and g!= "(+)" and g!="cluster"):
+            if g not in presetGroups:
+#             if (g!= "comb" and g!= "combT1" and g!= "combT2" and g!= "(+)" and g!="cluster"):
                f.write('"'+ g + "." + n[0][1]+ '"\n')
                if len(n) < 3:
                    n.append(('name','test'))

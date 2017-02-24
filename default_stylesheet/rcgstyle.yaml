@@ -20,6 +20,12 @@
     "combT3": "shape=box style=\"filled,rounded\" fillcolor=\"#CCCCFF\""
     "combT4": "shape=box style=\"filled,rounded\" fillcolor=\"#FFCCCC\""
     "combT5": "shape=box style=\"filled,rounded\" fillcolor=\"#CCFFFF\""
+    "subT1": "shape=box style=\"filled,rounded,dashed\" fillcolor=\"#CCFFCC\""
+    "subT2": "shape=box style=\"filled,rounded,dashed\" fillcolor=\"#FFFFCC\""
+    "subT3": "shape=box style=\"filled,rounded,dashed\" fillcolor=\"#CCCCFF\""
+    "subT4": "shape=box style=\"filled,rounded,dashed\" fillcolor=\"#FFCCCC\""
+    "subT5": "shape=box style=\"filled,rounded,dashed\" fillcolor=\"#CCFFFF\""
+    "intersectComb": "shape=box style=\"filled,rounded,bold\" fillcolor=\"#EEEEEE\""
     "comb": "shape=box style=\"filled,rounded\" fillcolor=\"#EEEEEE\""
   edgestyle: 
     - 
