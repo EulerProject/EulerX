@@ -278,6 +278,11 @@ class TaxonomyMapping:
         #        os.mkdir(self.mergeinputdir)
         
 #        self.ivpdf = os.path.join(self.pwspdfdir, self.name+"_iv.pdf")
+        if self.args['--xia']:
+            self.xiadir = os.path.join(self.outputdir, "11-ExtractInput")
+            if not os.path.exists(self.xiadir):
+                os.mkdir(self.xiadir)
+        
         if not self.args['-n']:
             self.args['-n'] = '0'             # by default output all possible worlds
         if reasoner[self.args['-r']] == reasoner["gringo"]:
@@ -832,7 +837,6 @@ class TaxonomyMapping:
             # generate alternative input files
             if self.args['--xia']:
                 self.genAltInputFile(i, tmpLeafRels)
-                print 'All alternative input files have been saved to the 0-Input/ folder'
             
         fav = open(self.avinternalfile, "w")
         fav.write('firstTName = ' + repr(self.firstTName) + '\n')
@@ -2525,12 +2529,15 @@ class TaxonomyMapping:
     
     def readFile(self):
         lines = []
-        for i in range(len(self.args['<inputfile>'])):
-            file = open(os.path.join(self.projectdir, self.args['<inputfile>'][i]), 'r')
-            alines = file.readlines()
-            lines.extend(alines)
-            file.close()
+#         for i in range(len(self.args['<inputfile>'])):
+#             file = open(os.path.join(self.projectdir, self.args['<inputfile>'][i]), 'r')
+#             alines = file.readlines()
+#             lines.extend(alines)
+#             file.close()
         flag = ""
+        
+        file = open(os.path.join(self.inputfilesdir, self.name+".txt"), "r")
+        lines = file.readlines()
         
         # used for input viz
         group2concepts = {}
@@ -2654,8 +2661,8 @@ class TaxonomyMapping:
         for a in self.artIndex:
             self.artDictBin[a] = 1 << self.artIndex.index(a)
         
-        # update leaf concepts
-        self.leafConcepts = list(set(self.leafConcepts).difference(self.nonleafConcepts))
+        # update leaf concepts for xia (by default is using all nodes, not just leaf nodes) 
+        #self.leafConcepts = list(set(self.leafConcepts).difference(self.nonleafConcepts))
         
         #### TEST
 #        for k,v in self.taxonomies.iteritems():
@@ -3277,8 +3284,8 @@ class TaxonomyMapping:
         
         
     def genAltInputFile(self, pwIndex, leafRels):
-        fileName = os.path.join(self.inputfilesdir, self.name+"-alt"+pwIndex.__str__()+".txt")
-        copyfile(os.path.join(self.projectdir, self.args['<inputfile>'][0]), fileName)
+        fileName = os.path.join(self.xiadir, self.name+"-alt"+pwIndex.__str__()+".txt")
+        copyfile(os.path.join(self.inputfilesdir, self.name+".txt"), fileName)
         f = open(fileName, "r")
         lines = f.readlines()
         f.close()
