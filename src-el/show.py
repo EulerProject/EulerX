@@ -162,57 +162,59 @@ class ProductsShowing:
         return
 
     def refreshStylesheets(self):
-        fOld = open(self.stylesheetdir+"inputstyle.yaml", "r")
-        contents = fOld.readlines()
-        fOld.close()
+        if (os.path.isfile(self.stylesheetdir+"inputstyle.yaml")):
+            fOld = open(self.stylesheetdir+"inputstyle.yaml", "r")
+            contents = fOld.readlines()
+            fOld.close()
+                
+            for line in contents:
+                if "nodestyle" in line:
+                    index = contents.index(line)
+                if 'all:' in line:
+                    index2 = contents.index(line)
             
-        for line in contents:
-            if "nodestyle" in line:
-                index = contents.index(line)
-            if 'all:' in line:
-                index2 = contents.index(line)
+            del contents[index+1:index2]    # clean nodestyle previously added        
+            fNew = open(self.stylesheetdir+"inputstyle.yaml", "w")
+            contents = "".join(contents)
+            fNew.write(contents)
+            fNew.flush()
+            fNew.close()
         
-        del contents[index+1:index2]    # clean nodestyle previously added
-        
-        fNew = open(self.stylesheetdir+"inputstyle.yaml", "w")
-        contents = "".join(contents)
-        fNew.write(contents)
-        fNew.flush()
-        fNew.close()
-        
-        fOld = open(self.stylesheetdir+"rcgstyle.yaml", "r")
-        contents = fOld.readlines()
-        fOld.close()
+        if (os.path.isfile(self.stylesheetdir+"rcgstyle.yaml")):
+            fOld = open(self.stylesheetdir+"rcgstyle.yaml", "r")
+            contents = fOld.readlines()
+            fOld.close()
+                
+            for line in contents:
+                if "nodestyle" in line:
+                    index = contents.index(line)
+                if 'default:' in line:
+                    index2 = contents.index(line)
             
-        for line in contents:
-            if "nodestyle" in line:
-                index = contents.index(line)
-            if 'default:' in line:
-                index2 = contents.index(line)
+            del contents[index+1:index2]    # clean nodestyle previously added
+            fNew = open(self.stylesheetdir+"rcgstyle.yaml", "w")
+            contents = "".join(contents)
+            fNew.write(contents)
+            fNew.flush()
+            fNew.close()
         
-        del contents[index+1:index2]    # clean nodestyle previously added
-        fNew = open(self.stylesheetdir+"rcgstyle.yaml", "w")
-        contents = "".join(contents)
-        fNew.write(contents)
-        fNew.flush()
-        fNew.close()
-
-        fOld = open(self.stylesheetdir+"aggregatestyle.yaml", "r")
-        contents = fOld.readlines()
-        fOld.close()
+        if (os.path.isfile(self.stylesheetdir+"aggregatestyle.yaml")):
+            fOld = open(self.stylesheetdir+"aggregatestyle.yaml", "r")
+            contents = fOld.readlines()
+            fOld.close()
+                
+            for line in contents:
+                if "nodestyle" in line:
+                    index = contents.index(line)
+                if 'default:' in line:
+                    index2 = contents.index(line)
             
-        for line in contents:
-            if "nodestyle" in line:
-                index = contents.index(line)
-            if 'default:' in line:
-                index2 = contents.index(line)
-        
-        del contents[index+1:index2]    # clean nodestyle previously added
-        fNew = open(self.stylesheetdir+"aggregatestyle.yaml", "w")
-        contents = "".join(contents)
-        fNew.write(contents)
-        fNew.flush()
-        fNew.close()        
+            del contents[index+1:index2]    # clean nodestyle previously added
+            fNew = open(self.stylesheetdir+"aggregatestyle.yaml", "w")
+            contents = "".join(contents)
+            fNew.write(contents)
+            fNew.flush()
+            fNew.close()        
         
         return
     
@@ -383,15 +385,15 @@ class ProductsShowing:
             #del contents[index+1:index2]    # clean nodestyle previously added
             
             if firstTName != "" and firstTName not in styles["nodestyle"]:
-                value += '    "' + firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n'
+                value += '    "' + firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"') + '"\n'
             if secondTName != "" and secondTName not in styles["nodestyle"]:
-                value += '    "' + secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n'
+                value += '    "' + secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"') + '"\n'
             if thirdTName != "" and thirdTName not in styles["nodestyle"]:
-                value += '    "' + thirdTName + '": "' + styles["nodestyle"]["3"].replace('"','\\"',2) + '"\n' 
+                value += '    "' + thirdTName + '": "' + styles["nodestyle"]["3"].replace('"','\\"') + '"\n' 
             if fourthTName != "" and fourthTName not in styles["nodestyle"]:
-                value += '    "' + fourthTName + '": "' + styles["nodestyle"]["4"].replace('"','\\"',2) + '"\n'
+                value += '    "' + fourthTName + '": "' + styles["nodestyle"]["4"].replace('"','\\"') + '"\n'
             if fifthTName != "" and fifthTName not in styles["nodestyle"]: 
-                value += '    "' + fifthTName + '": "' + styles["nodestyle"]["5"].replace('"','\\"',2) + '"\n' 
+                value += '    "' + fifthTName + '": "' + styles["nodestyle"]["5"].replace('"','\\"') + '"\n' 
                                 
             contents.insert(index+1, value)
 
