@@ -2111,7 +2111,8 @@ class TaxonomyMapping:
             self.com = "gringo "+self.cbfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
             self.cb = newgetoutput(self.com)
             if self.isCbNone():
-                self.remedy()
+                if self.args['--repair']:
+                    self.remedy()
             if self.cb.find("ERROR") != -1:
                 print self.cb
                 raise Exception(template.getEncErrMsg())
@@ -2126,7 +2127,8 @@ class TaxonomyMapping:
             self.com = "dlv -silent -filter=relout "+self.cbfile+" "+ self.pwswitch + " | "+path+"/muniq -u"
             self.cb = newgetoutput(self.com)
             if self.isCbNone():
-                self.remedy()
+                if self.args['--repair']:
+                    self.remedy()
             if self.cb.find("error") != -1:
                 print self.cb
                 raise Exception(template.getEncErrMsg())
