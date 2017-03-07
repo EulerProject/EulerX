@@ -1329,13 +1329,14 @@ class TaxonomyMapping:
                         lj = list(j)
                         print "************************************"
                         f.write("MIS "+str(self.fixedCnt)+": [",)
-                        print "Min inconsistent subset ",self.fixedCnt,": [",
+                        print "#",self.fixedCnt+1,"Min inconsistent subset : [",
                         for i in range(len(lj)):
                             if i != 0:
                                 f.write(",")
                                 print ",",
                             f.write(self.artIndex.index(lj[i].string.strip()).__str__())
-                            print lj[i].ruleNum,":",lj[i].string,
+                            #print lj[i].ruleNum,":",lj[i].string,
+                            print lj[i].string,
                         f.write("]\n")
                         print "]"
                         print "************************************"
@@ -1364,13 +1365,14 @@ class TaxonomyMapping:
                         tmplist = []
                         print "************************************"
                         f.write("MAS "+str(self.fixedCnt)+": [",)
-                        print "Min articulation subset that makes unique PW ",self.fixedCnt,": [",
+                        print "#",self.fixedCnt+1,"Min articulation subset that makes unique PW : [",
                         for i in range(len(lj)):
                             if i != 0:
                                 f.write(",") 
                                 print ",",
                             f.write(self.artIndex.index(lj[i].string.strip()).__str__())
-                            print lj[i].ruleNum,":",lj[i].string,
+                            #print lj[i].ruleNum,":",lj[i].string,
+                            print lj[i].string,
                             
     #                         # store for fourinone lattice
     #                         tmplist.append(lj[i].string)
