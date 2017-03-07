@@ -717,7 +717,7 @@ class ProductsShowing:
                         self.addRcgVizEdge(T1, T2, "redundant")
             
             #if self.args.rcgo:
-            if True:
+            if not self.args['--hideoverlaps']:
     
                 oskiplist = []
                 for key in it.mir.keys():

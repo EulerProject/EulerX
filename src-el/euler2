@@ -29,7 +29,7 @@ Usage:
 	euler2 --version
 	euler2 check <inputfile>...
 	euler2 align <inputfile>... [-o OUTFOLDER] [-e METHOD] [-r TOOL] [-n NPW] [--consistency] [--ambiguity] [--hidemirdisjoint] [--disablecov] [--disablesib] [--repair=WAY] [--artRem] [--fourinone] [--xia] [--ur] [--ie] [--ieo] [--pw]
-	euler2 show [-o OUTFOLDER] <name> [--svg] [--full] [--reduced]
+	euler2 show [-o OUTFOLDER] <name> [--svg] [--full] [--reduced] [--hideoverlaps]
 	euler2 show iv <inputfile>... [-o OUTFOLDER] [--svg]
 
 
@@ -48,6 +48,9 @@ Options:
     --fourinone		  Four in one lattice.
     --xia		  Extract input file.
     --svg		  Generate svg files instead of pdf files
+    --full		  Generate full diagnostic lattice
+    --reduced		  Generate reduced diagnostic lattice
+    --hideoverlaps	  Hide overlaps relations
     --ur		  Uncertainty reduction.
     --pw		  Output also possible worlds in Shawn's reasoner, used with -r rcc1.
     <name>		  The knowledge product you want to show, including: 
