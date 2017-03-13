@@ -139,8 +139,8 @@ def apply_style(data_file, f):
         	f.write("node[" + styles["nodestyle"]["all"] + '] \n')
         f.write("node[" + styles["nodestyle"][group] + '] \n')
         for n in nodes[g]:
-            if g not in presetGroups:
 #             if (g!= "comb" and g!= "combT1" and g!= "combT2" and g!= "(+)" and g!="cluster"):
+            if g not in presetGroups and '*' not in n[0][1] and '\\n' not in n[0][1] and '\\\\' not in n[0][1]:
                f.write('"'+ g + "." + n[0][1]+ '"\n')
                if len(n) < 3:
                    n.append(('name','test'))

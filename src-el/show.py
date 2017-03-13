@@ -197,6 +197,24 @@ class ProductsShowing:
             fNew.write(contents)
             fNew.flush()
             fNew.close()
+            
+        if (os.path.isfile(self.stylesheetdir+"zoominstyle.yaml")):
+            fOld = open(self.stylesheetdir+"zoominstyle.yaml", "r")
+            contents = fOld.readlines()
+            fOld.close()
+                
+            for line in contents:
+                if "nodestyle" in line:
+                    index = contents.index(line)
+                if 'default:' in line:
+                    index2 = contents.index(line)
+            
+            del contents[index+1:index2]    # clean nodestyle previously added
+            fNew = open(self.stylesheetdir+"zoominstyle.yaml", "w")
+            contents = "".join(contents)
+            fNew.write(contents)
+            fNew.flush()
+            fNew.close()
         
         if (os.path.isfile(self.stylesheetdir+"aggregatestyle.yaml")):
             fOld = open(self.stylesheetdir+"aggregatestyle.yaml", "r")
@@ -785,8 +803,14 @@ class ProductsShowing:
             fRcgVizYaml.close()
             
             # check whether stylesheet taxonomy names are in stylesheet
-            global styles
-            with open(self.stylesheetdir+"rcgstyle.yaml") as rcgStyleFileOld:
+            stylesheetname = ""
+            if "mncb" in it.fileName:
+                stylesheetname = "zoominstyle.yaml"
+            else:
+                stylesheetname = "rcgstyle.yaml"
+            
+            global styles    
+            with open(self.stylesheetdir+stylesheetname) as rcgStyleFileOld:
                 styles = yaml.load(rcgStyleFileOld)
                         
             # if taxonomy names are not in stylesheet, rewrite styesheet
@@ -794,7 +818,7 @@ class ProductsShowing:
                 or it.thirdTName not in styles["nodestyle"] or it.fourthTName not in styles["nodestyle"] \
                 or it.fifthTName not in styles["nodestyle"]:
                 value = ""
-                fOld = open(self.stylesheetdir+"rcgstyle.yaml", "r")
+                fOld = open(self.stylesheetdir+stylesheetname, "r")
                 contents = fOld.readlines()
                 fOld.close()
                 
@@ -807,19 +831,29 @@ class ProductsShowing:
                 #del contents[index+1:index2]    # clean nodestyle previously added
                 
                 if it.firstTName != "" and it.firstTName not in styles["nodestyle"]:
-                    value += '    "' + it.firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n'
+                    value += '    "' + it.firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"') + '"\n'
+#                     value += '    "comb' + it.firstTName + '": "' + styles["nodestyle"]["combT1"].replace('"','\\"') + '"\n'
+#                     value += '    "sub' + it.firstTName + '": "' + styles["nodestyle"]["subT1"].replace('"','\\"') + '"\n'
                 if it.secondTName != "" and it.secondTName not in styles["nodestyle"]:
-                    value += '    "' + it.secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n' 
+                    value += '    "' + it.secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"') + '"\n' 
+#                     value += '    "comb' + it.secondTName + '": "' + styles["nodestyle"]["combT2"].replace('"','\\"') + '"\n'
+#                     value += '    "sub' + it.secondTName + '": "' + styles["nodestyle"]["subT2"].replace('"','\\"') + '"\n'
                 if it.thirdTName != "" and it.thirdTName not in styles["nodestyle"]:
-                    value += '    "' + it.thirdTName + '": "' + styles["nodestyle"]["3"].replace('"','\\"',2) + '"\n' 
+                    value += '    "' + it.thirdTName + '": "' + styles["nodestyle"]["3"].replace('"','\\"') + '"\n' 
+#                     value += '    "comb' + it.thirdTName + '": "' + styles["nodestyle"]["combT3"].replace('"','\\"') + '"\n'
+#                     value += '    "sub' + it.thirdTName + '": "' + styles["nodestyle"]["subT3"].replace('"','\\"') + '"\n'
                 if it.fourthTName != "" and it.fourthTName not in styles["nodestyle"]:
-                    value += '    "' + it.fourthTName + '": "' + styles["nodestyle"]["4"].replace('"','\\"',2) + '"\n'
-                if it.fifthTName != "" and it.fourthTName not in styles["nodestyle"]: 
-                    value += '    "' + it.fifthTName + '": "' + styles["nodestyle"]["5"].replace('"','\\"',2) + '"\n' 
+                    value += '    "' + it.fourthTName + '": "' + styles["nodestyle"]["4"].replace('"','\\"') + '"\n'
+#                     value += '    "comb' + it.fourthTName + '": "' + styles["nodestyle"]["combT4"].replace('"','\\"') + '"\n'
+#                     value += '    "sub' + it.fourthTName + '": "' + styles["nodestyle"]["subT4"].replace('"','\\"') + '"\n'
+                if it.fifthTName != "" and it.fifthTName not in styles["nodestyle"]: 
+                    value += '    "' + it.fifthTName + '": "' + styles["nodestyle"]["5"].replace('"','\\"') + '"\n' 
+#                     value += '    "comb' + it.fifthTName + '": "' + styles["nodestyle"]["combT5"].replace('"','\\"') + '"\n'
+#                     value += '    "sub' + it.fifthTName + '": "' + styles["nodestyle"]["subT5"].replace('"','\\"') + '"\n'
                                     
                 contents.insert(index+1, value)
     
-                fNew = open(self.stylesheetdir+"rcgstyle.yaml", "w")
+                fNew = open(self.stylesheetdir+stylesheetname, "w")
                 contents = "".join(contents)
                 fNew.write(contents)
                 fNew.flush()
@@ -827,7 +861,7 @@ class ProductsShowing:
             
             
             # apply the rcgviz stylesheet
-            newgetoutput("cat "+rcgYamlFile+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + rcgDotFile)
+            newgetoutput("cat "+rcgYamlFile+" | y2d -s "+self.stylesheetdir+stylesheetname + ">" + rcgDotFile)
             if self.args['--svg']:
                 newgetoutput("dot -Tsvg "+rcgDotFile+" -o "+rcgSvgFile)
             else:
@@ -853,16 +887,18 @@ class ProductsShowing:
     def defineCombConceptGroup(self, conceptStr, firstTName, secondTName, thirdTName, fourthTName, fifthTName):
         if conceptStr.count("\\\\") == 1 and "\\n" not in conceptStr:
             taxName = conceptStr.split(".")[0]
-            if taxName == firstTName:
-                return "subT1"
-            if taxName == secondTName:
-                return "subT2"
-            if taxName == thirdTName:
-                return "subT3"
-            if taxName == fourthTName:
-                return "subT4"
-            if taxName == fifthTName:
-                return "subT5"
+            return taxName
+#             if taxName == firstTName:
+#                 return "subT1"
+#             if taxName == secondTName:
+#                 return "subT2"
+#             if taxName == thirdTName:
+#                 return "subT3"
+#             if taxName == fourthTName:
+#                 return "subT4"
+#             if taxName == fifthTName:
+#                 return "subT5"
+#             return "sub"+taxName
         elif "*" in conceptStr and "\\n" not in conceptStr:
             return "intersectComb"
         elif "\\\\" in conceptStr or "*" in conceptStr:
@@ -1079,15 +1115,25 @@ class ProductsShowing:
             #del contents[index+1:index2]    # clean nodestyle previously added
             
             if it.firstTName != "" and it.firstTName not in styles["nodestyle"]:
-                value += '    "' + it.firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n'
+                value += '    "' + it.firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"') + '"\n'
+#                 value += '    "comb' + it.firstTName + '": "' + styles["nodestyle"]["combT1"].replace('"','\\"') + '"\n'
+#                 value += '    "sub' + it.firstTName + '": "' + styles["nodestyle"]["subT1"].replace('"','\\"') + '"\n'
             if it.secondTName != "" and it.secondTName not in styles["nodestyle"]:
-                value += '    "' + it.secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n' 
+                value += '    "' + it.secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"') + '"\n' 
+#                 value += '    "comb' + it.secondTName + '": "' + styles["nodestyle"]["combT2"].replace('"','\\"') + '"\n'
+#                 value += '    "sub' + it.secondTName + '": "' + styles["nodestyle"]["subT2"].replace('"','\\"') + '"\n'
             if it.thirdTName != "" and it.thirdTName not in styles["nodestyle"]:
-                value += '    "' + it.thirdTName + '": "' + styles["nodestyle"]["3"].replace('"','\\"',2) + '"\n' 
+                value += '    "' + it.thirdTName + '": "' + styles["nodestyle"]["3"].replace('"','\\"') + '"\n' 
+#                 value += '    "comb' + it.thirdTName + '": "' + styles["nodestyle"]["combT3"].replace('"','\\"') + '"\n'
+#                 value += '    "sub' + it.thirdTName + '": "' + styles["nodestyle"]["subT3"].replace('"','\\"') + '"\n'
             if it.fourthTName != "" and it.fourthTName not in styles["nodestyle"]:
-                value += '    "' + it.fourthTName + '": "' + styles["nodestyle"]["4"].replace('"','\\"',2) + '"\n'
-            if it.fifthTName != "" and it.fourthTName not in styles["nodestyle"]: 
-                value += '    "' + it.fifthTName + '": "' + styles["nodestyle"]["5"].replace('"','\\"',2) + '"\n'  
+                value += '    "' + it.fourthTName + '": "' + styles["nodestyle"]["4"].replace('"','\\"') + '"\n'
+#                 value += '    "comb' + it.fourthTName + '": "' + styles["nodestyle"]["combT4"].replace('"','\\"') + '"\n'
+#                 value += '    "sub' + it.fourthTName + '": "' + styles["nodestyle"]["subT4"].replace('"','\\"') + '"\n'
+            if it.fifthTName != "" and it.fifthTName not in styles["nodestyle"]: 
+                value += '    "' + it.fifthTName + '": "' + styles["nodestyle"]["5"].replace('"','\\"') + '"\n'  
+#                 value += '    "comb' + it.fifthTName + '": "' + styles["nodestyle"]["combT5"].replace('"','\\"') + '"\n'
+#                 value += '    "sub' + it.fifthTName + '": "' + styles["nodestyle"]["subT5"].replace('"','\\"') + '"\n'
                                 
             contents.insert(index+1, value)
 
