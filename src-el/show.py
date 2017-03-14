@@ -618,14 +618,14 @@ class ProductsShowing:
                     if(T3 != T5 and set(T3.split("\\n")).issubset(set(T5.split("\\n")))):
                         if it.tr.count([T3, T4, P]) > 0:
                             it.tr.remove([T3, T4, P])
-                            it.tr.append([T5,T4,0])
+                            it.tr.append([T5,T4,1])
             tmpTr = list(it.tr)
             for [T3, T4, P] in tmpTr:
                 for T5 in it.eqConLi:
                     if(T4 != T5 and set(T4.split("\\n")).issubset(set(T5.split("\\n")))):
                         if it.tr.count([T3, T4, P]) > 0:
                             it.tr.remove([T3, T4, P])
-                            it.tr.append([T3,T5,0])
+                            it.tr.append([T3,T5,1])
             tmpeqConLi = []
             
             for T in it.eqConLi:
