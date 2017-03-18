@@ -293,10 +293,10 @@ class TaxonomyMapping:
             self.con = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD --eq=1"
         elif reasoner[self.args['-r']] == reasoner["dlv"]:
             # possible world command
-            self.com = "dlv -silent -filter=rel -n="+ self.args['-n'] + " " +self.pwfile+" "+ self.pwswitch+ " | "+self.path+"/muniq -u"
-            #self.com = "dlv -silent -filter=rel "+self.pwfile+" "+ self.pwswitch
+            self.com = "dlv -silent -stats -filter=rel -n="+ self.args['-n'] + " " +self.pwfile+" "+ self.pwswitch+ " | "+self.path+"/muniq -u"
+            #self.com = "dlv -silent -stats -filter=rel "+self.pwfile+" "+ self.pwswitch
             # consistency command
-            self.con = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+ self.pwswitch
+            self.con = "dlv -silent -stats -filter=rel -n=1 "+self.pwfile+" "+ self.pwswitch
 #        elif reasoner[self.args['-r']] == reasoner["rcc1"]:
 #            if self.args['--pw']:
 #                self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f t f"
@@ -497,8 +497,11 @@ class TaxonomyMapping:
             frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n")
             frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
         frsnr.close()
-        com = "dlv -silent -filter=rel -n=1 "+rsnrfile+" "+self.pwfile+" "+self.pwswitch
+        com = "dlv -silent -stats -filter=rel -n=1 "+rsnrfile+" "+self.pwfile+" "+self.pwswitch
         if newgetoutput(com) == "":
+            print "DLV stopped unexpectedly"
+            exit(0)
+        elif newgetoutput(com).find("{") == -1:
             return 0
         return rcc5[rel]
 ## NF ends
@@ -509,8 +512,11 @@ class TaxonomyMapping:
             if newgetoutput(com).find("Models     : 0") != -1:
                 return False
         else:
-            com = "dlv -silent -filter=rel -n=1 "+self.pwfile+" "+self.pwswitch
+            com = "dlv -silent -stats -filter=rel -n=1 "+self.pwfile+" "+self.pwswitch
             if newgetoutput(com) == "":
+                print "DLV stopped unexpectedly"
+                exit(0)
+            elif newgetoutput(com).find("{") == -1:
                 return False
         return True
 
@@ -520,8 +526,11 @@ class TaxonomyMapping:
             ie = newgetoutput(com)
             ie.replace(" ", ", ")
         else:
-            com = "dlv -silent -filter=ie "+self.pwfile+" "+self.ixswitch
+            com = "dlv -silent -stats -filter=ie "+self.pwfile+" "+self.ixswitch
             ie = newgetoutput(com)
+            if ie == "":
+                print "DLV stopped unexpectedly"
+                exit(0)
             ie.replace("{", "").replace("}", "")
         self.postProcessIE(ie);
 
@@ -654,7 +663,7 @@ class TaxonomyMapping:
         if reasoner[self.args['-r']] == reasoner["gringo"]:
             return output.find("Models     : 0 ") != -1
         elif reasoner[self.args['-r']] == reasoner["dlv"]:
-            return output.strip() == ""
+            return output.find("{") == -1
         elif reasoner[self.args['-r']] == reasoner["rcc1"]:
             return output.find("Consistent") == -1
         else:
@@ -664,7 +673,7 @@ class TaxonomyMapping:
         if reasoner[self.args['-r']] == reasoner["gringo"]:
             return output.find("Models     : 1 ") != -1
         elif reasoner[self.args['-r']] == reasoner["dlv"]:
-            return output.strip() != "" and output.strip().count("{") == 1
+            return output.find("{") != -1 and output.strip().count("{") == 1
         elif reasoner[self.args['-r']] == reasoner["rcc1"]:
             with open(self.shawnoutputhashed, 'r') as f:
                 for line in f:
@@ -687,6 +696,9 @@ class TaxonomyMapping:
 
     def genPW(self):
         self.pw = newgetoutput(self.com)
+        if self.pw == "":
+            print "DLV stopped unexpectedly"
+            exit(0)
         if self.args['--fourinone']:
             self.allJustificationsFourinone(sets.Set(self.articulations))
             self.postFourinone()
@@ -726,9 +738,11 @@ class TaxonomyMapping:
                 if raw[i].find("rel") == -1: continue
                 pws.append(raw[i].strip().replace(") ",");"))
         elif reasoner[self.args['-r']] == reasoner["dlv"]:
-            raw = self.pw.replace("{","").replace("}","").replace(" ","").replace("),",");")
-            if raw != "":
-                pws = raw.split("\n")
+            raw = self.pw.split("\n")
+            for line in raw:
+                if line.find("{") != -1:
+                    line = line.replace("{","").replace("}","").replace(" ","").replace("),",");")
+                    pws.append(line)
         else:
             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")
         self.npw = len(pws)
@@ -1432,6 +1446,9 @@ class TaxonomyMapping:
         self.genASP()
     	# Run the reasoner again
         self.pw = newgetoutput(self.con)
+        if self.pw == "":
+            print "DLV stopped unexpectedly"
+            exit(0)
 
         self.articulations = tmpart1
         self.mir = tmpmir
@@ -1682,6 +1699,9 @@ class TaxonomyMapping:
         self.genASP()
         # Run the reasoner again
         self.pw = newgetoutput(self.com)
+        if self.pw == "":
+            print "DLV stopped unexpectedly"
+            exit(0)
 
         # add the number of PWs visited
         tmpSet = set()
@@ -2060,8 +2080,12 @@ class TaxonomyMapping:
     def genOB(self):
         path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         if reasoner[self.args['-r']] == reasoner["dlv"]:
-            com = "dlv -silent -filter=pp "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
-            raw = newgetoutput(com).replace("{","").replace("}","").replace(" ","").replace("),",");")
+            com = "dlv -silent -stats -filter=pp "+self.pwfile+" "+ self.pwswitch+ " | "+path+"/muniq -u"
+            raw = newgetoutput(com)
+            if raw == "":
+                print "DLV stopped unexpectedly"
+                exit(0)
+            raw = raw.replace("{","").replace("}","").replace(" ","").replace("),",");")
         elif reasoner[self.args['-r']] == reasoner["gringo"]:
             com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=no"
             raw = newgetoutput(com)
@@ -2102,8 +2126,11 @@ class TaxonomyMapping:
             
 
     def genVE(self):
-        com = "dlv -silent -filter=vr "+self.pwfile+" "+self.pwswitch
+        com = "dlv -silent -stats -filter=vr "+self.pwfile+" "+self.pwswitch
         self.ve = newgetoutput(com)
+        if self.ve == "":
+            print "DLV stopped unexpectedly"
+            exit(0)
         print self.ve
         self.updateReportFile(self.reportfile)
 
@@ -2126,8 +2153,11 @@ class TaxonomyMapping:
                 #if self.args.verbose: print pws
         elif reasoner[self.args['-r']] == reasoner["dlv"]:
             path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-            self.com = "dlv -silent -filter=relout "+self.cbfile+" "+ self.pwswitch + " | "+path+"/muniq -u"
+            self.com = "dlv -silent -stats -filter=relout "+self.cbfile+" "+ self.pwswitch + " | "+path+"/muniq -u"
             self.cb = newgetoutput(self.com)
+            if self.cb == "":
+                print "DLV stopped unexpectedly"
+                exit(0)
             if self.isCbNone():
                 if self.args['--repair']:
                     self.remedy()
@@ -2135,9 +2165,11 @@ class TaxonomyMapping:
                 print self.cb
                 raise Exception(template.getEncErrMsg())
                 return None
-            raw = self.cb.replace("{","").replace("}","").replace(" ","").replace("),",");")
-            if raw != "":
-              pws = raw.split("\n")
+            raw = self.cb.split("\n")
+            for line in raw:
+                if line.find("{") != -1:
+                    line = line.replace("{","").replace("}","").replace(" ","").replace("),",");")
+                    pws.append(line)
         else:
             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")
         self.npw = len(pws)
