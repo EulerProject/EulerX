@@ -2388,8 +2388,8 @@ class TaxonomyMapping:
                         #self.baseAsp += "ir(X, r" + ruleNum.__str__() + ") " +coverage + ".\n\n"
                         
                         # D enable sibling disjointness globally, by default is ON
-                        #if self.args.enableSD:
-                        if True:
+                        if not self.args['--disablesib']:
+                        #if True:
                             self.baseAsp += "%% sibling disjointness\n"
                             for i in range(len(t.children) - 1):
                                 for j in range(i+1, len(t.children)):
