@@ -2342,8 +2342,8 @@ class TaxonomyMapping:
                 #    print "PC: ",queue
                 t = queue.pop(0)
                 # This is a nc flag
-                if t.abbrev == "nc":
-#                if t.abbrev.startswith("nc_"):
+#                 if t.abbrev == "nc":
+                if t.abbrev.startswith("nc_"):
                     self.baseAsp += "ncf(" + t.dlvName() + ").\n"
                 if t.hasChildren():
                     #if self.args.verbose:
@@ -3006,7 +3006,9 @@ class TaxonomyMapping:
                     #if self.args.verbose:
                     #    print pairkey+hint + findkey(relation, self.mir[pairkey] & ~relation["infer"] & ~relation["input"])+"\n"
             else:
-                self.mir[pairkey] = self.getPairMir(pair)
+                # the concept pair has does not appear in self.mir, no knowledge found
+#                 self.mir[pairkey] = self.getPairMir(pair)
+                self.mir[pairkey] = relation["{=, >, <, !, ><}"]
                 rl = findkey(relation, self.mir[pairkey])
 #                fmir.write(pairkey + ",inferred," + rl +"\n")
 #                fmir.write(pairkey1 +"," + rl + "," + pairkey2 + ",inferred" +"\n")
