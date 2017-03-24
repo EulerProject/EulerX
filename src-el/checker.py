@@ -1,4 +1,4 @@
-#! /usr/bin/env python2
+#! /usr/bin/env python
 
 # Euler checker receives a Cleantax file as input
 # and reports multiple roots per taxonomy, children with multiple parents, and unmatched leaves

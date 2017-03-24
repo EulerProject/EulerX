@@ -88,12 +88,12 @@ class Articulation:
             else:
                 raise Exception("Syntax error in \""+initInput+"\"!!")
                 
-            taxon1taxonomy = elements.group(1)
-            taxon1taxon = elements.group(2)
-            taxon2taxonomy = elements.group(3)
-            taxon2taxon = elements.group(4)
-            taxon3taxonomy = elements.group(5)
-            taxon3taxon = elements.group(6)
+            taxon1taxonomy = elements.group(1).strip()
+            taxon1taxon = elements.group(2).strip()
+            taxon2taxonomy = elements.group(3).strip()
+            taxon2taxon = elements.group(4).strip()
+            taxon3taxonomy = elements.group(5).strip()
+            taxon3taxon = elements.group(6).strip()
             self.taxon1 = mapping.getTaxon(taxon1taxonomy, taxon1taxon)
             self.taxon2 = mapping.getTaxon(taxon2taxonomy, taxon2taxon)
             self.taxon3 = mapping.getTaxon(taxon3taxonomy, taxon3taxon)
@@ -121,11 +121,11 @@ class Articulation:
             if elements is None:
                 raise Exception("Syntax error in \""+initInput+"\"!!")
             
-            taxon1taxonomy = elements.group(1)
-            taxon1taxon = elements.group(2)
-            relString = elements.group(3)
-            taxon2taxonomy = elements.group(4)
-            taxon2taxon = elements.group(5)
+            taxon1taxonomy = elements.group(1).strip()
+            taxon1taxon = elements.group(2).strip()
+            relString = elements.group(3).strip()
+            taxon2taxonomy = elements.group(4).strip()
+            taxon2taxon = elements.group(5).strip()
             
             if (relString.find(" ") != -1):
                 if (relation.has_key(relString)):
