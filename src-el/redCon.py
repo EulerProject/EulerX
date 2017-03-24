@@ -35,7 +35,7 @@ class RedCon():
         j = 0
         for i in range(5):
             if mir & (1 << i):
-                print j,'.',relstr[i]
+                print j,'.',relationstr[i]
                 self.returnValue[j] = 1 << i
                 j += 1
         val = raw_input("(Choose those possible ones, e.g. 0 or 1 or 0,1)?\n")

@@ -100,7 +100,7 @@ class CtiGenerator:
         else:
             myrel = int(math.log(relation[args.relation],2))
         # get rel string
-        myrelstr = relstr[myrel]
+        myrelstr = relationstr[myrel]
         if args.incEx and args.relation == "=":
             if args.depth < 2:
                 print 'Can not generate inconsistent complete trees with "=" for depth less than 2'

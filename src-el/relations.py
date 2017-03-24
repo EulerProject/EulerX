@@ -31,6 +31,11 @@ rcc5['"<"'] = 1 << 1
 rcc5['"="'] = 1 << 2
 rcc5['">"'] = 1 << 3
 rcc5['"><"'] = 1 << 4
+rcc5['!'] = 1 << 0
+rcc5['<'] = 1 << 1
+rcc5['=='] = 1 << 2
+rcc5['>'] = 1 << 3
+rcc5['><'] = 1 << 4
 
 logmap = {}
 logmap[1<<0] = 0
@@ -85,12 +90,17 @@ relation["+4="] = 1 << 9 #l4sum
 relation["-="] = 1 << 10 #ldiff
 relation["=-"] = (1 << 10) + 1 #rdiff
 
-relstr={}
-relstr[0] = "disjoint"
-relstr[1] = "is_included_in"
-relstr[2] = "equals"
-relstr[3] = "includes"
-relstr[4] = "overlaps"
+relationstr={}
+relationstr[0] = "disjoint"
+relationstr[1] = "is_included_in"
+relationstr[2] = "equals"
+relationstr[3] = "includes"
+relationstr[4] = "overlaps"
+relationstr[5] = "!"
+relationstr[6] = "<"
+relationstr[7] = "=="
+relationstr[8] = ">"
+relationstr[9] = "><"
 
 relss={}
 relss[1 << 0] = "disjoint"

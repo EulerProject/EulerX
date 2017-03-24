@@ -69,7 +69,7 @@ class RedWindow():
         
         for i in range(5):
             if mir & (1 << i):
-                button = gtk.CheckButton(relstr[i])
+                button = gtk.CheckButton(relationstr[i])
                 button.connect("toggled", self.toggle_handler, i)
                 button.set_active(True)
                 self.vbox.pack_start(button)

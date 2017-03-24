@@ -456,7 +456,7 @@ class TaxonomyMapping:
         rsnrfile = os.path.join(self.aspdir, dn1 +"_"+ dn2 + "_" + rel + ".dlv")
         frsnr = open(rsnrfile, "w")
         frsnr.write("\n%%% Assumption" + vn1 + "_" + vn2 + "_" + rel + "\n")
-        if rel == "equals":
+        if rel == relationstr[2] or rel == relationstr[7]: #"equals":
             frsnr.write("irs(X) :- out(" + vn1 + ",X), in(" + vn2 + ",X).\n")
             frsnr.write("irs(X) :- in(" + vn1 + ",X), out(" + vn2 + ",X).\n")
             frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
@@ -464,7 +464,7 @@ class TaxonomyMapping:
             frsnr.write("in(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
             frsnr.write("out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n") 
             frsnr.write("out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n")
-        elif rel == "includes":
+        elif rel == relationstr[3] or rel == relationstr[8]: #"includes":
             frsnr.write("irs(X) :- out(" + vn1 + ",X), in(" + vn2 + ",X).\n")
             frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), out(" + vn2 + ",X)} = 0.\n")
             frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
@@ -472,7 +472,7 @@ class TaxonomyMapping:
             frsnr.write("out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n")
             frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n")
             frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
-        elif rel == "is_included_in":
+        elif rel == relationstr[1] or rel ==  relationstr[6]: #"is_included_in":
             frsnr.write(":- #count{X: vrs(X), out(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
             frsnr.write("irs(X) :- in(" + vn1 + ",X), out(" + vn2 + ",X).\n")
             frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
@@ -480,7 +480,7 @@ class TaxonomyMapping:
             frsnr.write("out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n")
             frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- in(" + vn2 + ",X).\n")
             frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n")
-        elif rel == "disjoint":
+        elif rel == relationstr[0] or rel == relationstr[5]: #"disjoint":
             frsnr.write(":- #count{X: vrs(X), out(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
             frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), out(" + vn2 + ",X)} = 0.\n")
             frsnr.write("irs(X) :- in(" + vn1 + ",X), in(" + vn2 + ",X).\n")
@@ -488,7 +488,7 @@ class TaxonomyMapping:
             frsnr.write("out(" + vn2 + ",X) :- in(" + vn1 + ",X).\n")
             frsnr.write("in(" + vn1 + ",X) v out(" + vn1 + ",X) :- out(" + vn2 + ",X).\n")
             frsnr.write("in(" + vn2 + ",X) v out(" + vn2 + ",X) :- out(" + vn1 + ",X).\n")
-        elif rel == "overlaps":
+        elif rel == relationstr[4] or rel == relationstr[9]: #"overlaps":
             frsnr.write(":- #count{X: vrs(X), out(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
             frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), out(" + vn2 + ",X)} = 0.\n")
             frsnr.write(":- #count{X: vrs(X), in(" + vn1 + ",X), in(" + vn2 + ",X)} = 0.\n")
@@ -2730,7 +2730,7 @@ class TaxonomyMapping:
         self.articulations += [Articulation(artStr, self)]
         if artStr.find("{") != -1:
             r = re.match("(.*) \{(.*)\} (.*)", artStr)
-            self.addPMir(r.group(1), r.group(3), r.group(2).replace(" ",","), 0)
+            self.addPMir(r.group(1), r.group(3), r.group(2).strip().replace(" ",","), 0)
         else:
             self.addAMir(artStr, 0)
 
@@ -2826,13 +2826,13 @@ class TaxonomyMapping:
         r = astring.split(" ")
         #if(self.args.verbose):
         #    print "Articulations: ",astring
-        if (r[1] == "includes"):
+        if (r[1] == relationstr[3] or r[1] == relationstr[8]): # includes
             self.addIMir(r[0], r[2], provenance)
             self.tr.append([r[2], r[0], provenance])
-        elif (r[1] == "is_included_in"):
+        elif (r[1] == relationstr[1] or r[1] == relationstr[6]): # is_included_in
             self.addIMir(r[2], r[0], provenance)
             self.tr.append([r[0], r[2], provenance])
-        elif (r[1] == "equals"):
+        elif (r[1] == relationstr[2] or r[1] == relationstr[7]): # equals
             self.addEMir(r[0], r[2])
             self.addEqMap(r[0], r[2])
         elif (len(r) == 4):
@@ -3749,9 +3749,9 @@ class TaxonomyMapping:
             node2 = items.group(3)
             
             # create tr
-            if rel == "is_included_in" and self.notInTr(node1, node2):
+            if (rel == relationstr[1] or rel == relationstr[6]) and self.notInTr(node1, node2): # is_included_in
                 tmptr.append([node1, node2, 1])
-            if rel == "includes" and self.notInTr(node2, node1):
+            if (rel == relationstr[3] or rel == relationstr[8]) and self.notInTr(node2, node1): # includes
                 tmptr.append([node2, node1, 1])
                 
             # create inter-mir
