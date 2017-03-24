@@ -80,7 +80,7 @@ def apply_style(data_file, f):
     presetGroups.append("subT3")
     presetGroups.append("subT4")
     presetGroups.append("subT5")
-    presetGroups.append("intersectComb")
+    presetGroups.append("newComb")
     firstGroup = ""
     f.write("digraph{\n")
     f.write(str(styles["graphstyle"]["graph"]) + "\n")

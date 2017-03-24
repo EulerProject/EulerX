@@ -885,45 +885,59 @@ class ProductsShowing:
         #fcv.close()
         
     def defineCombConceptGroup(self, conceptStr, firstTName, secondTName, thirdTName, fourthTName, fifthTName):
-        if conceptStr.count("\\\\") == 1 and "\\n" not in conceptStr:
-            taxName = conceptStr.split(".")[0]
-            return taxName
-#             if taxName == firstTName:
-#                 return "subT1"
-#             if taxName == secondTName:
-#                 return "subT2"
-#             if taxName == thirdTName:
-#                 return "subT3"
-#             if taxName == fourthTName:
-#                 return "subT4"
-#             if taxName == fifthTName:
-#                 return "subT5"
-#             return "sub"+taxName
-        elif "*" in conceptStr and "\\n" not in conceptStr:
-            return "intersectComb"
-        elif "\\\\" in conceptStr or "*" in conceptStr:
+        if "\\n" not in conceptStr and (conceptStr.count("\\\\") == 1 or "*" in conceptStr):
+            return "newComb"
+        elif "\\\\" not in conceptStr:
             return "comb"
-        taxNames = Set()
-        concepts = conceptStr.split("\\n")
-        for concept in concepts:
-            taxNames.add(concept.split(".")[0])
-        if firstTName == "2" and secondTName == "1":
-            if firstTName in taxNames and secondTName not in taxNames:
-                return "combT2"
-            elif firstTName not in taxNames and secondTName in taxNames:
-                return "combT1"
-        if firstTName in taxNames and len(taxNames) == 1:
-            return "combT1"
-        if secondTName in taxNames and len(taxNames) == 1:
-            return "combT2"
-        if thirdTName in taxNames and len(taxNames) == 1:
-            return "combT3"
-        if fourthTName in taxNames and len(taxNames) == 1:
-            return "combT4"
-        if fifthTName in taxNames and len(taxNames) == 1:
-            return "combT5"
         else:
-            return "comb"
+            taxNames = Set()
+            concepts = conceptStr.split("\\n")
+            for concept in concepts:
+                if "\\\\" not in concept and "*" not in concept:
+                    return concept.split(".")[0]
+            return "newComb"
+        
+# for old stylesheets
+#         if conceptStr.count("\\\\") == 1 and "\\n" not in conceptStr:
+#             taxName = conceptStr.split(".")[0]
+#             return taxName
+# #             if taxName == firstTName:
+# #                 return "subT1"
+# #             if taxName == secondTName:
+# #                 return "subT2"
+# #             if taxName == thirdTName:
+# #                 return "subT3"
+# #             if taxName == fourthTName:
+# #                 return "subT4"
+# #             if taxName == fifthTName:
+# #                 return "subT5"
+# #             return "sub"+taxName
+#         elif "*" in conceptStr and "\\n" not in conceptStr:
+#             return "intersectComb"
+#         elif "\\\\" in conceptStr or "*" in conceptStr:
+#             return "comb"
+#         taxNames = Set()
+#         concepts = conceptStr.split("\\n")
+#         for concept in concepts:
+#             taxNames.add(concept.split(".")[0])
+#         if firstTName == "2" and secondTName == "1":
+#             if firstTName in taxNames and secondTName not in taxNames:
+#                 return "combT2"
+#             elif firstTName not in taxNames and secondTName in taxNames:
+#                 return "combT1"
+#         if firstTName in taxNames and len(taxNames) == 1:
+#             return "combT1"
+#         if secondTName in taxNames and len(taxNames) == 1:
+#             return "combT2"
+#         if thirdTName in taxNames and len(taxNames) == 1:
+#             return "combT3"
+#         if fourthTName in taxNames and len(taxNames) == 1:
+#             return "combT4"
+#         if fifthTName in taxNames and len(taxNames) == 1:
+#             return "combT5"
+#         else:
+#             return "comb"
+
 
 
     def restructureCbNames(self, cbName, firstTName):
