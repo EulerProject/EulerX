@@ -10,7 +10,7 @@
     wmin: "1"
     wmax: "5"
   nodestyle: 
-    "cluster": "shape=box style=\"filled, rounded\" fillcolor=\"#FFFFCC\""
+    "cluster": "shape=box style=\"filled, rounded\" fillcolor=\"#FFFFCC\" fontname=\"helvetica\""
   edgestyle: 
     - 
       label: "Art."

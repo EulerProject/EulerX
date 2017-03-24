@@ -10,14 +10,14 @@
     wmax: "5"
   nodestyle: 
     default: "shape=circle style=filled fillcolor=\"#FFFFFF\""
-    "1": "shape=box style=filled fillcolor=\"#CCFFCC\""
-    "2": "shape=octagon style=filled fillcolor=\"#FFFFCC\""
-    "3": "shape=box style=filled fillcolor=\"#CCCCFF\""
-    "4": "shape=box style=filled fillcolor=\"#FFCCCC\""
-    "5": "shape=box style=filled fillcolor=\"#CCFFFF\""
-    "combT1": "shape=box style=\"filled,rounded\" fillcolor=\"#CCFFCC\""
-    "combT2": "shape=box style=\"filled,rounded\" fillcolor=\"#FFFFCC\""
-    "comb": "shape=box style=\"filled,rounded\" fillcolor=\"#EEEEEE\""
+    "1": "shape=box style=filled fillcolor=\"#CCFFCC\" fontname=\"helvetica\""
+    "2": "shape=octagon style=filled fillcolor=\"#FFFFCC\" fontname=\"helvetica\""
+    "3": "shape=box style=filled fillcolor=\"#CCCCFF\" fontname=\"helvetica\""
+    "4": "shape=box style=filled fillcolor=\"#FFCCCC\" fontname=\"helvetica\""
+    "5": "shape=box style=filled fillcolor=\"#CCFFFF\" fontname=\"helvetica\""
+    "combT1": "shape=box style=\"filled,rounded\" fillcolor=\"#CCFFCC\" fontname=\"helvetica\""
+    "combT2": "shape=box style=\"filled,rounded\" fillcolor=\"#FFFFCC\" fontname=\"helvetica\""
+    "comb": "shape=box style=\"filled,rounded\" fillcolor=\"#EEEEEE\" fontname=\"helvetica\""
   edgestyle: 
     - 
       label: "default"
