@@ -115,9 +115,9 @@ class Articulation:
             ## initInput is of form b48.a equals k04.a
             self.relation = 0
             if (initInput.find("{") != -1):
-                elements = re.match("(.*)\.(.*) {(.*)} (.*)\.(.*)", initInput)
+                elements = re.match("(.*)\.(\S*)\s*{(.*)}\s*(\S*)\.(.*)", initInput)
             else:
-                elements = re.match("(.*)\.(.*) (.*) (.*)\.(.*)", initInput)
+                elements = re.match("(.*)\.(\S*)\s*(\S*)\s*(\S*)\.(.*)", initInput)
             if elements is None:
                 raise Exception("Syntax error in \""+initInput+"\"!!")
             
