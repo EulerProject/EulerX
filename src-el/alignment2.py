@@ -2169,6 +2169,7 @@ class TaxonomyMapping:
             raw = self.cb.split("\n")
             for line in raw:
                 if line.find("{") != -1:
+                    line = re.match("(.*)\{(.*)\}(.*)", line).group(2)
                     line = line.replace("{","").replace("}","").replace(" ","").replace("),",");")
                     pws.append(line)
         else:
