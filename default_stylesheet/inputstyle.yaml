@@ -11,7 +11,7 @@
   nodestyle: 
     all: "shape=circle style=filled fillcolor=\"#FFFFFF\""
     "1": "shape=box style=filled fillcolor=\"#CCFFCC\" fontname=\"helvetica\""
-    "2": "shape=octagon style=filled fillcolor=\"#FFFFCC\" fontname=\"helvetica\""
+    "2": "shape=note style=filled fillcolor=\"#FFFFCC\" fontname=\"helvetica\""
     "3": "shape=box style=filled fillcolor=\"#CCCCFF\" fontname=\"helvetica\""
     "4": "shape=box style=filled fillcolor=\"#FFCCCC\" fontname=\"helvetica\""
     "5": "shape=box style=filled fillcolor=\"#CCFFFF\" fontname=\"helvetica\""
