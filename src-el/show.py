@@ -118,7 +118,7 @@ class ProductsShowing:
     def show(self):
         #print "self.args", self.args
         
-        if self.args['<inputfile>'] and self.args['iv']:
+        if self.args['<inputfile>'] and (self.args['iv'] or self.args['tv']):
             self.showIV()
         
         elif not os.path.isfile(self.lastruntimestamp) and not os.path.isfile(self.exampleName):
@@ -126,7 +126,7 @@ class ProductsShowing:
             print 'Use "euler2 -h" to see more help.'
         else:
             # show other stuff
-            if self.args['<name>'] == 'iv':
+            if self.args['<name>'] == 'iv' or self.args['<name>'] == 'tv':
                 self.showIV()
             if self.args['<name>'] == 'pw':    # possible worlds
                 self.showPW()
@@ -161,7 +161,7 @@ class ProductsShowing:
         
         return
 
-    def refreshStylesheets(self):
+    def refreshStylesheets(self):            
         if (os.path.isfile(self.stylesheetdir+"inputstyle.yaml")):
             fOld = open(self.stylesheetdir+"inputstyle.yaml", "r")
             contents = fOld.readlines()
@@ -232,15 +232,33 @@ class ProductsShowing:
             contents = "".join(contents)
             fNew.write(contents)
             fNew.flush()
-            fNew.close()        
-        
+            fNew.close()
+    
+        if (os.path.isfile(self.stylesheetdir+"inputtaxonomystyle.yaml")):
+            fOld = open(self.stylesheetdir+"inputtaxonomystyle.yaml", "r")
+            contents = fOld.readlines()
+            fOld.close()
+                
+            for line in contents:
+                if "nodestyle" in line:
+                    index = contents.index(line)
+                if 'all:' in line:
+                    index2 = contents.index(line)
+            
+            del contents[index+1:index2]    # clean nodestyle previously added        
+            fNew = open(self.stylesheetdir+"inputtaxonomystyle.yaml", "w")
+            contents = "".join(contents)
+            fNew.write(contents)
+            fNew.flush()
+            fNew.close()       
+            
         return
     
 
     
     def showIV(self):
         print "******input visualization******"
-        if self.args['<inputfile>'] and self.args['iv']:
+        if self.args['<inputfile>'] and (self.args['iv'] or self.args['tv']):
             inputData = []
             for eachFile in self.args['<inputfile>']:
                 inputData += open(eachFile).readlines()
@@ -260,7 +278,7 @@ class ProductsShowing:
         fifthTName = ""
         taxName = ""
         
-        if self.args['<inputfile>'] and self.args['iv']:
+        if self.args['<inputfile>'] and (self.args['iv'] or self.args['tv']):
             lines = inputData
         else:
             f = open(inputFile, 'r')
@@ -317,61 +335,77 @@ class ProductsShowing:
                     self.addInputVizNode(v, key, self.checkConceptRank(v))
                     self.addInputVizEdge(key + "." + v, key + "." + parent, "isa")
         
-        for a in art:
-            a = a.replace("3sum", "sum")
-            a = a.replace ("4sum", "sum")
-            a = a.replace("3diff", "diff")
-            a = a.replace ("4diff", "diff")
-        
-            if "{" in a:
-                start = a.split(" {")[0]
-                end = a.split("} ")[-1]
-                ops = a.split("{", 1)[1].split("}")[0].split(" ")
-                label = art2symbol.get(ops[0], ops[0])
-                for i in range(1,len(ops)):
-                    label = label + " OR " + art2symbol.get(ops[i], ops[i])
-                self.addInputVizEdge(start, end, label)
-            else:
-                if any(l in a for l in ["lsum", "ldiff"]):
-                    if "lsum" in a:
-                        l = "lsum"
-                        op = "+"
-                    else:
-                        l = "ldiff"
-                        op = "-"
-                    plus = a.split(l + " ")[-1].replace(".","") + op
-                    self.addInputVizNode(plus, "(+)", 0)
-                    self.addInputVizEdge(plus, a.split(" " + l + " ")[-1], "out")
-                    for i in range(0,len(a.split(" " + l)[0].split(" "))):
-                        self.addInputVizEdge(a.split(" " + l)[0].split(" ")[i], plus, "in")
-                elif any(l in a for l in ["rsum", "rdiff"]):
-                    if "rsum" in a:
-                        l = "rsum"
-                        op = "+"
-                    else:
-                        l= "rdiff"
-                        op = "-"
-                    plus = a.split(" " + l)[0].replace(".","") + op
-                    self.addInputVizNode(plus, "(+)", 0)
-                    self.addInputVizEdge(plus, a.split(" " + l + " ")[0], "out")
-                    for i in range(1,len(a.split(" " + l)[-1].split(" "))):
-                        self.addInputVizEdge(a.split(" " + l)[-1].split(" ")[i], plus,"in")
+        if self.args['<inputfile>'] and self.args['iv'] or self.args['<name>'] == 'iv':
+            for a in art:
+                a = a.replace("3sum", "sum")
+                a = a.replace ("4sum", "sum")
+                a = a.replace("3diff", "diff")
+                a = a.replace ("4diff", "diff")
+            
+                if "{" in a:
+                    start = a.split(" {")[0]
+                    end = a.split("} ")[-1]
+                    ops = a.split("{", 1)[1].split("}")[0].split(" ")
+                    label = art2symbol.get(ops[0], ops[0])
+                    for i in range(1,len(ops)):
+                        label = label + " OR " + art2symbol.get(ops[i], ops[i])
+                    self.addInputVizEdge(start, end, label)
                 else:
-                    self.addInputVizEdge(a.split(" ")[0], a.split(" ")[2], art2symbol.get(a.split(" ")[1], a.split(" ")[1]))
+                    if any(l in a for l in ["lsum", "ldiff"]):
+                        if "lsum" in a:
+                            l = "lsum"
+                            op = "+"
+                        else:
+                            l = "ldiff"
+                            op = "-"
+                        plus = a.split(l + " ")[-1].replace(".","") + op
+                        self.addInputVizNode(plus, "(+)", 0)
+                        self.addInputVizEdge(plus, a.split(" " + l + " ")[-1], "out")
+                        for i in range(0,len(a.split(" " + l)[0].split(" "))):
+                            self.addInputVizEdge(a.split(" " + l)[0].split(" ")[i], plus, "in")
+                    elif any(l in a for l in ["rsum", "rdiff"]):
+                        if "rsum" in a:
+                            l = "rsum"
+                            op = "+"
+                        else:
+                            l= "rdiff"
+                            op = "-"
+                        plus = a.split(" " + l)[0].replace(".","") + op
+                        self.addInputVizNode(plus, "(+)", 0)
+                        self.addInputVizEdge(plus, a.split(" " + l + " ")[0], "out")
+                        for i in range(1,len(a.split(" " + l)[-1].split(" "))):
+                            self.addInputVizEdge(a.split(" " + l)[-1].split(" ")[i], plus,"in")
+                    else:
+                        self.addInputVizEdge(a.split(" ")[0], a.split(" ")[2], art2symbol.get(a.split(" ")[1], a.split(" ")[1]))
                 
         # create the yaml file
-        if self.args['<inputfile>'] and self.args['iv'] and not self.args['-o']:
-            inputYamlFile = fileName+".yaml"
-            inputDotFile = fileName+".gv"
-            inputPdfFile = fileName+".pdf"
-            inputSvgFile = fileName+".svg"
-        else:
-            if not os.path.exists(self.inputfilesdir):
-                os.makedirs(self.inputfilesdir)
-            inputYamlFile = os.path.join(self.inputfilesdir, self.name+".yaml")
-            inputDotFile = os.path.join(self.inputfilesdir, self.name+".gv")
-            inputPdfFile = os.path.join(self.inputfilesdir, self.name+".pdf")
-            inputSvgFile = os.path.join(self.inputfilesdir, self.name+".svg")
+        if self.args['<inputfile>'] and self.args['iv'] or self.args['<name>'] == 'iv':
+            if self.args['<inputfile>'] and self.args['iv'] and not self.args['-o']:
+                inputYamlFile = fileName+".yaml"
+                inputDotFile = fileName+".gv"
+                inputPdfFile = fileName+".pdf"
+                inputSvgFile = fileName+".svg"
+            else:
+                if not os.path.exists(self.inputfilesdir):
+                    os.makedirs(self.inputfilesdir)
+                inputYamlFile = os.path.join(self.inputfilesdir, self.name+".yaml")
+                inputDotFile = os.path.join(self.inputfilesdir, self.name+".gv")
+                inputPdfFile = os.path.join(self.inputfilesdir, self.name+".pdf")
+                inputSvgFile = os.path.join(self.inputfilesdir, self.name+".svg")
+            
+        if self.args['<inputfile>'] and self.args['tv'] or self.args['<name>'] == 'tv':
+            if self.args['<inputfile>'] and self.args['tv'] and not self.args['-o']:
+                inputYamlFile = fileName+"_tax.yaml"
+                inputDotFile = fileName+"_tax.gv"
+                inputPdfFile = fileName+"_tax.pdf"
+                inputSvgFile = fileName+"_tax.svg"
+            else:
+                if not os.path.exists(self.inputfilesdir):
+                    os.makedirs(self.inputfilesdir)
+                inputYamlFile = os.path.join(self.inputfilesdir, self.name+"_tax.yaml")
+                inputDotFile = os.path.join(self.inputfilesdir, self.name+"_tax.gv")
+                inputPdfFile = os.path.join(self.inputfilesdir, self.name+"_tax.pdf")
+                inputSvgFile = os.path.join(self.inputfilesdir, self.name+"_tax.svg")
         
         fInputVizYaml = open(inputYamlFile, 'w')
         if self.inputVizNodes:
@@ -382,7 +416,12 @@ class ProductsShowing:
         
         # check whether stylesheet taxonomy names are in stylesheet
         global styles
-        with open(self.stylesheetdir+"inputstyle.yaml") as inputStyleFileOld:
+        if self.args['iv'] or self.args['<name>'] == 'iv':
+            styleFilesToRead = self.stylesheetdir+"inputstyle.yaml"
+        if self.args['tv'] or self.args['<name>'] == 'tv':
+            styleFilesToRead = self.stylesheetdir+"inputtaxonomystyle.yaml"
+            
+        with open(styleFilesToRead) as inputStyleFileOld:
             styles = yaml.load(inputStyleFileOld)
                     
 #        # if taxonomy names are not in stylesheet, rewrite styesheet
@@ -390,7 +429,7 @@ class ProductsShowing:
            or thirdTName not in styles["nodestyle"] or fourthTName not in styles["nodestyle"] \
            or fifthTName not in styles["nodestyle"]:
             value = ""
-            fOld = open(self.stylesheetdir+"inputstyle.yaml", "r")
+            fOld = open(styleFilesToRead, "r")
             contents = fOld.readlines()
             fOld.close()
             
@@ -415,7 +454,7 @@ class ProductsShowing:
                                 
             contents.insert(index+1, value)
 
-            fNew = open(self.stylesheetdir+"inputstyle.yaml", "w")
+            fNew = open(styleFilesToRead, "w")
             contents = "".join(contents)
             fNew.write(contents)
             fNew.flush()
@@ -454,7 +493,7 @@ class ProductsShowing:
         if not firstTName or not secondTName:
             newgetoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"singletoninputstyle.yaml" + ">" + inputDotFile)
         else:
-            newgetoutput("cat "+inputYamlFile+" | y2d -s "+self.stylesheetdir+"inputstyle.yaml" + ">" + inputDotFile)
+            newgetoutput("cat "+inputYamlFile+" | y2d -s "+styleFilesToRead + ">" + inputDotFile)
         if self.args['--svg']:
             newgetoutput("dot -Tsvg "+inputDotFile+" -o "+inputSvgFile)
         else:

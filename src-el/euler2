@@ -31,6 +31,7 @@ Usage:
 	euler2 align <inputfile>... [-o OUTFOLDER] [-e METHOD] [-r TOOL] [-n NPW] [--consistency] [--ambiguity] [--hidemirdisjoint] [--disablecov] [--disablesib] [--repair=WAY] [--artRem] [--fourinone] [--xia] [--ur] [--ie] [--ieo] [--pw]
 	euler2 show [-o OUTFOLDER] <name> [--svg] [--full] [--reduced] [--hideoverlaps]
 	euler2 show iv <inputfile>... [-o OUTFOLDER] [--svg]
+	euler2 show tv <inputfile>... [-o OUTFOLDER] [--svg]
 
 
 Options:
