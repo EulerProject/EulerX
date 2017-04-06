@@ -645,11 +645,11 @@ class ProductsShowing:
                         if(T1 == T3 or T2 == T3):
                             if it.tr.count([T3, T4, P]) > 0:
                                 it.tr.remove([T3, T4, P])
-                                it.tr.append([tmpStr, T4, 0])
+                                it.tr.append([tmpStr, T4, 1])
                         elif(T1 == T4 or T2 == T4):
                             if it.tr.count([T3, T4, P]) > 0:
                                 it.tr.remove([T3, T4, P])
-                                it.tr.append([T3, tmpStr, 0])
+                                it.tr.append([T3, tmpStr, 1])
             
             tmpTr = list(it.tr)
             for [T3, T4, P] in tmpTr:
