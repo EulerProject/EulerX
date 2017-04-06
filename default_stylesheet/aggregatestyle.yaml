@@ -17,6 +17,7 @@
     "5": "shape=box style=filled fillcolor=\"#CCFFFF\" fontname=\"helvetica\""
     "combT1": "shape=box style=\"filled,rounded\" fillcolor=\"#CCFFCC\" fontname=\"helvetica\""
     "combT2": "shape=box style=\"filled,rounded\" fillcolor=\"#FFFFCC\" fontname=\"helvetica\""
+    "newComb": "shape=box style=\"filled,rounded,bold\" fillcolor=\"#FFE0D8\" fontname=\"helvetica\""
     "comb": "shape=box style=\"filled,rounded\" fillcolor=\"#EEEEEE\" fontname=\"helvetica\""
   edgestyle: 
     - 

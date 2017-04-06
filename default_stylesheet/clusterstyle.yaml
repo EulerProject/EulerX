@@ -19,6 +19,6 @@
       penwidth: "off"
     - 
       label: "default"
-      dot: "style=solid color=\"#000000\" constraint=true penwidth=1"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 arrowhead=none"
       display: "label"
       penwidth: "off"

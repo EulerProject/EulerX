@@ -876,11 +876,12 @@ class TaxonomyMapping:
         fpw.write(outputstr)
         fpw.close()
         
-        fcv = open(self.cvinternalfile, "w")
-        fcv.write('pws = ' + repr(pwmirs) + '\n')
-        fcv.write('npw = ' + repr(self.npw) + '\n')
-        fcv.write('cvFlag = ' + repr(False) + '\n')
-        fcv.close()
+        if not os.path.isfile(self.cvinternalfile):
+            fcv = open(self.cvinternalfile, "w")
+            fcv.write('pws = ' + repr(pwmirs) + '\n')
+            fcv.write('npw = ' + repr(self.npw) + '\n')
+            fcv.write('cvFlag = ' + repr(False) + '\n')
+            fcv.close()
         
         fhv = open(self.hvinternalfile, "w")
         fhv.write('firstTName = ' + repr(self.firstTName) + '\n')

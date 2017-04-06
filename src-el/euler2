@@ -56,8 +56,9 @@ Options:
     --pw		  Output also possible worlds in Shawn's reasoner, used with -r rcc1.
     <name>		  The knowledge product you want to show, including: 
     				iv (input visualization)
+    				tv (taxonomy visualization)    				
     				pw (possible worlds)
-    				sv (summary view, including aggregate view, cluster view, hierarchy view)
+    				sv (summary view, including aggregate view, cluster view, hierarchy view)    				
 
 """
 
