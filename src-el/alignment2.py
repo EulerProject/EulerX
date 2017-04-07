@@ -2151,6 +2151,7 @@ class TaxonomyMapping:
             #if self.args.verbose: print raw
             ## Filter out those trash in the gringo output
             for i in range(2, len(raw) - 2, 2):
+                if raw[i].find("relout") == -1: continue
                 pws.append(raw[i].strip().replace(") ",");"))
                 #if self.args.verbose: print pws
         elif reasoner[self.args['-r']] == reasoner["dlv"]:
