@@ -645,11 +645,11 @@ class ProductsShowing:
                         if(T1 == T3 or T2 == T3):
                             if it.tr.count([T3, T4, P]) > 0:
                                 it.tr.remove([T3, T4, P])
-                                it.tr.append([tmpStr, T4, 1])
+                                it.tr.append([tmpStr, T4, 0])
                         elif(T1 == T4 or T2 == T4):
                             if it.tr.count([T3, T4, P]) > 0:
                                 it.tr.remove([T3, T4, P])
-                                it.tr.append([T3, tmpStr, 1])
+                                it.tr.append([T3, tmpStr, 0])
             
             tmpTr = list(it.tr)
             for [T3, T4, P] in tmpTr:
@@ -657,14 +657,14 @@ class ProductsShowing:
                     if(T3 != T5 and set(T3.split("\\n")).issubset(set(T5.split("\\n")))):
                         if it.tr.count([T3, T4, P]) > 0:
                             it.tr.remove([T3, T4, P])
-                            it.tr.append([T5,T4,1])
+                            it.tr.append([T5,T4,0])
             tmpTr = list(it.tr)
             for [T3, T4, P] in tmpTr:
                 for T5 in it.eqConLi:
                     if(T4 != T5 and set(T4.split("\\n")).issubset(set(T5.split("\\n")))):
                         if it.tr.count([T3, T4, P]) > 0:
                             it.tr.remove([T3, T4, P])
-                            it.tr.append([T3,T5,1])
+                            it.tr.append([T3,T5,0])
             tmpeqConLi = []
             
             for T in it.eqConLi:
