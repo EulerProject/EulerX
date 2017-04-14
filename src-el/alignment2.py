@@ -75,6 +75,7 @@ class TaxonomyMapping:
         self.rules = {}
         self.taxonomies = {}                   # set of taxonomies
         self.articulations = []                # set of articulations
+        self.inputoverlaps = []                # set of pair of overlapping concepts in input 
         self.map = {}                          # mapping between the concept name and its numbering
         self.baseAsp = ""                      # tmp string for the ASP input file
         self.baseCb = ""                       # tmp string for the combined concept ASP input file
@@ -843,6 +844,7 @@ class TaxonomyMapping:
                 f.write('eqConLi = ' + repr(pwTm.eqConLi) + '\n')
                 f.write('tr = ' + repr(pwTm.tr) + '\n')
                 f.write('mir = ' + repr(pwTm.mir) + '\n')
+                f.write('inputoverlaps = ' + repr(pwTm.inputoverlaps) + '\n')
                 f.close()
                 
                 #pwTm.genPwRcg(name + "_" + i.__str__() + "_" + self.args['-e'], allRcgNodesDict, i)
@@ -2733,8 +2735,11 @@ class TaxonomyMapping:
     def addArticulation(self, artStr):
         self.articulations += [Articulation(artStr, self)]
         if artStr.find("{") != -1:
-            r = re.match("(.*) \{(.*)\} (.*)", artStr)
+            r = re.match("(.*)\s*\{(.*)\}\s*(.*)", artStr)
             self.addPMir(r.group(1), r.group(3), r.group(2).strip().replace(" ",","), 0)
+            # add input overlaps
+            if "overlaps" in r.group(2) or "><" in r.group(2):
+                self.inputoverlaps.append([r.group(1).strip(), r.group(3).strip()])
         else:
             self.addAMir(artStr, 0)
 
@@ -2828,6 +2833,9 @@ class TaxonomyMapping:
 
     def addAMir(self, astring, provenance):
         r = astring.split(" ")
+        # add to input overlaps
+        if r[1] == relationstr[4] or r[1] == relationstr[9]:
+            self.inputoverlaps.append([r[0].strip(), r[2].strip()])
         #if(self.args.verbose):
         #    print "Articulations: ",astring
         if (r[1] == relationstr[3] or r[1] == relationstr[8]): # includes

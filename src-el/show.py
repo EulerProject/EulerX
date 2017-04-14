@@ -806,7 +806,14 @@ class ProductsShowing:
                         else:
                             self.addRcgVizNode(re.match("(.*)\.(.*)", replace2).group(2), re.match("(.*)\.(.*)", replace2).group(1))
                             self.addRcgAllVizNode(re.match("(.*)\.(.*)", replace2).group(2), re.match("(.*)\.(.*)", replace2).group(1))
-                        self.addRcgVizEdge(replace1, replace2, "overlaps")
+                        # add overlaps edges
+                        if len(it.inputoverlaps) == 0:
+                            self.addRcgVizEdge(replace1, replace2, "overlapsinferred")
+                        else:
+                            if [replace1, replace2] in it.inputoverlaps or [replace2, replace1] in it.inputoverlaps :
+                                self.addRcgVizEdge(replace1, replace2, "overlapsinput")
+                            else:
+                                self.addRcgVizEdge(replace1, replace2, "overlapsinferred")
                         # Skip the reverse pair for redundant edges
                         oskiplist.append(item.group(2)+","+item.group(1))
             
