@@ -45,7 +45,7 @@
       penwidth: "off"
     - 
       label: "overlapsinferred"
-      dot: "arrowhead=none style=dotted color=\"#FF0000\" constraint=false penwidth=1"
+      dot: "arrowhead=none style=dashed color=\"#FF0000\" constraint=false penwidth=1"
       display: ""
       penwidth: "off"
     - 
