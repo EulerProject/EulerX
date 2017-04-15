@@ -39,12 +39,12 @@
       display: ""
       penwidth: "off"
     - 
-      label: "overlapsinput"
+      label: "overlaps (input)"
       dot: "arrowhead=none style=dotted color=\"#0000FF\" constraint=false penwidth=1"
       display: ""
       penwidth: "off"
     - 
-      label: "overlapsinferred"
+      label: "overlaps (inferred)"
       dot: "arrowhead=none style=dashed color=\"#FF0000\" constraint=false penwidth=1"
       display: ""
       penwidth: "off"
