@@ -33,6 +33,7 @@ import re
 import copy
 import relations
 import operator
+import fileinput
 from random import randint
 from helper import *
 from subprocess import call
@@ -311,7 +312,7 @@ class ProductsShowing:
             
             elif (re.match("\(.*\)", line)):
                 
-                conceptsToAdd = re.match("\((.*)\)", line).group(1).split(" ")
+                conceptsToAdd = re.match("\((.*)\)", line).group(1).split()
                 # check multiple nc
                 for c in conceptsToAdd:
                     if c == 'nc':
@@ -766,9 +767,9 @@ class ProductsShowing:
             
             for [T1, T2, P] in it.tr:
                 if(P == 0):
-                    self.addRcgVizEdge(T1, T2, "input")
+                    self.addRcgVizEdge(T1, T2, "is_a (input)")
                 elif(P == 1):
-                    self.addRcgVizEdge(T1, T2, "inferred")
+                    self.addRcgVizEdge(T1, T2, "is_a (inferred)")
                 elif(P == 2):
                     if False:
                         self.addRcgVizEdge(T1, T2, "redundant")
@@ -834,7 +835,6 @@ class ProductsShowing:
                             self.addRcgVizNode(concept1.split(".")[1], concept1.split(".")[0])
                         if not flagConcept2:
                             self.addRcgVizNode(concept2.split(".")[1], concept2.split(".")[0])
-            
             
             # create the visualization file
             rcgYamlFile = os.path.join(self.pwsvizdir, it.fileName+".yaml")
@@ -905,6 +905,15 @@ class ProductsShowing:
                 fNew.flush()
                 fNew.close()
             
+            # tweak rcgyaml file
+            for line in fileinput.input(rcgYamlFile, inplace=1):
+                if '\\\\' in line:
+                    line = line.replace('\\\\',' \\\\ ')
+                if '*' in line:
+                    line = line.replace('*',' * ')
+                if ' * NEW * ' in line:
+                    line = line.replace(' * NEW * ','*NEW*')
+                sys.stdout.write(line)
             
             # apply the rcgviz stylesheet
             newgetoutput("cat "+rcgYamlFile+" | y2d -s "+self.stylesheetdir+stylesheetname + ">" + rcgDotFile)
@@ -932,16 +941,16 @@ class ProductsShowing:
         
     def defineCombConceptGroup(self, conceptStr, firstTName, secondTName, thirdTName, fourthTName, fifthTName):
         if "\\n" not in conceptStr and (conceptStr.count("\\\\") == 1 or "*" in conceptStr):
-            return "newComb"
+            return "*NEW*"
         elif "\\\\" not in conceptStr:
-            return "comb"
+            return "congruent"
         else:
             taxNames = Set()
             concepts = conceptStr.split("\\n")
             for concept in concepts:
                 if "\\\\" not in concept and "*" not in concept:
                     return concept.split(".")[0]
-            return "newComb"
+            return "*NEW*"
         
 # for old stylesheets
 #         if conceptStr.count("\\\\") == 1 and "\\n" not in conceptStr:
@@ -1098,7 +1107,7 @@ class ProductsShowing:
                     tmprels.add(T1)
                     tmprels.add(T2)
             for key, value in self.allRcgNodesDict.iteritems():
-                if value['group']  == 'comb':
+                if value['group']  == 'congruent':
                     if value['concept'] not in tmprels:
                         removekey.add(key)
                 else:
@@ -1117,7 +1126,7 @@ class ProductsShowing:
                     tmprels.add(T1)
                     tmprels.add(T2)
             for key, value in self.allRcgNodesDict.iteritems():
-                if value['group']  == 'comb':
+                if value['group']  == 'congruent':
                     if value['concept'] not in tmprels:
                         removekey.add(key)
                 else:
@@ -1486,7 +1495,7 @@ class ProductsShowing:
         # read mis internal files
         misInternalFile = os.path.join(self.pwinternalfilesdir, 'mis.internal')
         if not os.path.isfile(misInternalFile):
-            print 'No MIS generated for this example, run "euler2 align" first'
+            print 'No MIS generated for this example, run "euler2 align" with "--repair=HST" first'
             return
 
         # create 6-Lattice/ folder

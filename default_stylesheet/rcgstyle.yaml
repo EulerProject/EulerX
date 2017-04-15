@@ -26,15 +26,15 @@
     "subT4": "shape=box style=\"filled,rounded,dashed\" fillcolor=\"#FFCCCC\" fontname=\"helvetica\""
     "subT5": "shape=box style=\"filled,rounded,dashed\" fillcolor=\"#CCFFFF\" fontname=\"helvetica\""
     "intersectComb": "shape=box style=\"filled,rounded,bold\" fillcolor=\"#EEEEEE\" fontname=\"helvetica\""
-    "comb": "shape=box style=\"filled,rounded\" fillcolor=\"#EEEEEE\" fontname=\"helvetica\""
+    "congruent": "shape=box style=\"filled,rounded\" fillcolor=\"#EEEEEE\" fontname=\"helvetica\""
   edgestyle: 
     - 
-      label: "input"
+      label: "is_a (input)"
       dot: "arrowhead=normal style=solid color=\"#000000\" constraint=true penwidth=1"
       display: ""
       penwidth: "off"
     - 
-      label: "inferred"
+      label: "is_a (inferred)"
       dot: "arrowhead=normal style=solid color=\"#FF0000\" constraint=true penwidth=1"
       display: ""
       penwidth: "off"

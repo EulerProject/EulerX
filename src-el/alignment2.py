@@ -704,12 +704,6 @@ class TaxonomyMapping:
             self.allJustificationsFourinone(sets.Set(self.articulations))
             self.postFourinone()
             return
-        if self.args['--artRem']:
-            if self.isPwUnique():
-                print "************************************"
-                print "Unique possible world generated"
-                self.allJustifications(sets.Set(self.articulations), 'Ambiguity')
-                return
         if self.isPwNone():
             print "************************************"
             print "Input is inconsistent\n"
@@ -725,6 +719,12 @@ class TaxonomyMapping:
         #if not self.pwflag: return None
         self.intOutPw(self.name, self.pwflag)
         self.genMir()
+        if self.args['--artRem']:
+            if self.isPwUnique():
+                print "************************************"
+                print "Unique possible world generated"
+                self.allJustifications(sets.Set(self.articulations), 'Ambiguity')
+                return
         self.updateReportFile(self.reportfile)
 
     #
@@ -1015,8 +1015,8 @@ class TaxonomyMapping:
             tmpComLi.append(newT)
             tmpCom += "  \""+newT+"\"\n"
             if self.isCbInterTaxonomy(newT):
-                self.addRcgVizNode(newT, "comb")
-            self.addRcgAllVizNode(newT, "comb", allRcgNodesDict)
+                self.addRcgVizNode(newT, "congruent")
+            self.addRcgAllVizNode(newT, "congruent", allRcgNodesDict)
             
         # Duplicates
     	tmpTr = list(self.tr)
@@ -1075,8 +1075,8 @@ class TaxonomyMapping:
                 if T1[0] != T2[0]:
                     tmpComLi.append(T1)
                     tmpCom += "  \""+T1+"\"\n"
-                    self.addRcgVizNode(T1, "comb")
-                    self.addRcgAllVizNode(T1, "comb", allRcgNodesDict)
+                    self.addRcgVizNode(T1, "congruent")
+                    self.addRcgAllVizNode(T1, "congruent", allRcgNodesDict)
             if(T2.find("*") == -1 and T2.find("\\") == -1 and T2.find("\\n") == -1 and T2.find(".") != -1):
                 T2s = T2.split(".")
                 if self.firstTName == T2s[0]:
@@ -1091,8 +1091,8 @@ class TaxonomyMapping:
                 if T1[0] != T2[0]:
                     tmpComLi.append(T2)
                     tmpCom += "  \""+T2+"\"\n"
-                    self.addRcgVizNode(T2, "comb")
-                    self.addRcgAllVizNode(T2, "comb", allRcgNodesDict)
+                    self.addRcgVizNode(T2, "congruent")
+                    self.addRcgAllVizNode(T2, "congruent", allRcgNodesDict)
                 
         # Dot drawing used for old viz
 #        fDot.write("  node [shape=box style=\"filled\" fillcolor=\"#CCFFCC\"]\n")
@@ -1145,15 +1145,15 @@ class TaxonomyMapping:
 #                    fDot.write("     \"" + replace1 + "\" -> \"" + replace2 + "\"\n")
                     if "\\n" in replace1 or "\\\\" in replace1:
                         replace1 = self.restructureCbNames(replace1)
-                        self.addRcgVizNode(replace1, "comb")
-                        self.addRcgAllVizNode(replace1, "comb", allRcgNodesDict)
+                        self.addRcgVizNode(replace1, "congruent")
+                        self.addRcgAllVizNode(replace1, "congruent", allRcgNodesDict)
                     else:
                         self.addRcgVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1))
                         self.addRcgAllVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1), allRcgNodesDict)
                     if "\\n" in replace2 or "\\\\" in replace2:
                         replace2 = self.restructureCbNames(replace2)
-                        self.addRcgVizNode(replace2, "comb")
-                        self.addRcgAllVizNode(replace2, "comb", allRcgNodesDict)
+                        self.addRcgVizNode(replace2, "congruent")
+                        self.addRcgAllVizNode(replace2, "congruent", allRcgNodesDict)
                     else:
                         self.addRcgVizNode(re.match("(.*)\.(.*)", replace2).group(2), re.match("(.*)\.(.*)", replace2).group(1))
                         self.addRcgAllVizNode(re.match("(.*)\.(.*)", replace2).group(2), re.match("(.*)\.(.*)", replace2).group(1), allRcgNodesDict)
@@ -1930,6 +1930,9 @@ class TaxonomyMapping:
         elif self.args['--repair'] == "minIncSubset":
             self.minInconsRemedy()
         elif self.args['--repair'] == "HST":
+            if not self.enc & encode["pw"]:
+                print 'Please run euler2 with "-e mnpw" to generate MIS'
+                exit(0)
             print "Here lists MIS:"
             self.allJustifications(sets.Set(self.articulations), "Consistency")
         # By default, we use top down remedy to repair
