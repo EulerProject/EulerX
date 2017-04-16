@@ -283,6 +283,11 @@ class TaxonomyMapping:
             self.xiadir = os.path.join(self.outputdir, "11-ExtractInput")
             if not os.path.exists(self.xiadir):
                 os.mkdir(self.xiadir)
+                
+        if self.args['--artRem']:
+            self.maidir = os.path.join(self.outputdir, "12-MinArtInput")
+            if not os.path.exists(self.maidir):
+                os.mkdir(self.maidir)
         
         if not self.args['-n']:
             self.args['-n'] = '0'             # by default output all possible worlds
@@ -1354,6 +1359,7 @@ class TaxonomyMapping:
                                 print ",",
                             f.write(self.artIndex.index(lj[i].string.strip()).__str__())
                             #print lj[i].ruleNum,":",lj[i].string,
+                            self.genMinArtInput(lj[i].string, self.fixedCnt)
                             print lj[i].string,
                         f.write("]\n")
                         print "]"
@@ -1390,6 +1396,7 @@ class TaxonomyMapping:
                                 print ",",
                             f.write(self.artIndex.index(lj[i].string.strip()).__str__())
                             #print lj[i].ruleNum,":",lj[i].string,
+                            self.genMinArtInput(lj[i].string, self.fixedCnt)
                             print lj[i].string,
                             
     #                         # store for fourinone lattice
@@ -1431,6 +1438,20 @@ class TaxonomyMapping:
             tmpart = copy.copy(artSet)
             tmpart.remove(a)
             self.computeAllJust(tmpart, justSet, tmpcur, allpaths, flag)
+            
+    def genMinArtInput(self, artStr, count):
+        minartFile = os.path.join(self.maidir, self.name+"_minart_"+str(count)+".txt")
+        if not os.path.isfile(minartFile):
+            f = open(os.path.join(self.inputfilesdir, self.name+".txt"), "r")
+            lines = f.readlines()
+            f.close()
+            f = open(minartFile, "w")
+            for line in lines:
+                if line != "\n" and line.find("[") == -1:
+                    f.write(line)
+        f = open(minartFile, "a")
+        f.write("["+artStr+"]\n")
+        
             
     def isConsistent(self, artSet):
         tmpart1 = copy.copy(self.articulations)
