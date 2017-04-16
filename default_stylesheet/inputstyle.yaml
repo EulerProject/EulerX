@@ -19,17 +19,17 @@
   edgestyle: 
     - 
       label: "isa"
-      dot: "style=solid color=\"#000000\" constraint=true penwidth=1"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 arrowhead=normal"
       display: ""
       penwidth: "off"
     - 
       label: "in"
-      dot: "style=solid color=\"#000000\" constraint=true penwidth=1"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 arrowhead=normal"
       display: ""
       penwidth: "off"
     - 
       label: "out"
-      dot: "style=solid color=\"#000000\" constraint=true penwidth=1"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 arrowhead=normal"
       display: ""
       penwidth: "off"
     - 
@@ -39,16 +39,16 @@
       penwidth: "off"
     - 
       label: "default"
-      dot: "style=solid color=\"#000000\" constraint=true penwidth=1"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 arrowhead=normal"
       display: "label"
       penwidth: "off"
     - 
       label: "=="
-      dot: "style=dotted color=\"#AA00FF\" constraint=true penwidth=3"
+      dot: "style=dotted color=\"#AA00FF\" constraint=true penwidth=3 arrowhead=normal"
       display: "="
       penwidth: "off"
     - 
       label: "all"
-      dot: "style=solid color=\"#000000\" constraint=true penwidth=1"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 arrowhead=normal"
       display: "label"
       penwidth: "off"
