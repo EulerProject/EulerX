@@ -1359,7 +1359,6 @@ class TaxonomyMapping:
                                 print ",",
                             f.write(self.artIndex.index(lj[i].string.strip()).__str__())
                             #print lj[i].ruleNum,":",lj[i].string,
-                            self.genMinArtInput(lj[i].string, self.fixedCnt)
                             print lj[i].string,
                         f.write("]\n")
                         print "]"
