@@ -942,15 +942,28 @@ class ProductsShowing:
     def defineCombConceptGroup(self, conceptStr, firstTName, secondTName, thirdTName, fourthTName, fifthTName):
         if "\\n" not in conceptStr and (conceptStr.count("\\\\") == 1 or "*" in conceptStr):
             return "*NEW*"
-        elif "\\\\" not in conceptStr:
+        elif "\\\\" not in conceptStr and "*" not in conceptStr:
             return "congruent"
         else:
-            taxNames = Set()
+            taxNames = set()
             concepts = conceptStr.split("\\n")
             for concept in concepts:
-                if "\\\\" not in concept and "*" not in concept:
-                    return concept.split(".")[0]
-            return "*NEW*"
+                if not "*" in concept.split(".")[1] and not "\\\\" in concept.split(".")[1]:
+                    taxNames.add(concept.split(".")[0])
+            if len(taxNames) > 1:
+                return "congruent"
+            elif len(taxNames) == 1:
+                return taxNames.pop()
+            else:
+                return "*NEW*"
+            
+#         else:
+#             taxNames = set()
+#             concepts = conceptStr.split("\\n")
+#             for concept in concepts:            
+#                 if "\\\\" not in concept and "*" not in concept:
+#                     return concept.split(".")[0]
+#             return "*NEW*"
         
 # for old stylesheets
 #         if conceptStr.count("\\\\") == 1 and "\\n" not in conceptStr:
