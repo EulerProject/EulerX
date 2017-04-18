@@ -60,7 +60,7 @@ def newgetoutput(cmd):
 
 def createLastRunTimeStamp(fileName, user, host, timestamp, name):
     f = open(fileName, "w")
-    s = os.path.join(user + '-' + host, timestamp + '-' + name)
+    s = os.path.join(user, host, timestamp + '-' + name)
     f.write(s)
     f.write('\n')
     f.write(name)

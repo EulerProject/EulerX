@@ -51,13 +51,13 @@ class ProductsShowing:
         self.runningHost = socket.gethostname()
         self.projectdir = ''      # initiate the project folder to be the current folder
         self.lastrundir = ''
-        self.userdir = ''
-        self.lastruntimestamp = os.path.join(self.projectdir, self.runningUser+'-'+self.runningHost+'-lastrun.timestamp')
+        #self.userdir = ''
+        self.lastruntimestamp = os.path.join(self.projectdir, self.runningUser, self.runningHost+'-lastrun.timestamp')
         self.exampleName = ''        
         if os.path.isfile(self.lastruntimestamp):
             f = open(self.lastruntimestamp, "r")
             self.lastrundir = f.readline().strip()
-            self.userdir = re.match('(.*)/(.*)', self.lastrundir).group(1)
+         #   self.userdir = re.match('(.*)/(.*)', self.lastrundir).group(1)
             self.name = f.readline()
             f.close()
         

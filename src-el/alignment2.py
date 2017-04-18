@@ -125,17 +125,20 @@ class TaxonomyMapping:
         self.runningDate = strftime("%Y-%m-%d-%H:%M:%S", localtime())   # running date
         self.projectdir = ''               # initiate project folder to be the current folder, inputdir originally
         if not self.args['-o']:
-            self.userdir = os.path.join(self.projectdir, self.runningUser+"-"+self.runningHost)
+            self.userdir = os.path.join(self.projectdir, self.runningUser)
             if not os.path.exists(self.userdir):
                 os.mkdir(self.userdir)
-            self.outputdir = os.path.join(self.userdir, self.runningDate+"-"+self.name)
+            self.hostdir = os.path.join(self.userdir, self.runningHost)
+            if not os.path.exists(self.hostdir):
+                os.mkdir(self.hostdir)
+            self.outputdir = os.path.join(self.hostdir, self.runningDate+"-"+self.name)
         else:
             self.outputdir = os.path.join(self.args['-o'])
         
         # construct a last run time stamp for "show" command to track
         if args['align']:
             if not self.args['-o']:
-                self.lastrunfile = os.path.join(self.projectdir, self.runningUser+'-'+self.runningHost+'-lastrun.timestamp')
+                self.lastrunfile = os.path.join(self.userdir, self.runningHost+'-lastrun.timestamp')
                 createLastRunTimeStamp(self.lastrunfile, self.runningUser, self.runningHost, self.runningDate, self.name)
             else:
                 self.lastrunfile = os.path.join(self.outputdir, 'lastrun.timestamp')
@@ -145,7 +148,7 @@ class TaxonomyMapping:
         if not os.path.isfile(self.reportfile):
             f = open(self.reportfile, "w")
             writer = csv.writer(f, delimiter='\t')
-            writer.writerow(['START_TIME','END_TIME','DURATION','INPUT-FILE','#PWs'])
+            writer.writerow(['USER','INPUT_FILE','#PWS','DURATION','START_TIME','END_TIME'])
             f.close()
         
         if not os.path.exists(self.outputdir):
@@ -285,7 +288,7 @@ class TaxonomyMapping:
                 os.mkdir(self.xiadir)
                 
         if self.args['--artRem']:
-            self.maidir = os.path.join(self.outputdir, "12-MinArtInput")
+            self.maidir = os.path.join(self.outputdir, "0-MinArtInput")
             if not os.path.exists(self.maidir):
                 os.mkdir(self.maidir)
         
@@ -729,6 +732,7 @@ class TaxonomyMapping:
                 print "************************************"
                 print "Unique possible world generated"
                 self.allJustifications(sets.Set(self.articulations), 'Ambiguity')
+                print self.fixedCnt, "minimal articulation input files are created in 0-MinArtInput."
                 return
         self.updateReportFile(self.reportfile)
 
@@ -3351,8 +3355,10 @@ class TaxonomyMapping:
     def updateReportFile(self, fileName):
         f = open(fileName, "a")
         writer = csv.writer(f, delimiter='\t')
-        writer.writerow([self.runningDate, strftime("%Y-%m-%d-%H:%M:%S", localtime()), (time.time()-self.startTime).__str__(),\
-                         self.name, self.npw.__str__()])
+#         writer.writerow([self.runningDate, strftime("%Y-%m-%d-%H:%M:%S", localtime()), (time.time()-self.startTime).__str__(),\
+#                          self.name, self.npw.__str__()])
+        writer.writerow([self.runningUser, self.name, self.npw.__str__(), 
+                         (time.time()-self.startTime).__str__(), self.runningDate, strftime("%Y-%m-%d-%H:%M:%S", localtime())])
         f.close()
         
         

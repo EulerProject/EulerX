@@ -19,36 +19,36 @@
   edgestyle: 
     - 
       label: "isa"
-      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 arrowhead=normal"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 dir=forward"
       display: ""
       penwidth: "off"
     - 
       label: "in"
-      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 arrowhead=normal"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 dir=forward"
       display: ""
       penwidth: "off"
     - 
       label: "out"
-      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 arrowhead=normal"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 dir=forward"
       display: ""
       penwidth: "off"
     - 
       label: "articulations"
-      dot: "style=dashed color=\"#AA00FF\" constraint=true penwidth=1 arrowhead=none"
+      dot: "style=dashed color=\"#AA00FF\" constraint=true penwidth=1 dir=both"
       display: "label"
       penwidth: "off"
     - 
       label: "default"
-      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 arrowhead=normal"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 dir=forward"
       display: "label"
       penwidth: "off"
     - 
       label: "=="
-      dot: "style=dotted color=\"#AA00FF\" constraint=true penwidth=3 arrowhead=normal"
+      dot: "style=dotted color=\"#AA00FF\" constraint=true penwidth=3 dir=forward"
       display: "="
       penwidth: "off"
     - 
       label: "all"
-      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 arrowhead=normal"
+      dot: "style=solid color=\"#000000\" constraint=true penwidth=1 dir=forward"
       display: "label"
       penwidth: "off"
