@@ -70,10 +70,10 @@ def main(infile, hashfile):
         elif is_hierarchy(line):
             terms = hierarchy_terms(line)
             sys.stdout.write('(')
-            for term in terms[1:-1]:
+            for term in terms[0:-1]:
                 new_id = inv_mapping[taxonomy + '.' + term].split('.')[1]
                 sys.stdout.write(new_id + ' ')
-            sys.stdout.write(inv_mapping[taxonomy+'.'+term].split('.')[1])
+            sys.stdout.write(inv_mapping[taxonomy+'.'+terms[-1]].split('.')[1])
             sys.stdout.write(')\n')
         # articulation section
         elif is_articulation_header(line): 
