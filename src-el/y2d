@@ -101,7 +101,7 @@ def apply_style(data_file, f):
                     wList.append(data[key]["w"])
                 else:
                     wList.append("1")
-                if value["label"] in ["==", "><", "!", ">" , "<","?","in","out"] or "OR" in str(value["label"]):
+                if value["label"] in ["=", "o", "!", ">" , "<","?","in","out"] or "  " in str(value["label"]):
                     edges["articulations"].append(value.items())
                 elif value["label"] == "isa":
                     # separate "isa" edges based on their group

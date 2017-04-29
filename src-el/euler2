@@ -38,7 +38,7 @@ Options:
     -h --help		  Show this screen.
     --version		  Show version.
     -e METHOD		  Set the encoding method, including mnpw, mncb, mnve, vrpw, vrve [default: mnpw].
-    -r TOOl		  Set the reasoner, including dlv and gringo [default: dlv].
+    -r TOOl		  Set the reasoner, including dlv, gringo, rcc1, rcc2 [default: dlv].
     -n NPW		  Set the number of possible worlds output, by default output all PWs.
     -o OUTFOLDER	  Set the output folder, ignore it to use the current folder.
     --consistency	  Check consistency ONLY.

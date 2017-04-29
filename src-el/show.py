@@ -326,7 +326,7 @@ class ProductsShowing:
             elif (re.match("\[.*?\]", line)):
                 art.append(re.match("\[(.*)\]", line).group(1))
                 
-        art2symbol = {"equals":"==","is_included_in":"<","includes":">","overlaps":"><","disjoint":"!"}
+        art2symbol = {"equals":"=","is_included_in":"<","includes":">","overlaps":"o","disjoint":"!"}
         
         for key, attr in group2concepts.iteritems():
             for value in attr:
@@ -344,12 +344,16 @@ class ProductsShowing:
                 a = a.replace ("4diff", "diff")
             
                 if "{" in a:
-                    start = a.split(" {")[0]
-                    end = a.split("} ")[-1]
-                    ops = a.split("{", 1)[1].split("}")[0].split(" ")
-                    label = art2symbol.get(ops[0], ops[0])
+                    r = re.match("(.*)\s*\{(.*)\}\s*(.*)", a)
+                    start = r.group(1).strip()
+                    end = r.group(3).strip()
+                    ops = r.group(2).strip().split()
+                    label = art2symbol.get(ops[0],ops[0])
+                    
                     for i in range(1,len(ops)):
-                        label = label + " OR " + art2symbol.get(ops[i], ops[i])
+                        label = label + "  " + art2symbol.get(ops[i], ops[i])
+                    label = label.replace("<  =", "=  <").replace("=  >", ">  =")    
+                    label = "{" + label + "}"
                     self.addInputVizEdge(start, end, label)
                 else:
                     if any(l in a for l in ["lsum", "ldiff"]):
@@ -377,7 +381,9 @@ class ProductsShowing:
                         for i in range(1,len(a.split(" " + l)[-1].split(" "))):
                             self.addInputVizEdge(a.split(" " + l)[-1].split(" ")[i], plus,"in")
                     else:
-                        self.addInputVizEdge(a.split(" ")[0], a.split(" ")[2], art2symbol.get(a.split(" ")[1], a.split(" ")[1]))
+                        a = a.strip()
+                        r = re.match("(\S*)\s*(\S*)\s*(\S*)", a)
+                        self.addInputVizEdge(r.group(1), r.group(3), art2symbol.get(r.group(2), r.group(2)))
                 
         # create the yaml file
         if self.args['<inputfile>'] and self.args['iv'] or self.args['<name>'] == 'iv':

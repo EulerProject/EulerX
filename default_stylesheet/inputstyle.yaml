@@ -34,7 +34,7 @@
       penwidth: "off"
     - 
       label: "articulations"
-      dot: "style=dashed color=\"#AA00FF\" constraint=true penwidth=1 dir=both"
+      dot: "style=dashed color=\"#AA00FF\" constraint=true penwidth=2 dir=both"
       display: "label"
       penwidth: "off"
     - 
