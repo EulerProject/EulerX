@@ -131,7 +131,7 @@ class Articulation:
                 if (relation.has_key(relString)):
                     self.relations = rcc5[relString]
                 else:
-                    relElements = re.split("\s", relString)
+                    relElements = re.split("\s+", relString)
                     
                     for rel in relElements:
                         self.relations |= rcc5[rel]

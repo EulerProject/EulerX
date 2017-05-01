@@ -105,9 +105,9 @@ class Taxonomy:
             return (self.taxa[theTaxon]);
         
     def addTaxaWithList(self, taxaMap, theList):
-        noParens = re.match("\((.*)\)", theList).group(1)
+        noParens = re.match("\((.*)\)", theList).group(1).strip()
         if (noParens.find(" ") != -1):
-            elements = re.split("\s", noParens)
+            elements = re.split("\s+", noParens)
             # no coverage
             nc = False
 #            if elements[len(elements)-1] != "nc":

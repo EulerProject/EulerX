@@ -1399,7 +1399,8 @@ class TaxonomyMapping:
                                 print ",",
                             f.write(self.artIndex.index(lj[i].string.strip()).__str__())
                             #print lj[i].ruleNum,":",lj[i].string,
-                            self.genMinArtInput(lj[i].string, self.fixedCnt)
+                            if not self.args['--fourinone']:
+                                self.genMinArtInput(lj[i].string, self.fixedCnt)
                             print lj[i].string,
                             
     #                         # store for fourinone lattice
@@ -2763,7 +2764,8 @@ class TaxonomyMapping:
         self.articulations += [Articulation(artStr, self)]
         if artStr.find("{") != -1:
             r = re.match("(.*)\s*\{(.*)\}\s*(.*)", artStr)
-            self.addPMir(r.group(1), r.group(3), r.group(2).strip().replace(" ",","), 0)
+            tmp = ' '.join(r.group(2).strip().split())
+            self.addPMir(r.group(1).strip(), r.group(3).strip(), tmp.replace(" ",","), 0)
             # add input overlaps
             if "overlaps" in r.group(2) or "><" in r.group(2):
                 self.inputoverlaps.append([r.group(1).strip(), r.group(3).strip()])

@@ -24,6 +24,7 @@
 #from taxonomy import *
 #from alignment import *
 import os
+import shutil
 import getpass
 import socket
 import inspect
@@ -39,6 +40,7 @@ from helper import *
 from subprocess import call
 from sets import Set
 from diaglattice import *
+from fileinput import filename
 
 class ProductsShowing:
     
@@ -143,6 +145,7 @@ class ProductsShowing:
                 self.showAV("regular")
                 self.showAV("avStable")
                 self.showAV("avLabile")
+                self.removeInternalfiles("av.internal")
                 self.showCV()
                 self.showHV()
             #if self.args['<name>'] == 'cv':    # cluster view
@@ -530,7 +533,7 @@ class ProductsShowing:
         else:
             return 2
 
-    def showPW(self):
+    def showPW(self):        
         # if this is an inconsistent example (there is no PW)
         if not os.path.isfile(os.path.join(self.pwinternalfilesdir, self.name+".pw")) \
         and not os.path.isfile(os.path.join(self.pwinternalfilesdir, "pw.internal0")):
@@ -541,6 +544,9 @@ class ProductsShowing:
         
         if not os.path.exists(self.pwsvizdir):
             os.mkdir(self.pwsvizdir)
+        else:
+            print "Possible worlds already generated in 4-PWs."
+            return
              
         numOfPws = len([f for f in os.walk(self.pwinternalfilesdir).next()[2] if f[0:11] == "pw.internal" and f[-1] != 'c'])
         avInternalFile = os.path.join(self.pwinternalfilesdir, 'av.internal')
@@ -945,6 +951,9 @@ class ProductsShowing:
         #fcv.write('cvFlag = ' + repr(True) + '\n')
         #fcv.close()
         
+        self.removeInternalfiles("pw.internal")
+        
+        
     def defineCombConceptGroup(self, conceptStr, firstTName, secondTName, thirdTName, fourthTName, fifthTName):
         if "\\n" not in conceptStr and (conceptStr.count("\\\\") == 1 or "*" in conceptStr):
             return "*NEW*"
@@ -1073,6 +1082,10 @@ class ProductsShowing:
         self.rcgVizEdges.update({s + "_" + t : edge})
         
     def checkPwFlag(self):
+        if os.path.exists(self.pwsaggregatedir):
+            print "Summary view already generated in 5-Aggregates."
+            exit(0)
+        
         avInternalFile = os.path.join(self.pwinternalfilesdir, 'av.internal')
         it = imp.load_source('it', avInternalFile)
         # check whether showPW() run first
@@ -1236,9 +1249,7 @@ class ProductsShowing:
         if self.args['--svg']:
             newgetoutput("dot -Tsvg "+rcgAllDotFile+" -o "+rcgAllSvgFile)
         else:
-            newgetoutput("dot -Tpdf "+rcgAllDotFile+" -o "+rcgAllPdfFile)
-        
-        
+            newgetoutput("dot -Tpdf "+rcgAllDotFile+" -o "+rcgAllPdfFile)        
     
     def addRcgAllVizNode(self, concept, group):
         node = {}
@@ -1276,6 +1287,7 @@ class ProductsShowing:
         # if there is only one PW, showCV will return nothing
         if it.npw == 1:
             print "There is only ONE possible world, no cluster view."
+            self.removeInternalfiles("cv.internal")
             return
         
         obs = False
@@ -1356,9 +1368,9 @@ class ProductsShowing:
         else:
             newgetoutput("neato -Tpdf "+cldot+" -o "+clneatopdf)
         #newgetoutput("dot -Tpdf "+cldot+" -o "+cldotpdf)
-        #newgetoutput("dot -Tsvg "+cldot+" -o "+cldotsvg)        
-
+        #newgetoutput("dot -Tsvg "+cldot+" -o "+cldotsvg)
         
+        self.removeInternalfiles("cv.internal")
         
     def addClusterVizNode(self, concept):
         node = {}
@@ -1483,7 +1495,8 @@ class ProductsShowing:
             newgetoutput("dot -Tsvg "+hvdot+" -o "+hvdotsvg)
         else:
             newgetoutput("dot -Tpdf "+hvdot+" -o "+hvdotpdf)
-
+            
+        self.removeInternalfiles("hv.internal")
         
     def getCollapsedNode(self, mergedNode):
         name = ""
@@ -1514,6 +1527,9 @@ class ProductsShowing:
         # read mis internal files
         misInternalFile = os.path.join(self.pwinternalfilesdir, 'mis.internal')
         if not os.path.isfile(misInternalFile):
+            if os.path.exists(self.latticedir):
+                print "Inconsistency lattice already generated in 6-Lattices"
+                return
             print 'No MIS generated for this example, run "euler2 align" with "--repair=HST" first'
             return
 
@@ -1561,6 +1577,8 @@ class ProductsShowing:
             else:
                 newgetoutput("dot -Tpdf "+redLatDotFile+" -o "+redLatPdfFile)
         
+        self.removeInternalfiles("mis.internal")
+        
 #         inputFile = os.path.abspath(os.path.join(self.inputfilesdir, self.name+".txt"))
 #         latticeFolder = os.path.abspath(self.latticedir)
 #         outputMIS = os.path.abspath(self.output)
@@ -1594,6 +1612,9 @@ class ProductsShowing:
         # read fourinone internal files
         fourinoneInternalFile = os.path.join(self.pwinternalfilesdir, 'fourinone.internal')
         if not os.path.isfile(fourinoneInternalFile):
+            if os.path.exists(self.latticedir):
+                print "Fourinone lattice already generated in 6-Lattices"
+                return
             print 'Need to run "euler2 align" with option "--fourinone" first'
             return
 
@@ -1665,6 +1686,8 @@ class ProductsShowing:
             newgetoutput("dot -Tsvg "+fourinoneLatDotFile+" -o "+fourinoneLatSvgFile)
         else:
             newgetoutput("dot -Tpdf "+fourinoneLatDotFile+" -o "+fourinoneLatPdfFile)
+            
+        self.removeInternalfiles("fourinone.internal")
 
     def convertToIndex(self, s, power):
         result = ""
@@ -1680,18 +1703,18 @@ class ProductsShowing:
 
     def showAmbLAT(self):
         # if this is a inconsistent example (there is at least one PW)
-        if os.path.isfile(os.path.join(self.pwinternalfilesdir, 'mis.internal')):
+        if not os.path.isfile(os.path.join(self.pwinternalfilesdir, self.name+'.pw')):
             print "This is an inconsistent example, no ambiguity lattice generated."
             return
         
         # read mas internal files or pw files
         masInternalFile = os.path.join(self.pwinternalfilesdir, 'mas.internal')
-        secondPwInternalFile = os.path.join(self.pwinternalfilesdir, 'pw.internal1')
         if not os.path.isfile(masInternalFile):
-            if os.path.isfile(secondPwInternalFile):
-                print 'This example has more than one possible world, no ambiguity lattice generated.'
-            else:
-                print 'No MUS generated for this example, run "euler2 align" with --artRem first.'
+            if os.path.exists(self.latticedir):
+                print "Ambiguity lattice already generated in 6-Lattices"
+                return
+            print 'No MUS generated for this example. This example may have more than one possible world.'
+            print 'Run "euler2 align" with --artRem first.'
             return
 
         # create 6-Lattice/ folder
@@ -1727,6 +1750,9 @@ class ProductsShowing:
             newgetoutput("dot -Tsvg "+fullAmbLatDotFile+" -o "+fullAmbLatSvgFile)
         else:
             newgetoutput("dot -Tpdf "+fullAmbLatDotFile+" -o "+fullAmbLatPdfFile)
+            
+        self.removeInternalfiles("mas.internal")
+        self.removeInternalfiles("arts2NumPW.internal")
         
     def showPW2INPUT(self):
         # if this is an inconsistent example (there is no PW)
@@ -1734,9 +1760,12 @@ class ProductsShowing:
             print "This is an inconsistent example, no possible worlds generated."
             return
         
-        print "******transfer possible worlds to input file******"
+        print "******transfer possible worlds to taxonomies******"
         
         if not os.path.isfile(os.path.join(self.pwinternalfilesdir, 'pw2input.internal0')):
+            if os.path.exists(self.mergeinputdir):
+                print "Already done, check 7-Merge-input."
+                return
             print 'Need to run "euler2 show pw" first.'
             return
         
@@ -1805,5 +1834,16 @@ class ProductsShowing:
                 f.write(str.strip())
                 f.write(')\n')
             f.close()
-        
+            
+        self.removeInternalfiles("pw2input.internal")
+    
+    def removeInternalfiles(self, fileName):
+        for internalfileName in os.listdir(self.pwinternalfilesdir):
+            internalFilePath = os.path.join(self.pwinternalfilesdir, internalfileName)
+            try:
+                if os.path.isfile(internalFilePath) and fileName in internalFilePath:
+                    os.unlink(internalFilePath)
+            except Exception as e:
+                print(e)
+
 
