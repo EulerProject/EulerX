@@ -354,9 +354,15 @@ class TaxonomyMapping:
                     taxa.append(newTuple)
         return taxa
 
+    def rccWarningMessenger(self):
+        print "RCC reasoner is calling..."
+        print "Only path-consistency is checked. The example may be actually inconsistent if", \
+        "{<, >}, {!, <, >}, {<, >, =} or {!, < , >, =} show up in input articulations."
+    
     def run(self):
         print "******* You are running example", self.name, "*******"
         if reasoner[self.args['-r']] == reasoner["rcc1"]:
+            self.rccWarningMessenger()
             self.hashShawn()
             if self.args['--ambiguity']: # quick check for ambiguity
                 self.runShawnMir(self.shawninputhashed)
@@ -389,14 +395,17 @@ class TaxonomyMapping:
             self.updateReportFile(self.reportfile)
             return
         if reasoner[self.args['-r']] == reasoner["rcc2"]:
+            self.rccWarningMessenger()
             self.runRCCReasoner()
             self.updateReportFile(self.reportfile)
             return
         if reasoner[self.args['-r']] ==  reasoner["rcc2eq"]:
+            self.rccWarningMessenger()
             self.runRCCEQReasoner()
             self.updateReportFile(self.reportfile)
             return
         if reasoner[self.args['-r']] ==  reasoner["rcc2pw"]:
+            self.rccWarningMessenger()
             originalUberMir = {}
             originalUberMir = self.processInputFile()
             self.handleRCCPW(originalUberMir)
@@ -2770,7 +2779,7 @@ class TaxonomyMapping:
             if "overlaps" in r.group(2) or "><" in r.group(2):
                 self.inputoverlaps.append([r.group(1).strip(), r.group(3).strip()])
         else:
-            self.addAMir(artStr, 0)
+            self.addAMir(artStr.strip(), 0)
 
     def addLocation(self, line):
         self.exploc = True
@@ -2861,7 +2870,7 @@ class TaxonomyMapping:
         self.eq[T2].add(T1)
 
     def addAMir(self, astring, provenance):
-        r = astring.split(" ")
+        r = astring.split()
         # add to input overlaps
         if r[1] == relationstr[4] or r[1] == relationstr[9]:
             self.inputoverlaps.append([r[0].strip(), r[2].strip()])
