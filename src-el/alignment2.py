@@ -3745,8 +3745,13 @@ class TaxonomyMapping:
         # unhash shawn's output
         cmd = "unhash_names.py " + self.shawnoutputhashed + " hash_values.json > " + self.shawnoutput
         newgetoutput(cmd)
+#         mirList = []
+#         fmir = open(self.mirfile, 'w')
+#         for k,v in self.allPairsMir.iteritems():
+#             mirList.append([k[0].taxonomy.abbrev + "." + k[0].name, findkey(relation, v), k[1].taxonomy.abbrev + "." + k[1].name])
         
         # read shawn's output
+        outputlines = []
         pwIndex = 0
         currentChunk = []
         chunks = []
@@ -3760,8 +3765,12 @@ class TaxonomyMapping:
             
             if re.match("\[.*?\]", line):
                 currentChunk.append(line)
+                outputlines.append(line)
             
         chunks.append(currentChunk)
+        
+        # output mir
+        self.genShawnMir(outputlines)
         
         # for each PW
         if len(chunks) == 1:
@@ -3777,6 +3786,31 @@ class TaxonomyMapping:
                 
 #        for pair in self.getAllTaxonPairs():
 #            print "Pair are: ", pair[0].taxonomy.abbrev, pair[0].name, "and", pair[1].taxonomy.abbrev, pair[1].name, self.findRelWithinTaxonomy(pair[0], pair[1])
+    
+    def genShawnMir(self, outputlines):
+        mirList = []
+        fmir = open(self.mirfile, 'w')
+        for line in outputlines:
+            relstr = re.match("\[(.*)\]", line).group(1).strip()
+            if "{" in relstr:
+                relBin = 0
+                r = re.match("(.*)\s*\{(.*)\}\s*(.*)", relstr)
+                disjunctiveRels = r.group(2).strip().split()
+                for disjunctiveRel in disjunctiveRels:
+                    relBin = relBin | findkey(relss, disjunctiveRel)
+                mirList.append([r.group(1).strip(), findkey(relation, relBin), r.group(3).strip()])
+            else:
+                rels = relstr.split()
+                mirList.append([rels[0], findkey(relation, findkey(relss, rels[1])), rels[2]])
+        
+        # sorted the mirList
+        print "#########"
+        for pair in sorted(mirList, key=itemgetter(0,2)):
+            print pair[0], pair[1], pair[2]
+            fmir.write(pair[0] + ',' + pair[1] + ',' + pair[2] + '\n')            
+        fmir.close()
+            
+        
     
     def prepareShawnInternal(self, chunk, pwIndex, tmptr):
         # create intra-mir
