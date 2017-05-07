@@ -3877,6 +3877,7 @@ class TaxonomyMapping:
         f.write('eqConLi = ' + repr(self.eqConLi) + '\n')
         f.write('tr = ' + repr(tmptr) + '\n')
         f.write('mir = ' + repr(tmpmir) + '\n')
+        f.write('inputoverlaps = ' + repr(self.inputoverlaps) + '\n')
         f.close()
         
         return
