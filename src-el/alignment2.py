@@ -306,13 +306,17 @@ class TaxonomyMapping:
             #self.com = "dlv -silent -stats -filter=rel "+self.pwfile+" "+ self.pwswitch
             # consistency command
             self.con = "dlv -silent -stats -filter=rel -n=1 "+self.pwfile+" "+ self.pwswitch
+        elif reasoner[self.args['-r']] == reasoner["rccasp"]:
+            # possible world command
+            self.com = "dlv -silent -stats -filter=rel -n="+ self.args['-n'] + " " +self.pwfile+" | "+self.path+"/muniq -u"
 #        elif reasoner[self.args['-r']] == reasoner["rcc1"]:
 #            if self.args['--pw']:
 #                self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f t f"
 #            else:
 #                self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f f f"
         elif reasoner[self.args['-r']] == reasoner["rcc1"] or reasoner[self.args['-r']] == reasoner["rcc2"] \
-            or reasoner[self.args['-r']] == reasoner["rcc2eq"] or reasoner[self.args['-r']] == reasoner["rcc2pw"]:
+            or reasoner[self.args['-r']] == reasoner["rcc2eq"] or reasoner[self.args['-r']] == reasoner["rcc2pw"] \
+            or reasoner[self.args['-r']] == reasoner["rccasp"]:
             pass
         else:
             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")
@@ -361,6 +365,10 @@ class TaxonomyMapping:
     
     def run(self):
         print "******* You are running example", self.name, "*******"
+        if reasoner[self.args['-r']] == reasoner["rccasp"]:
+            self.genRCCASP()
+            self.genPW()
+            return
         if reasoner[self.args['-r']] == reasoner["rcc1"]:
             self.rccWarningMessenger()
             self.hashShawn()
@@ -680,7 +688,7 @@ class TaxonomyMapping:
     def isNone(self, output):
         if reasoner[self.args['-r']] == reasoner["gringo"]:
             return output.find("Models     : 0 ") != -1
-        elif reasoner[self.args['-r']] == reasoner["dlv"]:
+        elif reasoner[self.args['-r']] == reasoner["dlv"] or reasoner[self.args['-r']] == reasoner["rccasp"]:
             return output.find("{") == -1
         elif reasoner[self.args['-r']] == reasoner["rcc1"]:
             return output.find("Consistent") == -1
@@ -690,7 +698,7 @@ class TaxonomyMapping:
     def isUnique(self, output):
         if reasoner[self.args['-r']] == reasoner["gringo"]:
             return output.find("Models     : 1 ") != -1
-        elif reasoner[self.args['-r']] == reasoner["dlv"]:
+        elif reasoner[self.args['-r']] == reasoner["dlv"] or reasoner[self.args['-r']] == reasoner["rccasp"]:
             return output.find("{") != -1 and output.strip().count("{") == 1
         elif reasoner[self.args['-r']] == reasoner["rcc1"]:
             with open(self.shawnoutputhashed, 'r') as f:
@@ -712,6 +720,56 @@ class TaxonomyMapping:
 #         else:
 #             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")    
 
+    def genRCCASP(self):
+        # generate concepts
+        tid = 0
+        self.baseAsp = "%%% Universe of concepts\n"
+        for key in self.taxonomies.keys():
+            for taxon in self.taxonomies[key].taxa.keys():
+                t = self.taxonomies[key].taxa[taxon]
+                self.baseAsp += "concept(" + t.dlvName() + ", " + tid.__str__() +").\n"
+            tid = tid + 1
+        
+        # generate isa and sibling-disjointness
+        for key in self.taxonomies.keys():
+            queue = copy.deepcopy(self.taxonomies[key].roots)
+            while len(queue) != 0:
+                t = queue.pop(0)
+                if t.hasChildren():
+                    self.baseAsp += "\n%% ISA relations for " + t.dlvName() +"\n"
+                    if len(t.children) == 1:
+                        self.baseAsp += "pp(" + t.children[0].dlvName() + ", " + t.dlvName() + ") v " \
+                                      + "eq(" + t.children[0].dlvName() + ", " + t.dlvName() + ").\n"
+                    else:
+                        for t1 in t.children:
+                            queue.append(t1)
+                            self.baseAsp += "pp(" + t1.dlvName() + ", " + t.dlvName() + ").\n"    
+                            
+                        self.baseAsp += "\n%% Sibling disjointness\n"
+                        for i in range(len(t.children) - 1):
+                            for j in range(i+1, len(t.children)):
+                                name1 = t.children[i].dlvName()
+                                name2 = t.children[j].dlvName()
+                                self.baseAsp += "dr(" + name1 + ", " + name2+ ").\n"
+                            
+        # generate articulations
+        relationNum = 0
+        self.baseAsp += "\n%%% Articulations\n"
+        for i in range(len(self.articulations)):
+            artStr = self.articulations[i].string
+            self.baseAsp += "% " + artStr + "\n"
+            self.baseAsp += self.articulations[i].toRCCASP(self) + "\n"
+        
+        # rules
+        self.baseAsp += template.getRCCASPRules()
+        self.baseAsp += template.getRCCASPDc()
+        
+        # prepare the asp file
+        fdlv = open(self.pwfile, 'w')
+        fdlv.write(self.baseAsp)
+        fdlv.close()
+        return
+    
     def genPW(self):
         self.pw = newgetoutput(self.com)
         if self.pw == "":
@@ -756,7 +814,7 @@ class TaxonomyMapping:
             for i in range(2, len(raw) - 2):
                 if raw[i].find("rel") == -1: continue
                 pws.append(raw[i].strip().replace(") ",");"))
-        elif reasoner[self.args['-r']] == reasoner["dlv"]:
+        elif reasoner[self.args['-r']] == reasoner["dlv"] or reasoner[self.args['-r']] == reasoner["rccasp"]:
             raw = self.pw.split("\n")
             for line in raw:
                 if line.find("{") != -1:

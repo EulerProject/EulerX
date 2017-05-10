@@ -278,7 +278,77 @@ class template:
     #    dlvDc += "hint(X, Y, 0) :- concept2(X, N1), concept2(Y, N2), vrs(R), in(X, R), out(Y, R), pw.\n"
     #    dlvDc += "hint(X, Y, 1) :- concept2(X, N1), concept2(Y, N2), vrs(R), in(X, R), in(Y, R), pw.\n"
     #    dlvDc += "hint(X, Y, 2) :- concept2(X, N1), concept2(Y, N2), vrs(R), out(X, R), in(Y, R), pw.\n\n"
-
+    
+    # rccasp encoding rules
+    rccasp  = '\n\n% RCCASP rules\n'\
+            + '% UNIVERSE of Discourse\n'\
+            + 'u(X) :- dr(X,_).\n'\
+            + 'u(X) :- dr(_,X).\n'\
+            + 'u(X) :- eq(X,_).\n'\
+            + 'u(X) :- eq(_,X).\n'\
+            + 'u(X) :- po(X,_).\n'\
+            + 'u(X) :- po(_,X).\n'\
+            + 'u(X) :- pp(X,_).\n'\
+            + 'u(X) :- pp(_,X).\n'\
+            + 'u(X) :- pi(X,_).\n'\
+            + 'u(X) :- pi(_,X).\n'\
+            + '% DEFINITION 5: DISJUNCTIVE ENCODING of the Search Space\n'\
+            + 'eq(X,Y) v dr(X,Y) v pp(X,Y) v pi(X,Y) v po(X,Y) :- u(X), u(Y), X != Y.\n'\
+            + '% Base5 rels are mutually exclusive, so there are 4+3+2+1 =10 ICs\n'\
+            + ':- eq(X,Y), dr(X,Y).\n'\
+            + ':- eq(X,Y), pp(X,Y).\n'\
+            + ':- eq(X,Y), pi(X,Y).\n'\
+            + ':- eq(X,Y), po(X,Y).\n'\
+            + ':- dr(X,Y), pp(X,Y).\n'\
+            + ':- dr(X,Y), pi(X,Y).\n'\
+            + ':- dr(X,Y), po(X,Y).\n'\
+            + ':- pp(X,Y), pi(X,Y).\n'\
+            + ':- pp(X,Y), po(X,Y).\n'\
+            + ':- pi(X,Y), po(X,Y).\n'\
+            + '% Reflexive closure of eq/2:\n'\
+            + 'eq(X,X) :- u(X).\n'\
+            + '% CONVERSE relations\n'\
+            + 'pi(X,Y) :- pp(Y,X).\n'\
+            + 'pp(X,Y) :- pi(Y,X).\n'\
+            + '% SYMMETRIC closure\n'\
+            + 'eq(X,Y) :- eq(Y,X).\n'\
+            + 'po(X,Y) :- po(Y,X).\n'\
+            + 'dr(X,Y) :- dr(Y,X).\n'\
+            + '% Composition table\n'\
+            + 'eq(X,Y)                                          :- eq(X,Z), eq(Z,Y).\n'\
+            + '          dr(X,Y)                                :- eq(X,Z), dr(Z,Y).\n'\
+            + '                    pp(X,Y)                      :- eq(X,Z), pp(Z,Y).\n'\
+            + '                              pi(X,Y)            :- eq(X,Z), pi(Z,Y).\n'\
+            + '                                         po(X,Y) :- eq(X,Z), po(Z,Y).\n'\
+            + '\n'\
+            + '          dr(X,Y)                                :- dr(X,Z), eq(Z,Y).\n'\
+            + '          dr(X,Y) v pp(X,Y)            v po(X,Y) :- dr(X,Z), pp(Z,Y).\n'\
+            + '          dr(X,Y)           v pi(X,Y)  v po(X,Y) :- dr(X,Z), pi(Z,Y).\n'\
+            + '          dr(X,Y) v pp(X,Y)            v po(X,Y) :- dr(X,Z), po(Z,Y).\n'\
+            + '\n'\
+            + '                    pp(X,Y)                      :- pp(X,Z), eq(Z,Y).\n'\
+            + '          dr(X,Y)                                :- pp(X,Z), dr(Z,Y).\n'\
+            + '                    pp(X,Y)                      :- pp(X,Z), pp(Z,Y).\n'\
+            + '          dr(X,Y) v pp(X,Y)            v po(X,Y) :- pp(X,Z), po(Z,Y).\n'\
+            + '\n'\
+            + '                              pi(X,Y)            :- pi(X,Z), eq(Z,Y).\n'\
+            + '          dr(X,Y)           v pi(X,Y) v po(X,Y)  :- pi(X,Z), dr(Z,Y).\n'\
+            + '                              pi(X,Y)            :- pi(X,Z), pi(Z,Y).\n'\
+            + '                              pi(X,Y) v po(X,Y)  :- pi(X,Z), po(Z,Y).\n'\
+            + '\n'\
+            + '                                        po(X,Y)  :- po(X,Z), eq(Z,Y).\n'\
+            + '          dr(X,Y)           v pi(X,Y) v po(X,Y)  :- po(X,Z), dr(Z,Y).\n'\
+            + '                    pp(X,Y)           v po(X,Y)  :- po(X,Z), pp(Z,Y).\n'\
+            + '          dr(X,Y)           v pi(X,Y) v po(X,Y)  :- po(X,Z), pi(Z,Y).\n'
+            
+    # rccasp decoding
+    rccaspDc  = '\n\n% Decoding\n'\
+              + 'rel(X,Y,"=") :- eq(X,Y), concept(X,T1), concept(Y,T2), T1 < T2.\n'\
+              + 'rel(X,Y,"<") :- pp(X,Y), concept(X,T1), concept(Y,T2), T1 < T2.\n'\
+              + 'rel(X,Y,">") :- pi(X,Y), concept(X,T1), concept(Y,T2), T1 < T2.\n'\
+              + 'rel(X,Y,"!") :- dr(X,Y), concept(X,T1), concept(Y,T2), T1 < T2.\n'\
+              + 'rel(X,Y,"><") :- po(X,Y), concept(X,T1), concept(Y,T2), T1 < T2.\n'
+             
     # Binary encoding base constraints
     @Callable
     def getAspVrCon():
@@ -318,3 +388,11 @@ class template:
     @Callable
     def getEncErrMsg():
         return template.encErrMsg
+    
+    @Callable
+    def getRCCASPRules():
+        return template.rccasp
+    
+    @Callable
+    def getRCCASPDc():
+        return template.rccaspDc

@@ -142,6 +142,31 @@ class Articulation:
             self.taxon1 = mapping.getTaxon(taxon1taxonomy, taxon1taxon)
             self.taxon2 = mapping.getTaxon(taxon2taxonomy, taxon2taxon)
 
+    def toRCCASP(self, align):
+        name1 = self.taxon1.dlvName()
+        name2 = self.taxon2.dlvName()
+        relpreds = []
+        disjunctive = " v "
+        result = ""
+        
+        if self.relations & rcc5["equals"]:
+            relpreds.append("eq")
+        if self.relations & rcc5["is_included_in"]:
+            relpreds.append("pp")
+        if self.relations & rcc5["includes"]:
+            relpreds.append("pi")
+        if self.relations & rcc5["disjoint"]:
+            relpreds.append("dr")
+        if self.relations & rcc5["overlaps"]:
+            relpreds.append("po")
+        
+        for relpred in relpreds:
+            result += relpred + "(" + name1 + ", " + name2 + ")"
+            result += disjunctive
+        
+        result = result[:-3] + ".\n"
+        return result 
+    
     def toASP(self, enc, rnr, align):
         result = ""
         name1 = self.taxon1.dlvName()
