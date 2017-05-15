@@ -142,11 +142,14 @@ class Articulation:
             self.taxon1 = mapping.getTaxon(taxon1taxonomy, taxon1taxon)
             self.taxon2 = mapping.getTaxon(taxon2taxonomy, taxon2taxon)
 
-    def toRCCASP(self, align):
+    def toRCCASP(self, align, rnr):
         name1 = self.taxon1.dlvName()
         name2 = self.taxon2.dlvName()
         relpreds = []
-        disjunctive = " v "
+        if reasoner[rnr] == reasoner["rccdlv"]:
+            disjunctive = " v "
+        elif reasoner[rnr] == reasoner["rccclingo"]:
+            disjunctive = " ; " 
         result = ""
         
         if self.relations & rcc5["equals"]:

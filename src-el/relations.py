@@ -116,7 +116,8 @@ reasoner["rcc2"] = 1 << 2
 reasoner["rcc2eq"] = 1 << 3
 reasoner["rcc2pw"] = 1 << 4
 reasoner["rcc1"] = 1 << 5
-reasoner["rccasp"] = 1 << 6
+reasoner["rccdlv"] = 1 << 6
+reasoner["rccclingo"] = 1 << 7
 
 encode = {}
 encode[0] = 0                                  # null encoding

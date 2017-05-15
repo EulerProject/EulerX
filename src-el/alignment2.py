@@ -306,9 +306,12 @@ class TaxonomyMapping:
             #self.com = "dlv -silent -stats -filter=rel "+self.pwfile+" "+ self.pwswitch
             # consistency command
             self.con = "dlv -silent -stats -filter=rel -n=1 "+self.pwfile+" "+ self.pwswitch
-        elif reasoner[self.args['-r']] == reasoner["rccasp"]:
+        elif reasoner[self.args['-r']] == reasoner["rccdlv"]:
             # possible world command
             self.com = "dlv -silent -stats -filter=rel -n="+ self.args['-n'] + " " +self.pwfile+" | "+self.path+"/muniq -u"
+        elif reasoner[self.args['-r']] == reasoner["rccclingo"]:
+            # possible world command
+            self.com = "clingo 0 "+ self.pwfile + " | "+self.path+"/muniq -u"
 #        elif reasoner[self.args['-r']] == reasoner["rcc1"]:
 #            if self.args['--pw']:
 #                self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f t f"
@@ -316,7 +319,7 @@ class TaxonomyMapping:
 #                self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f f f"
         elif reasoner[self.args['-r']] == reasoner["rcc1"] or reasoner[self.args['-r']] == reasoner["rcc2"] \
             or reasoner[self.args['-r']] == reasoner["rcc2eq"] or reasoner[self.args['-r']] == reasoner["rcc2pw"] \
-            or reasoner[self.args['-r']] == reasoner["rccasp"]:
+            or reasoner[self.args['-r']] == reasoner["rccdlv"] or reasoner[self.args['-r']] == reasoner["rccclingo"]:
             pass
         else:
             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")
@@ -365,7 +368,7 @@ class TaxonomyMapping:
     
     def run(self):
         print "******* You are running example", self.name, "*******"
-        if reasoner[self.args['-r']] == reasoner["rccasp"]:
+        if reasoner[self.args['-r']] == reasoner["rccdlv"] or reasoner[self.args['-r']] == reasoner["rccclingo"]:
             self.genRCCASP()
             self.genPW()
             return
@@ -686,9 +689,9 @@ class TaxonomyMapping:
         return self.isNone(self.cb)
 
     def isNone(self, output):
-        if reasoner[self.args['-r']] == reasoner["gringo"]:
+        if reasoner[self.args['-r']] == reasoner["gringo"] or reasoner[self.args['-r']] == reasoner["rccclingo"]:
             return output.find("Models     : 0 ") != -1
-        elif reasoner[self.args['-r']] == reasoner["dlv"] or reasoner[self.args['-r']] == reasoner["rccasp"]:
+        elif reasoner[self.args['-r']] == reasoner["dlv"] or reasoner[self.args['-r']] == reasoner["rccdlv"]:
             return output.find("{") == -1
         elif reasoner[self.args['-r']] == reasoner["rcc1"]:
             return output.find("Consistent") == -1
@@ -696,9 +699,9 @@ class TaxonomyMapping:
             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")
         
     def isUnique(self, output):
-        if reasoner[self.args['-r']] == reasoner["gringo"]:
+        if reasoner[self.args['-r']] == reasoner["gringo"] or reasoner[self.args['-r']] == reasoner["rccclingo"]:
             return output.find("Models     : 1 ") != -1
-        elif reasoner[self.args['-r']] == reasoner["dlv"] or reasoner[self.args['-r']] == reasoner["rccasp"]:
+        elif reasoner[self.args['-r']] == reasoner["dlv"] or reasoner[self.args['-r']] == reasoner["rccdlv"]:
             return output.find("{") != -1 and output.strip().count("{") == 1
         elif reasoner[self.args['-r']] == reasoner["rcc1"]:
             with open(self.shawnoutputhashed, 'r') as f:
@@ -721,6 +724,12 @@ class TaxonomyMapping:
 #             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")    
 
     def genRCCASP(self):
+        disjunctive = ""
+        if reasoner[self.args['-r']] == reasoner["rccdlv"]:
+            disjunctive = " v "
+        elif reasoner[self.args['-r']] == reasoner["rccclingo"]:
+            disjunctive = " ; "
+        
         # generate concepts
         tid = 0
         self.baseAsp = "%%% Universe of concepts\n"
@@ -738,7 +747,7 @@ class TaxonomyMapping:
                 if t.hasChildren():
                     self.baseAsp += "\n%% ISA relations for " + t.dlvName() +"\n"
                     if len(t.children) == 1:
-                        self.baseAsp += "pp(" + t.children[0].dlvName() + ", " + t.dlvName() + ") v " \
+                        self.baseAsp += "pp(" + t.children[0].dlvName() + ", " + t.dlvName() + ")" + disjunctive \
                                       + "eq(" + t.children[0].dlvName() + ", " + t.dlvName() + ").\n"
                     else:
                         for t1 in t.children:
@@ -758,11 +767,15 @@ class TaxonomyMapping:
         for i in range(len(self.articulations)):
             artStr = self.articulations[i].string
             self.baseAsp += "% " + artStr + "\n"
-            self.baseAsp += self.articulations[i].toRCCASP(self) + "\n"
+            self.baseAsp += self.articulations[i].toRCCASP(self, self.args['-r']) + "\n"
         
         # rules
-        self.baseAsp += template.getRCCASPRules()
-        self.baseAsp += template.getRCCASPDc()
+        if reasoner[self.args['-r']] == reasoner["rccdlv"]:
+            self.baseAsp += template.getRCCDLVRules()
+            self.baseAsp += template.getRCCDLVDc()
+        elif reasoner[self.args['-r']] == reasoner["rccclingo"]:
+            self.baseAsp += template.getRCCClingoRules()
+            self.baseAsp += template.getRCCClingoDc()
         
         # prepare the asp file
         fdlv = open(self.pwfile, 'w')
@@ -772,9 +785,10 @@ class TaxonomyMapping:
     
     def genPW(self):
         self.pw = newgetoutput(self.com)
-        if self.pw == "":
-            print "DLV stopped unexpectedly"
-            exit(0)
+        if reasoner[self.args['-r']] == reasoner["dlv"] or reasoner[self.args['-r']] == reasoner["rccdlv"]:
+            if self.pw == "":
+                print "DLV stopped unexpectedly"
+                exit(0)
         if self.args['--fourinone']:
             self.allJustificationsFourinone(sets.Set(self.articulations))
             self.postFourinone()
@@ -808,13 +822,13 @@ class TaxonomyMapping:
     #
     def intOutPw(self, name, pwflag):
         pws = []
-        if reasoner[self.args['-r']] == reasoner["gringo"]:
+        if reasoner[self.args['-r']] == reasoner["gringo"] or reasoner[self.args['-r']] == reasoner["rccclingo"]:
             raw = self.pw.split("\n")
             ## Filter out those trash in the gringo output
             for i in range(2, len(raw) - 2):
                 if raw[i].find("rel") == -1: continue
                 pws.append(raw[i].strip().replace(") ",");"))
-        elif reasoner[self.args['-r']] == reasoner["dlv"] or reasoner[self.args['-r']] == reasoner["rccasp"]:
+        elif reasoner[self.args['-r']] == reasoner["dlv"] or reasoner[self.args['-r']] == reasoner["rccdlv"]:
             raw = self.pw.split("\n")
             for line in raw:
                 if line.find("{") != -1:
