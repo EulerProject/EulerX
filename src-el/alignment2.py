@@ -821,12 +821,17 @@ class TaxonomyMapping:
             pwmirs.append({})
 
             # pwTm is the possible world taxonomy mapping, used for RCG
-            pwTm = copy.deepcopy(self)
+            tmpTr = copy.deepcopy(self.tr)
+            tmpMir = copy.deepcopy(self.mir)
+            tmpEq = copy.deepcopy(self.eq)
+#             pwTm = copy.deepcopy(self)
             
             if self.enc & encode["cb"]:
-                 
-                pwTm.tr = pwTm.basetr
-                pwTm.mir = pwTm.basemir
+                
+                tmpTr = deepish_copy(self.basetr)
+                tmpMir = deepish_copy(self.basemir)
+#                 pwTm.tr = pwTm.basetr
+#                 pwTm.mir = pwTm.basemir
                     
             outputstr += "\nPossible world "+i.__str__()+":\n{"
             
@@ -856,14 +861,26 @@ class TaxonomyMapping:
                 pair = dotc1+","+dotc2
                 pwmirs[i][pair] = rcc5[rel[2]]
                 
-                # RCG
-                pwTm.mir[pair] = rcc5[rel[2]]
+                # RCG                
+                tmpMir[pair] = rcc5[rel[2]]
+#                 pwTm.mir[pair] = rcc5[rel[2]]
+                
                 if rcc5[rel[2]] == rcc5["is_included_in"]:
-                    pwTm.tr.append([dotc1, dotc2, 1])
+                    tmpTr.append([dotc1, dotc2, 1])
+#                     pwTm.tr.append([dotc1, dotc2, 1])
                 elif rcc5[rel[2]] == rcc5["includes"]:
-                    pwTm.tr.append([dotc2, dotc1, 1])
+                    tmpTr.append([dotc2, dotc1, 1])
+#                     pwTm.tr.append([dotc2, dotc1, 1])
                 elif rcc5[rel[2]] == rcc5["equals"]:
-                    pwTm.addEqMap(dotc1, dotc2)
+#                     pwTm.addEqMap(dotc1, dotc2)
+                    if not tmpEq.has_key(dotc1):
+                        tmpEq[dotc1] = sets.Set()
+                    tmpEq[dotc1].add(dotc2)
+                    if not tmpEq.has_key(dotc2):
+                        tmpEq[dotc2] = sets.Set()
+                    tmpEq[dotc2].add(dotc1)
+                    
+                    
                 if i == 0:
                     if not self.mir.has_key(pair) or not self.mir[pair] & rcc5[rel[2]]:
                         self.mir[pair] = rcc5[rel[2]] | relation["infer"]
@@ -890,16 +907,16 @@ class TaxonomyMapping:
                 f.write('from sets import Set\n')
                 f.write('fileName = ' + repr(name + "_" + i.__str__() + "_" + self.args['-e']) + '\n')
                 f.write('pwIndex = ' + repr(i) + '\n')
-                f.write('eq = ' + repr(pwTm.eq) + '\n')
-                f.write('firstTName = ' + repr(pwTm.firstTName) + '\n')
-                f.write('secondTName = ' + repr(pwTm.secondTName) + '\n')
-                f.write('thirdTName = ' + repr(pwTm.thirdTName) + '\n')
-                f.write('fourthTName = ' + repr(pwTm.fourthTName) + '\n')
-                f.write('fifthTName = ' + repr(pwTm.fifthTName) + '\n')
-                f.write('eqConLi = ' + repr(pwTm.eqConLi) + '\n')
-                f.write('tr = ' + repr(pwTm.tr) + '\n')
-                f.write('mir = ' + repr(pwTm.mir) + '\n')
-                f.write('inputoverlaps = ' + repr(pwTm.inputoverlaps) + '\n')
+                f.write('eq = ' + repr(tmpEq) + '\n')
+                f.write('firstTName = ' + repr(self.firstTName) + '\n')
+                f.write('secondTName = ' + repr(self.secondTName) + '\n')
+                f.write('thirdTName = ' + repr(self.thirdTName) + '\n')
+                f.write('fourthTName = ' + repr(self.fourthTName) + '\n')
+                f.write('fifthTName = ' + repr(self.fifthTName) + '\n')
+                f.write('eqConLi = ' + repr(self.eqConLi) + '\n')
+                f.write('tr = ' + repr(tmpTr) + '\n')
+                f.write('mir = ' + repr(tmpMir) + '\n')
+                f.write('inputoverlaps = ' + repr(self.inputoverlaps) + '\n')
                 f.close()
                 
                 #pwTm.genPwRcg(name + "_" + i.__str__() + "_" + self.args['-e'], allRcgNodesDict, i)
