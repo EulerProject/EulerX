@@ -34,16 +34,10 @@ else
 echo "Mace4 check passed	:)"
 fi
 
-if ! which gringo > /dev/null; then
-echo "gringo check failed	o_O	Please install gringo-3.0.3 or make sure it is in your path !!!!"
+if ! which clingo > /dev/null; then
+echo "clingo check failed	o_O	Please install gringo-3.0.3 or make sure it is in your path !!!!"
 else
-echo "gringo check passed	:)"
-fi
-
-if ! which claspD > /dev/null; then
-echo "claspD check failed	o_O	Please install claspD-1.1.4  or make sure it is in your path !!!!"
-else
-echo "claspD check passed	:)"
+echo "clingo check passed	:)"
 fi
 
 echo "=== End of checking full dependecies. You can run Euler with all supported reasoners. ==="
