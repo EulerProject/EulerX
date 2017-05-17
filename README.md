@@ -5,7 +5,7 @@ EulerX Toolkit Overview
 
 # Introduction
 
-Euler is an open source toolkit (mostly written in Python) for merging taxonomies (taxonomical organized datasets) and visualizing the results. (see [Euler Toolkit Wiki](https://github.com/EulerProject/EulerX/wiki) for more information.
+Euler is an open source toolkit (mostly written in Python) for merging taxonomies (taxonomical organized datasets) and visualizing the results. See [Euler Toolkit Wiki](https://github.com/EulerProject/EulerX/wiki) for more information.
 
 We have all the EulerFO source code, EulerASP source code, and a bunch of use cases in this toolkit. EulerFO is a modified version of CleanTax which was firstly developed by Dave Thau. CleanTax/EulerFO are built upon Prover9/Mace4 reasoning software. EulerASP is a brand new taxonomy reasoning tool that Mingmin built from scratch. EulerASP is built based on popular ASP reasoners DLV and Potassco. This readme page is mainly focusing on the use of EulerASP.
 
