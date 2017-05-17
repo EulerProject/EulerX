@@ -47,7 +47,7 @@ from taxonomy import *
 from alignment import * 
 from redCon import *
 from template import *
-from helper import *
+from helper2 import *
 from inputViz import *
 from fourinone import genFourinone
 from checker import checkInputFiles

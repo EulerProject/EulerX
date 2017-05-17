@@ -30,7 +30,7 @@
 import sys
 import os
 import random
-from helper import *
+from helper2 import *
 
 class InputVisual:
     

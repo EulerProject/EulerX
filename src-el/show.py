@@ -20,9 +20,6 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#from helper import *
-#from taxonomy import *
-#from alignment import *
 import os
 import shutil
 import getpass
@@ -36,7 +33,7 @@ import relations
 import operator
 import fileinput
 from random import randint
-from helper import *
+from helper2 import *
 from subprocess import call
 from sets import Set
 from diaglattice import *

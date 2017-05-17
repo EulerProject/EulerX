@@ -20,7 +20,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from helper import *
+from helper2 import *
 
 class template:
     encErrMsg = "\nEncoding error, please contact Mingmin at michen@ucdavis.edu"

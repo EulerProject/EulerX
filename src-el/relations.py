@@ -111,7 +111,7 @@ relss[1 << 4] = "overlaps"
 
 reasoner={}
 reasoner["dlv"] = 1 << 0
-reasoner["gringo"] = 1 << 1
+reasoner["clingo"] = 1 << 1
 reasoner["rcc2"] = 1 << 2
 reasoner["rcc2eq"] = 1 << 3
 reasoner["rcc2pw"] = 1 << 4

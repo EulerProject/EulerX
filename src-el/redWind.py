@@ -25,7 +25,7 @@ pygtk.require('2.0')
 import gtk
 import re
 from relations import *
-from helper import *
+from helper2 import *
 
 class RedWindow():
     def toggle_handler(self, widget, data):

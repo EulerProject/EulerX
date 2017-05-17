@@ -4,7 +4,7 @@ import re
 from itertools import count
 
 def usage():
-    print "USAGE: python pwCompare.py dlv_pw_file gringo_pw_file"
+    print "USAGE: python pwCompare.py dlv_pw_file clingo_pw_file"
 
 def main():
     file1 = sys.argv[1]

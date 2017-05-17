@@ -23,7 +23,7 @@
 import os
 import random
 import math
-from helper import *
+from helper2 import *
 from relations import *
 
 class CtiGenerator:

@@ -22,7 +22,7 @@
 
 import re
 from relations import *
-from helper import *
+from helper2 import *
 
 class RedCon():
     def __init__(self, pair, mir):

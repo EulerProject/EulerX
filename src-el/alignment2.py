@@ -55,6 +55,7 @@ from random import randint
 from time import localtime, strftime
 from operator import itemgetter
 from shutil import copyfile
+import commands
 
 class TaxonomyMapping:
 
@@ -294,12 +295,11 @@ class TaxonomyMapping:
         
         if not self.args['-n']:
             self.args['-n'] = '0'             # by default output all possible worlds
-        if reasoner[self.args['-r']] == reasoner["gringo"]:
+        if reasoner[self.args['-r']] == reasoner["clingo"]:
             # possible world command
-            self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0 | "+self.path+"/muniq -u"
-            #self.com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
+            self.com = "clingo 0 "+self.pwfile+" "+ self.pwswitch+ " | "+self.path+"/muniq -u"
             # consistency command
-            self.con = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD --eq=1"
+            self.con = "clingo 1 "+self.pwfile+" "+ self.pwswitch
         elif reasoner[self.args['-r']] == reasoner["dlv"]:
             # possible world command
             self.com = "dlv -silent -stats -filter=rel -n="+ self.args['-n'] + " " +self.pwfile+" "+ self.pwswitch+ " | "+self.path+"/muniq -u"
@@ -318,8 +318,7 @@ class TaxonomyMapping:
 #            else:
 #                self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f f f"
         elif reasoner[self.args['-r']] == reasoner["rcc1"] or reasoner[self.args['-r']] == reasoner["rcc2"] \
-            or reasoner[self.args['-r']] == reasoner["rcc2eq"] or reasoner[self.args['-r']] == reasoner["rcc2pw"] \
-            or reasoner[self.args['-r']] == reasoner["rccdlv"] or reasoner[self.args['-r']] == reasoner["rccclingo"]:
+            or reasoner[self.args['-r']] == reasoner["rcc2eq"] or reasoner[self.args['-r']] == reasoner["rcc2pw"]:
             pass
         else:
             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")
@@ -536,9 +535,9 @@ class TaxonomyMapping:
 ## NF ends
 
     def testConsistency(self):
-        if reasoner[self.args['-r']] == reasoner["gringo"]:
-            com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 1"
-            if newgetoutput(com).find("Models     : 0") != -1:
+        if reasoner[self.args['-r']] == reasoner["clingo"]:
+            com = "clingo 1 "+self.pwfile+" "+ self.pwswitch
+            if newgetoutput(com).find("Models       : 0 ") != -1:
                 return False
         else:
             com = "dlv -silent -stats -filter=rel -n=1 "+self.pwfile+" "+self.pwswitch
@@ -550,8 +549,8 @@ class TaxonomyMapping:
         return True
 
     def inconsistencyExplanation(self):
-        if reasoner[self.args['-r']] == reasoner["gringo"]:
-            com = "gringo "+self.pwfile+" "+ self.ixswitch+ " | claspD 1"
+        if reasoner[self.args['-r']] == reasoner["clingo"]:
+            com = "clingo 1 "+self.pwfile+" "+ self.ixswitch
             ie = newgetoutput(com)
             ie.replace(" ", ", ")
         else:
@@ -652,30 +651,6 @@ class TaxonomyMapping:
                 artSet.add(self.articulations[i])
         return artSet
 
-    def outGringoPW(self):
-        raw = self.pw.split("\n")
-        pws = []
-        ## Filter out those trash in the gringo output
-        for i in range(2, len(raw) - 2, 2):
-            pws.append(raw[i])
-        self.npw = len(pws)
-        outputstr = ""
-        # mirs for each pw
-        if self.args.cluster: pwmirs = []
-        for i in range(len(pws)):
-            if self.args.cluster: pwmirs.append({})
-
-            # pwTm is the possible world taxonomy mapping, used for RCG
-            pwTm = copy.deepcopy(self)
-            pwTm.mir = [] #pwTm.basemir
-            pwTm.tr = [] #pwTm.basetr
-
-            outputstr += "\nPossible world "+i.__str__()+":\n{"
-            items = pws[i].split(" ")
-            outputstr += pws[i]
-            outputstr += "}\n"
-        print outputstr
-
     def isPwNone(self):
         return self.isNone(self.pw)
     
@@ -689,8 +664,8 @@ class TaxonomyMapping:
         return self.isNone(self.cb)
 
     def isNone(self, output):
-        if reasoner[self.args['-r']] == reasoner["gringo"] or reasoner[self.args['-r']] == reasoner["rccclingo"]:
-            return output.find("Models     : 0 ") != -1
+        if reasoner[self.args['-r']] == reasoner["clingo"] or reasoner[self.args['-r']] == reasoner["rccclingo"]:
+            return output.find("Models       : 0 ") != -1
         elif reasoner[self.args['-r']] == reasoner["dlv"] or reasoner[self.args['-r']] == reasoner["rccdlv"]:
             return output.find("{") == -1
         elif reasoner[self.args['-r']] == reasoner["rcc1"]:
@@ -699,8 +674,8 @@ class TaxonomyMapping:
             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")
         
     def isUnique(self, output):
-        if reasoner[self.args['-r']] == reasoner["gringo"] or reasoner[self.args['-r']] == reasoner["rccclingo"]:
-            return output.find("Models     : 1 ") != -1
+        if reasoner[self.args['-r']] == reasoner["clingo"] or reasoner[self.args['-r']] == reasoner["rccclingo"]:
+            return output.find("Models       : 1 ") != -1
         elif reasoner[self.args['-r']] == reasoner["dlv"] or reasoner[self.args['-r']] == reasoner["rccdlv"]:
             return output.find("{") != -1 and output.strip().count("{") == 1
         elif reasoner[self.args['-r']] == reasoner["rcc1"]:
@@ -714,14 +689,6 @@ class TaxonomyMapping:
 
     def isUniqueOrIncon(self, output):
         return self.isNone(output) or self.isUnique(output)
-#         if reasoner[self.args['-r']] == reasoner["gringo"]:
-#             return output.find("Models     : 0 ") != -1 or output.find("Models     : 1 ") != -1
-#         elif reasoner[self.args['-r']] == reasoner["dlv"]:
-#             return output.strip() == "" or (output.strip() != "" and output.strip().count("{") == 1)
-#         elif reasoner[self.args['-r']] == reasoner["rcc1"]:
-#             
-#         else:
-#             raise Exception("Reasoner:", self.args['-r'], " is not supported !!")    
 
     def genRCCASP(self):
         disjunctive = ""
@@ -822,10 +789,10 @@ class TaxonomyMapping:
     #
     def intOutPw(self, name, pwflag):
         pws = []
-        if reasoner[self.args['-r']] == reasoner["gringo"] or reasoner[self.args['-r']] == reasoner["rccclingo"]:
+        if reasoner[self.args['-r']] == reasoner["clingo"] or reasoner[self.args['-r']] == reasoner["rccclingo"]:
             raw = self.pw.split("\n")
-            ## Filter out those trash in the gringo output
-            for i in range(2, len(raw) - 2):
+            ## Filter out those trash in the clingo output
+            for i in range(len(raw)):
                 if raw[i].find("rel") == -1: continue
                 pws.append(raw[i].strip().replace(") ",");"))
         elif reasoner[self.args['-r']] == reasoner["dlv"] or reasoner[self.args['-r']] == reasoner["rccdlv"]:
@@ -847,6 +814,7 @@ class TaxonomyMapping:
         allRcgNodesDict = {}
         allRcgEdgesDict = {}
         allRcgNumOfPwsDict = {}
+        
 
         for i in range(len(pws)):
             tmpLeafRels = []
@@ -854,12 +822,9 @@ class TaxonomyMapping:
 
             # pwTm is the possible world taxonomy mapping, used for RCG
             pwTm = copy.deepcopy(self)
-            if i == 0:
-                pwTm.firstRcg = True
-            else:
-                pwTm.firstRcg = False
+            
             if self.enc & encode["cb"]:
-                
+                 
                 pwTm.tr = pwTm.basetr
                 pwTm.mir = pwTm.basemir
                     
@@ -980,333 +945,334 @@ class TaxonomyMapping:
         fhv.write('hvFlag = ' + repr(False) + '\n')
         fhv.close()
         
-        
-    def genPwCb(self, fileName):
-        self.name = fileName
-        self.cbfile = os.path.join(self.aspdir, self.name+"_cb.asp")
-        self.genCbConcept()
-        fcb = open(self.cbfile, 'w')
-        fcb.write(self.baseCb)
-        fcb.close()
-        self.genCB()
+    
+#     # deprecated    
+#     def genPwCb(self, fileName):
+#         self.name = fileName
+#         self.cbfile = os.path.join(self.aspdir, self.name+"_cb.asp")
+#         self.genCbConcept()
+#         fcb = open(self.cbfile, 'w')
+#         fcb.write(self.baseCb)
+#         fcb.close()
+#         self.genCB()
 
     
-    # deprecated, see show.py
-    def genPwRcg(self, fileName, allRcgNodesDict, pwIndex):
-
-#        fAllDot = open(rcgAllFile, 'a')
-
-#        if self.firstRcg:
-#            fAllDot.write("digraph {\n\nrankdir = RL\n\n")
-        tmpCom = ""    # cache of combined taxa
-        taxa1 = ""     # cache of taxa in the first taxonomy
-        taxa2 = ""     # cache of taxa in the second taxonomy
-        tmpComLi = [] # cache of list of combined taxa for --rcgo option in RCG
-        replace1 = "" # used for replace combined concept in --rcgo option in RCG
-        replace2 = "" # used for replace combined concept in --rcgo option in RCG
-        rcgVizNodes = {} # used for rcg nodes visualization in stylesheet
-        rcgVizEdges = {} # used for rcg edges visualization in stylesheet
-
-        alias = {}
-        
-        # Equalities
-        for T1 in self.eq.keys():
-            # self.eq is dynamically changed, so we need this check
-            if not self.eq.has_key(T1):
-                continue
-            tmpStr = ""
-
-            T1s = T1.split(".")
-            for T2 in self.eq[T1]:
-                T2s = T2.split(".")
-                
-                if tmpStr != "":
-                    tmpStr = "\\n" + tmpStr
-                tmpStr = T2 + tmpStr
-            if tmpStr != "":
-                tmpStr = "\\n" + tmpStr + "\\n"
-
-            if T1s[0] == self.firstTName:
-                tmpStr = T1 + tmpStr
-            else:
-                tmpStr = tmpStr + T1
-            if tmpStr[0:2] == "\\n": tmpStr = tmpStr[2:]
-            if tmpStr[-2:] == "\\n": tmpStr = tmpStr[:-2]
-            self.eqConLi.append(tmpStr)
-
-            tmpeqConLi2 = []
-            for T in self.eqConLi:
-                tmpeqConLi2.append(T)
-
-            for T10 in tmpeqConLi2:
-                for T11 in tmpeqConLi2:
-                    if T10 != T11:
-                        tmpC = []
-                        ss = ""
-                        T10s = T10.split("\\n")
-                        T11s = T11.split("\\n")
-                        for c1 in T10s:
-                            if c1 in T11s:
-                                tmpC = T10s + T11s
-                                tmpC.sort()
-                                self.remove_duplicate_string(tmpC)
-                                for e in tmpC:
-                                    ss = ss + e + "\\n"
-                                ss = ss[:-2]
-                                if T10 in self.eqConLi:
-                                    self.eqConLi.remove(T10)
-                                if T11 in self.eqConLi:
-                                    self.eqConLi.remove(T11)
-                                if ss not in self.eqConLi:
-                                    self.eqConLi.append(ss)
-                                break 
-
-            for T2 in self.eq[T1]:
-#                if self.eq.has_key(T2):
-#                    del self.eq[T2]
-                tmpTr = list(self.tr)
-                for [T3, T4, P] in tmpTr:
-                    if(T1 == T3 or T2 == T3):
-                        if self.tr.count([T3, T4, P]) > 0:
-                            self.tr.remove([T3, T4, P])
-                            self.tr.append([tmpStr, T4, 0])
-                    elif(T1 == T4 or T2 == T4):
-                        if self.tr.count([T3, T4, P]) > 0:
-                            self.tr.remove([T3, T4, P])
-                            self.tr.append([T3, tmpStr, 0])
-                    for T5 in self.eqConLi:
-                        #if(T5 == T3 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
-                        if(T3 != T5 and set(T3.split("\\n")).issubset(set(T5.split("\\n")))):
-                            if self.tr.count([T3, T4, P]) > 0:
-                                self.tr.remove([T3, T4, P])
-                                self.tr.append([T5,T4,0])
-                        elif(T4 != T5 and set(T4.split("\\n")).issubset(set(T5.split("\\n")))):
-                        #elif(T5 == T4 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
-                            if self.tr.count([T3, T4, P]) > 0:
-                                self.tr.remove([T3, T4, P])
-                                self.tr.append([T3,T5,0])
-        tmpeqConLi = []
-#        print "self.eqConLi=", self.eqConLi
-        for T in self.eqConLi:
-            tmpeqConLi.append(T)
-        for T6 in tmpeqConLi:
-            for T7 in tmpeqConLi:
-                if (set(T6.split("\\n")).issubset(set(T7.split("\\n"))) and T6 != T7 and T6 in self.eqConLi):
-                    self.eqConLi.remove(T6)
-        
-        tmpTr = list(self.tr)
-        #print "self.eqConli", self.eqConLi
-        for T in self.eqConLi:
-            #for [T1, T2, P] in tmpTr:
-            #    if T == T1 or T == T2:
-            #print "T=", T
-            newT = self.restructureCbNames(T)
-            #print "newT=", newT
-            tmpComLi.append(newT)
-            tmpCom += "  \""+newT+"\"\n"
-            if self.isCbInterTaxonomy(newT):
-                self.addRcgVizNode(newT, "congruent")
-            self.addRcgAllVizNode(newT, "congruent", allRcgNodesDict)
-            
-        # Duplicates
-    	tmpTr = list(self.tr)
-        for [T1, T2, P] in tmpTr:
-    	    if(self.tr.count([T1, T2, P]) > 1):
-                self.tr.remove([T1, T2, P])
-    	tmpTr = list(self.tr)
-        for [T1, T2, P] in tmpTr:
-    	    if(P == 0):
-    	        if(self.tr.count([T1, T2, 1]) > 0):
-                    self.tr.remove([T1, T2, 1])
-        tmpTr = list(self.tr)
-        for [T1, T2, P] in tmpTr:
-            if T1 == T2:
-                self.tr.remove([T1, T2, P])
-            
-    	# Reductions
-    	tmpTr = list(self.tr)
-        for [T1, T2, P1] in tmpTr:
-            for [T3, T4, P2] in tmpTr:
-            	if (T2 == T3):
-                    if(self.tr.count([T1, T4, 0])>0):
-                        self.tr.remove([T1, T4, 0])
-                        self.tr.append([T1, T4, 2])
-                    if(self.tr.count([T1, T4, 1])>0):
-                        self.tr.remove([T1, T4, 1])
-                        #self.tr.append([T1, T4, 3])
-
-        #    print "Transitive reduction:"
-        #    print self.tr
-            
-        # restructure for cb visualization
-        for [T1, T2, P] in self.tr:
-            if (T1.find("*") != -1 or T1.find("\\\\") != -1):
-                newT1 = self.restructureCbNames(T1)
-                self.tr[self.tr.index([T1,T2,P])] = [newT1, T2, P]
-        
-        for [T1, T2, P] in self.tr:
-            if (T2.find("*") != -1 or T2.find("\\\\") != -1):
-                newT2 = self.restructureCbNames(T2)
-                self.tr[self.tr.index([T1,T2,P])] = [T1, newT2, P]
-        
-        # Node Coloring (Creating dot file, will be replaced by stylesheet processor)
-        for [T1, T2, P] in self.tr:
-            if(T1.find("*") == -1 and T1.find("\\") == -1 and T1.find("\\n") == -1 and T1.find(".") != -1):
-                T1s = T1.split(".")
-                if self.firstTName == T1s[0]:
-                    taxa1 += "  \""+T1+"\"\n"               # used in old viz
-                else:
-                    taxa2 += "  \""+T1+"\"\n"
-                self.addRcgVizNode(T1s[1], T1s[0])          # used in stylesheet
-                self.addRcgAllVizNode(T1s[1], T1s[0], allRcgNodesDict)
-            else:
-#                newT1 = self.restructureCbNames(T1)
-#                self.tr[self.tr.index([T1,T2,P])] = [newT1, T2, P]
-                if T1[0] != T2[0]:
-                    tmpComLi.append(T1)
-                    tmpCom += "  \""+T1+"\"\n"
-                    self.addRcgVizNode(T1, "congruent")
-                    self.addRcgAllVizNode(T1, "congruent", allRcgNodesDict)
-            if(T2.find("*") == -1 and T2.find("\\") == -1 and T2.find("\\n") == -1 and T2.find(".") != -1):
-                T2s = T2.split(".")
-                if self.firstTName == T2s[0]:
-                    taxa1 += "  \""+T2+"\"\n"
-                else:
-                    taxa2 += "  \""+T2+"\"\n"
-                self.addRcgVizNode(T2s[1], T2s[0])
-                self.addRcgAllVizNode(T2s[1], T2s[0], allRcgNodesDict)
-            else:
-#                newT2 = self.restructureCbNames(T2)
-#                self.tr[self.tr.index([T1,T2,P])] = [T1, newT2, P]
-                if T1[0] != T2[0]:
-                    tmpComLi.append(T2)
-                    tmpCom += "  \""+T2+"\"\n"
-                    self.addRcgVizNode(T2, "congruent")
-                    self.addRcgAllVizNode(T2, "congruent", allRcgNodesDict)
-                
-        # Dot drawing used for old viz
-#        fDot.write("  node [shape=box style=\"filled\" fillcolor=\"#CCFFCC\"]\n")
-#        fDot.write(taxa1)
-#        fDot.write("  node [shape=octagon style=\"filled\" fillcolor=\"#FFFFCC\"]\n")
-#        fDot.write(taxa2)
-#        fDot.write("  node [shape=Msquare style=\"filled\" fillcolor=\"#EEEEEE\"]\n")
-#        fDot.write(tmpCom)
-#        fAllDot.write("  node [shape=box style=\"filled\" fillcolor=\"#CCFFCC\"]\n")
-#        fAllDot.write(taxa1)
-#        fAllDot.write("  node [shape=octagon style=\"filled\" fillcolor=\"#FFFFCC\"]\n")
-#        fAllDot.write(taxa2)
-#        fAllDot.write("  node [shape=box style=\"filled,rounded\" fillcolor=\"#EEEEEE\"]\n")
-#        fAllDot.write(tmpCom)
-#        fAllDot.close()
-        
-        #if self.args.pw2input:
-        #    self.transPwToTaxonomy(self.tr, pwIndex)
-        
-        for [T1, T2, P] in self.tr:
-    	    if(P == 0):
-#    	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")       # used in old viz
-                self.addRcgVizEdge(T1, T2, "input")
-    	    elif(P == 1):
-#    	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=red];\n")
-                self.addRcgVizEdge(T1, T2, "inferred")
-    	    elif(P == 2):
-                if False:
-#                    fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
-                    self.addRcgVizEdge(T1, T2, "redundant")
-        
-        #if self.args.rcgo:
-        if True:
-
-            oskiplist = []
-            for key in self.mir.keys():
-                if self.mir[key] == rcc5["overlaps"] and key not in oskiplist: # and key not in oskiplist
-                    item = re.match("(.*),(.*)", key)
-                    replace1 = item.group(1)
-                    replace2 = item.group(2)
-                    for comb in tmpComLi:
-                        if item.group(1) in comb.split("\\n"):
-                            replace1 = comb
-                            break
-                    for comb in tmpComLi:
-                        if item.group(2) in comb.split("\\n"):
-                            replace2 = comb
-                            break                            
-#                    fDot.write("     \"" + item.group(1) + "\" -> \"" + item.group(2) + "\"\n")
-#                    fDot.write("     \"" + replace1 + "\" -> \"" + replace2 + "\"\n")
-                    if "\\n" in replace1 or "\\\\" in replace1:
-                        replace1 = self.restructureCbNames(replace1)
-                        self.addRcgVizNode(replace1, "congruent")
-                        self.addRcgAllVizNode(replace1, "congruent", allRcgNodesDict)
-                    else:
-                        self.addRcgVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1))
-                        self.addRcgAllVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1), allRcgNodesDict)
-                    if "\\n" in replace2 or "\\\\" in replace2:
-                        replace2 = self.restructureCbNames(replace2)
-                        self.addRcgVizNode(replace2, "congruent")
-                        self.addRcgAllVizNode(replace2, "congruent", allRcgNodesDict)
-                    else:
-                        self.addRcgVizNode(re.match("(.*)\.(.*)", replace2).group(2), re.match("(.*)\.(.*)", replace2).group(1))
-                        self.addRcgAllVizNode(re.match("(.*)\.(.*)", replace2).group(2), re.match("(.*)\.(.*)", replace2).group(1), allRcgNodesDict)
-                    self.addRcgVizEdge(replace1, replace2, "overlaps")
-                    # Skip the reverse pair for redundant edges
-                    oskiplist.append(item.group(2)+","+item.group(1))
-#            fDot.write("  }\n")
-        #fDot.write("  subgraph cluster_lg {\n")
-        #fDot.write("    rankdir = LR\n")
-        #fDot.write("    label = \"Legend\";\n")
-        #fDot.write("    A1 -> B1 [label=\"is included in (given)\" style=filled, color=black]\n")
-        #fDot.write("    A2 -> B2 [label=\"is included in (inferred)\" style=filled, color=red]\n")
-        #fDot.write("    A3 -> B3 [label=\"overlaps\" dir=none, style=dashed, color=blue]\n")
-        #fDot.write("  }\n")
-#        fDot.write("}\n")
-#        fDot.close()
-#        newgetoutput("dot -Tpdf "+self.args.outputdir+fileName+".dot -o "+self.args.outputdir+fileName+".pdf")
-        
-        # create the visualization file
-        rcgYamlFile = os.path.join(self.pwsvizdir, fileName+".yaml")
-        rcgDotFile = os.path.join(self.pwsvizdir, fileName+".gv")
-        rcgPdfFile = os.path.join(self.pwsvizdir, fileName+".pdf")
-        rcgSvgFile = os.path.join(self.pwsvizdir, fileName+".svg")
-        fRcgVizYaml = open(rcgYamlFile, 'w')
-        if self.rcgVizNodes:
-            fRcgVizYaml.write(yaml.safe_dump(self.rcgVizNodes, default_flow_style=False))
-        if self.rcgVizEdges:
-            fRcgVizYaml.write(yaml.safe_dump(self.rcgVizEdges, default_flow_style=False))
-        fRcgVizYaml.close()
-        
-        # check whether stylesheet taxonomy names are in stylesheet
-        global styles
-        with open(self.stylesheetdir+"rcgstyle.yaml") as rcgStyleFileOld:
-            styles = yaml.load(rcgStyleFileOld)
-                    
-        # if taxonomy names are not in stylesheet, rewrite styesheet
-        if self.firstTName not in styles["nodestyle"] or self.secondTName not in styles["nodestyle"]:
-            fOld = open(self.stylesheetdir+"rcgstyle.yaml", "r")
-            contents = fOld.readlines()
-            fOld.close()
-            
-            for line in contents:
-                if "nodestyle" in line:
-                    index = contents.index(line)
-                if '"1":' in line:
-                    index2 = contents.index(line)
-            
-            del contents[index+1:index2]    # clean nodestyle previously added
-                
-            value = '    "' + self.firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n    "' + self.secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n' 
-                                
-            contents.insert(index+1, value)
-
-            fNew = open(self.stylesheetdir+"rcgstyle.yaml", "w")
-            contents = "".join(contents)
-            fNew.write(contents)
-            fNew.close()
-        
-        
-        # apply the rcgviz stylesheet
-        newgetoutput("cat "+rcgYamlFile+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + rcgDotFile)
-        newgetoutput("dot -Tpdf "+rcgDotFile+" -o "+rcgPdfFile)
-        newgetoutput("dot -Tsvg "+rcgDotFile+" -o "+rcgSvgFile)
+#     # deprecated, see show.py
+#     def genPwRcg(self, fileName, allRcgNodesDict, pwIndex):
+# 
+# #        fAllDot = open(rcgAllFile, 'a')
+# 
+# #        if self.firstRcg:
+# #            fAllDot.write("digraph {\n\nrankdir = RL\n\n")
+#         tmpCom = ""    # cache of combined taxa
+#         taxa1 = ""     # cache of taxa in the first taxonomy
+#         taxa2 = ""     # cache of taxa in the second taxonomy
+#         tmpComLi = [] # cache of list of combined taxa for --rcgo option in RCG
+#         replace1 = "" # used for replace combined concept in --rcgo option in RCG
+#         replace2 = "" # used for replace combined concept in --rcgo option in RCG
+#         rcgVizNodes = {} # used for rcg nodes visualization in stylesheet
+#         rcgVizEdges = {} # used for rcg edges visualization in stylesheet
+# 
+#         alias = {}
+#         
+#         # Equalities
+#         for T1 in self.eq.keys():
+#             # self.eq is dynamically changed, so we need this check
+#             if not self.eq.has_key(T1):
+#                 continue
+#             tmpStr = ""
+# 
+#             T1s = T1.split(".")
+#             for T2 in self.eq[T1]:
+#                 T2s = T2.split(".")
+#                 
+#                 if tmpStr != "":
+#                     tmpStr = "\\n" + tmpStr
+#                 tmpStr = T2 + tmpStr
+#             if tmpStr != "":
+#                 tmpStr = "\\n" + tmpStr + "\\n"
+# 
+#             if T1s[0] == self.firstTName:
+#                 tmpStr = T1 + tmpStr
+#             else:
+#                 tmpStr = tmpStr + T1
+#             if tmpStr[0:2] == "\\n": tmpStr = tmpStr[2:]
+#             if tmpStr[-2:] == "\\n": tmpStr = tmpStr[:-2]
+#             self.eqConLi.append(tmpStr)
+# 
+#             tmpeqConLi2 = []
+#             for T in self.eqConLi:
+#                 tmpeqConLi2.append(T)
+# 
+#             for T10 in tmpeqConLi2:
+#                 for T11 in tmpeqConLi2:
+#                     if T10 != T11:
+#                         tmpC = []
+#                         ss = ""
+#                         T10s = T10.split("\\n")
+#                         T11s = T11.split("\\n")
+#                         for c1 in T10s:
+#                             if c1 in T11s:
+#                                 tmpC = T10s + T11s
+#                                 tmpC.sort()
+#                                 self.remove_duplicate_string(tmpC)
+#                                 for e in tmpC:
+#                                     ss = ss + e + "\\n"
+#                                 ss = ss[:-2]
+#                                 if T10 in self.eqConLi:
+#                                     self.eqConLi.remove(T10)
+#                                 if T11 in self.eqConLi:
+#                                     self.eqConLi.remove(T11)
+#                                 if ss not in self.eqConLi:
+#                                     self.eqConLi.append(ss)
+#                                 break 
+# 
+#             for T2 in self.eq[T1]:
+# #                if self.eq.has_key(T2):
+# #                    del self.eq[T2]
+#                 tmpTr = list(self.tr)
+#                 for [T3, T4, P] in tmpTr:
+#                     if(T1 == T3 or T2 == T3):
+#                         if self.tr.count([T3, T4, P]) > 0:
+#                             self.tr.remove([T3, T4, P])
+#                             self.tr.append([tmpStr, T4, 0])
+#                     elif(T1 == T4 or T2 == T4):
+#                         if self.tr.count([T3, T4, P]) > 0:
+#                             self.tr.remove([T3, T4, P])
+#                             self.tr.append([T3, tmpStr, 0])
+#                     for T5 in self.eqConLi:
+#                         #if(T5 == T3 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
+#                         if(T3 != T5 and set(T3.split("\\n")).issubset(set(T5.split("\\n")))):
+#                             if self.tr.count([T3, T4, P]) > 0:
+#                                 self.tr.remove([T3, T4, P])
+#                                 self.tr.append([T5,T4,0])
+#                         elif(T4 != T5 and set(T4.split("\\n")).issubset(set(T5.split("\\n")))):
+#                         #elif(T5 == T4 and T5 != tmpStr and set(T5.split("\\n")).issubset(set(tmpStr.split("\\n")))):
+#                             if self.tr.count([T3, T4, P]) > 0:
+#                                 self.tr.remove([T3, T4, P])
+#                                 self.tr.append([T3,T5,0])
+#         tmpeqConLi = []
+# #        print "self.eqConLi=", self.eqConLi
+#         for T in self.eqConLi:
+#             tmpeqConLi.append(T)
+#         for T6 in tmpeqConLi:
+#             for T7 in tmpeqConLi:
+#                 if (set(T6.split("\\n")).issubset(set(T7.split("\\n"))) and T6 != T7 and T6 in self.eqConLi):
+#                     self.eqConLi.remove(T6)
+#         
+#         tmpTr = list(self.tr)
+#         #print "self.eqConli", self.eqConLi
+#         for T in self.eqConLi:
+#             #for [T1, T2, P] in tmpTr:
+#             #    if T == T1 or T == T2:
+#             #print "T=", T
+#             newT = self.restructureCbNames(T)
+#             #print "newT=", newT
+#             tmpComLi.append(newT)
+#             tmpCom += "  \""+newT+"\"\n"
+#             if self.isCbInterTaxonomy(newT):
+#                 self.addRcgVizNode(newT, "congruent")
+#             self.addRcgAllVizNode(newT, "congruent", allRcgNodesDict)
+#             
+#         # Duplicates
+#     	tmpTr = list(self.tr)
+#         for [T1, T2, P] in tmpTr:
+#     	    if(self.tr.count([T1, T2, P]) > 1):
+#                 self.tr.remove([T1, T2, P])
+#     	tmpTr = list(self.tr)
+#         for [T1, T2, P] in tmpTr:
+#     	    if(P == 0):
+#     	        if(self.tr.count([T1, T2, 1]) > 0):
+#                     self.tr.remove([T1, T2, 1])
+#         tmpTr = list(self.tr)
+#         for [T1, T2, P] in tmpTr:
+#             if T1 == T2:
+#                 self.tr.remove([T1, T2, P])
+#             
+#     	# Reductions
+#     	tmpTr = list(self.tr)
+#         for [T1, T2, P1] in tmpTr:
+#             for [T3, T4, P2] in tmpTr:
+#             	if (T2 == T3):
+#                     if(self.tr.count([T1, T4, 0])>0):
+#                         self.tr.remove([T1, T4, 0])
+#                         self.tr.append([T1, T4, 2])
+#                     if(self.tr.count([T1, T4, 1])>0):
+#                         self.tr.remove([T1, T4, 1])
+#                         #self.tr.append([T1, T4, 3])
+# 
+#         #    print "Transitive reduction:"
+#         #    print self.tr
+#             
+#         # restructure for cb visualization
+#         for [T1, T2, P] in self.tr:
+#             if (T1.find("*") != -1 or T1.find("\\\\") != -1):
+#                 newT1 = self.restructureCbNames(T1)
+#                 self.tr[self.tr.index([T1,T2,P])] = [newT1, T2, P]
+#         
+#         for [T1, T2, P] in self.tr:
+#             if (T2.find("*") != -1 or T2.find("\\\\") != -1):
+#                 newT2 = self.restructureCbNames(T2)
+#                 self.tr[self.tr.index([T1,T2,P])] = [T1, newT2, P]
+#         
+#         # Node Coloring (Creating dot file, will be replaced by stylesheet processor)
+#         for [T1, T2, P] in self.tr:
+#             if(T1.find("*") == -1 and T1.find("\\") == -1 and T1.find("\\n") == -1 and T1.find(".") != -1):
+#                 T1s = T1.split(".")
+#                 if self.firstTName == T1s[0]:
+#                     taxa1 += "  \""+T1+"\"\n"               # used in old viz
+#                 else:
+#                     taxa2 += "  \""+T1+"\"\n"
+#                 self.addRcgVizNode(T1s[1], T1s[0])          # used in stylesheet
+#                 self.addRcgAllVizNode(T1s[1], T1s[0], allRcgNodesDict)
+#             else:
+# #                newT1 = self.restructureCbNames(T1)
+# #                self.tr[self.tr.index([T1,T2,P])] = [newT1, T2, P]
+#                 if T1[0] != T2[0]:
+#                     tmpComLi.append(T1)
+#                     tmpCom += "  \""+T1+"\"\n"
+#                     self.addRcgVizNode(T1, "congruent")
+#                     self.addRcgAllVizNode(T1, "congruent", allRcgNodesDict)
+#             if(T2.find("*") == -1 and T2.find("\\") == -1 and T2.find("\\n") == -1 and T2.find(".") != -1):
+#                 T2s = T2.split(".")
+#                 if self.firstTName == T2s[0]:
+#                     taxa1 += "  \""+T2+"\"\n"
+#                 else:
+#                     taxa2 += "  \""+T2+"\"\n"
+#                 self.addRcgVizNode(T2s[1], T2s[0])
+#                 self.addRcgAllVizNode(T2s[1], T2s[0], allRcgNodesDict)
+#             else:
+# #                newT2 = self.restructureCbNames(T2)
+# #                self.tr[self.tr.index([T1,T2,P])] = [T1, newT2, P]
+#                 if T1[0] != T2[0]:
+#                     tmpComLi.append(T2)
+#                     tmpCom += "  \""+T2+"\"\n"
+#                     self.addRcgVizNode(T2, "congruent")
+#                     self.addRcgAllVizNode(T2, "congruent", allRcgNodesDict)
+#                 
+#         # Dot drawing used for old viz
+# #        fDot.write("  node [shape=box style=\"filled\" fillcolor=\"#CCFFCC\"]\n")
+# #        fDot.write(taxa1)
+# #        fDot.write("  node [shape=octagon style=\"filled\" fillcolor=\"#FFFFCC\"]\n")
+# #        fDot.write(taxa2)
+# #        fDot.write("  node [shape=Msquare style=\"filled\" fillcolor=\"#EEEEEE\"]\n")
+# #        fDot.write(tmpCom)
+# #        fAllDot.write("  node [shape=box style=\"filled\" fillcolor=\"#CCFFCC\"]\n")
+# #        fAllDot.write(taxa1)
+# #        fAllDot.write("  node [shape=octagon style=\"filled\" fillcolor=\"#FFFFCC\"]\n")
+# #        fAllDot.write(taxa2)
+# #        fAllDot.write("  node [shape=box style=\"filled,rounded\" fillcolor=\"#EEEEEE\"]\n")
+# #        fAllDot.write(tmpCom)
+# #        fAllDot.close()
+#         
+#         #if self.args.pw2input:
+#         #    self.transPwToTaxonomy(self.tr, pwIndex)
+#         
+#         for [T1, T2, P] in self.tr:
+#     	    if(P == 0):
+# #    	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=black];\n")       # used in old viz
+#                 self.addRcgVizEdge(T1, T2, "input")
+#     	    elif(P == 1):
+# #    	    	fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=filled, color=red];\n")
+#                 self.addRcgVizEdge(T1, T2, "inferred")
+#     	    elif(P == 2):
+#                 if False:
+# #                    fDot.write("  \"" + T1 + "\" -> \"" + T2 + "\" [style=dashed, color=grey];\n")
+#                     self.addRcgVizEdge(T1, T2, "redundant")
+#         
+#         #if self.args.rcgo:
+#         if True:
+# 
+#             oskiplist = []
+#             for key in self.mir.keys():
+#                 if self.mir[key] == rcc5["overlaps"] and key not in oskiplist: # and key not in oskiplist
+#                     item = re.match("(.*),(.*)", key)
+#                     replace1 = item.group(1)
+#                     replace2 = item.group(2)
+#                     for comb in tmpComLi:
+#                         if item.group(1) in comb.split("\\n"):
+#                             replace1 = comb
+#                             break
+#                     for comb in tmpComLi:
+#                         if item.group(2) in comb.split("\\n"):
+#                             replace2 = comb
+#                             break                            
+# #                    fDot.write("     \"" + item.group(1) + "\" -> \"" + item.group(2) + "\"\n")
+# #                    fDot.write("     \"" + replace1 + "\" -> \"" + replace2 + "\"\n")
+#                     if "\\n" in replace1 or "\\\\" in replace1:
+#                         replace1 = self.restructureCbNames(replace1)
+#                         self.addRcgVizNode(replace1, "congruent")
+#                         self.addRcgAllVizNode(replace1, "congruent", allRcgNodesDict)
+#                     else:
+#                         self.addRcgVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1))
+#                         self.addRcgAllVizNode(re.match("(.*)\.(.*)", replace1).group(2), re.match("(.*)\.(.*)", replace1).group(1), allRcgNodesDict)
+#                     if "\\n" in replace2 or "\\\\" in replace2:
+#                         replace2 = self.restructureCbNames(replace2)
+#                         self.addRcgVizNode(replace2, "congruent")
+#                         self.addRcgAllVizNode(replace2, "congruent", allRcgNodesDict)
+#                     else:
+#                         self.addRcgVizNode(re.match("(.*)\.(.*)", replace2).group(2), re.match("(.*)\.(.*)", replace2).group(1))
+#                         self.addRcgAllVizNode(re.match("(.*)\.(.*)", replace2).group(2), re.match("(.*)\.(.*)", replace2).group(1), allRcgNodesDict)
+#                     self.addRcgVizEdge(replace1, replace2, "overlaps")
+#                     # Skip the reverse pair for redundant edges
+#                     oskiplist.append(item.group(2)+","+item.group(1))
+# #            fDot.write("  }\n")
+#         #fDot.write("  subgraph cluster_lg {\n")
+#         #fDot.write("    rankdir = LR\n")
+#         #fDot.write("    label = \"Legend\";\n")
+#         #fDot.write("    A1 -> B1 [label=\"is included in (given)\" style=filled, color=black]\n")
+#         #fDot.write("    A2 -> B2 [label=\"is included in (inferred)\" style=filled, color=red]\n")
+#         #fDot.write("    A3 -> B3 [label=\"overlaps\" dir=none, style=dashed, color=blue]\n")
+#         #fDot.write("  }\n")
+# #        fDot.write("}\n")
+# #        fDot.close()
+# #        newgetoutput("dot -Tpdf "+self.args.outputdir+fileName+".dot -o "+self.args.outputdir+fileName+".pdf")
+#         
+#         # create the visualization file
+#         rcgYamlFile = os.path.join(self.pwsvizdir, fileName+".yaml")
+#         rcgDotFile = os.path.join(self.pwsvizdir, fileName+".gv")
+#         rcgPdfFile = os.path.join(self.pwsvizdir, fileName+".pdf")
+#         rcgSvgFile = os.path.join(self.pwsvizdir, fileName+".svg")
+#         fRcgVizYaml = open(rcgYamlFile, 'w')
+#         if self.rcgVizNodes:
+#             fRcgVizYaml.write(yaml.safe_dump(self.rcgVizNodes, default_flow_style=False))
+#         if self.rcgVizEdges:
+#             fRcgVizYaml.write(yaml.safe_dump(self.rcgVizEdges, default_flow_style=False))
+#         fRcgVizYaml.close()
+#         
+#         # check whether stylesheet taxonomy names are in stylesheet
+#         global styles
+#         with open(self.stylesheetdir+"rcgstyle.yaml") as rcgStyleFileOld:
+#             styles = yaml.load(rcgStyleFileOld)
+#                     
+#         # if taxonomy names are not in stylesheet, rewrite styesheet
+#         if self.firstTName not in styles["nodestyle"] or self.secondTName not in styles["nodestyle"]:
+#             fOld = open(self.stylesheetdir+"rcgstyle.yaml", "r")
+#             contents = fOld.readlines()
+#             fOld.close()
+#             
+#             for line in contents:
+#                 if "nodestyle" in line:
+#                     index = contents.index(line)
+#                 if '"1":' in line:
+#                     index2 = contents.index(line)
+#             
+#             del contents[index+1:index2]    # clean nodestyle previously added
+#                 
+#             value = '    "' + self.firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n    "' + self.secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n' 
+#                                 
+#             contents.insert(index+1, value)
+# 
+#             fNew = open(self.stylesheetdir+"rcgstyle.yaml", "w")
+#             contents = "".join(contents)
+#             fNew.write(contents)
+#             fNew.close()
+#         
+#         
+#         # apply the rcgviz stylesheet
+#         newgetoutput("cat "+rcgYamlFile+" | y2d -s "+self.stylesheetdir+"rcgstyle.yaml" + ">" + rcgDotFile)
+#         newgetoutput("dot -Tpdf "+rcgDotFile+" -o "+rcgPdfFile)
+#         newgetoutput("dot -Tsvg "+rcgDotFile+" -o "+rcgSvgFile)
 
 
     def isCbInterTaxonomy(self, cbName):
@@ -2199,8 +2165,8 @@ class TaxonomyMapping:
                 print "DLV stopped unexpectedly"
                 exit(0)
             raw = raw.replace("{","").replace("}","").replace(" ","").replace("),",");")
-        elif reasoner[self.args['-r']] == reasoner["gringo"]:
-            com = "gringo "+self.pwfile+" "+ self.pwswitch+ " | claspD 0 --eq=no"
+        elif reasoner[self.args['-r']] == reasoner["clingo"]:
+            com = "clingo 0 --eq=no "+self.pwfile+" "+ self.pwswitch
             raw = newgetoutput(com)
         pws = raw.split("\n")
         self.npw = 0
@@ -2211,7 +2177,7 @@ class TaxonomyMapping:
             if pws[i].find("pp(") == -1: continue
             if reasoner[self.args['-r']] == reasoner["dlv"]:
                 items = pws[i].split(";")
-            elif reasoner[self.args['-r']] == reasoner["gringo"]:
+            elif reasoner[self.args['-r']] == reasoner["clingo"]:
                 items = pws[i].split(" ")
             pw = ""
             for j in range(len(items)):
@@ -2249,8 +2215,16 @@ class TaxonomyMapping:
 
     def genCB(self):
         pws = []
-        if reasoner[self.args['-r']] == reasoner["gringo"]:
-            self.com = "gringo "+self.cbfile+" "+ self.pwswitch+ " | claspD 0 --eq=0"
+        if reasoner[self.args['-r']] == reasoner["clingo"]:
+            # update pwswitch
+            pdlv = open(self.pwswitch, 'w')
+            pdlv.write(self.basePw)
+            pdlv.write("pw.")
+            pdlv.write(self.baseIx)
+            pdlv.write("\n#show relout/3.")
+            pdlv.close()
+            
+            self.com = "clingo 0 "+self.cbfile+" "+ self.pwswitch + " | "+self.path+"/muniq -u"
             self.cb = newgetoutput(self.com)
             if self.isCbNone():
                 if self.args['--repair']:
@@ -2260,8 +2234,8 @@ class TaxonomyMapping:
                 raise Exception(template.getEncErrMsg())
             raw = self.cb.split("\n")
             #if self.args.verbose: print raw
-            ## Filter out those trash in the gringo output
-            for i in range(2, len(raw) - 2, 2):
+            ## Filter out those trash in the clingo output
+            for i in range(len(raw)):
                 if raw[i].find("relout") == -1: continue
                 pws.append(raw[i].strip().replace(") ",");"))
                 #if self.args.verbose: print pws
@@ -2309,13 +2283,14 @@ class TaxonomyMapping:
         #    pdlv.write("\nhide.")
         pdlv.write(self.baseIx)
         idlv.write("ix.")
-        if reasoner[self.args['-r']] == reasoner["gringo"]:
+        if reasoner[self.args['-r']] == reasoner["clingo"]:
             if self.enc & encode["ob"]:
                 pdlv.write("\n#show pp/" + self.obslen.__str__() + ".")
             elif self.enc & encode["pw"]:
                 pdlv.write("\n#show rel/3.")
             elif self.enc & encode["cb"]:
-                pdlv.write("\n#show relout/3.")
+                pdlv.write("\n#show rel/3.")
+#                 pdlv.write("\n#show relout/3.")
             idlv.write("\n#show ie/1.")
         pdlv.close()
         idlv.close()
@@ -2410,7 +2385,7 @@ class TaxonomyMapping:
                 for i in range(len(couArray)):
                     self.baseAsp += "bit(M, " + i.__str__() + ", V):-r(M),M1=M/" + proArray[i].__str__() + ", #mod(M1," + couArray[i].__str__() + ",V).\n"
                     
-            elif reasoner[self.args['-r']] == reasoner["gringo"]:
+            elif reasoner[self.args['-r']] == reasoner["clingo"]:
                 self.baseAsp  = "%%% Euler regions\n"
                 self.baseAsp += "r(1.."+maxint.__str__()+").\n\n"
                 self.baseAsp += con
@@ -2430,7 +2405,7 @@ class TaxonomyMapping:
                 self.baseAsp += "count(N):- #int(N),N>=0,N<"+num.__str__()+".\n\n"
                 self.baseAsp += "bit(M, N, 0):-r(M),count(N),p(N,P),M1=M/P,#mod(M1,2,0).\n"
                 self.baseAsp += con
-            elif reasoner[self.args['-r']] == reasoner["gringo"]:
+            elif reasoner[self.args['-r']] == reasoner["clingo"]:
                 # TODO vrpw may not be working for gringo, gringo 4 may be needed
                 # raise Exception("Reasoner: vrpw is not supported for gringo !!")
                 self.baseAsp  = "%%% Euler regions\n"
@@ -2599,7 +2574,7 @@ class TaxonomyMapping:
         if reasoner[self.args['-r']] == reasoner["dlv"]:
             self.seperator = "v"
             self.connector = ", "
-        elif reasoner[self.args['-r']] == reasoner["gringo"]:
+        elif reasoner[self.args['-r']] == reasoner["clingo"]:
             self.seperator = "|"
             self.connector = ": "
         if self.location == []:

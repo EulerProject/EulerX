@@ -24,7 +24,7 @@ import re
 import copy
 import commands
 from relations import *
-from taxonomy import *
+from taxonomy2 import *
 from helper2 import *
 
 class Articulation:
@@ -174,7 +174,7 @@ class Articulation:
         result = ""
         name1 = self.taxon1.dlvName()
         name2 = self.taxon2.dlvName()
-        disjointSymbol = "v" if reasoner[rnr] == reasoner["dlv"] else "|"
+        disjointSymbol = "v" if reasoner[rnr] == reasoner["dlv"] else ";"
         twoPredFormat = ":- {}, {}.\n"
         threePredFormat = ":- {}, {}, {}.\n"
 
@@ -240,7 +240,7 @@ class Articulation:
                     result += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} = 0, #count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} = 0.\n\n"
                     result += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} > 0, #count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} = 0.\n\n"
                     result += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} > 0, #count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} > 0.\n\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
+                elif reasoner[rnr] == reasoner["clingo"]:
                     ## TODO
                     result = ""
             elif self.relations == (rcc5["equals"] | rcc5["is_included_in"]):
@@ -363,7 +363,7 @@ class Articulation:
                     result += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2 + ", X)} = 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} = 0.\n"
                     result += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2 + ", X)} > 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} > 0.\n"
                     result += ":- #count{X: vrs(X), out(" + name1 + ", X), in(" + name2 + ", X)} > 0, #count{Y: vrs(Y), in(" + name1 +", Y), in(" + name2 + ", Y)} = 0, #count{Z: vrs(Z), in(" + name1 + ", Z), out(" + name2 + ", Z)} = 0.\n\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
+                elif reasoner[rnr] == reasoner["clingo"]:
                     # TODO
                     result = ""
             elif self.relations == (rcc5["equals"] | rcc5["is_included_in"] | rcc5["disjoint"]):
@@ -371,7 +371,7 @@ class Articulation:
                     result += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} = 0, #count{Y:vrs(Y), in(" + name1 + ", Y), in(" + name2 + ", Y)} = 0.\n"
                     result += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y:vrs(Y), in(" + name1 + ", Y), in(" + name2 + ", Y)} > 0.\n"
                     result += ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y:vrs(Y), in(" + name1 + ", Y), in(" + name2 + ", Y)} = 0, #count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} = 0.\n\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
+                elif reasoner[rnr] == reasoner["clingo"]:
                     # TODO
                     result = ""
             elif self.relations == (rcc5["includes"] | rcc5["is_included_in"] | rcc5["overlaps"]):
@@ -390,28 +390,28 @@ class Articulation:
                     result  = ":- #count{X : vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y : vrs(Y), out(" + name1 + ", Y ), in(" + name2 + ", Y )} = 0.\n"
                     result += ":- #count{X : vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} = 0, #count{Y : vrs(Y), out(" + name1 + ", Y ), in(" + name2 + ", Y )} > 0.\n"
                     result += ":- #count{X : vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} = 0, #count{Y : vrs(Y), in(" + name1 + ", Y ), in(" + name2 + ", Y )} = 0, #count{Z : vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} = 0.\n\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
+                elif reasoner[rnr] == reasoner["clingo"]:
                     # TODO
                     result = ""
             elif self.relations == (rcc5["disjoint"] | rcc5["is_included_in"] | rcc5["overlaps"]):
                 if reasoner[rnr] == reasoner["dlv"]:
                     result = ":- #count{X : vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} = 0, #count{Y: vrs(Y), out(" + name1 + ", Y), in(" + name2 + ", Y)} = 0.\n"\
                            ":- #count{X : vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y: vrs(Y), in(" + name1 + ", Y), in(" + name2 + ", Y)} > 0, #count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} = 0.\n\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
+                elif reasoner[rnr] == reasoner["clingo"]:
                     # TODO
                     result = ""
             elif self.relations == (rcc5["includes"] | rcc5["disjoint"] | rcc5["overlaps"]):
                 if reasoner[rnr] == reasoner["dlv"]:
                     result = ":- #count{X : vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} = 0, #count{Y : vrs(Y ), out(" + name1 + ", Y), in(" + name2 + ", Y )} = 0.\n"\
                            ":- #count{X : vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} = 0, #count{Y : vrs(Y), in(" + name1 + ", Y), in(" + name2 + ", Y )} > 0, #count{Z : vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} > 0.\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
+                elif reasoner[rnr] == reasoner["clingo"]:
                     # TODO
                     result = ""
             elif self.relations == (rcc5["includes"] | rcc5["is_included_in"] | rcc5["disjoint"]):
                 if reasoner[rnr] == reasoner["dlv"]:
                     result = ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} = 0, #count{Y: vrs(Y), out(" + name1 + ", Y), in(" + name2 + ", Y)} = 0.\n"\
                            ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0, #count{Y: vrs(Y), in(" + name1 + ", Y), in(" + name2 + ", Y)} > 0, #count{Z : vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} > 0.\n\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
+                elif reasoner[rnr] == reasoner["clingo"]:
                     # TODO
                     result = ""
             elif self.relations == (rcc5["includes"] | rcc5["is_included_in"] | rcc5["overlaps"] | rcc5["equals"]):
@@ -419,7 +419,7 @@ class Articulation:
                     result = ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0,"\
                                 "#count{Y: vrs(Y), in(" + name1 + ", Y), in(" + name2 + ", Y)} = 0,"\
                                 "#count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} > 0.\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
+                elif reasoner[rnr] == reasoner["clingo"]:
                     # TODO
                     result = ""
             elif self.relations == (rcc5["disjoint"] | rcc5["is_included_in"] | rcc5["overlaps"] | rcc5["equals"]):
@@ -427,7 +427,7 @@ class Articulation:
                     result = ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0,"\
                                 "#count{Y: vrs(Y), in(" + name1 + ", Y), in(" + name2 + ", Y)} > 0,"\
                                 "#count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} = 0.\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
+                elif reasoner[rnr] == reasoner["clingo"]:
                     # TODO
                     result = ""
             elif self.relations == (rcc5["includes"] | rcc5["disjoint"] | rcc5["overlaps"] | rcc5["equals"]):
@@ -435,7 +435,7 @@ class Articulation:
                     result = ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} = 0,"\
                                 "#count{Y: vrs(Y), in(" + name1 + ", Y), in(" + name2 + ", Y)} > 0,"\
                                 "#count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} > 0.\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
+                elif reasoner[rnr] == reasoner["clingo"]:
                     # TODO
                     result = ""
             elif self.relations == (rcc5["includes"] | rcc5["is_included_in"] | rcc5["disjoint"] | rcc5["equals"]):
@@ -443,14 +443,14 @@ class Articulation:
                     result = ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} > 0,"\
                                 "#count{Y: vrs(Y), in(" + name1 + ", Y), in(" + name2 + ", Y)} > 0,"\
                                 "#count{Z: vrs(Z), out(" + name1 + ", Z), in(" + name2 + ", Z)} > 0.\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
+                elif reasoner[rnr] == reasoner["clingo"]:
                     # TODO
                     result = ""
             elif self.relations == (rcc5["includes"] | rcc5["is_included_in"] | rcc5["overlaps"] | rcc5["disjoint"]):
                 if reasoner[rnr] == reasoner["dlv"]:
                     result = ":- #count{X: vrs(X), in(" + name1 + ", X), out(" + name2 + ", X)} = 0,"\
                                 "#count{Y: vrs(Y), out(" + name1 + ", Y), in(" + name2 + ", Y)} = 0.\n"
-                elif reasoner[rnr] == reasoner["gringo"]:
+                elif reasoner[rnr] == reasoner["clingo"]:
                     # TODO
                     result = ""
             elif self.relations == relation["+="]: # lsum

@@ -23,6 +23,7 @@
 import sys
 import commands
 import os
+import subprocess
 
 class Callable:
     def __init__(self, callable):
