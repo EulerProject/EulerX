@@ -954,8 +954,8 @@ class ProductsShowing:
     def defineCombConceptGroup(self, conceptStr, firstTName, secondTName, thirdTName, fourthTName, fifthTName):
         if "\\n" not in conceptStr and (conceptStr.count("\\\\") == 1 or "*" in conceptStr):
             return "*NEW*"
-        elif "\\\\" not in conceptStr and "*" not in conceptStr:
-            return "congruent"
+#         elif "\\\\" not in conceptStr and "*" not in conceptStr:
+#             return "congruent"
         else:
             taxNames = set()
             concepts = conceptStr.split("\\n")
