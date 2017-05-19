@@ -71,7 +71,7 @@ Euler/X use either **DLV** or **Clingo** as underlining reasoner. Please install
     Specify -help for more detailed usage information.
     
     
-    $ EulerX$ clingo -v
+    $ clingo -v
     clingo version 5.2.0
     Address model: 64-bit
 
