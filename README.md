@@ -71,26 +71,21 @@ Euler/X use either **DLV** or **Clingo** as underlining reasoner. Please install
     Specify -help for more detailed usage information.
     
     
-    $ clingo -v
-    clingo version 4.5.4
+    $ EulerX$ clingo -v
+    clingo version 5.2.0
     Address model: 64-bit
-    
-    libgringo version 4.5.4
-    Configuration: with Python 2.7.5, with Lua 5.3.1
-    Copyright (C) Roland Kaminski
-    License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-    Gringo is free software: you are free to change and redistribute it.
-    There is NO WARRANTY, to the extent permitted by law.
 
-    libclasp version 3.1.4
-    Configuration: WITH_THREADS=1 (Intel TBB version 4.3)
+    libgringo version 5.2.0
+    Configuration: without Python, with Lua 5.3.4
+
+    libclasp version 3.3.0 (libpotassco version 1.0.0)
+    Configuration: WITH_THREADS=1
     Copyright (C) Benjamin Kaufmann
-    License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>
-    clasp is free software: you are free to change and redistribute it.
-    There is NO WARRANTY, to the extent permitted by law.
+
+    License: The MIT License <https://opensource.org/licenses/MIT>
 
 To install DLV, please use the version `static no ODBC support` from [DLV download page](http://www.dlvsystem.com/dlv/#1).
-To install Clingo, please use the version [4.5.4](https://sourceforge.net/projects/potassco/files/clingo/4.5.4/).
+To install Clingo, please use the version [5.2.0](https://github.com/potassco/clingo/releases).
 Note: You do not need to install all to use Euler/X, either DLV or Clingo will do the job.
 
 ##### 5. Install Graphviz visualization tool
