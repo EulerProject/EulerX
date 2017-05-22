@@ -51,11 +51,11 @@ from helper2 import *
 from inputViz import *
 from r32comptable import *
 from fourinone2 import genFourinone
+from rcc2Verbose import *
 from random import randint
 from time import localtime, strftime
 from operator import itemgetter
 from shutil import copyfile
-import commands
 
 class TaxonomyMapping:
 
@@ -4026,6 +4026,11 @@ class TaxonomyMapping:
 #        
 #        print ""
         
+        # Verbose mode in rcc2
+#         if self.args['--rcc2Verbose']:
+#             print "RCC2 verbose mode"
+        rcc2V = RCC2Verbose()
+            
         # prepare for input
         for pair in self.getAllArticulationPairs():
 #            print "pair[0].taxonomy", pair[0].taxonomy.abbrev, self.firstTName
@@ -4058,33 +4063,37 @@ class TaxonomyMapping:
 #        for k,v in self.allPairsMir.iteritems():
 #            print k[0].name, k[1].name, v
         
+        # use list to implement "toDo"
+        #toDo = []        
+        #        toDo.append(taxonPair)
+        #while len(toDo) > 0:
+        #    print "------------ Step ", step, " ------------"
+        #    randomIndex = randint(0,len(toDo)-1)
+        #    taxonPair = toDo[randomIndex]
+        #    del toDo[randomIndex]
+        #print "#########"
+        #for k,v in self.allPairsMir.iteritems():
+        #    print k[0].name, k[1].name, findkey(relation, v)              
+        #print "TO-DO"
+        #for e in toDo:
+        #    print e[0].name, e[1].name
+        
         toDo = Queue.Queue()
-#        toDo = []
+
         for taxonPair,rel in self.allPairsMir.iteritems():
             if rel != relation["{=, >, <, !, ><}"]:
                 toDo.put(taxonPair)
-#                toDo.append(taxonPair)
         
         step = 1
         while not toDo.empty():
-#        while len(toDo) > 0:
-#            print "------------ Step ", step, " ------------"
+            if self.args['--rcc2Verbose']:
+                rcc2V.getStep(step)
             taxonPair = toDo.get()
-#            randomIndex = randint(0,len(toDo)-1)
-#            taxonPair = toDo[randomIndex]
-#            del toDo[randomIndex]
-            self.reasonOver(taxonPair, toDo, step)
+            self.reasonOver(taxonPair, toDo, step, rcc2V)
             step = step + 1
         
         # output all mirs
         self.rccGenMir()
-#        print "#########"
-#        for k,v in self.allPairsMir.iteritems():
-#            print k[0].name, k[1].name, findkey(relation, v)
-            
-#        print "TO-DO"
-#        for e in toDo:
-#            print e[0].name, e[1].name
         
         return
     
@@ -4098,22 +4107,18 @@ class TaxonomyMapping:
             revArts = arts
         return revArts
 
-    def reasonOver(self, taxonPair, toDo, step):
+    def reasonOver(self, taxonPair, toDo, step, rcc2V):
         t1 = taxonPair[0]
         t2 = taxonPair[1]
         t1Parent = t1.parent
         t2Parent = t2.parent
         givenRel = self.allPairsMir[taxonPair]
-#        print "Pick pair: ", t1.name, findkey(relation, givenRel), t2.name
+        cnt = 0
         
-#        # visualize reasoning
-#        fileName = os.path.join(self.rccfilesdir, "rccreasoningviz_step" + str(step) + ".dot")
-#        f = open(fileName, "w")
-#        f.write("digraph {\n\nrankdir = LR\n\n")
-#        f.write('node [shape=box]\n')
-#        f.write(t1.name + ' -> ' + t2.name + ' [color=blue, label="'+ findkey(relation,givenRel) +'"];\n')
-        
-        
+        fileName = os.path.join(self.rccfilesdir, "rccreasoningviz_step" + str(step) + ".dot")
+        if self.args['--rcc2Verbose']:
+            rcc2V.getPair(fileName, step, t1, t2, givenRel)
+                    
         # begin reason over
         if t2Parent != "":
             # update pair between t1 and t2's parent
@@ -4131,8 +4136,10 @@ class TaxonomyMapping:
 #                    "-->", t1.name, findkey(relation, deducedRel), t2Parent.name
 #            f.write(t2.name + ' -> ' + t2Parent.name + ' [label="< (parent)"];\n')
 #            f.write(t1.name + ' -> ' + t2Parent.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
-            part = '1'            
-            self.assertNew(deducedPair, deducedRel, toDo)
+            part = '1'
+            if self.args['--rcc2Verbose']:
+                rcc2V.getROPart1(fileName, t1, t2, t2Parent, givenRel, deducedPair, deducedRel, self.allPairsMir)
+            self.assertNew(fileName, deducedPair, deducedRel, toDo, part, cnt, rcc2V)
             
             
             # update pair between t1 and t2's siblings
@@ -4142,6 +4149,9 @@ class TaxonomyMapping:
 #                print t2.name + " has the following siblings:"
 #            else:
 #                print t2.name + " has no siblings"
+            if self.args['--rcc2Verbose']:
+                rcc2V.getROPart2Intro(t2, t2Siblings)
+            cnt = 0
             for t2Sibling in t2Siblings:
                 if t2Sibling != t2:
 #                    print "Sibling: " + t2Sibling.name + ", then look at pair (" + t1.name + ", " + t2Sibling.name + ")"
@@ -4153,9 +4163,13 @@ class TaxonomyMapping:
 #                    f.write(t2.name + ' -> ' + t2Sibling.name + ' [label="! (sibling)"];\n')
 #                    f.write(t1.name + ' -> ' + t2Sibling.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
                     part = '2'
-                    self.assertNew(deducedPair, deducedRel, toDo)
-#        else:
-#            print "\nPart (I) and Part (II) no exist, " + t2.name + " has no parent or siblings"
+                    if self.args['--rcc2Verbose']:
+                        rcc2V.getROPart2(fileName, t1, t2, t2Sibling, givenRel, deducedPair, deducedRel, self.allPairsMir)
+                    self.assertNew(fileName, deducedPair, deducedRel, toDo, part, cnt, rcc2V)
+                    cnt += 1
+        else:
+            if self.args['--rcc2Verbose']:
+                rcc2V.getNoPart12(t2)
         
         # update pair between t1 and t2's children
 #        print "\nPart (III)"
@@ -4164,7 +4178,10 @@ class TaxonomyMapping:
 #            print t2.name + " has the following children:"
 #        else:
 #            print t2.name + " has no children"
+        if self.args['--rcc2Verbose']:
+            rcc2V.getROPart3Intro(t2, t2Children)
         if len(t2Children) > 1:
+            cnt = 0
             for t2Child in t2Children:
 #                print "Child: " + t2Child.name + ", then look at pair (" + t1.name + ", " + t2Child.name + ")"
                 deducedPair = (t1, t2Child)
@@ -4175,7 +4192,10 @@ class TaxonomyMapping:
 #                f.write(t2.name + ' -> ' + t2Child.name + ' [label="> (children)"];\n')
 #                f.write(t1.name + ' -> ' + t2Child.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
                 part = '3'
-                self.assertNew(deducedPair, deducedRel, toDo)
+                if self.args['--rcc2Verbose']:
+                    rcc2V.getROPart3(fileName, t1, t2, t2Child, givenRel, deducedPair, deducedRel, self.allPairsMir)
+                self.assertNew(fileName, deducedPair, deducedRel, toDo, part, cnt, rcc2V)
+                cnt += 1
         else:
             for t2Child in t2Children:
 #                print "Child: " + t2Child.name + ", then look at pair (" + t1.name + ", " + t2Child.name + ")"
@@ -4187,7 +4207,9 @@ class TaxonomyMapping:
 #                f.write(t2.name + ' -> ' + t2Child.name + ' [label="> (children)"];\n')
 #                f.write(t1.name + ' -> ' + t2Child.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
                 part = '3'
-                self.assertNew(deducedPair, deducedRel, toDo)
+                if self.args['--rcc2Verbose']:
+                    rcc2V.getROPart3(fileName, t1, t2, t2Child, givenRel, deducedPair, deducedRel, self.allPairsMir)
+                self.assertNew(fileName, deducedPair, deducedRel, toDo, part, cnt, rcc2V)
             
         if t1Parent != "":
             # update pair between t1's Parent and t2
@@ -4204,7 +4226,9 @@ class TaxonomyMapping:
 #            f.write(t1Parent.name + ' -> ' + t1.name + ' [label="> (parent)"];\n')
 #            f.write(t1Parent.name + ' -> ' + t2.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
             part = '4'
-            self.assertNew(deducedPair, deducedRel, toDo)
+            if self.args['--rcc2Verbose']:
+                rcc2V.getROPart4(fileName, t1, t2, t1Parent, givenRel, deducedPair, deducedRel, self.allPairsMir)
+            self.assertNew(fileName, deducedPair, deducedRel, toDo, part, cnt, rcc2V)
             
             # update pair between t1's siblings and t2 siblings
 #            print "\nPart (V):"
@@ -4213,6 +4237,9 @@ class TaxonomyMapping:
 #                print t1.name + " has the following siblings:"
 #            else:
 #                print t1.name + " has no siblings"
+            if self.args['--rcc2Verbose']:
+                rcc2V.getROPart5Intro(t1, t1Siblings)
+            cnt = 0
             for t1Sibling in t1Siblings:
                 if t1Sibling != t1:
 #                    print "Sibling: " + t1Sibling.name + ", then look at pair (" + t1Sibling.name + ", " + t2.name + ")"
@@ -4224,9 +4251,13 @@ class TaxonomyMapping:
 #                    f.write(t1Sibling.name + ' -> ' + t1.name + ' [label="! (sibling)"];\n')
 #                    f.write(t1Sibling.name + ' -> ' + t2.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
                     part = '5'
-                    self.assertNew(deducedPair, deducedRel, toDo)
-#        else:
-#            print "\nPart (IV) and Part (V) no exist, " + t1.name + " has no parent or siblings"
+                    if self.args['--rcc2Verbose']:
+                        rcc2V.getROPart5(fileName, t1, t2, t1Sibling, givenRel, deducedPair, deducedRel, self.allPairsMir)
+                    self.assertNew(fileName, deducedPair, deducedRel, toDo, part, cnt, rcc2V)
+                    cnt += 1
+        else:
+            if self.args['--rcc2Verbose']:
+                rcc2V.getNoPart56(t1)
         
         # update pair between t1's children and t2
 #        print "\nPart (VI)"
@@ -4235,7 +4266,10 @@ class TaxonomyMapping:
 #            print t1.name + " has the following children:"
 #        else:
 #            print t1.name + " has no children"
+        if self.args['--rcc2Verbose']:
+            rcc2V.getROPart6Intro(t1, t1Children)
         if len(t1Children) > 1:
+            cnt = 0
             for t1Child in t1Children:
 #                print "Child: " + t1Child.name + ", then look at pair (" + t1Child.name + ", " + t2.name + ")"
                 deducedPair = (t1Child, t2)
@@ -4246,7 +4280,10 @@ class TaxonomyMapping:
 #                f.write(t1Child.name + ' -> ' + t1.name + ' [label="< (children)"];\n')
 #                f.write(t1Child.name + ' -> ' + t2.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
                 part = '6'
-                self.assertNew(deducedPair, deducedRel, toDo)
+                if self.args['--rcc2Verbose']:
+                    rcc2V.getROPart6(fileName, t1, t2, t1Child, givenRel, deducedPair, deducedRel, self.allPairsMir)
+                self.assertNew(fileName, deducedPair, deducedRel, toDo, part, cnt, rcc2V)
+                cnt += 1
         else:
             for t1Child in t1Children:
 #                print "Child: " + t1Child.name + ", then look at pair (" + t1Child.name + ", " + t2.name + ")"
@@ -4258,15 +4295,20 @@ class TaxonomyMapping:
 #                f.write(t1Child.name + ' -> ' + t1.name + ' [label="< (children)"];\n')
 #                f.write(t1Child.name + ' -> ' + t2.name + ' [color=red, label="'+ findkey(relation,deducedRel) +'"];\n')
                 part = '6'
-                self.assertNew(deducedPair, deducedRel, toDo)
-            
+                if self.args['--rcc2Verbose']:
+                    rcc2V.getROPart6(fileName, t1, t2, t1Child, givenRel, deducedPair, deducedRel, self.allPairsMir)
+                self.assertNew(fileName, deducedPair, deducedRel, toDo, part, cnt, rcc2V)
+                
+        if self.args['--rcc2Verbose']:
+            rcc2V.getFinish(fileName)
+        
 #        print ""
         
 #        f.write("}\n")
 #        f.close()
             
         
-    def assertNew(self, deducedPair, deducedRel, toDo):
+    def assertNew(self, fileName, deducedPair, deducedRel, toDo, part, cnt, rcc2V):
         oldRel = self.allPairsMir[deducedPair]
         newRel = oldRel & deducedRel
         if not newRel:
@@ -4283,7 +4325,11 @@ class TaxonomyMapping:
 #            f.write('node1'+part+' -> intersect'+part+' [label="original"];\n')
 #            f.write('node2'+part+' -> intersect'+part+' [label="deduced"];\n')
 #            f.write('intersect'+part+' -> node3'+part+' [label="intersection"];\n')
+            if self.args['--rcc2Verbose']:
+                rcc2V.getAssertNewViz(fileName, part, deducedPair, deducedRel, oldRel, newRel, cnt)
             if newRel == relation["{=, >, <, !, ><}"] or oldRel == newRel:
+                if self.args['--rcc2Verbose']:
+                    rcc2V.getNoChange()
 #                print "No change..."
                 return
         self.allPairsMir[deducedPair] = newRel
