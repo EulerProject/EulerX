@@ -828,8 +828,8 @@ class TaxonomyMapping:
             
             if self.enc & encode["cb"]:
                 
-                tmpTr = deepish_copy(self.basetr)
-                tmpMir = deepish_copy(self.basemir)
+                tmpTr = copy.deepcopy(self.basetr)
+                tmpMir = copy.deepcopy(self.basemir)
 #                 pwTm.tr = pwTm.basetr
 #                 pwTm.mir = pwTm.basemir
                     
