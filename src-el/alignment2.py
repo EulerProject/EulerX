@@ -2520,12 +2520,13 @@ class TaxonomyMapping:
 
                                         if t.children[i].abbrev.find("nc_") == -1:
                                             self.baseAsp += AggregationRule(firstVar=name1, secondVar=name2, secondPredIsIn=False).rule
-                                            self.baseAsp += AggregationRule(firstVar=name1, secondVar=name2,
-                                                                            firstPredIsIn=False).rule
+                                        if t.children[j].abbrev.find("nc_") == -1:
+                                            self.baseAsp += AggregationRule(firstVar=name1, secondVar=name2, firstPredIsIn=False).rule
 
                                         if t.children[i].abbrev.find("nc_") == -1:
                                             self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 1) :- ir(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
                                             self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 1) :- vr(X, A), in(" + name1 + ", X), out(" + name2 + ", X), ix.\n"
+                                        if t.children[j].abbrev.find("nc_") == -1:
                                             self.baseAsp += "pie(r" + ruleNum.__str__() + ", A, 2) :- ir(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n"
                                             self.baseAsp += "c(r" + ruleNum.__str__() + ", A, 2) :- vr(X, A), out(" + name1 + ", X), in(" + name2 + ", X), ix.\n\n"
                     elif self.enc & encode["direct"]:
