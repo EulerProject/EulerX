@@ -4116,7 +4116,7 @@ class TaxonomyMapping:
         givenRel = self.allPairsMir[taxonPair]
         cnt = 0
         
-        fileName = os.path.join(self.rccfilesdir, "rccreasoningviz_step" + str(step) + ".dot")
+        fileName = os.path.join(self.rccfilesdir, "rccreasoningviz_step" + str(step) + ".gv")
         if self.args['--rcc2Verbose']:
             rcc2V.getPair(fileName, step, t1, t2, givenRel)
                     
