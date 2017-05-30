@@ -541,9 +541,9 @@ class ProductsShowing:
         
         if not os.path.exists(self.pwsvizdir):
             os.mkdir(self.pwsvizdir)
-        else:
-            print "Possible worlds already generated in 4-PWs."
-            return
+#         else:
+#             print "Possible worlds already generated in 4-PWs."
+#             return
              
         numOfPws = len([f for f in os.walk(self.pwinternalfilesdir).next()[2] if f[0:11] == "pw.internal" and f[-1] != 'c'])
         avInternalFile = os.path.join(self.pwinternalfilesdir, 'av.internal')
@@ -948,7 +948,7 @@ class ProductsShowing:
         #fcv.write('cvFlag = ' + repr(True) + '\n')
         #fcv.close()
         
-        self.removeInternalfiles("pw.internal")
+#         self.removeInternalfiles("pw.internal")
         
         
     def defineCombConceptGroup(self, conceptStr, firstTName, secondTName, thirdTName, fourthTName, fifthTName):
