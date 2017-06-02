@@ -83,6 +83,10 @@ class ProductsShowing:
         self.inputVizEdges = {}                # edges for input visualization in stylesheet
         
         self.pwinternalfilesdir = os.path.join(self.lastrundir, "2-ASP-output")
+        
+        self.mirfiledir = os.path.join(self.lastrundir, "3-MIR") 
+        self.mirVizNodes = {} 
+        self.mirVizEdges = {}
                 
         self.pwsvizdir = os.path.join(self.lastrundir, "4-PWs")
         self.rcgVizNodes = {}
@@ -149,6 +153,8 @@ class ProductsShowing:
             #    self.showCV()
             #if self.args['<name>'] == 'hv':    # hierarchy view
             #    self.showHV()
+            if self.args['<name>'] == 'mv':   # inconsistency lattice 
+                self.showMV()
             if self.args['<name>'] == 'inconLat':   # inconsistency lattice 
                 self.showInconLAT()
             if self.args['<name>'] == 'fourinone':   # 4-in-1 lattice 
@@ -1833,6 +1839,206 @@ class ProductsShowing:
             f.close()
             
         self.removeInternalfiles("pw2input.internal")
+        
+    def showMV(self):
+        print "******MIR visualization******"
+        inputFile = os.path.join(self.inputfilesdir, self.name+".txt")
+        mirfile = os.path.join(self.mirfiledir, self.name+"_mir.csv")
+                
+        group2concepts = {}
+        firstTName = ""
+        secondTName = ""
+        thirdTName = ""
+        fourthTName = ""
+        fifthTName = ""
+        taxName = ""
+        
+        f = open(inputFile, 'r')
+        lines = f.readlines()
+        f.close()
+        
+        for line in lines:
+            
+            if (re.match("taxonomy", line)):
+                taxName = re.match("taxonomy(\s+)(\S+)(.*)", line).group(2)
+
+                if firstTName == "":
+                    firstTName = taxName
+                
+                if firstTName != "" and secondTName == "" and firstTName != taxName:
+                    secondTName = taxName
+                    
+                if firstTName != "" and secondTName != "" and thirdTName == "" \
+                    and firstTName != taxName and secondTName != taxName:
+                    thirdTName = taxName
+                    
+                if firstTName != "" and secondTName != "" and thirdTName != "" \
+                    and fourthTName == "" and firstTName != taxName and secondTName != taxName and thirdTName != taxName:
+                    fourthTName = taxName
+                
+                if firstTName != "" and secondTName != "" and thirdTName != "" \
+                    and fourthTName != "" and fifthTName == "" and firstTName != taxName and secondTName != taxName \
+                    and thirdTName != taxName and fourthTName != taxName:
+                    fifthTName = taxName
+            
+            elif (re.match("\(.*\)", line)):
+                
+                conceptsToAdd = re.match("\((.*)\)", line).group(1).split()
+                # check multiple nc
+                for c in conceptsToAdd:
+                    if c == 'nc':
+                        conceptsToAdd[conceptsToAdd.index(c)] = 'nc_' + conceptsToAdd[0]
+                        
+                if taxName in group2concepts:
+                    group2concepts[taxName].append(conceptsToAdd)
+                else:
+                    group2concepts[taxName] = [conceptsToAdd]
+                                    
+#         art2symbol = {"equals":"=","is_included_in":"<","includes":">","overlaps":"o","disjoint":"!"}
+        
+        for key, attr in group2concepts.iteritems():
+            for value in attr:
+                parent = value.pop(0)
+                self.addMIRVizNode(parent, key, self.checkConceptRank(parent))
+                for v in value:
+                    self.addMIRVizNode(v, key, self.checkConceptRank(v))
+                    self.addMIRVizEdge(key + "." + v, key + "." + parent, "isa")
+                    
+        # read mir file
+        f = open(mirfile, 'r')
+        lines = f.readlines()
+        f.close()
+        
+        for line in lines:
+            if "{" in line:
+                line = line.replace("{",";").replace("}",";")
+                items = line.split(";")
+                start = items[0].replace(",","")
+                label = items[1].replace(","," ").replace("<  =", "=  <").replace("=  >", ">  =")
+                end = items[2].split(",")[1]
+            else:
+                items = line.split(",")
+                start = items[0]
+                label = items[1]
+                end = items[2]
+            self.addMIRVizEdge(start, end, label)
+        
+        # create the yaml file
+        if not os.path.exists(self.mirfiledir):
+            os.makedirs(self.mirfiledir)
+        mirYamlFile = os.path.join(self.mirfiledir, self.name+"_mir.yaml")
+        mirDotFile = os.path.join(self.mirfiledir, self.name+"_mir.gv")
+        mirPdfFile = os.path.join(self.mirfiledir, self.name+"_mir.pdf")
+        mirSvgFile = os.path.join(self.mirfiledir, self.name+"_mir.svg")
+        
+        fMirVizYaml = open(mirYamlFile, 'w')
+        if self.mirVizNodes:
+            fMirVizYaml.write(yaml.safe_dump(self.mirVizNodes, default_flow_style=False))
+        if self.mirVizEdges:
+            fMirVizYaml.write(yaml.safe_dump(self.mirVizEdges, default_flow_style=False))
+        fMirVizYaml.close()   
+        
+        # check whether stylesheet taxonomy names are in stylesheet
+        global styles
+        styleFilesToRead = self.stylesheetdir+"mirstyle.yaml"
+            
+        with open(styleFilesToRead) as mirStyleFileOld:
+            styles = yaml.load(mirStyleFileOld)
+                    
+#        # if taxonomy names are not in stylesheet, rewrite styesheet
+        if firstTName not in styles["nodestyle"] or secondTName not in styles["nodestyle"] \
+           or thirdTName not in styles["nodestyle"] or fourthTName not in styles["nodestyle"] \
+           or fifthTName not in styles["nodestyle"]:
+            value = ""
+            fOld = open(styleFilesToRead, "r")
+            contents = fOld.readlines()
+            fOld.close()
+            
+            for line in contents:
+                if "nodestyle" in line:
+                    index = contents.index(line)
+                if 'all:' in line:
+                    index2 = contents.index(line)
+            
+            #del contents[index+1:index2]    # clean nodestyle previously added
+            
+            if firstTName != "" and firstTName not in styles["nodestyle"]:
+                value += '    "' + firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"') + '"\n'
+            if secondTName != "" and secondTName not in styles["nodestyle"]:
+                value += '    "' + secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"') + '"\n'
+            if thirdTName != "" and thirdTName not in styles["nodestyle"]:
+                value += '    "' + thirdTName + '": "' + styles["nodestyle"]["3"].replace('"','\\"') + '"\n' 
+            if fourthTName != "" and fourthTName not in styles["nodestyle"]:
+                value += '    "' + fourthTName + '": "' + styles["nodestyle"]["4"].replace('"','\\"') + '"\n'
+            if fifthTName != "" and fifthTName not in styles["nodestyle"]: 
+                value += '    "' + fifthTName + '": "' + styles["nodestyle"]["5"].replace('"','\\"') + '"\n' 
+                                
+            contents.insert(index+1, value)
+
+            fNew = open(styleFilesToRead, "w")
+            contents = "".join(contents)
+            fNew.write(contents)
+            fNew.flush()
+            fNew.close()
+
+        # Redo -- check whether stylesheet taxonomy names are in stylesheet
+        # Redo -- if taxonomy names are not in stylesheet, rewrite styesheet, for single taxnomy        
+        if not firstTName or not secondTName:
+            with open(self.stylesheetdir+"singletoninputstyle.yaml") as mirStyleFileOld:
+                styles = yaml.load(mirStyleFileOld)
+            
+            if firstTName not in styles["nodestyle"] or secondTName not in styles["nodestyle"]:
+                fOld = open(self.stylesheetdir+"singletoninputstyle.yaml", "r")
+                contents = fOld.readlines()
+                fOld.close()
+                
+                for line in contents:
+                    if "nodestyle" in line:
+                        index = contents.index(line)
+                    if 'all:' in line:
+                        index2 = contents.index(line)
+                
+                #del contents[index+1:index2]    # clean nodestyle previously added
+                    
+                value = '    "' + firstTName + '": "' + styles["nodestyle"]["1"].replace('"','\\"',2) + '"\n    "' + secondTName + '": "' + styles["nodestyle"]["2"].replace('"','\\"',2) + '"\n' 
+                                    
+                contents.insert(index+1, value)
+    
+                fNew = open(self.stylesheetdir+"singletoninputstyle.yaml", "w")
+                contents = "".join(contents)
+                fNew.write(contents)
+                fNew.flush()
+                fNew.close()
+        
+        # apply the mirviz stylesheet
+        if not firstTName or not secondTName:
+            newgetoutput("cat "+mirYamlFile+" | y2d -s "+self.stylesheetdir+"singletoninputstyle.yaml" + ">" + mirDotFile)
+        else:
+            newgetoutput("cat "+mirYamlFile+" | y2d -s "+styleFilesToRead + ">" + mirDotFile)
+        if self.args['--svg']:
+            newgetoutput("dot -Tsvg "+mirDotFile+" -o "+mirSvgFile)
+        else:
+            newgetoutput("dot -Tpdf "+mirDotFile+" -o "+mirPdfFile)
+                    
+
+    def addMIRVizNode(self, concept, group, pathlen):
+        node = {}
+        node.update({"concept": concept})
+        node.update({"group": group})
+        #if self.args.withrank:
+        #    node.update({"pathlen": pathlen})
+        if group != "(+)":
+            self.mirVizNodes.update({group + "." + concept: node})
+        else:
+            self.mirVizNodes.update({concept: node})
+    
+    def addMIRVizEdge(self, s, t, label):
+        edge = {}
+        edge.update({"s" : s})
+        edge.update({"t" : t})
+        edge.update({"label" : label})
+        self.mirVizEdges.update({s + "_" + t : edge})
+
     
     def removeInternalfiles(self, fileName):
         for internalfileName in os.listdir(self.pwinternalfilesdir):
@@ -1842,5 +2048,3 @@ class ProductsShowing:
                     os.unlink(internalFilePath)
             except Exception as e:
                 print(e)
-
-
