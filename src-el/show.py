@@ -1913,14 +1913,14 @@ class ProductsShowing:
             if "{" in line:
                 line = line.replace("{",";").replace("}",";")
                 items = line.split(";")
-                start = items[0].replace(",","")
-                label = items[1].replace(","," ").replace("<  =", "=  <").replace("=  >", ">  =")
-                end = items[2].split(",")[1]
+                start = items[0].replace(",","").strip()
+                label = items[1].replace(","," ").replace("<  =", "=  <").replace("=  >", ">  =").strip()
+                end = items[2].split(",")[1].strip()
             else:
                 items = line.split(",")
-                start = items[0]
-                label = items[1]
-                end = items[2]
+                start = items[0].strip()
+                label = items[1].strip()
+                end = items[2].strip()
             self.addMIRVizEdge(start, end, label)
         
         # create the yaml file

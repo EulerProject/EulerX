@@ -42,9 +42,9 @@ Options:
     -n NPW		  Set the number of possible worlds output, by default output all PWs.
     -o OUTFOLDER	  Set the output folder, ignore it to use the current folder.
     --consistency	  Check consistency ONLY.
-    --disablecov	  Disable coverage.
-    --disablesib	  Disable sibling disjointness.
-    --repair WAY	  Repair inconsistency.
+    --disablecov	  Disable coverage globally, used with binary encoding.
+    --disablesib	  Disable sibling disjointness, used with binary encoding.
+    --repair WAY	  Repair inconsistency, e.g.--repair=HST to display MIS.
     --artRem		  Articulation remover.
     --fourinone		  Four in one lattice.
     --xia		  Extract input file.
@@ -59,7 +59,10 @@ Options:
     				iv (input visualization)
     				tv (taxonomy visualization)    				
     				pw (possible worlds)
-    				sv (summary view, including aggregate view, cluster view, hierarchy view)    				
+    				sv (summary view, including aggregate view, cluster view, hierarchy view)
+    				mv (mir view)
+    				inconLat (inconsistency diagnostic lattice, used after --repair=HST)
+    				ambLat (ambiguity diagnostic lattice, used after --artRem)
 
 """
 
