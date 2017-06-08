@@ -118,6 +118,7 @@ reasoner["rcc2pw"] = 1 << 4
 reasoner["rcc1"] = 1 << 5
 reasoner["rccdlv"] = 1 << 6
 reasoner["rccclingo"] = 1 << 7
+reasoner["shawndlv"] = 1 << 8
 
 encode = {}
 encode[0] = 0                                  # null encoding
@@ -145,3 +146,36 @@ encode["mncb"] = encode["mn"] | encode["cb"]
 encode["mnvr"] = encode["mn"] | encode["vr"]
 encode["mnob"] = encode["mn"] | encode["ob"]
 encode["mnct"] = encode["mn"] | encode["ct"]
+
+shawnrcc5 = {}
+shawnrcc5["!"] = 16
+shawnrcc5["<"] = 1
+shawnrcc5["="] = 8
+shawnrcc5[">"] = 4
+shawnrcc5["><"] = 2
+shawnrcc5["{=, >}"] = 12
+shawnrcc5["{=, <}"] = 9
+shawnrcc5["{=, !}"] = 24
+shawnrcc5["{=, ><}"] = 10
+shawnrcc5["{>, <}"] = 5
+shawnrcc5["{>, !}"] = 20
+shawnrcc5["{>, ><}"] = 6
+shawnrcc5["{<, !}"] = 17
+shawnrcc5["{<, ><}"] = 3
+shawnrcc5["{!, ><}"] = 18
+shawnrcc5["{=, >, <}"] = 13
+shawnrcc5["{=, >, !}"] = 28
+shawnrcc5["{=, >, ><}"] = 14
+shawnrcc5["{=, <, !}"] = 25
+shawnrcc5["{=, <, ><}"] = 11
+shawnrcc5["{=, !, ><}"] = 26
+shawnrcc5["{>, <, !}"] = 21
+shawnrcc5["{>, <, ><}"] = 7
+shawnrcc5["{>, !, ><}"] = 22
+shawnrcc5["{<, !, ><}"] = 19
+shawnrcc5["{=, >, <, !}"] = 29
+shawnrcc5["{=, >, <, ><}"] = 15
+shawnrcc5["{=, >, !, ><}"] = 30
+shawnrcc5["{=, <, !, ><}"] = 27
+shawnrcc5["{>, <, !, ><}"] = 23
+shawnrcc5["{=, >, <, !, ><}"] = 31

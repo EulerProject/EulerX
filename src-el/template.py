@@ -419,6 +419,15 @@ class template:
               + 'rel(X,Y,"!") :- dr(X,Y), concept(X,T1), concept(Y,T2), T1 < T2.\n'\
               + 'rel(X,Y,"><") :- po(X,Y), concept(X,T1), concept(Y,T2), T1 < T2.\n'\
               + '#show rel/3.\n'
+              
+    shawndlvDc  = '\n\n% Decoding\n'\
+              + 'finalans(N1,X,Y) :- ans(N1,X,Y), ans(N2,X,Y), N1 <= N2.\n'\
+              + 'rel(X,Y,R) :- finalans(R,X,Y), concept(X,T1), concept(Y,T2), T1 < T2.\n'
+#               + 'rel(X,Y,"=") :- eq(X,Y), concept(X,T1), concept(Y,T2), T1 < T2.\n'\
+#               + 'rel(X,Y,"<") :- pp(X,Y), concept(X,T1), concept(Y,T2), T1 < T2.\n'\
+#               + 'rel(X,Y,">") :- pi(X,Y), concept(X,T1), concept(Y,T2), T1 < T2.\n'\
+#               + 'rel(X,Y,"!") :- dr(X,Y), concept(X,T1), concept(Y,T2), T1 < T2.\n'\
+#               + 'rel(X,Y,"><") :- po(X,Y), concept(X,T1), concept(Y,T2), T1 < T2.\n'
              
     # Binary encoding base constraints
     @Callable
@@ -475,3 +484,7 @@ class template:
     @Callable
     def getRCCClingoDc():
         return template.rccclingoDc
+
+    @Callable
+    def getShawnDLVDc():
+        return template.shawndlvDc

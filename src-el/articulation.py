@@ -169,6 +169,31 @@ class Articulation:
         
         result = result[:-3] + ".\n"
         return result 
+
+    def toShawnASP(self, align, rnr):
+        name1 = self.taxon1.dlvName()
+        name2 = self.taxon2.dlvName()
+        relpreds = ""
+#         if reasoner[rnr] == reasoner["shawndlv"]:
+#             disjunctive = " v "
+#         elif reasoner[rnr] == reasoner["rccclingo"]:
+#             disjunctive = " ; " 
+        result = ""
+        
+        # order : dr eq pi po pp
+        if self.relations & rcc5["disjoint"]:
+            relpreds += "dr"
+        if self.relations & rcc5["equals"]:
+            relpreds += "eq"
+        if self.relations & rcc5["includes"]:
+            relpreds += "pi"
+        if self.relations & rcc5["overlaps"]:
+            relpreds += "po"
+        if self.relations & rcc5["is_included_in"]:
+            relpreds += "pp"
+        
+        result = "r(" + relpreds + ", " + name1 + ", " + name2 + ").\n"
+        return result
     
     def toASP(self, enc, rnr, align):
         result = ""

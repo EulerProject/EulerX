@@ -174,6 +174,10 @@ class TaxonomyMapping:
             self.stylesheetdir = self.path + "/../default_stylesheet/"
         elif not os.listdir(self.stylesheetdir):
             self.stylesheetdir = self.path + "/../default_stylesheet/"
+            
+        if reasoner[self.args['-r']] == reasoner["shawndlv"]:
+            self.shawnrcc5file = self.path + "/shawnRCC5"
+            self.shawncoveragefile = self.path + "/shawnCoverage"
                 
         #if self.args.inputViz or self.args.function == "inputviz":
         #    return
@@ -312,6 +316,9 @@ class TaxonomyMapping:
         elif reasoner[self.args['-r']] == reasoner["rccclingo"]:
             # possible world command
             self.com = "clingo 0 "+ self.pwfile + " | "+self.path+"/muniq -u"
+        elif reasoner[self.args['-r']] == reasoner["shawndlv"]:
+            # possible world command
+            self.com = "dlv -silent -stats -filter=rel -n="+ self.args['-n']+" "+self.shawnrcc5file+" "+self.shawncoveragefile+" "+self.pwfile+" | "+self.path+"/muniq -u"
 #        elif reasoner[self.args['-r']] == reasoner["rcc1"]:
 #            if self.args['--pw']:
 #                self.com = "mir.py " + self.args['<inputfile>'][0] + " " + self.shawnoutput + " f t f"
@@ -370,6 +377,10 @@ class TaxonomyMapping:
         if reasoner[self.args['-r']] == reasoner["rccdlv"] or reasoner[self.args['-r']] == reasoner["rccclingo"]:
             self.genRCCASP()
             self.genPW()
+            return
+        if reasoner[self.args['-r']] == reasoner["shawndlv"]:
+            self.genShawnASP()
+            self.genShawnASPMir()
             return
         if reasoner[self.args['-r']] == reasoner["rcc1"]:
             self.rccWarningMessenger()
@@ -666,7 +677,7 @@ class TaxonomyMapping:
     def isNone(self, output):
         if reasoner[self.args['-r']] == reasoner["clingo"] or reasoner[self.args['-r']] == reasoner["rccclingo"]:
             return output.find("Models       : 0 ") != -1
-        elif reasoner[self.args['-r']] == reasoner["dlv"] or reasoner[self.args['-r']] == reasoner["rccdlv"]:
+        elif reasoner[self.args['-r']] == reasoner["dlv"] or reasoner[self.args['-r']] == reasoner["rccdlv"] or reasoner[self.args['-r']] == reasoner["shawndlv"]:
             return output.find("{") == -1
         elif reasoner[self.args['-r']] == reasoner["rcc1"]:
             return output.find("Consistent") == -1
@@ -690,6 +701,45 @@ class TaxonomyMapping:
     def isUniqueOrIncon(self, output):
         return self.isNone(output) or self.isUnique(output)
 
+    def genShawnASP(self):
+        # generate concepts
+        tid = 0
+        self.baseAsp = "%%% Universe of concepts\n"
+        for key in self.taxonomies.keys():
+            for taxon in self.taxonomies[key].taxa.keys():
+                t = self.taxonomies[key].taxa[taxon]
+                self.baseAsp += "concept(" + t.dlvName() + ", " + tid.__str__() +").\n"
+            tid = tid + 1
+            
+        # generate tinytree
+        for key in self.taxonomies.keys():
+            queue = copy.deepcopy(self.taxonomies[key].roots)
+            while len(queue) != 0:
+                t = queue.pop(0)
+                if t.hasChildren():
+                    self.baseAsp += "\n%% Tiny Tree for " + t.dlvName() +"\n"
+                    self.baseAsp += "tt(" + t.dlvName() + ", "
+                    for child in t.children:
+                        self.baseAsp += child.dlvName() + ", "
+                    self.baseAsp = self.baseAsp[:-2] + ").\n"
+                        
+        # generate articulations
+        relationNum = 0
+        self.baseAsp += "\n%%% Articulations\n"
+        for i in range(len(self.articulations)):
+            artStr = self.articulations[i].string
+            self.baseAsp += "% " + artStr + "\n"
+            self.baseAsp += self.articulations[i].toShawnASP(self, self.args['-r']) + "\n"
+        
+        # decoding
+        self.baseAsp += template.getShawnDLVDc()
+        
+        # prepare the asp file
+        fdlv = open(self.pwfile, 'w')
+        fdlv.write(self.baseAsp)
+        fdlv.close()
+        return
+    
     def genRCCASP(self):
         disjunctive = ""
         if reasoner[self.args['-r']] == reasoner["rccdlv"]:
@@ -3944,6 +3994,39 @@ class TaxonomyMapping:
         f.write('mir = ' + repr(tmpmir) + '\n')
         f.write('inputoverlaps = ' + repr(self.inputoverlaps) + '\n')
         f.close()
+        
+        return
+    
+    def genShawnASPMir(self):
+        self.pw = newgetoutput(self.com)
+        if self.pw == "":
+            print "DLV stopped unexpectedly"
+            exit(0)
+        if self.isPwNone():
+            print "************************************"
+            print "Input is inconsistent\n"
+        
+        rels = []
+        mirList = []
+        
+        raw = self.pw.split("\n")
+        for line in raw:
+            if line.find("{") != -1:
+                line = re.match("(.*)\{(.*)\}(.*)", line).group(2)
+                rels = line.split(", ")
+                break
+        
+        for rel in rels:
+            items = rel.replace("rel(","").replace(")","").split(",")
+            mirList.append([self.dlvName2dot(items[0]), findkey(shawnrcc5, int(items[2])), self.dlvName2dot(items[1])])
+        
+        # sorted the mirList
+        print "#########"
+        fmir = open(self.mirfile, 'w')
+        for pair in sorted(mirList, key=itemgetter(0,2)):
+            print pair[0], pair[1], pair[2]
+            fmir.write(pair[0] + ',' + pair[1] + ',' + pair[2] + '\n')            
+        fmir.close()
         
         return
     
