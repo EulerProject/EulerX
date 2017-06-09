@@ -548,7 +548,7 @@ class TaxonomyMapping:
     def testConsistency(self):
         if reasoner[self.args['-r']] == reasoner["clingo"]:
             com = "clingo 1 "+self.pwfile+" "+ self.pwswitch
-            if newgetoutput(com).find("Models       : 0 ") != -1:
+            if newgetoutput(com).find("Models       : 0") != -1:
                 return False
         else:
             com = "dlv -silent -stats -filter=rel -n=1 "+self.pwfile+" "+self.pwswitch
@@ -676,7 +676,7 @@ class TaxonomyMapping:
 
     def isNone(self, output):
         if reasoner[self.args['-r']] == reasoner["clingo"] or reasoner[self.args['-r']] == reasoner["rccclingo"]:
-            return output.find("Models       : 0 ") != -1
+            return output.find("Models       : 0") != -1
         elif reasoner[self.args['-r']] == reasoner["dlv"] or reasoner[self.args['-r']] == reasoner["rccdlv"] or reasoner[self.args['-r']] == reasoner["shawndlv"]:
             return output.find("{") == -1
         elif reasoner[self.args['-r']] == reasoner["rcc1"]:
@@ -720,6 +720,7 @@ class TaxonomyMapping:
                     self.baseAsp += "\n%% Tiny Tree for " + t.dlvName() +"\n"
                     self.baseAsp += "tt(" + t.dlvName() + ", "
                     for child in t.children:
+                        queue.append(child)
                         self.baseAsp += child.dlvName() + ", "
                     self.baseAsp = self.baseAsp[:-2] + ").\n"
                         
@@ -4005,6 +4006,7 @@ class TaxonomyMapping:
         if self.isPwNone():
             print "************************************"
             print "Input is inconsistent\n"
+            return
         
         rels = []
         mirList = []
