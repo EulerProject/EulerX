@@ -174,7 +174,7 @@ class Articulation:
         name1 = self.taxon1.dlvName()
         name2 = self.taxon2.dlvName()
         relpreds = ""
-#         if reasoner[rnr] == reasoner["shawndlv"]:
+#         if reasoner[rnr] == reasoner["rcctt"]:
 #             disjunctive = " v "
 #         elif reasoner[rnr] == reasoner["rccclingo"]:
 #             disjunctive = " ; " 

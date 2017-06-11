@@ -175,7 +175,7 @@ class TaxonomyMapping:
         elif not os.listdir(self.stylesheetdir):
             self.stylesheetdir = self.path + "/../default_stylesheet/"
             
-        if reasoner[self.args['-r']] == reasoner["shawndlv"]:
+        if reasoner[self.args['-r']] == reasoner["rcctt"]:
             self.shawnrcc5file = self.path + "/shawnRCC5"
             self.shawncoveragefile = self.path + "/shawnCoverage"
                 
@@ -316,7 +316,7 @@ class TaxonomyMapping:
         elif reasoner[self.args['-r']] == reasoner["rccclingo"]:
             # possible world command
             self.com = "clingo 0 "+ self.pwfile + " | "+self.path+"/muniq -u"
-        elif reasoner[self.args['-r']] == reasoner["shawndlv"]:
+        elif reasoner[self.args['-r']] == reasoner["rcctt"]:
             # possible world command
             self.com = "dlv -silent -stats -filter=rel -n="+ self.args['-n']+" "+self.shawnrcc5file+" "+self.shawncoveragefile+" "+self.pwfile+" | "+self.path+"/muniq -u"
 #        elif reasoner[self.args['-r']] == reasoner["rcc1"]:
@@ -378,7 +378,7 @@ class TaxonomyMapping:
             self.genRCCASP()
             self.genPW()
             return
-        if reasoner[self.args['-r']] == reasoner["shawndlv"]:
+        if reasoner[self.args['-r']] == reasoner["rcctt"]:
             self.genShawnASP()
             self.genShawnASPMir()
             return
@@ -677,7 +677,7 @@ class TaxonomyMapping:
     def isNone(self, output):
         if reasoner[self.args['-r']] == reasoner["clingo"] or reasoner[self.args['-r']] == reasoner["rccclingo"]:
             return output.find("Models       : 0") != -1
-        elif reasoner[self.args['-r']] == reasoner["dlv"] or reasoner[self.args['-r']] == reasoner["rccdlv"] or reasoner[self.args['-r']] == reasoner["shawndlv"]:
+        elif reasoner[self.args['-r']] == reasoner["dlv"] or reasoner[self.args['-r']] == reasoner["rccdlv"] or reasoner[self.args['-r']] == reasoner["rcctt"]:
             return output.find("{") == -1
         elif reasoner[self.args['-r']] == reasoner["rcc1"]:
             return output.find("Consistent") == -1
@@ -3598,12 +3598,12 @@ class TaxonomyMapping:
         if isConsistent:
             numWorlds = self.countUberMirPW(outputUberMir)
             if numWorlds != 1:
-                worlds = self.createUberMirWorlds(originalUberMir, outputUberMir)
+                worlds = self.createUberMirWorlds(outputUberMir, outputUberMir)
                 for world in worlds:
                     newOutputUberMir = {}
                     isConsistent = self.runRCCReasonerPW(world, newOutputUberMir)
                     if isConsistent:
-                        self.runPW(world, newOutputUberMir)
+                        self.runPW(newOutputUberMir)
                     
 #        print self.countUberMirPW(finalMir)
 #        worlds = self.createUberMirWorlds(finalMir, finalMir)
@@ -3616,7 +3616,7 @@ class TaxonomyMapping:
 #            self.rccGenMirPW(finalMir)
         return
     
-    def runPW(self, OWorld, newOutputUberMir):
+    def runPW(self, newOutputUberMir):
         isConsistent = False
         numWorlds = self.countUberMirPW(newOutputUberMir)
         
@@ -3632,7 +3632,7 @@ class TaxonomyMapping:
                 anotherNewOutputUberMir = {}
                 isConsistent = self.runRCCReasonerPW(world, anotherNewOutputUberMir)
                 if isConsistent:
-                    self.runPW(OWorld, anotherNewOutputUberMir)
+                    self.runPW(anotherNewOutputUberMir)
         else:
             # print Possible Worlds
             print "\n\nPossible Worlds: ", self.numPWsInRCC
