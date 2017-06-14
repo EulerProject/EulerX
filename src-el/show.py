@@ -1674,9 +1674,9 @@ class ProductsShowing:
         fDot.write("node[shape=box] \n")
         fDot.write('{rank=top Intro [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
         intro = "<TR> \n <TD> Minimal Inconsistent Subsets (MIS) </TD> \n <TD> Red box </TD> \n </TR> \n" \
-              + "<TR> \n <TD> Maximal Consistent Subsets </TD> \n <TD> Green box </TD> \n </TR> \n" \
-              + "<TR> \n <TD> Minimal Unique Subsets </TD> \n <TD> Green octagon</TD> \n </TR> \n" \
-              + "<TR> \n <TD> Maximal Ambiguous Subsets </TD> \n <TD> Cyan diamond </TD> \n </TR> \n"
+              + "<TR> \n <TD> Maximal Consistent Subsets (MCS) </TD> \n <TD> Green box </TD> \n </TR> \n" \
+              + "<TR> \n <TD> Minimal Unique Subsets (MUS) </TD> \n <TD> Green octagon</TD> \n </TR> \n" \
+              + "<TR> \n <TD> Maximal Ambiguous Subsets (MAA) </TD> \n <TD> Cyan diamond </TD> \n </TR> \n"
         fDot.write(intro)
         fDot.write("</TABLE> \n >] } \n")
         fDot.write('}')
@@ -1690,14 +1690,14 @@ class ProductsShowing:
         else:
             newgetoutput("dot -Tpdf "+fourinoneLatDotFile+" -o "+fourinoneLatPdfFile)
             
-        self.removeInternalfiles("fourinone.internal")
+#         self.removeInternalfiles("fourinone.internal")
 
     def convertToIndex(self, s, power):
         result = ""
         num = int(s,2)
         for i in range(power):
             if num & 1 << i:
-                result += str(i) + ','
+                result += str(i+1) + ','   # let "i+1" to represent articulations starting from 1 instead of 0
         if len(result) == 0:
             result = 'None'
         else:

@@ -139,22 +139,27 @@ def genFourinone(latticedir, stylesheetdir, artDictbin, mis, mus, fourinoneinter
         if e not in rem:
             mcsBin.append(e)
 
-    supOfmus = []
-    for aMus in musBin:
-        supOfmus.extend(findAllSupsets(aMus, binCandidates))
-    tmpmaa = copy.deepcopy(binCandidates)
-    for e in binCandidates:
-        if supOfmus.count(e) > 0:
-            tmpmaa.remove(e)
-    maaBin = []
-    rem = []
-    for e1 in tmpmaa:
-        for e2 in tmpmaa:
-            if e1 != e2 and isSupset(e1,e2):
-                rem.append(e2)
-    for e in tmpmaa:
-        if e not in rem and supOfmis.count(e) == 0:
-            maaBin.append(e)
+    if len(musBin) == 0:
+        # mus is empty
+        maaBin = copy.deepcopy(mcsBin)
+    else:
+        # others
+        supOfmus = []
+        for aMus in musBin:
+            supOfmus.extend(findAllSupsets(aMus, binCandidates))
+        tmpmaa = copy.deepcopy(binCandidates)
+        for e in binCandidates:
+            if supOfmus.count(e) > 0:
+                tmpmaa.remove(e)
+        maaBin = []
+        rem = []
+        for e1 in tmpmaa:
+            for e2 in tmpmaa:
+                if e1 != e2 and isSupset(e1,e2):
+                    rem.append(e2)        
+        for e in tmpmaa:
+            if e not in rem and supOfmis.count(e) == 0:
+                maaBin.append(e)
 
     #print "mcsBin", mcsBin
     #print "maaBin", maaBin
