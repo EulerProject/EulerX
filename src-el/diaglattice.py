@@ -361,6 +361,86 @@ class DiagnosticLattice:
         outstr += 'Legend -> "None" [style=invis]\n'   
         outstr += "}"
         return outstr
+    
+    def reducedAmbLatViz(self, arts2NumPW):
+        outstr = ""
+        outstr += "digraph{\n"
+        outstr += "rankdir=BT\n"
+        outstr += 'node[fontname="Helvetica"]\n\n'
+        
+        # add nodes
+        if len(self.otherRed) > 0:
+            outstr += '"AllOtherRed" [shape=octagon color="#9f1684" fillcolor="#df77cb" style=solid penwidth=0.4]\n'
+        if len(self.otherGreen) > 0:
+            outstr += '"AllOtherGreen" [shape=box color="#134d9c" style=rounded penwidth=0.4]\n'
+        outstr += 'node[shape=octagon color="#9f1684" fillcolor="#df77cb" style=filled]\n'
+        for solidRed in self.allMIS:
+            label = ','.join(str(s+1) for s in solidRed)
+            if solidRed in arts2NumPW:
+                label = '"' + label +'" [label="' + label + '\\n(' + str(arts2NumPW[solidRed]) +')"]\n'
+            else:
+                label = '"' + label +'" [label="' + label + '"]\n'
+            outstr += label
+        outstr += 'node[shape=box color="#134d9c" fillcolor="#68b5e3" style="rounded,filled"]\n'
+        for solidGreen in self.allMCS:
+            if len(solidGreen) == 0:
+                outstr += '"None"\n'
+            else:
+                label = ','.join(str(s+1) for s in solidGreen)
+                if solidGreen in arts2NumPW:
+                    label = '"' + label +'" [label="' + label + '\\n(' + str(arts2NumPW[solidGreen]) +')"]\n'
+                else:
+                    label = '"' + label +'" [label="' + label + '"]\n'
+                outstr += label
+                
+        # add edges
+        outstr += '\nedge[style=dotted penwidth=0.4]\n\n'
+        if len(self.otherRed) > 0:
+            for solidRed in self.allMIS:
+                start = ','.join(str(s+1) for s in solidRed)
+                end = 'AllOtherRed'
+                outstr += '"' + start + '" -> "' + end +'" [color="#9c1382",label='+str(len(self.art)-len(solidRed))+']\n'
+        if len(self.otherGreen) > 0:
+            for solidGreen in self.allMCS:
+                start = 'AllOtherGreen'
+                if len(solidGreen) == 0:
+                    end = '"None"\n'
+                else:
+                    end = ','.join(str(s+1) for s in solidGreen)
+                outstr += '"' + start + '" -> "' + end +'" [dir=back color="#134d9c",label='+str(len(solidGreen))+']\n'
+        for edge in self.edgesBin:
+            if edge[0] in self.allMCS and edge[1] in self.allMIS:
+                if len(edge[0]) == 0:
+                    start = 'None'
+                else:
+                    start = ','.join(str(s+1) for s in edge[0])
+                end = ','.join(str(s+1) for s in edge[1])
+                outstr += '"' + start + '" -> "' + end +'" [arrowhead=none color="#0000FF" penwidth=2 style=solid]\n'
+        if len(self.otherGreen) > 0:
+            for mis in self.allMIS:
+                start = 'AllOtherGreen'
+                end = ','.join(str(s+1) for s in mis)
+                outstr += '"' + start + '" -> "' + end +'" [arrowhead=none color="#0000FF" penwidth=2 style=solid label='+str(len(mis))+']\n'
+        if len(self.otherRed) > 0:
+            for mcs in self.allMCS:
+                start = ','.join(str(s+1) for s in mcs)
+                end = 'AllOtherRed'
+                outstr += '"' + start + '" -> "' + end +'" [arrowhead=none color="#0000FF" penwidth=2 style=solid label='+str(len(self.art)-len(mcs))+']\n'
+        
+        # add legend
+        artsLabels = ""
+        for art in self.art:
+            artsLabels += "<TR> \n <TD>" + str(self.art.index(art)+1) + "</TD> \n <TD>" + art + "</TD> \n </TR> \n"
+        outstr += "node[shape=plaintext fontsize=12 color=black fillcolor=white] \n"
+        outstr += '{rank=top Legend [label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="2"> \n'
+        outstr += artsLabels
+        outstr += "</TABLE> \n >] } \n"
+        if len(self.otherGreen) > 0:
+            outstr += 'Legend -> "AllOtherGreen" [style=invis]\n'
+        else:
+            outstr += 'Legend -> "None" [style=invis]\n'
+        outstr += "}"
+        return outstr
          
 #         # generate the full lattice
 #         for solidRed in self.allMIS:

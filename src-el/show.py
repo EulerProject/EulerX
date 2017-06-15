@@ -1804,19 +1804,32 @@ class ProductsShowing:
 
         diagShower = DiagnosticLattice(allMUS, inputFile)
         diagShower.genLattice()
-        fullAmbLatstr = diagShower.fullAmbLatViz(it.arts2NumPW)
         
         # create the visualization file
-        fullAmbLatDotFile = os.path.join(self.latticedir, self.name+"_amblat.gv")
-        fullAmbLatPdfFile = os.path.join(self.latticedir, self.name+"_amblat.pdf")
-        fullAmbLatSvgFile = os.path.join(self.latticedir, self.name+"_amblat.svg")
-        fullAmbLatViz = open(fullAmbLatDotFile, 'w')
-        fullAmbLatViz.write(fullAmbLatstr)
-        fullAmbLatViz.close()
-        if self.args['--svg']:
-            newgetoutput("dot -Tsvg "+fullAmbLatDotFile+" -o "+fullAmbLatSvgFile)
-        else:
-            newgetoutput("dot -Tpdf "+fullAmbLatDotFile+" -o "+fullAmbLatPdfFile)
+        if self.args['--full'] or (not self.args['--full'] and not self.args['--reduced']):
+            fullAmbLatstr = diagShower.fullAmbLatViz(it.arts2NumPW)
+            fullAmbLatDotFile = os.path.join(self.latticedir, self.name+"_fullamblat.gv")
+            fullAmbLatPdfFile = os.path.join(self.latticedir, self.name+"_fullamblat.pdf")
+            fullAmbLatSvgFile = os.path.join(self.latticedir, self.name+"_fullamblat.svg")
+            fullAmbLatViz = open(fullAmbLatDotFile, 'w')
+            fullAmbLatViz.write(fullAmbLatstr)
+            fullAmbLatViz.close()
+            if self.args['--svg']:
+                newgetoutput("dot -Tsvg "+fullAmbLatDotFile+" -o "+fullAmbLatSvgFile)
+            else:
+                newgetoutput("dot -Tpdf "+fullAmbLatDotFile+" -o "+fullAmbLatPdfFile)
+        if self.args['--reduced'] or (not self.args['--full'] and not self.args['--reduced']):
+            redAmbLatstr = diagShower.reducedAmbLatViz(it.arts2NumPW)
+            redAmbLatDotFile = os.path.join(self.latticedir, self.name+"_amblat.gv")
+            redAmbLatPdfFile = os.path.join(self.latticedir, self.name+"_amblat.pdf")
+            redAmbLatSvgFile = os.path.join(self.latticedir, self.name+"_amblat.svg")
+            redAmbLatViz = open(redAmbLatDotFile, 'w')
+            redAmbLatViz.write(redAmbLatstr)
+            redAmbLatViz.close()
+            if self.args['--svg']:
+                newgetoutput("dot -Tsvg "+redAmbLatDotFile+" -o "+redAmbLatSvgFile)
+            else:
+                newgetoutput("dot -Tpdf "+redAmbLatDotFile+" -o "+redAmbLatPdfFile)
             
         self.removeInternalfiles("mas.internal")
         self.removeInternalfiles("arts2NumPW.internal")
