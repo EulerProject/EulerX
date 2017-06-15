@@ -52,10 +52,12 @@ from inputViz import *
 from r32comptable import *
 from fourinone2 import genFourinone
 from rcc2Verbose import *
+from decompose import *
 from random import randint
 from time import localtime, strftime
 from operator import itemgetter
 from shutil import copyfile
+from __builtin__ import file
 
 class TaxonomyMapping:
 
@@ -2746,7 +2748,12 @@ class TaxonomyMapping:
 #             file.close()
         flag = ""
         
-        file = open(os.path.join(self.inputfilesdir, self.name+".txt"), "r")
+        if reasoner[self.args['-r']] == reasoner["rcctt"]:
+            decompose(os.path.join(self.inputfilesdir, self.name+".txt"), os.path.join(self.inputfilesdir, self.name+"_decompose.txt"))
+            file = open(os.path.join(self.inputfilesdir, self.name+"_decompose.txt"), "r")
+        else:
+            file = open(os.path.join(self.inputfilesdir, self.name+".txt"), "r")
+        
         lines = file.readlines()
         
         # used for input viz
@@ -4035,6 +4042,8 @@ class TaxonomyMapping:
         
         for rel in rels:
             items = rel.replace("rel(","").replace(")","").split(",")
+            if "fake" in items[0] or "fake" in items[1]:
+                continue
             mirList.append([self.dlvName2dot(items[0]), findkey(shawnrcc5, int(items[2])), self.dlvName2dot(items[1])])
         
         # sorted the mirList
