@@ -38,6 +38,7 @@ from subprocess import call
 from sets import Set
 from diaglattice import *
 from fileinput import filename
+from fourinone2 import isSupset,isSubset
 
 class ProductsShowing:
     
@@ -1606,6 +1607,7 @@ class ProductsShowing:
 #             else:
 #                 newgetoutput("dot -Tpdf "+fileFullDot+" -o "+fileFullPdf)        
 
+
     def showFourinoneLAT(self):
 #         # if this is a consistent example (there is at least one PW)
 #         if os.stat(os.path.join(self.pwinternalfilesdir, "mis.internal")).st_size == 0:
@@ -1627,7 +1629,7 @@ class ProductsShowing:
             
         it = imp.load_source('it', fourinoneInternalFile)
     
-        nodesBin = []
+        nodesBin = set()
         for node in it.nodes:
             nodeBin = bin(node)[2:]
             tmp = ""
@@ -1635,50 +1637,112 @@ class ProductsShowing:
                 for k in range(it.power-len(nodeBin)):
                     tmp = '0' + tmp
             nodeBin = tmp + nodeBin
-            nodesBin.append(nodeBin)
-        #print "nodesBin", nodesBin
+            nodesBin.add(nodeBin)
+        #print "nodesBin", nodesBin, len(nodesBin)
         
+        misBin = frozenset(it.misBin)
+        musBin = frozenset(it.musBin)
+        mcsBin = frozenset(it.mcsBin)
+        maaBin = frozenset(it.maaBin)
+        otherRed = set()
+        otherGreen = set()
+        
+        for amisBin in misBin:
+            for aNodeBin in nodesBin:
+                if aNodeBin != amisBin and isSupset(aNodeBin, amisBin):
+                    otherRed.add(aNodeBin)
+        
+        for amcsBin in mcsBin:
+            for aNodeBin in nodesBin:
+                if aNodeBin != amcsBin and isSubset(aNodeBin, amcsBin):
+                    otherGreen.add(aNodeBin)
+                    
+#         print "otherRed", otherRed, len(otherRed)
+#         print "otherGreen", otherGreen, len(otherGreen)
+        
+        mcsmusBin = mcsBin.intersection(musBin)
+        mcsmaaBin = mcsBin.intersection(maaBin)
+        mcsBin = mcsBin.difference(mcsmusBin).difference(mcsmaaBin)
+        
+        # generate viz
+        outstr = ""
+        outstr += "digraph {\n\nrankdir = BT\n\n"
+        outstr += 'node[fontname="Helvetica"]\n\n'
+        
+        # add nodes
+        # MIS
+        outstr += 'node[shape=octagon style="filled" fillcolor="#FFB0B0"];\n'
+        for nodeBin in misBin:
+            outstr += self.convertToIndex(nodeBin, it.power) + "\n"
+            
+        # MCS and MUS
+        outstr += 'node[shape=Mdiamond style="filled" fillcolor="#228B22"];\n'
+        for nodeBin in mcsmusBin:
+            outstr += self.convertToIndex(nodeBin, it.power) + "\n"
+        
+        # MCS and MAA
+        outstr += 'node[shape=Msquare style="filled" fillcolor="#228B22"];\n'
+        for nodeBin in mcsmaaBin:
+            outstr += self.convertToIndex(nodeBin, it.power) + "\n"
+        
+        # MCS
+        outstr += 'node[shape=octagon style="filled" fillcolor="#A0FFA0"];\n'
+        for nodeBin in mcsBin:
+            outstr += self.convertToIndex(nodeBin, it.power) + "\n" 
+            
+        # MUS
+        outstr += 'node[shape=diamond style="filled" fillcolor="#68b5e3"];\n'
+        for nodeBin in musBin:
+            outstr += self.convertToIndex(nodeBin, it.power) + "\n" 
+            
+        # MAA
+        outstr += 'node[shape=box style="filled" fillcolor="#68b5e3"];\n'
+        for nodeBin in maaBin:
+            outstr += self.convertToIndex(nodeBin, it.power) + "\n"     
+            
+        # other red
+        outstr += 'node[shape=octagon color="#FF0000" fillcolor="#FFB0B0" style=solid penwidth=0.4]\n'
+        for nodeBin in otherRed:
+            outstr += self.convertToIndex(nodeBin, it.power) + "\n"
+            
+        # other green
+        outstr += 'node[shape=box color="#006400" penwidth=0.4]\n'
+        for nodeBin in otherGreen:
+            outstr += self.convertToIndex(nodeBin, it.power) + "\n"
+        
+        # add edges
+        outstr += '\nedge[style=dotted penwidth=0.4]\n\n'
+        for edge in it.edges:
+            if edge[0] in otherRed or edge[1] in otherRed:
+                outstr += self.convertToIndex(edge[0], it.power) +  ' -> ' + self.convertToIndex(edge[1], it.power) + ' [color="#CC0000"]\n'
+            elif edge[0] in otherGreen or edge[1] in otherGreen:
+                outstr += self.convertToIndex(edge[0], it.power) +  ' -> ' + self.convertToIndex(edge[1], it.power) + ' [dir=back color="#006400"]\n'
+            else:
+                outstr += self.convertToIndex(edge[0], it.power) +  ' -> ' + self.convertToIndex(edge[1], it.power) + ' [arrowhead=none color="#0000FF" penwidth=2 style=solid]\n'
+
         fourinoneLatDotFile = os.path.join(self.latticedir, self.name+"_fourinonelat.gv")
         fDot = open(fourinoneLatDotFile, 'w')
-        fDot.write("digraph {\n\nrankdir = BT\n\n")
-         
-        for nodeBin in nodesBin:
-            if nodeBin in it.misBin:
-                fDot.write(self.convertToIndex(nodeBin, it.power) + ' [shape=box style="filled" fillcolor="#FF0000"];\n')
-            elif nodeBin in it.mcsBin and nodeBin in it.musBin:
-                fDot.write(self.convertToIndex(nodeBin, it.power) + ' [shape=octagon style="filled" fillcolor="#00FF00"];\n')
-            elif nodeBin in it.mcsBin and nodeBin in it.maaBin:
-                fDot.write(self.convertToIndex(nodeBin, it.power) + ' [shape=diamond style="filled" fillcolor="#00FFCC"];\n')
-            elif nodeBin in it.mcsBin:
-                fDot.write(self.convertToIndex(nodeBin, it.power) + ' [shape=box style="filled" fillcolor="#00FF00"];\n')
-            elif nodeBin in it.musBin:
-                fDot.write(self.convertToIndex(nodeBin, it.power) + ' [shape=octagon style="filled" fillcolor="#00FF00"];\n')
-            elif nodeBin in it.maaBin:
-                fDot.write(self.convertToIndex(nodeBin, it.power) + ' [shape=diamond style="filled" fillcolor="#00FFCC"];\n')
-            else:
-                fDot.write(self.convertToIndex(nodeBin, it.power) + ' [shape=box style="filled" fillcolor="#FFFFFF"];\n')
+        fDot.write(outstr)
         
-        for edge in it.edges:
-            fDot.write(self.convertToIndex(edge[0], it.power) +  ' -> ' + self.convertToIndex(edge[1], it.power) + ' [arrowhead=none]\n')
-        
-        # lengend
+        # legend
         artsLabels = ""
         sorted_artDictbin = sorted(it.artDictbin.items(), key=operator.itemgetter(1))
         for pair in sorted_artDictbin:
             artsLabels += "<TR> \n <TD>" + self.convertToIndex(str(bin(pair[1])[2:]),it.power)[1:-1] + "</TD> \n <TD>" + pair[0] + "</TD> \n </TR> \n"
-        fDot.write("node[shape=box] \n")
+        fDot.write("node[shape=box color=black] \n")
         fDot.write('{rank=top Legend [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
         fDot.write(artsLabels)
         fDot.write("</TABLE> \n >] } \n")
         fDot.write('Legend -> "None" [style=invis]\n')
-        fDot.write("node[shape=box] \n")
-        fDot.write('{rank=top Intro [fillcolor= white margin=0 label=< \n <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4"> \n' )
-        intro = "<TR> \n <TD> Minimal Inconsistent Subsets (MIS) </TD> \n <TD> Red box </TD> \n </TR> \n" \
-              + "<TR> \n <TD> Maximal Consistent Subsets (MCS) </TD> \n <TD> Green box </TD> \n </TR> \n" \
-              + "<TR> \n <TD> Minimal Unique Subsets (MUS) </TD> \n <TD> Green octagon</TD> \n </TR> \n" \
-              + "<TR> \n <TD> Maximal Ambiguous Subsets (MAA) </TD> \n <TD> Cyan diamond </TD> \n </TR> \n"
-        fDot.write(intro)
-        fDot.write("</TABLE> \n >] } \n")
+        fDot.write('subgraph cluster_key {\n')
+        fDot.write('label="Legend";\n')
+        fDot.write('kc6[label="MCS\nand\nMAA" shape=Msquare style="filled" fillcolor="#228B22"];\n')
+        fDot.write('kc5[label="MCS\nand\nMUS" shape=Mdiamond style="filled" fillcolor="#228B22"];\n')
+        fDot.write('kc4[label="MAA" shape=box style="filled" fillcolor="#68b5e3"];\n')
+        fDot.write('kc3[label="MUS" shape=diamond style="filled" fillcolor="#68b5e3"];\n')
+        fDot.write('kc2[label="MCS" shape=octagon style="filled" fillcolor="#A0FFA0"];\n')
+        fDot.write('kc1[label="MIS" shape=octagon style="filled" fillcolor="#FFB0B0"];\n')        
+        fDot.write('}\n')
         fDot.write('}')
         fDot.close()
         
@@ -1690,7 +1754,7 @@ class ProductsShowing:
         else:
             newgetoutput("dot -Tpdf "+fourinoneLatDotFile+" -o "+fourinoneLatPdfFile)
             
-#         self.removeInternalfiles("fourinone.internal")
+        self.removeInternalfiles("fourinone.internal")
 
     def convertToIndex(self, s, power):
         result = ""

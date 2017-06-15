@@ -1469,34 +1469,42 @@ class TaxonomyMapping:
                     # output mis
                     if not reasoner[self.args['-r']] == reasoner["rcc1"]:
                         lj = list(j)
-                        print "************************************"
                         f.write("MIS "+str(self.fixedCnt)+": [",)
-                        print "#",self.fixedCnt+1,"Min inconsistent subset : [",
+                        if not self.args['--fourinone']:
+                            print "************************************"
+                            print "#",self.fixedCnt+1,"Min inconsistent subset : [",
                         for i in range(len(lj)):
                             if i != 0:
                                 f.write(",")
-                                print ",",
+                                if not self.args['--fourinone']:
+                                    print ",",
                             f.write(self.artIndex.index(lj[i].string.strip()).__str__())
                             #print lj[i].ruleNum,":",lj[i].string,
-                            print lj[i].string,
+                            if not self.args['--fourinone']:
+                                print lj[i].string,
                         f.write("]\n")
-                        print "]"
-                        print "************************************"
+                        if not self.args['--fourinone']:
+                            print "]"
+                            print "************************************"
                         self.fixedCnt += 1
                     else:
                         lj = list(j)
-                        print "************************************"
                         f.write("MIS "+str(self.fixedCnt)+": [",)
-                        print "Min inconsistent subset ",self.fixedCnt,": [",
+                        if not self.args['--fourinone']:
+                            print "************************************"
+                            print "Min inconsistent subset ",self.fixedCnt,": [",
                         for i in range(len(lj)):
                             if i != 0:
                                 f.write(",")
-                                print ",",
+                                if not self.args['--fourinone']:
+                                    print ",",
                             f.write(self.shawnarticulations.index(lj[i].strip()).__str__())
-                            print lj[i],
+                            if not self.args['--fourinone']:
+                                print lj[i],
                         f.write("]\n")
-                        print "]"
-                        print "************************************"
+                        if not self.args['--fourinone']:
+                            print "]"
+                            print "************************************"
                         self.fixedCnt += 1
                         
                 # Ambiguity output
@@ -1505,18 +1513,20 @@ class TaxonomyMapping:
                     if not reasoner[self.args['-r']] == reasoner["rcc1"]:
                         lj = list(j)
                         tmplist = []
-                        print "************************************"
                         f.write("MAS "+str(self.fixedCnt)+": [",)
-                        print "#",self.fixedCnt+1,"Min articulation subset that makes unique PW : [",
+                        if not self.args['--fourinone']:
+                            print "************************************"
+                            print "#",self.fixedCnt+1,"Min articulation subset that makes unique PW : [",
                         for i in range(len(lj)):
                             if i != 0:
-                                f.write(",") 
-                                print ",",
+                                f.write(",")
+                                if not self.args['--fourinone']: 
+                                    print ",",
                             f.write(self.artIndex.index(lj[i].string.strip()).__str__())
                             #print lj[i].ruleNum,":",lj[i].string,
                             if not self.args['--fourinone']:
                                 self.genMinArtInput(lj[i].string, self.fixedCnt)
-                            print lj[i].string,
+                                print lj[i].string,
                             
     #                         # store for fourinone lattice
     #                         tmplist.append(lj[i].string)
@@ -1529,23 +1539,28 @@ class TaxonomyMapping:
     #                             self.misANDmus.append(tmplist)
     #                         
                         f.write("]\n")
-                        print "]"
-                        print "************************************"
+                        if not self.args['--fourinone']:
+                            print "]"
+                            print "************************************"
                         self.fixedCnt += 1
                     else:
                         lj = list(j)
-                        print "************************************"
                         f.write("MAS "+str(self.fixedCnt)+": [",)
-                        print "Min articulation subset that makes unique PW ",self.fixedCnt,": [",
+                        if not self.args['--fourinone']:
+                            print "************************************"
+                            print "Min articulation subset that makes unique PW ",self.fixedCnt,": [",
                         for i in range(len(lj)):
                             if i != 0:
                                 f.write(",")
-                                print ",",
+                                if not self.args['--fourinone']:
+                                    print ",",
                             f.write(self.shawnarticulations.index(lj[i].strip()).__str__())
-                            print lj[i],
+                            if not self.args['--fourinone']:
+                                print lj[i],
                         f.write("]\n")
-                        print "]"
-                        print "************************************"
+                        if not self.args['--fourinone']:
+                            print "]"
+                            print "************************************"
                         self.fixedCnt += 1
         
         # update justification set
