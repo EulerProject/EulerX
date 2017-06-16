@@ -370,7 +370,7 @@ class TaxonomyMapping:
         return taxa
 
     def rccWarningMessenger(self):
-        print "RCC reasoner is calling..."
+        #print "RCC reasoner is calling..."
         print "Only path-consistency is checked. The example may be actually inconsistent if", \
         "{<, >}, {!, <, >}, {<, >, =} or {!, < , >, =} show up in input articulations."
     
@@ -381,11 +381,13 @@ class TaxonomyMapping:
             self.genPW()
             return
         if reasoner[self.args['-r']] == reasoner["rcctt"]:
+            self.rccWarningMessenger()
             self.genShawnASP()
             self.genShawnASPMir()
             return
         if reasoner[self.args['-r']] == reasoner["rcc1"]:
             self.rccWarningMessenger()
+            print "Total ambiguous relation {=,>,<,!,><} is not showing up in mir\n"
             self.hashShawn()
             if self.args['--ambiguity']: # quick check for ambiguity
                 self.runShawnMir(self.shawninputhashed)
@@ -719,12 +721,16 @@ class TaxonomyMapping:
             while len(queue) != 0:
                 t = queue.pop(0)
                 if t.hasChildren():
-                    self.baseAsp += "\n%% Tiny Tree for " + t.dlvName() +"\n"
-                    self.baseAsp += "tt(" + t.dlvName() + ", "
-                    for child in t.children:
-                        queue.append(child)
-                        self.baseAsp += child.dlvName() + ", "
-                    self.baseAsp = self.baseAsp[:-2] + ").\n"
+                    if len(t.children) == 1:
+                        self.baseAsp += "\n%% Single Child for " + t.dlvName() +"\n"
+                        self.baseAsp += "r(eq," + t.dlvName() + "," + t.children[0].dlvName() + ").\n"
+                    else:
+                        self.baseAsp += "\n%% Tiny Tree for " + t.dlvName() +"\n"
+                        self.baseAsp += "tt(" + t.dlvName() + ", "
+                        for child in t.children:
+                            queue.append(child)
+                            self.baseAsp += child.dlvName() + ", "
+                        self.baseAsp = self.baseAsp[:-2] + ").\n"
                         
         # generate articulations
         relationNum = 0

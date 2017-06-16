@@ -60,6 +60,9 @@ r(R,X,Y) :- r(R1,X,Y), r(R2,X,Y), intersect(R1,R2,R).
 % don't want to derive empty
 :- r(empty,_,_).
 
+% disjunctive encoding - originally missing !!
+r(dreqpipopp,X,Y) :- concept(X,N1), concept(Y,N2), N1 != N2.
+
 % inverse rels 
 r(pi,Y,X) :- r(pp,X,Y).
 r(po,Y,X) :- r(po,X,Y).
