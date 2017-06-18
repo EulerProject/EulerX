@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+
+'''eclean -- "Euler clean files"
+Deletes internal Euler files (".internal"), starting in current working directory, 
+descending into all subdirectories recursively.
+'''
+ 
+import os
+ 
+rootDir = '.'             
+extension = ".internal"
+
+filecount = 0
+totalsize = 0
+
+for dirName, subdirList, fileList in os.walk(rootDir):
+    for fname in fileList:
+        if fname.lower().endswith(extension):
+            filecount += 1
+            pname = os.path.join(dirName, fname)
+            size = os.path.getsize(pname)             
+            totalsize += size
+            cmd = "rm " + pname
+            print cmd, "{0:,} bytes".format(size)
+#            os.system(cmd)
+
+print "Deleted {0:,} files, {1:,} bytes total".format(filecount, totalsize)
+
