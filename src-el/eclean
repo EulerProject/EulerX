@@ -2,16 +2,29 @@
 
 '''eclean -- "Euler clean files"
 Deletes internal Euler files (".internal"), starting in current working directory, 
-descending into all subdirectories recursively.
+descending into subdirectories recursively.
+
+See what might happen: 
+  $ eclean  
+
+Actually do the cleaning:
+  $ eclean doit
+
 '''
  
 import os
+import sys
  
 rootDir = '.'             
 extension = ".internal"
 
 filecount = 0
 totalsize = 0
+
+if len(sys.argv) == 2:
+    execute_rm = (sys.argv[1] == "doit")
+else:
+    execute_rm = False 
 
 for dirName, subdirList, fileList in os.walk(rootDir):
     for fname in fileList:
@@ -22,7 +35,13 @@ for dirName, subdirList, fileList in os.walk(rootDir):
             totalsize += size
             cmd = "rm " + pname
             print cmd, "{0:,} bytes".format(size)
-#            os.system(cmd)
+            if execute_rm:
+                os.system(cmd)
 
-print "Deleted {0:,} files, {1:,} bytes total".format(filecount, totalsize)
+if execute_rm:
+    print 'Deleted {0:,} files, {1:,} bytes total'.format(filecount, totalsize)   
+else:
+    print 'Run "eclean doit" to delete {0:,} files, {1:,} bytes total'.format(filecount, totalsize)
+
+
 
