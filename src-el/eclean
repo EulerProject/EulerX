@@ -14,9 +14,10 @@ Actually do the cleaning:
  
 import os
 import sys
+import re
  
 rootDir = '.'             
-extension = ".internal"
+extension = "internal"
 
 filecount = 0
 totalsize = 0
@@ -28,7 +29,7 @@ else:
 
 for dirName, subdirList, fileList in os.walk(rootDir):
     for fname in fileList:
-        if fname.lower().endswith(extension):
+        if "." in fname and re.match("(.*)\.(.*)", fname.lower()).group(2).startswith(extension):
             filecount += 1
             pname = os.path.join(dirName, fname)
             size = os.path.getsize(pname)             
