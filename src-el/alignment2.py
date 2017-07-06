@@ -58,6 +58,7 @@ from time import localtime, strftime
 from operator import itemgetter
 from shutil import copyfile
 from __builtin__ import file
+from Carbon.Aliases import false
 
 class TaxonomyMapping:
 
@@ -780,12 +781,14 @@ class TaxonomyMapping:
                             queue.append(t1)
                             self.baseAsp += "pp(" + t1.dlvName() + ", " + t.dlvName() + ").\n"    
                             
-                        self.baseAsp += "\n%% Sibling disjointness\n"
-                        for i in range(len(t.children) - 1):
-                            for j in range(i+1, len(t.children)):
-                                name1 = t.children[i].dlvName()
-                                name2 = t.children[j].dlvName()
-                                self.baseAsp += "dr(" + name1 + ", " + name2+ ").\n"
+                        if not self.args['--disablesib']:                            
+                            self.baseAsp += "\n%% Sibling disjointness\n"
+                            for i in range(len(t.children) - 1):
+                                for j in range(i+1, len(t.children)):
+                                    name1 = t.children[i].dlvName()
+                                    name2 = t.children[j].dlvName()
+                                    if not self.isInRCCASPLocalNoSib(t.children[i].dotName(), t.children[j].dotName()):
+                                        self.baseAsp += "dr(" + name1 + ", " + name2+ ").\n"
                             
         # generate articulations
         relationNum = 0
@@ -808,6 +811,15 @@ class TaxonomyMapping:
         fdlv.write(self.baseAsp)
         fdlv.close()
         return
+    
+    def isInRCCASPLocalNoSib(self, concept1, concept2):
+        if len(self.nosiblingdisjointness) == 0:
+            return False
+        else:
+            for pair in self.nosiblingdisjointness:
+                if concept1 in pair and concept2 in pair:
+                    return True
+            return False
     
     def genPW(self):
         self.pw = newgetoutput(self.com)
