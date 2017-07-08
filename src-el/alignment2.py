@@ -58,7 +58,6 @@ from time import localtime, strftime
 from operator import itemgetter
 from shutil import copyfile
 from __builtin__ import file
-from Carbon.Aliases import false
 
 class TaxonomyMapping:
 
