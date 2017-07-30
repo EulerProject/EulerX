@@ -3906,6 +3906,7 @@ class TaxonomyMapping:
 #             mirList.append([k[0].taxonomy.abbrev + "." + k[0].name, findkey(relation, v), k[1].taxonomy.abbrev + "." + k[1].name])
         
         # read shawn's output
+        mirFlag = True
         outputlines = []
         pwIndex = 0
         currentChunk = []
@@ -3920,7 +3921,11 @@ class TaxonomyMapping:
             
             if re.match("\[.*?\]", line):
                 currentChunk.append(line)
-                outputlines.append(line)
+                if mirFlag:
+                    outputlines.append(line)
+            
+            if line.startswith("Possible World"):
+                mirFlag = False
             
         chunks.append(currentChunk)
         
