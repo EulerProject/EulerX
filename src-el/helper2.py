@@ -59,9 +59,9 @@ def newgetoutput(cmd):
     else:
         return result[1]
 
-def createLastRunTimeStamp(fileName, user, host, timestamp, name):
+def createLastRunTimeStamp(fileName, user, timestamp, name):
     f = open(fileName, "w")
-    s = os.path.join(user, host, timestamp + '-' + name)
+    s = os.path.join(user, timestamp + '-' + name)
     f.write(s)
     f.write('\n')
     f.write(name)

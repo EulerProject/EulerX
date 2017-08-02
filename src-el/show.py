@@ -52,7 +52,7 @@ class ProductsShowing:
         self.projectdir = ''      # initiate the project folder to be the current folder
         self.lastrundir = ''
         #self.userdir = ''
-        self.lastruntimestamp = os.path.join(self.projectdir, self.runningUser, self.runningHost+'-lastrun.timestamp')
+        self.lastruntimestamp = os.path.join(self.projectdir, self.runningUser, 'lastrun.timestamp')
         self.exampleName = ''        
         if os.path.isfile(self.lastruntimestamp):
             f = open(self.lastruntimestamp, "r")

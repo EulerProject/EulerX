@@ -131,18 +131,19 @@ class TaxonomyMapping:
             self.userdir = os.path.join(self.projectdir, self.runningUser)
             if not os.path.exists(self.userdir):
                 os.mkdir(self.userdir)
-            self.hostdir = os.path.join(self.userdir, self.runningHost)
-            if not os.path.exists(self.hostdir):
-                os.mkdir(self.hostdir)
-            self.outputdir = os.path.join(self.hostdir, self.runningDate+"-"+self.name)
+#             self.hostdir = os.path.join(self.userdir, self.runningHost)
+#             if not os.path.exists(self.hostdir):
+#                 os.mkdir(self.hostdir)
+#             self.outputdir = os.path.join(self.hostdir, self.runningDate+"-"+self.name)
+            self.outputdir = os.path.join(self.userdir, self.runningDate+"-"+self.name)
         else:
             self.outputdir = os.path.join(self.args['-o'])
         
         # construct a last run time stamp for "show" command to track
         if args['align']:
             if not self.args['-o']:
-                self.lastrunfile = os.path.join(self.userdir, self.runningHost+'-lastrun.timestamp')
-                createLastRunTimeStamp(self.lastrunfile, self.runningUser, self.runningHost, self.runningDate, self.name)
+                self.lastrunfile = os.path.join(self.userdir, 'lastrun.timestamp')
+                createLastRunTimeStamp(self.lastrunfile, self.runningUser, self.runningDate, self.name)
             else:
                 self.lastrunfile = os.path.join(self.outputdir, 'lastrun.timestamp')
                 createLastRunName(self.lastrunfile, self.name)
@@ -151,7 +152,7 @@ class TaxonomyMapping:
         if not os.path.isfile(self.reportfile):
             f = open(self.reportfile, "w")
             writer = csv.writer(f, delimiter='\t')
-            writer.writerow(['USER','INPUT_FILE','#PWS','DURATION','START_TIME','END_TIME'])
+            writer.writerow(['USER','INPUT_FILE','#PWS','DURATION','RUNNING_HOST','START_TIME','END_TIME'])
             f.close()
         
         if not os.path.exists(self.outputdir):
@@ -3524,7 +3525,7 @@ class TaxonomyMapping:
 #         writer.writerow([self.runningDate, strftime("%Y-%m-%d-%H:%M:%S", localtime()), (time.time()-self.startTime).__str__(),\
 #                          self.name, self.npw.__str__()])
         writer.writerow([self.runningUser, self.name, self.npw.__str__(), 
-                         (time.time()-self.startTime).__str__(), self.runningDate, strftime("%Y-%m-%d-%H:%M:%S", localtime())])
+                         (time.time()-self.startTime).__str__(), self.runningHost, self.runningDate, strftime("%Y-%m-%d-%H:%M:%S", localtime())])
         f.close()
         
         
@@ -3653,6 +3654,8 @@ class TaxonomyMapping:
 #        
 #        if isConsistent:
 #            self.rccGenMirPW(finalMir)
+        
+        self.npw = self.numPWsInRCC
         return
     
     def runPW(self, newOutputUberMir):
@@ -3942,6 +3945,8 @@ class TaxonomyMapping:
                 self.prepareShawnInternal(chunks[i], pwIndex, tmptr)
                 pwIndex = pwIndex + 1
         
+        self.npw = pwIndex
+        
         fIn.close()
                 
 #        for pair in self.getAllTaxonPairs():
@@ -3987,7 +3992,7 @@ class TaxonomyMapping:
             
             if "{" in line:
                 print "MIR contains disjunctions, NO visualization."
-                exit(0)
+                return
             
             items = re.match("\[(.*)\ (.*)\ (.*)\]", line)
             node1 = items.group(1)
