@@ -148,10 +148,10 @@ class RCC2Verbose:
         f.close()
         
     def getNoPart12(self, t2):
-        print "\nPart (I) and Part (II) are not exist, " + t2.taxonomy.abbrev+'.'+t2.name + " has no parent or siblings"
+        print "\nPart (I) and Part (II) do not exist, because" + t2.taxonomy.abbrev+'.'+t2.name + " has no parent or siblings"
         
     def getNoPart56(self, t1):
-        print "\nPart (IV) and Part (V) are not exist, " + t1.taxonomy.abbrev+'.'+t1.name + " has no parent or siblings"
+        print "\nPart (IV) and Part (V) do not exist, because" + t1.taxonomy.abbrev+'.'+t1.name + " has no parent or siblings"
     
     def getNoChange(self):
         print "No change..."
