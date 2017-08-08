@@ -422,16 +422,19 @@ class TaxonomyMapping:
             return
         if reasoner[self.args['-r']] == reasoner["rcc2"]:
             self.rccWarningMessenger()
+            print "Coverage is not supported.\n"
             self.runRCCReasoner()
             self.updateReportFile(self.reportfile)
             return
         if reasoner[self.args['-r']] ==  reasoner["rcc2eq"]:
             self.rccWarningMessenger()
+            print "Coverage is not supported.\n"
             self.runRCCEQReasoner()
             self.updateReportFile(self.reportfile)
             return
         if reasoner[self.args['-r']] ==  reasoner["rcc2pw"]:
             self.rccWarningMessenger()
+            print "Coverage is not supported.\n"
             originalUberMir = {}
             originalUberMir = self.processInputFile()
             self.handleRCCPW(originalUberMir)
@@ -3656,6 +3659,9 @@ class TaxonomyMapping:
 #            self.rccGenMirPW(finalMir)
         
         self.npw = self.numPWsInRCC
+        
+#         self.prepareRCCInternal(chunk, pwIndex, tmptr)
+        
         return
     
     def runPW(self, newOutputUberMir):
@@ -3677,11 +3683,16 @@ class TaxonomyMapping:
                     self.runPW(anotherNewOutputUberMir)
         else:
             # print Possible Worlds
+            mirList = []
             print "\n\nPossible Worlds: ", self.numPWsInRCC
             for k,v in newOutputUberMir.iteritems():
                 print k[0].taxonomy.abbrev+"."+k[0].name, findkey(relation,v), k[1].taxonomy.abbrev+"."+k[1].name
+                mirList.append([k[0].taxonomy.abbrev+"."+k[0].name, findkey(relation,v), k[1].taxonomy.abbrev+"."+k[1].name])
+            tmptr = copy.deepcopy(self.tr)
+            self.prepareRCCInternal(mirList, self.numPWsInRCC, tmptr)
             self.numPWsInRCC = self.numPWsInRCC + 1
         return
+    
     
     def countUberMirPW(self, uberMir):
         num = 1
@@ -4231,7 +4242,7 @@ class TaxonomyMapping:
         
         # output all mirs
         self.rccGenMir()
-        
+                
         return
     
     def reverseArts(self, arts):
@@ -4473,24 +4484,29 @@ class TaxonomyMapping:
         toDo.put(deducedPair)
 #        toDo.append(deducedPair)
 
-    def rccGenMirPW(self, finalMir):
-        mirList = []
-        fmir = open(self.mirfile, 'w')
-        for k,v in finalMir.iteritems():
-            mirList.append([k[0].taxonomy.abbrev + "." + k[0].name, findkey(relation, v), k[1].taxonomy.abbrev + "." + k[1].name])
-        
-        # sorted the mirList
-        print "#########"
-        for pair in sorted(mirList, key=itemgetter(0,2)):
-            print pair[0], pair[1], pair[2]
-            fmir.write(pair[0] + ',' + pair[1] + ',' + pair[2] + '\n')            
-        fmir.close()
+#     def rccGenMirPW(self, finalMir):
+#         mirList = []
+#         fmir = open(self.mirfile, 'w')
+#         for k,v in finalMir.iteritems():
+#             mirList.append([k[0].taxonomy.abbrev + "." + k[0].name, findkey(relation, v), k[1].taxonomy.abbrev + "." + k[1].name])
+#         
+#         # sorted the mirList
+#         print "#########"
+#         for pair in sorted(mirList, key=itemgetter(0,2)):
+#             print pair[0], pair[1], pair[2]
+#             fmir.write(pair[0] + ',' + pair[1] + ',' + pair[2] + '\n')            
+#         fmir.close()
 
     def rccGenMir(self):
         mirList = []
         fmir = open(self.mirfile, 'w')
         for k,v in self.allPairsMir.iteritems():
             mirList.append([k[0].taxonomy.abbrev + "." + k[0].name, findkey(relation, v), k[1].taxonomy.abbrev + "." + k[1].name])
+        
+        # prepare internal for viz
+        pwIndex = 0
+        tmptr = copy.deepcopy(self.tr)
+        self.prepareRCCInternal(mirList, pwIndex, tmptr)
         
         # sorted the mirList
 #        for pair in sorted(mirList, key=itemgetter(3,0,2)):
@@ -4499,6 +4515,78 @@ class TaxonomyMapping:
             print pair[0], pair[1], pair[2]
             fmir.write(pair[0] + ',' + pair[1] + ',' + pair[2] + '\n')            
         fmir.close()
+        
+    
+    def prepareRCCInternal(self, mirList, pwIndex, tmptr):
+        # create intra-mir
+        tmpmir = {}
+        tmpeq = copy.deepcopy(self.eq)
+        for pair in self.getAllTaxonPairs():
+            if pair[0].taxonomy.abbrev == pair[1].taxonomy.abbrev:
+                intraRel = self.findRelWithinTaxonomy(pair[0], pair[1])
+                name1 = pair[0].taxonomy.abbrev + "." + pair[0].name
+                name2 = pair[1].taxonomy.abbrev + "." + pair[1].name
+                tmpmir[name1+","+name2] = relation[intraRel]
+                
+        for line in mirList:
+            
+            if "{" in line[1]:
+                print "MIR contains disjunctions, NO visualization."
+                return
+            
+#             items = re.match("\[(.*)\ (.*)\ (.*)\]", line)
+            node1 = line[0]
+            rel = line[1]
+            node2 = line[2]
+            
+            # create tr
+            if (rel == relationstr[1] or rel == relationstr[6]) and self.notInTr(node1, node2): # is_included_in
+                tmptr.append([node1, node2, 1])
+            if (rel == relationstr[3] or rel == relationstr[8]) and self.notInTr(node2, node1): # includes
+                tmptr.append([node2, node1, 1])
+                
+            # create inter-mir
+            tmpmir[node1+","+node2] = rcc5[rel]
+            
+        # create eq
+        for k,v in tmpmir.iteritems():
+            if v == relation["="]:
+                t1 = k.split(",")[0]
+                t2 = k.split(",")[1]
+                if t1 in tmpeq:
+                    tmpeq[t1].add(t2)
+                else:
+                    tmpeq[t1] = sets.Set([t2])
+                if t2 in tmpeq:
+                    tmpeq[t2].add(t1)
+                else:
+                    tmpeq[t2] = sets.Set([t1])
+            
+#        print "pwIndex= ", pwIndex
+#        print "tmptr= ", tmptr
+#        print "tmpmir=", tmpmir
+#        print "tmpeq=", tmpeq
+#        print ""
+        
+        # create internal file
+        f = open(self.pwinternalfile + pwIndex.__str__(), "w")
+        f.write('from sets import Set\n')
+        f.write('fileName = ' + repr(self.name + "_" + pwIndex.__str__() + "_" + self.args['-e']) + '\n')
+        f.write('pwIndex = ' + repr(pwIndex) + '\n')
+        f.write('eq = ' + repr(tmpeq) + '\n')
+        f.write('firstTName = ' + repr(self.firstTName) + '\n')
+        f.write('secondTName = ' + repr(self.secondTName) + '\n')
+        f.write('thirdTName = ' + repr(self.thirdTName) + '\n')
+        f.write('fourthTName = ' + repr(self.fourthTName) + '\n')
+        f.write('fifthTName = ' + repr(self.fifthTName) + '\n')
+        f.write('eqConLi = ' + repr(self.eqConLi) + '\n')
+        f.write('tr = ' + repr(tmptr) + '\n')
+        f.write('mir = ' + repr(tmpmir) + '\n')
+        f.write('inputoverlaps = ' + repr(self.inputoverlaps) + '\n')
+        f.close()
+        
+        return
+    
     
     # function that get the sum of depths of a pair of taxa
 #    def getDepthFromPair(self, taxonPair):
