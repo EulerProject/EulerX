@@ -478,6 +478,8 @@ class Articulation:
                 elif reasoner[rnr] == reasoner["clingo"]:
                     # TODO
                     result = ""
+            elif self.relations == (rcc5["equals"] | rcc5["includes"] | rcc5["is_included_in"] | rcc5["overlaps"] | rcc5["disjoint"]):
+                    result = ""
             elif self.relations == relation["+="]: # lsum
                 name3 = self.taxon3.dlvName()
                 result = AggregationRule(firstVar=name1, secondVar=name3, firstPredIsIn=False).rule
