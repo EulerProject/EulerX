@@ -30,7 +30,7 @@ sudo ln -s /workspaces/EulerX/dlv.x86-64-linux-elf-static.bin /usr/local/bin/dlv
 echo "Installing clingo and graphviz"
 conda install -c potassco clingo --yes
 conda update -n base -c defaults conda --yes
-conda install -c "conda-forge/label/cf201901" python-graphviz --yes
+conda install -c conda-forge python-graphviz --yes
 
 # Install Python dependencies
 echo "Installing Python dependencies"
