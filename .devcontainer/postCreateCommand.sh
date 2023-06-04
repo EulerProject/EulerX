@@ -16,8 +16,8 @@ echo "Removing existing DLV binary"
 sudo unlink /go/bin/dlv
 
 # Download the dlv binary
-echo "Downloading new DLV binary"
-wget https://www.dlvsystem.it/files/dlv.x86-64-linux-elf-static.bin
+# echo "Downloading new DLV binary"
+# wget https://www.dlvsystem.it/files/dlv.x86-64-linux-elf-static.bin
 
 # Change permissions to make the binary executable
 echo "Setting execute permissions for the DLV binary"
@@ -30,7 +30,7 @@ sudo ln -s /workspaces/EulerX/dlv.x86-64-linux-elf-static.bin /usr/local/bin/dlv
 # Install clingo and graphviz using conda
 echo "Installing clingo and graphviz"
 conda install -c potassco clingo --yes
-conda install -c anaconda graphviz --yes
+conda install -c conda-forge python-graphviz --yes
 
 # Install Python dependencies
 echo "Installing Python dependencies"
