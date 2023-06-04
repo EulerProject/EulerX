@@ -16,7 +16,7 @@ sudo unlink /go/bin/dlv
 
 # Download the dlv binary
 # echo "Downloading new DLV binary"
-# wget https://www.dlvsystem.it/files/dlv.x86-64-linux-elf-static.bin
+wget https://www.dlvsystem.it/files/dlv.x86-64-linux-elf-static.bin
 
 # Change permissions to make the binary executable
 echo "Setting execute permissions for the DLV binary"
