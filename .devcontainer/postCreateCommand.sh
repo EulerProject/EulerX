@@ -1,18 +1,9 @@
 #!/bin/bash
 
-# This script sets up a python 2.7 environment and installs necessary tools
-echo "Creating a Python 2.7 environment named 'py2'"
-
-# Create a Python 2.7 environment
-conda create --name py2 python=2.7 --yes
-
-# Activate the Python 2.7 environment
-echo "Activating Python 2.7 environment"
-source activate py2
-
-# Unlink existing dlv binary
-echo "Removing existing DLV binary"
-sudo unlink /go/bin/dlv
+# This script installs python2
+sudo apt update
+sudo apt install python2 --yes
+sudo ln -s /usr/bin/python2 /usr/local/bin/python
 
 # Download the dlv binary
 # echo "Downloading new DLV binary"
@@ -28,9 +19,13 @@ sudo ln -s /workspaces/EulerX/dlv.x86-64-linux-elf-static.bin /usr/local/bin/dlv
 
 # Install clingo and graphviz using conda
 echo "Installing clingo and graphviz"
-conda install -n root conda=4.6
-conda install -c conda-forge python-graphviz --yes
-conda install -c potassco clingo --yes
+sudo apt install graphviz --yes
+sudo apt install gringo --yes
+
+# Install pip
+wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
+sudo python2 get-pip.py
+sudo ln -s /usr/bin/pip2 /usr/local/bin/pip
 
 # Install Python dependencies
 echo "Installing Python dependencies"
