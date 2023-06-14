@@ -15,3 +15,5 @@
 *.yaml
 *.DS_Store
 *.out
+dlv.x86-64-linux-elf-static.bin
+get-pip.py
